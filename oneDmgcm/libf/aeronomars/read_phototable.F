@@ -19,10 +19,12 @@ c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
 ! to use  'getin'
+      USE netcdf
       USE ioipsl_getincom 
 
       implicit none
 c
+#include "netcdf.inc"
 #include "dimensions.h"
 #include "chimiedata.h"
 #include "datafile.h"
@@ -35,7 +37,19 @@ c
 c
       real xsza
       character(len=128) :: phototable ! photolysis table file name
+	  
+ccc Organic netCDF File 
+      character(len=128) :: netcdf_phototable ! photolysis for new organics
+      integer ncid    ! file ID
+      integer retval  ! Error code
+      real org_j(ntemp, nsza, 201, nozo, ntau)
+      integer orgvarid 
+      integer numorgs 
+      parameter(numorgs = 13)
+      character(len=30) organic_reactions(numorgs)
+      integer i 
 c
+      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
 ! set photolysis table input file name
@@ -65,6 +79,8 @@ c
 c
       print*, 'read photolysis lookup table ',trim(phototable)
 c
+
+
       do itau = 1,ntau
          do itemp = 1,ntemp
             do iozo = 1,nozo
@@ -73,8 +89,9 @@ c
                      read(fic,*) colairtab(iz), xsza, table_ozo(iozo)
 c                    print*, colairtab(iz), xsza, table_ozo(iozo)
                      read(fic,'(7e11.4)')
-     $               (jphot(itemp,isza,iz,iozo,itau,ij), ij= 1,nd)
-                     do ij = 1,nd
+     $               (jphot(itemp,isza,iz,iozo,itau,ij),
+     $                                       ij= 1, nd-numorgs)
+                     do ij = 1,nd-numorgs
                         if (jphot(itemp,isza,iz,iozo,itau,ij)
      $                     .eq. 1.e-30) then
                            jphot(itemp,isza,iz,iozo,itau,ij) = 0.
@@ -88,6 +105,73 @@ c                    print*, colairtab(iz), xsza, table_ozo(iozo)
 c
       print*, 'lookup table...ok'
       close(fic)
-c
+	  
+       
+       
+       
+       
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  New organic rate coefficients read in from a 
+c  netCDF file located in datafile      
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      ! NetCDF file name 
+       netcdf_phototable = "/jmars_organics.nc"
+       write(*,*) "NEW ORGANIC PHOTOLYSIS:"
+       WRITE(*,*) trim(datafile) // trim(netcdf_phototable)
+       retval = nf_open(trim(datafile) // trim(netcdf_phototable), 
+     $                        NF_NOWRITE, ncid)
+     
+       if (retval .ne. nf_noerr) call net_err(retval)
+
+
+C Create array with reaction name strings and iterate through to 
+c save file size
+       organic_reactions(1) = "CH3CHO -> CH3 + HCO"
+       organic_reactions(2) = "CH3CHO -> CH4 + CO"   
+       organic_reactions(3) = "CH3CHO -> CH3CO + H"
+       organic_reactions(4) = "HOCH2OOH -> HOCH2O. + OH"
+       organic_reactions(5) = "HOCH2CHO -> CH2OH + HCO"
+       organic_reactions(6) = "HOCH2CHO -> CH3OH + CO"
+       organic_reactions(7) = "HOCH2CHO -> CH2CHO + OH"
+       organic_reactions(8) = "CHOCHO -> HCO + HCO"
+       organic_reactions(9) = "CHOCHO -> H2 + 2CO"
+       organic_reactions(10) = "CHOCHO -> CH2O + CO"
+       organic_reactions(11) = "CH3COOH -> CH3 + COOH"
+       organic_reactions(12) = "CH3CO(OOH) -> Products"
+       organic_reactions(13) = "CH3COCO(OH) -> Products"
+       
+       
+       ! Iterate through the reaction strings and store
+       ! the values extracted from the netCDF table and
+       ! place in the jphot array
+
+       do i = 1, numorgs
+       
+       retval = nf_inq_varid(ncid,TRIM(organic_reactions(i)),orgvarid)
+       if (retval .ne. nf_noerr) call net_err(retval)
+       retval = nf_get_var_real(ncid, orgvarid, org_j)
+       if (retval .ne. nf_noerr) call net_err(retval)       
+
+       jphot(:,:,:,:,:,ij+i-1) = org_j
+	   
+
+       end do 
+       
+       retval = nf_close(ncid)
+       if (retval .ne. nf_noerr) call net_err(retval)       
+
       return
+      end
+
+      
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      subroutine net_err(errcode)
+      implicit none
+      include 'netcdf.inc'
+      integer errcode
+
+      print *, 'Error: ', nf_strerror(errcode)
+      stop 2
       end
