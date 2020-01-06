@@ -11,8 +11,8 @@ c*****************************************************************
 c
       subroutine photochemistry(lswitch, zycol, sza, ptimestep, 
      $                  press,temp, dens, dist_sol, surfdust1d,
-     $                  surfice1d, jo3, tau)
-c
+     $                  surfice1d, jo3, tau,pq,pdq)
+
       implicit none
 c
 #include "dimensions.h"
@@ -40,7 +40,8 @@ c
       real surfdust1d(nlayermx)  ! dust surface area (cm2/cm3)
       real surfice1d(nlayermx)   ! ice surface area (cm2/cm3)
       real tau                   ! optical depth at 7 hpa
-c
+      real pq(nlayermx,nqmx)   ! mixing ratios (mmrs)
+      real pdq(nlayermx,nqmx)  ! tracer tendency prior to photochem routine
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     output:
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -57,7 +58,8 @@ c
       integer nesp
       integer lswitch
 c
-      parameter (nesp = 16)      ! number of species in the chemistry
+      integer l
+      parameter (nesp = 58)      ! number of species in the chemistry (+1 for RO2)
 c
       real stimestep             ! standard timestep for the chemistry (s)
       real ctimestep             ! real timestep for the chemistry (s) 
@@ -83,31 +85,79 @@ c
       real h001(nlayermx), h002(nlayermx), h003(nlayermx),
      $     h004(nlayermx), h005(nlayermx)
       real t001(nlayermx), t002(nlayermx), t003(nlayermx)
-c
+ 
+cc    reaction rates from CAABA/MECCA 
+      real cab001(nlayermx), cab002(nlayermx), cab003(nlayermx),
+     $     cab004(nlayermx), cab005(nlayermx), cab006(nlayermx),
+     $     cab007(nlayermx), cab008(nlayermx), cab009(nlayermx),
+     $     cab010(nlayermx), cab011(nlayermx), cab012(nlayermx),
+     $     cab013(nlayermx), cab014(nlayermx), cab015(nlayermx),
+     $     cab016(nlayermx), cab017(nlayermx), cab018(nlayermx), 
+     $     cab019(nlayermx), cab020(nlayermx), cab021(nlayermx), 
+     $     cab022(nlayermx), cab023(nlayermx), cab024(nlayermx), 
+     $     cab025(nlayermx), cab026(nlayermx), cab027(nlayermx), 
+     $     cab028(nlayermx), cab029(nlayermx), cab030(nlayermx),
+     $     cab031(nlayermx), cab032(nlayermx), cab033(nlayermx),
+     $     cab034(nlayermx), cab035(nlayermx), cab036(nlayermx),
+     $     cab037(nlayermx), cab038(nlayermx), cab039(nlayermx),
+     $     cab040(nlayermx), cab041(nlayermx), cab042(nlayermx),
+     $     cab043(nlayermx), cab044(nlayermx), cab045(nlayermx),
+     $     cab046(nlayermx), cab047(nlayermx), cab048(nlayermx),
+     $     cab049(nlayermx), cab050(nlayermx), cab051(nlayermx),
+     $     cab052(nlayermx), cab053(nlayermx), cab054(nlayermx),
+     $     cab055(nlayermx), cab056(nlayermx), cab057(nlayermx),
+     $     cab058(nlayermx), cab059(nlayermx), cab060(nlayermx),
+     $     cab061(nlayermx), cab062(nlayermx), cab063(nlayermx),
+     $     cab064(nlayermx), cab065(nlayermx), cab066(nlayermx),
+     $     cab067(nlayermx), cab068(nlayermx), cab069(nlayermx),
+     $     cab070(nlayermx), cab071(nlayermx), cab072(nlayermx),
+     $     cab073(nlayermx), cab074(nlayermx), cab075(nlayermx),
+     $     cab076(nlayermx), cab077(nlayermx), cab078(nlayermx),
+     $     cab079(nlayermx), cab080(nlayermx), cab081(nlayermx),
+     $     cab082(nlayermx), cab083(nlayermx), cab084(nlayermx),
+     $     cab085(nlayermx), cab086(nlayermx), cab087(nlayermx),
+     $     cab088(nlayermx), cab089(nlayermx), cab090(nlayermx),
+     $     cab091(nlayermx), cab092(nlayermx), cab093(nlayermx),
+     $     cab094(nlayermx), cab095(nlayermx), cab096(nlayermx),
+     $     cab097(nlayermx), cab098(nlayermx), cab099(nlayermx),
+     $     cab100(nlayermx), cab101(nlayermx), cab102(nlayermx),
+     $     cab103(nlayermx), cab104(nlayermx), cab105(nlayermx),
+     $     cab106(nlayermx)
+
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     stimestep  : standard timestep for the chemistry (s)       c
 c     ctimestep  : real timestep for the chemistry (s)           c
 c     phychemrat : ratio physical/chemical timestep              c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
-      stimestep = 600. ! standard value : 10 mn
-c
+
+      stimestep = 600.
+
+
       phychemrat = nint(ptimestep/stimestep)
 c
       ctimestep = ptimestep/real(phychemrat)
+
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     initialisation of chemical species and families            c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
+
+
       call gcmtochim(zycol, lswitch, nesp, rm) 
-c
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     compute reaction rates                                     c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  
+
+
       call chemrates(lswitch, dens, press, temp,
-     $               surfdust1d, surfice1d,
+     $               surfdust1d, surfice1d, 
      $               a001, a002, a003,
      $               b001, b002, b003, b004, b005, b006,
      $               b007, b008, b009,
@@ -117,7 +167,29 @@ c
      $               d001, d002, d003,
      $               e001, e002, e003,
      $               h001, h002, h003, h004, h005,
-     $               t001, t002, t003, tau)
+     $               t001, t002, t003, tau,
+     $               cab001, cab002, cab003, cab004, cab005,
+     $               cab006, cab007, cab008, cab009, cab010,
+     $               cab011, cab012, cab013, cab014, cab015,
+     $               cab016, cab017, cab018, cab019, cab020,
+     $               cab021, cab022, cab023, cab024, cab025,
+     $               cab026, cab027, cab028, cab029, cab030,
+     $               cab031, cab032, cab033, cab034, cab035,
+     $               cab036, cab037, cab038, cab039, cab040,
+     $               cab041, cab042, cab043, cab044, cab045,
+     $               cab046, cab047, cab048, cab049, cab050,
+     $               cab051, cab052, cab053, cab054, cab055,
+     $               cab056, cab057, cab058, cab059, cab060,
+     $               cab061, cab062, cab063, cab064, cab065,
+     $               cab066, cab067, cab068, cab069, cab070,
+     $               cab071, cab072, cab073, cab074, cab075,
+     $               cab076, cab077, cab078, cab079, cab080,
+     $               cab081, cab082, cab083, cab084, cab085,
+     $               cab086, cab087, cab088, cab089, cab090,
+     $               cab091, cab092, cab093, cab094, cab095,
+     $               cab096, cab097, cab098, cab099, cab100,
+     $               cab101, cab102, cab103, cab104, cab105,
+     $               cab106)
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     interpolation of photolysis rates in the lookup table      c
@@ -126,16 +198,18 @@ c
       i_co2 = 1
       i_o3  = 6 
 c
+
       do lev = 1,lswitch-1
          rmco2(lev) = rm(lev,i_co2)
          rmo3(lev)  = rm(lev, i_o3)
       end do
 c
+
+
       call phot(lswitch, press, temp, sza, tau, dist_sol, 
      $          rmco2, rmo3, j)
-c
+      
       j_o3_o1d = 5
-c
       do lev = 1,lswitch-1
          jo3(lev) = j(lev,j_o3_o1d)
       end do
@@ -143,10 +217,13 @@ c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     loop over time within the physical timestep                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
+      
       do istep = 1,phychemrat
-         call chimie(lswitch,nesp, rm, j, dens, ctimestep, 
-     $               press, temp, sza, dist_sol,
+
+c =================================================================
+
+         call chimie(lswitch,nesp, rm, j, dens, ctimestep,
+     $               press, temp, sza, dist_sol, 
      $               a001, a002, a003,
      $               b001, b002, b003, b004, b005, b006,
      $               b007, b008, b009,
@@ -156,22 +233,49 @@ c
      $               d001, d002, d003,
      $               e001, e002, e003,
      $               h001, h002, h003, h004, h005,
-     $               t001, t002, t003)
+     $               t001, t002, t003,
+     $               cab001, cab002, cab003, cab004, cab005,
+     $               cab006, cab007, cab008, cab009, cab010,
+     $               cab011, cab012, cab013, cab014, cab015,
+     $               cab016, cab017, cab018, cab019, cab020,
+     $               cab021, cab022, cab023, cab024, cab025,
+     $               cab026, cab027, cab028, cab029, cab030,
+     $               cab031, cab032, cab033, cab034, cab035,
+     $               cab036, cab037, cab038, cab039, cab040,
+     $               cab041, cab042, cab043, cab044, cab045,
+     $               cab046, cab047, cab048, cab049, cab050,
+     $               cab051, cab052, cab053, cab054, cab055,
+     $               cab056, cab057, cab058, cab059, cab060,
+     $               cab061, cab062, cab063, cab064, cab065,
+     $               cab066, cab067, cab068, cab069, cab070,
+     $               cab071, cab072, cab073, cab074, cab075,
+     $               cab076, cab077, cab078, cab079, cab080,
+     $               cab081, cab082, cab083, cab084, cab085,
+     $               cab086, cab087, cab088, cab089, cab090,
+     $               cab091, cab092, cab093, cab094, cab095,
+     $               cab096, cab097, cab098, cab099, cab100,
+     $               cab101, cab102, cab103, cab104, cab105,
+     $               cab106)
+      
       end do
-c
+
+          
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     save chemical species for the gcm                          c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
+ 
+
       call chimtogcm(zycol, lswitch, nesp, rm) 
-c
+c      
+
+
       return
       end
 c
 c*****************************************************************
 c
-      subroutine chimie(lswitch, nesp, rm, j, dens, dt, 
-     $                  press, t, sza, dist_sol,
+      subroutine chimie(lswitch, nesp, rm, j, dens, dt,
+     $                  press, t, sza, dist_sol, 
      $                  a001, a002, a003,
      $                  b001, b002, b003, b004, b005, b006,
      $                  b007, b008, b009,
@@ -181,7 +285,29 @@ c
      $                  d001, d002, d003,
      $                  e001, e002, e003,
      $                  h001, h002, h003, h004, h005,
-     $                  t001, t002, t003)
+     $                  t001, t002, t003,
+     $               cab001, cab002, cab003, cab004, cab005,
+     $               cab006, cab007, cab008, cab009, cab010,
+     $               cab011, cab012, cab013, cab014, cab015,
+     $               cab016, cab017, cab018, cab019, cab020,
+     $               cab021, cab022, cab023, cab024, cab025,
+     $               cab026, cab027, cab028, cab029, cab030,
+     $               cab031, cab032, cab033, cab034, cab035,
+     $               cab036, cab037, cab038, cab039, cab040,
+     $               cab041, cab042, cab043, cab044, cab045,
+     $               cab046, cab047, cab048, cab049, cab050,
+     $               cab051, cab052, cab053, cab054, cab055,
+     $               cab056, cab057, cab058, cab059, cab060,
+     $               cab061, cab062, cab063, cab064, cab065,
+     $               cab066, cab067, cab068, cab069, cab070,
+     $               cab071, cab072, cab073, cab074, cab075,
+     $               cab076, cab077, cab078, cab079, cab080,
+     $               cab081, cab082, cab083, cab084, cab085,
+     $               cab086, cab087, cab088, cab089, cab090,
+     $               cab091, cab092, cab093, cab094, cab095,
+     $               cab096, cab097, cab098, cab099, cab100,
+     $               cab101, cab102, cab103, cab104, cab105,
+     $               cab106)
 c
 c*****************************************************************
 c
@@ -198,7 +324,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c      
       integer lswitch         ! interface level between chemistries
       integer nesp            ! number of species
-c
+c0.!
       real rm(nlayermx,nesp)  ! volume mixing ratios 
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -207,12 +333,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       real dens(nlayermx)     ! density (cm-3)
       real dt                 ! chemistry timestep (s) 
+      real ptimestep          ! physical timestep (s)
       real j(nlayermx,nd)     ! interpolated photolysis rates (s-1) 
       real press(nlayermx)    ! pressure (hpa)
       real t(nlayermx)        ! temperature (k)
       real sza                ! solar zenith angle (deg)
       real dist_sol           ! sun distance (au) 
-c
+      real pq(nlayermx,nqmx)  ! mixing ratios (mmr)
+      real pdq(nlayermx,nqmx) ! tracer tendency prior to photochem routine
 c     reaction rates
 c
       real a001(nlayermx), a002(nlayermx), a003(nlayermx)
@@ -230,29 +358,70 @@ c
       real h001(nlayermx), h002(nlayermx), h003(nlayermx),
      $     h004(nlayermx), h005(nlayermx)
       real t001(nlayermx), t002(nlayermx), t003(nlayermx)
-c
+      real cab001(nlayermx), cab002(nlayermx), cab003(nlayermx),
+     $     cab004(nlayermx), cab005(nlayermx), cab006(nlayermx),
+     $     cab007(nlayermx), cab008(nlayermx), cab009(nlayermx),
+     $     cab010(nlayermx), cab011(nlayermx), cab012(nlayermx),
+     $     cab013(nlayermx), cab014(nlayermx), cab015(nlayermx),
+     $     cab016(nlayermx), cab017(nlayermx), cab018(nlayermx), 
+     $     cab019(nlayermx), cab020(nlayermx), cab021(nlayermx), 
+     $     cab022(nlayermx), cab023(nlayermx), cab024(nlayermx), 
+     $     cab025(nlayermx), cab026(nlayermx), cab027(nlayermx), 
+     $     cab028(nlayermx), cab029(nlayermx), cab030(nlayermx),
+     $     cab031(nlayermx), cab032(nlayermx), cab033(nlayermx),
+     $     cab034(nlayermx), cab035(nlayermx), cab036(nlayermx),
+     $     cab037(nlayermx), cab038(nlayermx), cab039(nlayermx),
+     $     cab040(nlayermx), cab041(nlayermx), cab042(nlayermx),
+     $     cab043(nlayermx), cab044(nlayermx), cab045(nlayermx),
+     $     cab046(nlayermx), cab047(nlayermx), cab048(nlayermx),
+     $     cab049(nlayermx), cab050(nlayermx), cab051(nlayermx),
+     $     cab052(nlayermx), cab053(nlayermx), cab054(nlayermx),
+     $     cab055(nlayermx), cab056(nlayermx), cab057(nlayermx),
+     $     cab058(nlayermx), cab059(nlayermx), cab060(nlayermx),
+     $     cab061(nlayermx), cab062(nlayermx), cab063(nlayermx),
+     $     cab064(nlayermx), cab065(nlayermx), cab066(nlayermx),
+     $     cab067(nlayermx), cab068(nlayermx), cab069(nlayermx),
+     $     cab070(nlayermx), cab071(nlayermx), cab072(nlayermx),
+     $     cab073(nlayermx), cab074(nlayermx), cab075(nlayermx),
+     $     cab076(nlayermx), cab077(nlayermx), cab078(nlayermx),
+     $     cab079(nlayermx), cab080(nlayermx), cab081(nlayermx),
+     $     cab082(nlayermx), cab083(nlayermx), cab084(nlayermx),
+     $     cab085(nlayermx), cab086(nlayermx), cab087(nlayermx),
+     $     cab088(nlayermx), cab089(nlayermx), cab090(nlayermx),
+     $     cab091(nlayermx), cab092(nlayermx), cab093(nlayermx),
+     $     cab094(nlayermx), cab095(nlayermx), cab096(nlayermx),
+     $     cab097(nlayermx), cab098(nlayermx), cab099(nlayermx),
+     $     cab100(nlayermx), cab101(nlayermx), cab102(nlayermx),
+     $     cab103(nlayermx), cab104(nlayermx), cab105(nlayermx),
+     $     cab106(nlayermx)
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     local:
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       real hetero_ice, hetero_dust
 c
-      integer iesp, iter, l, niter
-      integer i_co2, i_co, i_o2, i_h2, i_h2o, i_h2o2, i_hox, i_ox,
-     $        i_o1d, i_o, i_o3, i_h, i_oh, i_ho2, i_ch4, i_n2
+      integer iesp, iter, l, niter, i, k
+
       integer j_o2_o, j_o2_o1d, j_co2_o, j_co2_o1d,
      $        j_o3_o1d, j_o3_o, j_h2o, j_hdo, j_h2o2,
      $        j_ho2, j_no2, j_ch4_ch3_h, j_ch4_1ch2_h2,
      $        j_ch4_3ch2_h_h, j_ch4_ch_h2_h, j_ch3o2h,
      $        j_ch2o_co, j_ch2o_hco, j_ch3oh, j_c2h6, j_hcl,
      $        j_hocl, j_clo, j_so2, j_so, j_h2s, j_so3,
-     $        j_hno3, j_hno4 
+     $        j_hno3, j_hno4,
+     $        j_ch3cho_ch3, j_ch3cho_ch4, j_ch3cho_h, 
+     $        j_hoch2ooh, j_hoch2cho_hco, j_hoch2cho_co,
+     $        j_hoch2cho_oh, j_glyox_hco, j_glyox_hcho,
+     $        j_glyox_h2, j_ch3cooh, j_ch3coooh, j_ch3cocooh
+
+    
 c
       parameter (hetero_ice  = 1.)   ! switch for het. chem. on ice clouds
       parameter (hetero_dust = 0.)   ! switch for het. chem. on dust
                                      ! hetero_dust = 0. advised for the moment
 c
-      parameter (niter = 5)          ! iterations in the chemical scheme
+      parameter (niter = 5)          ! iterations in the chemical scheme [originally 5]
 c
       real cc0(nlayermx,nesp)        ! initial number density (cm-3)
       real cc(nlayermx,nesp)         ! final number density (cm-3)
@@ -263,28 +432,80 @@ c
       real loss(nlayermx,nesp)       ! loss rate
 c
       real ro_o3, rh_ho2, roh_ho2, rno2_no
+      
+      real CHx(nlayermx)            ! Number density of CHx radicals
 c
+      integer activations, iq
+      real cc_prev(nlayermx,nesp)
+      
+      logical,save :: badvalues = .FALSE. 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     tracer numbering in the chemistry
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
-      i_co2    =  1
-      i_co     =  2
-      i_o      =  3
-      i_o1d    =  4
-      i_o2     =  5
-      i_o3     =  6
-      i_h      =  7
-      i_h2     =  8
-      i_oh     =  9
-      i_ho2    = 10 
-      i_h2o2   = 11
-      i_ch4    = 12
-      i_h2o    = 13
-      i_n2     = 14
-      i_hox    = 15
-      i_ox     = 16
-c
+       integer, parameter :: i_co2  =  1
+       integer, parameter :: i_co   =  2
+       integer, parameter :: i_o    =  3
+       integer, parameter :: i_o1d  =  4
+       integer, parameter :: i_o2   =  5
+       integer, parameter :: i_o3   =  6
+       integer, parameter :: i_h    =  7
+       integer, parameter :: i_h2   =  8
+       integer, parameter :: i_oh   =  9
+       integer, parameter :: i_ho2  = 10
+       integer, parameter :: i_h2o2 = 11
+!      Methane Oxidation
+       integer, parameter :: i_ch4  = 12
+       integer, parameter :: i_ch3  = 13 
+       integer, parameter :: i_ch3o2 = 14
+       integer, parameter :: i_ch3ooh = 15
+       integer, parameter :: i_ch3oh= 16
+       integer, parameter :: i_ch3o  = 17
+       integer, parameter :: i_hcho = 18
+       integer, parameter :: i_hcooh = 19
+       integer, parameter :: i_hoch2o2 = 20
+       integer, parameter :: i_hoch2oh = 21 
+       integer, parameter :: i_hoch2ooh = 22 
+       integer, parameter :: i_hco = 23
+!      Alkane Oxidation
+       integer, parameter :: i_c2h6 = 24
+       integer, parameter :: i_c2h5 = 25
+       integer, parameter :: i_c2h5o2 = 26
+       integer, parameter :: i_c2h5ooh = 27
+       integer, parameter :: i_c2h5oh = 28
+       integer, parameter :: i_hoch2ch2o2 = 29
+       integer, parameter :: i_hoch2ch2o = 30
+       integer, parameter :: i_ethgly = 31
+       integer, parameter :: i_hyetho2h = 32
+       integer, parameter :: i_ch3cho = 33
+       integer, parameter :: i_ch3choho2 = 34
+       integer, parameter :: i_ch3cooh = 35
+       integer, parameter :: i_ch3chohooh = 36
+       integer, parameter :: i_ch3co = 37
+       integer, parameter :: i_ch3cooo = 38
+       integer, parameter :: i_ch3coooh = 39
+       integer, parameter :: i_hcoch2o2 = 40
+       integer, parameter :: i_glyox = 41
+       integer, parameter :: i_hcoco = 42
+       integer, parameter :: i_hooch2cho = 43
+       integer, parameter :: i_hoch2cho = 44
+       integer, parameter :: i_hochcho = 45
+       integer, parameter :: i_hoch2co = 46
+       integer, parameter :: i_hoch2co3 = 47
+       integer, parameter :: i_hoch2co2h = 48
+       integer, parameter :: i_hcoco2h = 49
+       integer, parameter :: i_hoch2co3h = 50
+       integer, parameter :: i_hcoco3h = 51
+       integer, parameter :: i_hcoco3 = 52
+       integer, parameter :: i_ch2choh = 53
+!      Water, nitrogen, and Families
+       integer, parameter :: i_h2o  = 54
+       integer, parameter :: i_n2   = 55
+       integer, parameter :: i_hox  = 56
+       integer, parameter :: i_ox   = 57
+       integer, parameter :: i_RO2  = 58
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     numbering of photolysis rates
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -297,7 +518,7 @@ c
       j_o3_o         =  6      ! o3 + hv     -> o2 + o
       j_h2o          =  7      ! h2o + hv    -> h + oh
       j_hdo          =  8      ! hdo + hv    -> d + oh
-      j_h2o2         =  9      ! h2o2 + hv   -> oh + oh
+      j_h2o2         =  9      ! h2o2 + hv   -> oh + ohOLV
       j_ho2          =  10     ! ho2 + hv    -> oh + o
       j_no2          =  11     ! no2 + hv    -> no + o
       j_ch4_ch3_h    =  12     ! ch4 + hv    -> ch3 + h
@@ -318,7 +539,44 @@ c
       j_so3          =  27     ! so2 + hv    -> so2 + o
       j_hno3         =  28     ! hno3 + hv   -> oh + no2
       j_hno4         =  29     ! hno4 + hv   -> ho2 + no2
-c
+      
+      j_ch3cho_ch3   =  30     ! ch3cho + hv -> ch3 + hco 
+      j_ch3cho_ch4   =  31     ! ch3cho + hv -> ch4 + co 
+      j_ch3cho_h     =  32     ! ch3cho + hv -> ch3co + h 
+      j_hoch2ooh     =  33     ! hoch2ooh + hv -> hoch2o + oh 
+                               ! hoch2o + o2 -> hcooh + ho2 
+                               ! = hoch2ooh + o2 + hv -> hcooh + ho2 + oh
+                               ! handle via 
+      j_hoch2cho_hco =  34     ! hoch2cho + hv -> ch2oh + hco 
+      j_hoch2cho_co  =  35     ! hoch2cho + hv -> ch3oh + co
+      j_hoch2cho_oh  =  36     ! hoch2cho + hv -> ch2cho + oh 
+                               ! ch2cho + o2   -> hcoch2o2 
+                               ! hoch2cho + o2 + hv -> hcoch2o2 + oh
+      j_glyox_hco    =  37     ! glyoxal  + hv -> hco + hco 
+      j_glyox_h2     =  38     ! glyoxal  + hv -> h2 + 2co 
+      j_glyox_hcho   =  39     ! glyoxal  + hv -> hcho + co 
+      j_ch3cooh      =  40     ! ch3cooh  + hv -> ch3 + cooh 
+      j_ch3coooh     =  41     ! ch3c(o)ooh + hv -> ch3 + oh + co2 
+      j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products 
+      
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c New rates : Tropospheric Photochemistry of Ozone, its
+c  			  Precursors and the Hydroxyl Radical: A 3D
+c 			  modeling Study Considering Non-methane 
+C 			  Hydrocarbon - Rolf von Kuhlmann [2001]
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc =
+C                                ! hoch2ooh + hv -> hcooh + oh + ho2 [ = (ch3ooh + hv) ] (2)
+C                                ! hoch2co3h + hv -> hcho + ho2 + oh + co2 [ = (ch3ooh + hv) ] (2)
+C                                ! hcoco2h + hv -> 2.*ho2 + co + co2 [ = (hcho + hv -> co + h2)*3.95 ] (1)
+C                                ! ch3chohooh + hv -> ch3 + hcooh + oh [ = (ch3ooh + hv) ] (2)
+C                                ! hyetho2h + hv -> hoch2ch2o + oh [ = (ch3ooh + hv) ] (2)
+                                 ! hcoco3h + hv -> ho2 + co + oh + co2 [ = j_ch3o2h + SUM(j_hoch2cho)] (2)
+                                 ! hooch2cho + hv -> oh + hcho + co + ho2 [= j_ch3o2h + SUM(j_hoch2cho)] (2)
+c (1) : A model for studies of tropospheric ozone and nonmethane hydrocarbons: Model description and ozone results   
+c (2) : Sander et al. (2014) [CAABA 4.0]
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     volume mixing ratio -> density conversion
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -330,7 +588,9 @@ c
          end do
       end do
 c
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     co2 and nox number densities (cm-3)    
 c      
 c     nox mixing ratio: 6.e-10 (yung and demore, 1999)
@@ -338,14 +598,18 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       do l = 1,lswitch-1
          nox(l) = 6.e-10*dens(l)
+        
       end do 
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     loop over iterations in the chemical scheme
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
+
+
       do iter = 1,niter
-c
+       
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        nox species
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -372,6 +636,7 @@ c
 c
       end do
 c
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        hox species
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -380,9 +645,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        h/ho2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
+
       do l = 1,lswitch-1
-c
-         rh_ho2 = (c001(l)*cc(l,i_o)
+      
+          rh_ho2 = ( c001(l)*cc(l,i_o)
      $           + c004(l)*cc(l,i_h)
      $           + c005(l)*cc(l,i_h)
      $           + c006(l)*cc(l,i_h)
@@ -393,40 +659,178 @@ c
      $           + d003(l)*no(l)             ! ajout 20090401
      $           + j(l,j_ho2)
      $           + h001(l)*hetero_ice 
-     $           + h003(l)*hetero_dust)
+     $           + h003(l)*hetero_dust
+     $           + cab006(l)*cc(l,i_ch3o2)
+     $           + cab007(l)*cc(l,i_ch3o2)
+     $           + cab019(l)*cc(l,i_hcho)
+     $           + cab029(l)*cc(l,i_hoch2o2)*0.8
+     $           + cab043(l)*cc(l,i_c2h5o2)
+     $           + cab049(l)*cc(l,i_hoch2ch2o2)
+     $           + cab050(l)*cc(l,i_hoch2ch2o2)
+     $           + cab059(l)*cc(l,i_ch3cho)
+     $           + cab065(l)*cc(l,i_ch3choho2)
+     $           + cab072(l)*cc(l,i_ch3cooo)
+     $           + cab073(l)*cc(l,i_ch3cooo)
+     $           + cab074(l)*cc(l,i_ch3cooo)
+     $           + cab079(l)*cc(l,i_hcoch2o2)
+     $           + cab096(l)*cc(l,i_hoch2co3)
+     $           + cab097(l)*cc(l,i_hoch2co3)
+     $           + (cab002(l)*cc(l,i_o)*cc(l,i_ch4)*0.49
+     $                + cab005(l)*cc(l,i_ch3)*cc(l,i_o3)*0.956
+     $                + cab006(l)*cc(l,i_ch3)*cc(l,i_o)
+     $                + j(l,j_ch4_ch3_h)*cc(l,i_ch4)
+     $                + j(l,j_ch4_3ch2_h_h)*cc(l,i_ch4)*2.
+     $                + j(l,j_ch4_ch_h2_h)*cc(l,i_ch4)
+     $                + j(l,j_ch2o_hco)*cc(l,i_hcho)
+     $                + j(l,j_ch3oh)*cc(l,i_ch3oh)
+     $                + j(l,j_ch3cho_h)*cc(l,i_ch3cho))
+     $                /MAX(cc(l,i_ho2),dens(l)*1.e-30)
+     $           ) 
      $          /( c011(l)*cc(l,i_o2)
      $           + t001(l)*cc(l,i_h2o)
      $            /max(cc(l,i_h),dens(l)*1.e-30)   ! ajout 20090401
+     $           + cab027(l)*cc(l,i_hco)
+     $           + cab042(l)*cc(l,i_c2h5)
+     $           +    (cab011(l)*cc(l,i_ch3o2)*cc(l,i_oh)
+     $                + cab013(l)*cc(l,i_ch3oh)*cc(l,i_oh)
+     $                + cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
+     $                + cab028(l)*cc(l,i_hoch2o2)
+     $                + cab030(l)*cc(l,i_hoch2o2)*cc(l,i_ro2)
+     $                + cab032(l)*cc(l,i_hcooh)*cc(l,i_oh)
+     $                + cab035(l)*cc(l,i_hoch2oh)*cc(l,i_oh)
+     $                + cab041(l)*cc(l,i_c2h5)*cc(l,i_o2)
+     $                + 0.6*cab044(l)*cc(l,i_c2h5o2)*cc(l,i_ro2)
+     $                + 0.95*cab047(l)*cc(l,i_c2h5oh)*cc(l,i_oh)
+     $                + cab051(l)*cc(l,i_hoch2ch2o)*cc(l,i_o2)
+     $                + cab052(l)*cc(l,i_hoch2ch2o)
+     $                + cab053(l)*cc(l,i_ethgly)*cc(l,i_oh)
+     $                + cab056(l)*cc(l,i_hyetho2h)*cc(l,i_oh)
+     $                + cab062(l)*cc(l,i_ch2choh)*cc(l,i_oh)
+     $                + cab064(l)*cc(l,i_ch3choho2)
+     $                + cab078(l)*cc(l,i_hcoch2o2)*cc(l,i_ro2)*0.6
+     $                + cab090(l)*cc(l,i_hochcho)
+     $                + cab093(l)*cc(l,i_hoch2co3)*cc(l,i_ro2)
+     $                + cab098(l)*cc(l,i_hoch2co2h)*cc(l,i_oh)
+     $                + cab099(l)*cc(l,i_hcoco2h)*cc(l,i_oh)
+     $                + cab101(l)*cc(l,i_hoch2co3h)*cc(l,i_oh)
+     $                + cab104(l)*cc(l,i_hcoco3)*cc(l,i_ro2)
+     $                + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
+     $                + j(l,j_ch3o2h)*cc(l,i_hoch2ooh)
+     $                + j(l,j_ch3o2h)*cc(l,i_hoch2co3h)
+     $                + 2.*3.95*j(l,j_ch2o_co)*cc(l,i_hcoco2h)
+     $                + (j(l,j_ch3o2h) + j(l,j_hoch2cho_co)
+     $                   + j(l,j_hoch2cho_hco) + j(l,j_hoch2cho_oh))
+     $                   *cc(l,i_hcoco3h)
+     $                + (j(l,j_ch3o2h) + j(l,j_hoch2cho_co)
+     $                   + j(l,j_hoch2cho_hco) + j(l,j_hoch2cho_oh))
+     $                   *cc(l,i_hooch2cho) 
+     $                )
+     $                /MAX(cc(l,i_h),dens(l)*1.e-30)
      $           )
-c
+  
+  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        oh/ho2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
-         roh_ho2 = (c001(l)*cc(l,i_o)
+          
+          roh_ho2 = (c001(l)*cc(l,i_o)
      $            + c003(l)*cc(l,i_o3)*rh_ho2
      $            + 2.*c004(l)*cc(l,i_h)
      $            + 2.*c008(l)*cc(l,i_ho2)
      $            + c015(l)*cc(l,i_o3)
      $            + d003(l)*no(l)
      $            + j(l,j_ho2)
-     $            + 2.*b002(l)*cc(l,i_o1d)*cc(l,i_h2o)         ! ajout 20101210
-     $             /max(cc(l,i_ho2),dens(l)*1.e-30)            ! ajout 20101210
-     $            + b003(l)*cc(l,i_o1d)*cc(l,i_h2)             ! ajout 20101210
-     $             /max(cc(l,i_ho2),dens(l)*1.e-30)            ! ajout 20101210
-     $            + j(l,j_h2o)*cc(l,i_h2o)
-     $             /max(cc(l,i_ho2),dens(l)*1.e-30)
-     $            + t001(l)*cc(l,i_h2o)               ! suppression 20090401
-     $             /max(cc(l,i_ho2),dens(l)*1.e-30)   ! suppression 20090401
-     $            )
+     $            + cab006(l)*cc(l,i_ch3o2)
+     $            + cab007(l)*cc(l,i_ch3o2)
+     $            + cab019(l)*cc(l,i_hcho)
+     $            + 0.25*cab029(l)*cc(l,i_hoch2o2)
+     $            + cab043(l)*cc(l,i_c2h5o2)
+     $            + cab049(l)*cc(l,i_hoch2ch2o2)
+     $            + 2.*cab050(l)*cc(l,i_hoch2ch2o2)
+     $            + cab059(l)*cc(l,i_ch3cho)
+     $            + 1.2*cab065(l)*cc(l,i_ch3choho2)
+     $            + 2.*cab072(l)*cc(l,i_ch3cooo)
+     $            + cab073(l)*cc(l,i_ch3cooo)
+     $            + cab074(l)*cc(l,i_ch3cooo)
+     $            + cab079(l)*cc(l,i_hcoch2o2)
+     $            + cab080(l)*cc(l,i_hcoch2o2)
+     $            + cab095(l)*cc(l,i_hoch2co3)
+     $            + cab096(l)*cc(l,i_hoch2co3)
+     $            + cab097(l)*cc(l,i_hoch2co3)
+     $            + cab106(l)*cc(l,i_hcoco3)
+     $            + (cab002(l)*cc(l,i_o)*cc(l,i_ch4)*0.51
+     $                 + cab017(l)*cc(l,i_ch3o)*cc(l,i_o)*0.25
+     $                 + cab020(l)*cc(l,i_hcho)*cc(l,i_o)
+     $                 + cab021(l)*cc(l,i_hco)*cc(l,i_o)
+     $                 + cab037(l)*cc(l,i_c2h6)*cc(l,i_o)
+     $                 + cab066(l)*cc(l,i_ch3choho2)*cc(l,i_ro2)
+     $                 + cab071(l)*cc(l,i_ch3co)*cc(l,i_o2)
+     $                 + cab084(l)*cc(l,i_hcoco)*cc(L,i_o2)
+     $                 + cab092(l)*cc(l,i_hoch2co)*cc(l,i_o2)
+     $                 + j(l,j_ch3coooh)*cc(l,i_ch3coooh)
+     $                 + j(l,j_ch3o2h)*cc(l,i_ch3ooh)
+     $                 + j(l,j_hoch2cho_oh)*cc(l,i_hoch2cho)
+     $                 + j(l,j_ch3o2h)*cc(l,i_ch3chohooh)
+     $                 + j(l,j_ch3o2h)*cc(l,i_hyetho2h)
+     $                + 2.*b002(l)*cc(l,i_o1d)*cc(l,i_h2o)         ! ajout 20101210
+     $            	  + b003(l)*cc(l,i_o1d)*cc(l,i_h2)             ! ajout 20101210
+     $            	  + j(l,j_h2o)*cc(l,i_h2o)
+     $               + b007(l)*cc(l,i_ch4)*cc(l,i_o1d))
+     $                /MAX(cc(l,i_ho2),1.e-30*dens(l))
+     $               )
      $            /(c002(l)*cc(l,i_o)
      $            + c007(l)*cc(l,i_ho2)
      $            + c009(l)*cc(l,i_h2o2)         ! ajout 20090401
      $            + 2.*c013(l)*cc(l,i_oh)        ! ajout 20090401
      $            + 2.*c017(l)*cc(l,i_oh)        ! ajout 20090401
      $            + e001(l)*cc(l,i_co)
-     $            + h002(l)*hetero_ice)
-c
+     $            + h002(l)*hetero_ice
+     $            + cab001(l)*cc(l,i_ch4)
+     $            + 2.*cab011(l)*cc(l,i_ch3o2)
+     $            + 0.15*cab013(l)*cc(l,i_ch3oh)
+     $            + 0.6*cab014(l)*cc(l,i_ch3ooh)
+     $            + cab018(l)*cc(l,i_hcho)
+     $            + cab025(l)*cc(l,i_hco)
+     $            + 2.*cab032(l)*cc(l,i_hcooh)
+     $            + cab033(l)*cc(l,i_hoch2ooh)
+     $            + 2.*cab035(l)*cc(l,i_hoch2oh)
+     $            + cab036(l)*cc(l,i_c2h6)
+     $            + cab045(l)*cc(l,i_c2h5ooh)
+     $            + cab047(l)*cc(l,i_c2h5oh)*1.95
+     $            + 2.*cab053(l)*cc(l,i_ethgly)
+     $            + cab054(l)*cc(l,i_hyetho2h)
+     $            + 2.*cab056(l)*cc(l,i_hyetho2h)
+     $            + cab057(l)*cc(l,i_ch3cho)
+     $            + cab058(l)*cc(l,i_ch3cho)
+     $            + 2.*cab062(l)*cc(l,i_ch2choh)
+     $            + cab067(l)*cc(l,i_ch3cooh)
+     $            + cab069(l)*cc(l,i_ch3chohooh)
+     $            + cab077(l)*cc(l,i_ch3coooh)
+     $            + cab081(l)*cc(l,i_glyox)
+     $            + cab085(l)*cc(l,i_hooch2cho)
+     $            + cab088(l)*cc(l,i_hoch2cho)
+     $            + cab089(l)*cc(l,i_hoch2cho)
+     $            + cab098(l)*cc(l,i_hoch2co2h)*2.
+     $            + cab099(l)*cc(l,i_hcoco2h)*.2
+     $            + cab100(l)*cc(l,i_hoch2co3h)
+     $            + cab101(l)*cc(l,i_hoch2co3h)*2.
+     $            + cab102(l)*cc(l,i_hcoco3h)
+     $            + (cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
+     $                 + cab026(l)*cc(l,i_hco)*cc(l,i_o2)
+     $                 + cab028(l)*cc(l,i_hoch2o2)
+     $                 + cab030(l)*cc(l,i_hoch2o2)*cc(l,i_ro2)
+     $                 + cab041(l)*cc(l,i_c2h5)*cc(l,i_o2)
+     $                 + 0.6*cab044(l)*cc(l,i_c2h5o2)*cc(l,i_ro2)
+     $                 + cab051(l)*cc(l,i_hoch2ch2o)*cc(l,i_o2)
+     $                 + cab052(l)*cc(l,i_hoch2ch2o)
+     $                 + cab064(l)*cc(l,i_ch3choho2)
+     $                 + cab078(l)*cc(l,i_hcoch2o2)*cc(l,i_ro2)*0.6
+     $                 + cab090(l)*cc(l,i_hochcho)
+     $                 + cab093(l)*cc(l,i_hoch2co3)*cc(l,i_ro2)
+     $                 + cab104(l)*cc(l,i_hcoco3)*cc(l,i_ro2)
+     $                 + 2.*3.95*j(l,j_ch2o_co)*cc(l,i_hcoco2h))
+     $                 /MAX(cc(l,i_oh),dens(l)*1.e-30)
+     $            )
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        h
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -446,8 +850,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
          cc(l,i_oh) = cc(l,i_ho2)*roh_ho2
 c
+     
       end do
-c
+       
+       
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ox species
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -463,6 +869,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        
       if (sza .le. 95.) then
 c
+         
          do l = 1,lswitch-1
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -477,32 +884,51 @@ c
      $                   + b003(l)*cc(l,i_h2)
      $                   + b004(l)*cc(l,i_o2)
      $                   + b005(l)*cc(l,i_o3)
-     $                   + b006(l)*cc(l,i_o3))
-c
+     $                   + b006(l)*cc(l,i_o3)
+     $                   + b007(l)*cc(l,i_ch4)
+     $                   + b008(l)*cc(l,i_ch4)
+     $                   + b009(l)*cc(l,i_ch4))
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o/o3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
+
+cccc Original Routine
             ro_o3 = (j(l,j_o3_o1d) + j(l,j_o3_o)
      $              + a003(l)*cc(l,i_o)
      $              + c003(l)*cc(l,i_h)
      $              + c014(l)*cc(l,i_oh)
      $              + c015(l)*cc(l,i_ho2)
+     $              + cab004(l)*cc(l,i_ch3)
+     $              + cab010(l)*cc(l,i_ch3o2)
+     $              + cab016(l)*cc(l,i_ch3o)
      $              )
-     $              /(a001(l)*cc(l,i_o2))
-c
+     $              /(a001(l)*cc(l,i_o2)
+     $              + cab002(l)*cc(l,i_ch4)
+     $              + cab005(l)*cc(l,i_ch3)
+     $              + cab012(l)*cc(l,i_ch3o2)
+     $              + cab017(l)*cc(l,i_ch3o)
+     $              + cab020(l)*cc(l,i_hcho)
+     $              + cab021(l)*cc(l,i_hco)
+     $              + cab037(l)*cc(l,i_c2h6)
+     $              + (cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
+     $               + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
+     $                 )/MAX(cc(l,i_o),dens(l)*1.e-30)
+     $			)
+
+     
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
-            cc(l,i_o3) = cc(l,i_ox)/(1. + ro_o3)
-c
+           cc(l,i_o3) = cc(l,i_ox)/(1. + ro_o3)
+          
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
             cc(l,i_o) = cc(l,i_o3)*ro_o3
-c
+     
+     
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ox = o + o3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -516,6 +942,8 @@ c
      $                   + c006(l)*cc(l,i_h)*cc(l,i_ho2)
      $                   + c013(l)*cc(l,i_oh)*cc(l,i_oh)
      $                   + d003(l)*cc(l,i_ho2)*no(l)
+     $                   + cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
+     $                   + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
 c
             loss(l,i_ox) = 2.*a002(l)*cc(l,i_o)*cc(l,i_o)
      $                   + 2.*a003(l)*cc(l,i_o)*cc(l,i_o3)
@@ -527,11 +955,23 @@ c
      $                   + c015(l)*cc(l,i_o3)*cc(l,i_ho2)
      $                   + d001(l)*cc(l,i_o)*no2(l)
      $                   + e002(l)*cc(l,i_o)*cc(l,i_co)
-c
+     $                   + cab002(l)*cc(l,i_o)*cc(l,i_ch4)
+     $                   + cab004(l)*cc(l,i_o3)*cc(l,i_ch3)
+     $                   + cab010(l)*cc(l,i_o3)*cc(l,i_ch3o2)
+     $                   + cab012(l)*cc(l,i_o)*cc(l,i_ch3o2)
+     $                   + cab016(l)*cc(l,i_o3)*cc(l,i_ch3o)
+     $                   + cab017(l)*cc(l,i_o)*cc(l,i_ch3o)
+     $                   + cab020(l)*cc(l,i_o)*cc(l,i_hcho)
+     $                   + cab021(l)*cc(l,i_hco)*cc(l,i_o)
+     $                   + cab037(l)*cc(l,i_c2h6)*cc(l,i_o)
+
+
             loss(l,i_ox) = loss(l,i_ox)/cc(l,i_ox)
-c
+
+       
+       
          end do
-c
+
       else
 c
          do l = 1,lswitch-1
@@ -544,16 +984,21 @@ c
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o3
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
             production(l,i_o3) = a001(l)*cc(l,i_o2)*cc(l,i_o)
+     $                        + cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
+     $                        + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
 c
+
             loss(l,i_o3) = a003(l)*cc(l,i_o)
      $                   + c003(l)*cc(l,i_h)
      $                   + c014(l)*cc(l,i_oh)
      $                   + c015(l)*cc(l,i_ho2)
-c
-
+     $                   + cab004(l)*cc(l,i_ch3)
+     $                   + cab010(l)*cc(l,i_ch3o2)
+     $                   + cab016(l)*cc(l,i_ch3o)
+           
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -561,6 +1006,7 @@ c
             production(l,i_o) = c006(l)*cc(l,i_h)*cc(l,i_ho2)
      $                        + c013(l)*cc(l,i_oh)*cc(l,i_oh)
 c
+
             loss(l,i_o)  =  a001(l)*cc(l,i_o2)
      $                   + 2.*a002(l)*cc(l,i_o)
      $                   + a003(l)*cc(l,i_o3)
@@ -568,9 +1014,26 @@ c
      $                   + c002(l)*cc(l,i_oh)
      $                   + c012(l)*cc(l,i_h2o2)
      $                   + e002(l)*cc(l,i_co)
-c
-         end do
+     $                   + cab002(l)*cc(l,i_ch4)
+     $                   + cab005(l)*cc(l,i_ch3)
+     $                   + cab012(l)*cc(l,i_ch3o2)
+     $                   + cab017(l)*Cc(L,i_ch3o)
+     $                   + cab021(l)*cc(l,i_hco)
+     $                   + cab037(l)*cc(l,i_c2h6)
+
+       end do 
+     
+
       end if
+c
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     CHx radicals
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c
+c     [CHx] = [CH3] + [1CH2] + [3CH2] + [CH]
+C
+C     Daytime : All species in photochemical equilibrium
+c     Night-time : No more production via light (photo. eq.?)
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     other species
@@ -581,15 +1044,36 @@ c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        co2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
+
          production(l,i_co2) = e001(l)*cc(l,i_oh)*cc(l,i_co)
      $                       + e002(l)*cc(l,i_o)*cc(l,i_co)
      $                       + t002(l)*cc(l,i_ch4)*16./44. ! ajout 20090401
      $                       + t003(l)*cc(l,i_co2)*8./44.  ! ajout 20090401
-c
+     $                 + cab032(l)*cc(l,i_oh)*cc(l,i_hcooh)
+     $                 + cab067(l)*cc(l,i_ch3cooh)*cc(l,i_oh)
+     $                 + cab072(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
+     $                 + cab075(l)*cc(l,i_ch3cooo)*cc(l,i_ro2)
+     $                 + cab084(l)*cc(l,i_o2)*cc(l,i_hcoco)
+     $                 + j(l,j_ch3o2h)*cc(l,i_hoch2co3h)
+     $                 + j(l,j_ch2o_co)*3.95*cc(l,i_hcoco2h)
+     $                 + cab092(l)*cc(l,i_hoch2co)*cc(l,i_o2)
+     $                 + cab093(l)*cc(l,i_hoch2co3)*cc(l,i_ro2)
+     $                 + cab095(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
+     $                 + 0.91*cab098(l)*cc(l,i_hoch2co2h)*cc(l,i_oh)
+     $                 + cab099(l)*cc(l,i_oh)*cc(l,i_hcoco2h)
+     $                 + cab103(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
+     $                 + cab104(l)*cc(l,i_hcoco3)*cc(l,i_ro2)
+     $                 + cab106(l)*cc(l,i_hcoco3)*cc(l,i_ho2)
+     $                 + j(l,j_ch3coooh)*cc(l,i_ch3coooh)
+     $                 + 2.*( j(l,j_ch3o2h)
+     $                 + j(l,j_hoch2cho_co)
+     $                 + j(l,j_hoch2cho_hco)
+     $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hcoco3h)
+     
          loss(l,i_co2) = j(l,j_co2_o)
      $                 + j(l,j_co2_o1d)
      $                 + t003(l)
+     
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        co
@@ -598,10 +1082,43 @@ c
          production(l,i_co) = j(l,j_co2_o)*cc(l,i_co2)
      $                      + j(l,j_co2_o1d)*cc(l,i_co2)
      $                      + t003(l)*cc(l,i_co2)
-c
+     $                   + 0.17*cab005(l)*cc(l,i_ch3)*cc(l,i_o)     
+     $                   + j(l,j_ch2o_co)*cc(l,i_hcho)
+     $                   + cab021(l)*cc(l,i_hco)*cc(l,i_o)
+     $                   + cab022(l)*cc(l,i_hco)*cc(l,i_ch3)
+     $                   + cab024(l)*cc(l,i_hco)*cc(l,i_hco)
+     $                   + cab025(l)*cc(l,i_hco)*cc(l,i_oh)
+     $                   + cab026(l)*cc(l,i_hco)*cc(l,i_o2)
+     $                   + cab027(l)*cc(l,i_hco)*cc(l,i_h)
+     $                   + cab071(l)*cc(l,i_ch3co)*cc(l,i_o2)
+     $                   + 0.6*cab078(l)*cc(l,i_hcoch2o2)*cc(l,i_ro2)
+     $                   + cab080(l)*cc(l,i_hcoch2o2)*cc(l,i_ho2)
+     $                   + cab082(l)*cc(l,i_hcoco)
+     $                   + cab084(l)*cc(l,i_o2)*cc(l,i_hcoco)
+     $                   + cab086(l)*cc(l,i_oh)*cc(l,i_hooch2cho)
+     $                   + j(l,j_ch2o_co)*3.95*cc(l,i_hcoco2h)
+     $                   + cab099(l)*cc(l,i_oh)*cc(l,i_hcoco2h)
+     $                   + cab103(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
+     $                   + cab104(l)*cc(l,i_hcoco3)*cc(l,i_ro2)
+     $                   + cab106(l)*cc(l,i_hcoco3)*cc(l,i_ho2)
+     $                   + j(l,j_ch3cho_ch4)*cc(l,i_ch3cho)
+     $                   + 2.*j(l,j_glyox_h2)*cc(l,i_glyox)
+     $                   + j(l,j_glyox_hcho)*cc(l,i_glyox)
+     $                 + 2.*( j(l,j_ch3o2h)
+     $                 + j(l,j_hoch2cho_co)
+     $                 + j(l,j_hoch2cho_hco)
+     $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hcoco3h)
+     $                 + ( j(l,j_ch3o2h)
+     $                 + j(l,j_hoch2cho_co)
+     $                 + j(l,j_hoch2cho_hco)
+     $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
+     
          loss(l,i_co) = e001(l)*cc(l,i_oh)
      $                + e002(l)*cc(l,i_o)
 c
+
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -623,19 +1140,54 @@ c
      $                + 2.*c015(l)*cc(l,i_o3)*cc(l,i_ho2)
      $                + c016(l)*cc(l,i_ho2)*cc(l,i_ho2)
      $                + d001(l)*cc(l,i_o)*no2(l)
-c
+     $                + cab004(l)*cc(l,i_ch3)*cc(l,i_o3)
+     $                + cab006(l)*cc(l,i_ch3o2)*cc(l,i_ho2)
+     $                + cab007(L)*cc(l,i_ch3o2)*cc(l,i_ho2)
+     $                + 0.5*cab008(l)*cc(l,i_ch3o2)*cc(l,i_ro2)
+     $                + 0.5*cab009(l)*cc(l,i_ch3o2)*cc(l,i_ro2)
+     $                + 2.*cab010(l)*cc(l,i_ch3o2)*cc(l,i_o3)
+     $                + cab012(l)*cc(l,i_ch3o2)*cc(l,i_o)
+     $                + cab016(l)*cc(l,i_ch3o)*cc(l,i_o3)
+     $                + 0.75*cab017(l)*cc(l,i_ch3o)*cc(l,i_o)
+     $                + 0.8*cab029(l)*cc(l,i_hoch2o2)*cc(l,i_ho2)
+     $                + 0.5*cab031(l)*cc(l,i_hoch2o2)*cc(l,i_ro2)
+     $                + cab043(l)*cc(l,i_c2h5o2)*cc(l,i_ho2)
+     $                + cab044(l)*cc(l,i_c2h5o2)*cc(l,i_ro2)
+     $                + cab065(l)*cc(l,i_ch3choho2)*cc(L,i_ho2)
+     $                + cab105(l)*cc(l,i_hcoco3)*cc(l,i_ro2)*0.1
+
          loss(l,i_o2) = j(l,j_o2_o)
      $                + j(l,j_o2_o1d)
      $                + a001(l)*cc(l,i_o)
      $                + c011(l)*cc(l,i_h)
-c
+     $                + cab003(l)*cc(l,i_ch3)
+     $                + cab015(l)*cc(l,i_ch3o)
+     $                + cab026(l)*cc(l,i_hco)
+     $                + cab039(l)*cc(l,i_c2h5)
+     $                + cab041(l)*cc(l,i_c2h5)
+     $                + cab051(L)*cc(l,i_hoch2ch2o)
+     $                + cab070(l)*cc(l,i_ch3co)
+     $                + cab071(l)*cc(l,i_ch3co)
+     $                + cab083(l)*cc(l,i_hcoco)
+     $                + cab091(l)*cc(l,i_hoch2co)
+     $                + cab092(l)*cc(l,i_hoch2co)
+     $                + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)*3.5e-14 ! Factor from Veyret, B. et al. [1982]
+
+     
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        h2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
          production(l,i_h2) = c005(l)*cc(l,i_h)*cc(l,i_ho2)
      $                      + c018(l)*cc(l,i_h)*cc(l,i_h)
-c
+     $                      + b009(l)*cc(l,i_o1d)*cc(l,i_ch4)
+     $                   + 0.17*cab005(l)*cc(l,i_ch3)*cc(l,i_o)    
+     $                   + j(l,j_ch4_1ch2_h2)*cc(l,i_ch4)
+     $                   + j(l,j_ch4_ch_h2_h)*cc(l,i_ch4)
+     $                   + j(l,j_ch2o_co)*cc(l,i_hcho)
+     $                   + cab027(l)*cc(l,i_hco)*cc(l,i_h)
+     $                   + j(l,j_glyox_h2)*cc(l,i_glyox)
+
          loss(l,i_h2) = b003(l)*cc(l,i_o1d)
      $                + c010(l)*cc(l,i_oh)
 c
@@ -650,11 +1202,43 @@ c
      $                 + c010(l)*cc(l,i_oh)*cc(l,i_h2)
      $                 + c013(l)*cc(l,i_oh)*cc(l,i_oh)
      $                 + h004(l)*cc(l,i_h2o2)*hetero_ice
-c
+     $                 + cab001(l)*cc(l,i_ch4)*cc(l,i_oh)
+     $                 + cab007(L)*cc(l,i_ch3o2)*cc(l,i_ho2)
+     $                 + cab013(l)*cc(l,i_ch3oh)*cc(l,i_oh)
+     $                 + cab014(l)*cc(l,i_ch3ooh)*cc(l,i_oh)
+     $                 + cab018(l)*cc(l,i_hcho)*cc(l,i_oh)
+     $                 + cab025(l)*cc(l,i_hco)*cc(l,i_oh)
+     $                 + 0.3*cab029(l)*cc(l,i_hoch2o2)*cc(l,i_ho2)
+     $                 + cab032(l)*cc(l,i_oh)*cc(l,i_hcooh)
+     $                 + cab034(l)*cc(l,i_hoch2ooh)*cc(l,i_oh)
+     $                 + cab035(l)*cc(l,i_hoch2oh)*cc(l,i_oh)
+     $                 + cab036(l)*cc(l,i_c2h6)*cc(l,i_oh)
+     $                 + cab045(l)*cc(l,i_c2h5ooh)*cc(l,i_oh)
+     $                 + cab047(l)*cc(l,i_c2h5oh)*cc(l,i_oh)
+     $                 + cab053(l)*cc(l,i_ethgly)*cc(l,i_oh)
+     $                 + cab054(l)*cc(l,i_hyetho2h)*cc(l,i_oh)
+     $                 + cab055(l)*cc(l,i_hyetho2h)*cc(l,i_oh)
+     $                 + cab056(l)*cc(l,i_oh)*cc(l,i_hyetho2h)
+     $                 + cab057(l)*cc(l,i_oh)*cc(l,i_ch3cho)
+     $                 + cab058(l)*cc(l,i_oh)*cc(l,i_ch3cho)
+     $                 + cab067(l)*cc(l,i_ch3cooh)*cc(l,i_oh)
+     $                 + cab077(l)*cc(l,i_oh)*cc(l,i_ch3coooh)
+     $                 + cab081(l)*cc(l,i_oh)*cc(l,i_glyox)
+     $                 + cab085(l)*cc(l,i_hooch2cho)*cc(l,i_oh)
+     $                 + cab086(l)*cc(l,i_hooch2cho)*cc(l,i_oh)
+     $                 + cab087(l)*cc(l,i_hooch2cho)*cc(l,i_oh)
+     $                 + cab088(l)*cc(l,i_oh)*cc(l,i_hoch2cho)
+     $                 + cab089(l)*cc(l,i_oh)*cc(l,i_hoch2cho)
+     $                 + cab099(l)*cc(l,i_oh)*cc(l,i_hcoco2h)
+     $                 + cab100(l)*cc(l,i_oh)*Cc(l,i_hoch2co3h)
+     $                 + cab102(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
+     $                 + cab103(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
+
          loss(l,i_h2o) = j(l,j_h2o)
      $                 + b002(l)*cc(l,i_o1d)
      $                 + t001(l)
 c
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        h2o2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -683,8 +1267,61 @@ c
      $                 + 2.*b003(l)*cc(l,i_o1d)*cc(l,i_h2)
      $                 + 2.*c012(l)*cc(l,i_o)*cc(l,i_h2o2)
      $                 + 2.*t001(l)*cc(l,i_h2o)
-c
-         loss(l,i_hox) = 2.*c005(l)*cc(l,i_h)*cc(l,i_ho2)
+     $                 + cab002(l)*cc(l,i_ch4)*cc(l,i_o)
+     $                 + b007(l)*cc(l,i_ch4)*cc(l,i_o1d)
+     $                 + b008(l)*cc(l,i_ch4)*cc(l,i_o1d)
+     $                 + 0.956*cab004(l)*cc(l,i_ch3)*cc(l,i_o3)           
+     $                 + cab005(l)*cc(l,i_ch3)*cc(l,i_o)
+     $                 + cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
+     $                 + 0.25*cab017(l)*cc(l,i_ch3o)*cc(l,i_o)
+     $                 + cab020(l)*cc(l,i_hcho)*cc(l,i_o)
+     $                 + j(l,j_ch4_ch3_h)*cc(l,i_ch4)
+     $                 + 2.*j(l,j_ch4_3ch2_h_h)*cc(l,i_ch4)
+     $                 + j(l,j_ch4_ch_h2_h)*cc(l,i_ch4)
+     $                 + j(l,j_ch3o2h)*cc(l,i_ch3ooh)
+     $                 + j(l,j_ch2o_hco)*cc(l,i_hcho)*2.
+     $                 + j(l,j_ch3oh)*cc(l,i_ch3oh)
+     $                 + cab021(l)*cc(l,i_hco)*cc(l,i_o)
+     $                 + cab026(l)*cc(l,i_hco)*cc(l,i_o2)
+     $                 + cab028(l)*cc(l,i_hoch2o2)
+     $                 + cab030(l)*cc(l,i_hoch2o2)*cc(l,i_ro2)
+     $                 + cab037(l)*cc(l,i_c2h6)*cc(l,i_o)
+     $                 + cab041(l)*cc(l,i_c2h5)*cc(l,i_o2)
+     $                 + cab044(l)*cc(l,i_c2h5o2)*cc(l,i_ro2)*0.6
+     $                 + cab051(L)*cc(l,i_hoch2ch2o)*cc(l,i_o2)
+     $                 + cab052(l)*cc(l,i_hoch2ch2o)
+     $                 + cab064(l)*cc(l,i_ch3choho2)
+     $                 + cab066(L)*cc(l,i_ch3choho2)*cc(l,i_ro2)
+     $                 + cab071(l)*cc(l,i_ch3co)*cc(l,i_o2)
+     $                 + 0.6*cab078(l)*cc(l,i_hcoch2o2)*cc(l,i_ro2)
+     $                 + cab080(l)*cc(l,i_hcoch2o2)*cc(l,i_ho2)
+     $                 + cab084(l)*cc(l,i_o2)*cc(l,i_hcoco)
+     $                 + 0.025*j(l,j_ch2o_hco)*cc(l,i_ch3coooh)
+     $                 + 2.*j(l,j_ch3o2h)*cc(l,i_hoch2co3h)
+     $                 + j(l,j_ch2o_co)*3.95*cc(l,i_hcoco2h)*2.
+     $                 + j(l,j_ch3o2h)*cc(l,i_ch3chohooh)
+     $                 + cab090(l)*cc(l,i_hochcho)
+     $                 + cab092(l)*cc(l,i_hoch2co)*cc(l,i_o2)
+     $                 + cab093(l)*cc(l,i_hoch2co3)*cc(l,i_ro2)
+     $                 + cab095(l)*cc(l,i_ho2)*cc(l,i_hoch2co3)
+     $                 + cab104(l)*cc(l,i_hcoco3)*cc(l,i_ro2)
+     $                 + cab106(l)*cc(l,i_ho2)*cc(l,i_hcoco3)
+     $                 + j(l,j_ch3o2h)*cc(l,i_hyetho2h)
+     $                 + j(l,j_ch3cho_h)*cc(l,i_ch3cho)
+     $                 + 2.*j(l,j_hoch2ooh)*cc(l,j_hoch2ooh)
+     $                 + j(l,j_hoch2cho_oh)*cc(l,i_hoch2cho)
+     $                 + j(l,j_ch3coooh)*cc(l,i_ch3coooh)
+     $                 + 2.*( j(l,j_ch3o2h)
+     $                 + j(l,j_hoch2cho_co)
+     $                 + j(l,j_hoch2cho_hco)
+     $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hcoco3h)
+     $                 + 2.*( j(l,j_ch3o2h)
+     $                 + j(l,j_hoch2cho_co)
+     $                 + j(l,j_hoch2cho_hco)
+     $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
+     
+     
+          loss(l,i_hox) = 2.*c005(l)*cc(l,i_h)*cc(l,i_ho2)
      $                 + 2.*c006(l)*cc(l,i_h)*cc(l,i_ho2)
      $                 + 2.*c007(l)*cc(l,i_oh)*cc(l,i_ho2)
      $                 + 2.*c008(l)*cc(l,i_ho2)*cc(l,i_ho2)
@@ -695,26 +1332,603 @@ c
      $                 + h001(l)*cc(l,i_ho2)*hetero_ice
      $                 + h002(l)*cc(l,i_oh)*hetero_ice
      $                 + h003(l)*cc(l,i_ho2)*hetero_dust
+     $                 + cab001(l)*cc(l,i_ch4)*cc(l,i_oh)
+     $                 + cab006(l)*cc(l,i_ch3o2)*cc(l,i_ho2)
+     $                 + cab007(L)*cc(l,i_ch3o2)*cc(l,i_ho2)
+     $                 + 0.15*cab013(l)*cc(l,i_ch3oh)*cc(l,i_oh)
+     $                 + 0.6*cab014(l)*cc(l,i_ch3ooh)*cc(l,i_oh)
+     $                 + cab018(l)*cc(l,i_hcho)*cc(l,i_oh)
+     $                 + cab019(l)*cc(l,i_hcho)*cc(l,i_ho2)
+     $                 + cab025(l)*cc(l,i_hco)*cc(l,i_oh)
+     $                 + cab027(l)*cc(l,i_hco)*cc(l,i_h)
+     $                 + cab029(l)*cc(l,i_hoch2o2)*cc(l,i_ho2)
+     $                 + 0.6*cab029(l)*cc(l,i_hoch2o2)*cc(l,i_ho2)
+     $                 + cab034(l)*cc(l,i_hoch2ooh)*cc(l,i_oh)
+     $                 + cab036(l)*cc(l,i_c2h6)*cc(l,i_oh)
+     $                 + cab042(l)*cc(l,i_c2h5)*cc(l,i_h)
+     $                 + cab043(l)*cc(l,i_c2h5o2)*cc(l,i_ho2)
+     $                 + cab045(l)*cc(l,i_c2h5ooh)*cc(l,i_oh)
+     $                 + 0.05*cab047(l)*cc(l,i_c2h5oh)*cc(l,i_oh)
+     $                 + cab049(l)*cc(l,i_hoch2ch2o2)*cc(l,i_ho2)
+     $                 + cab054(l)*cc(l,i_hyetho2h)*cc(l,i_oh)
+     $                 + cab057(l)*cc(l,i_oh)*cc(l,i_ch3cho)
+     $                 + cab058(l)*cc(l,i_oh)*cc(l,i_ch3cho)
+     $                 + cab059(l)*cc(l,i_ho2)*cc(l,i_ch3cho)
+     $                 + 0.8*cab065(l)*cc(l,i_ch3choho2)*cc(l,i_ho2)
+     $                 + cab067(l)*cc(l,i_ch3cooh)*cc(l,i_oh)
+     $                 + cab069(l)*cc(l,i_ch3chohooh)*cc(l,i_oh)
+     $                 + cab073(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
+     $                 + cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
+     $                 + cab077(l)*cc(l,i_oh)*cc(l,i_ch3coooh)
+     $                 + cab079(l)*cc(l,i_hcoch2o2)*cc(l,i_ho2)
+     $                 + cab080(l)*cc(l,i_hcoch2o2)*cc(l,i_ho2)
+     $                 + cab081(l)*cc(l,i_oh)*cc(l,i_glyox)
+     $                 + cab085(l)*cc(l,i_oh)*cc(l,i_hooch2cho)
+     $                 + cab088(l)*cc(l,i_oh)*cc(l,i_hoch2cho)
+     $                 + cab089(l)*cc(l,i_oh)*cc(l,i_hoch2cho)
+     $                 + cab096(l)*cc(l,i_ho2)*cc(l,i_hoch2co3)
+     $                 + cab097(l)*cc(l,i_ho2)*cc(l,i_hoch2co3)
+     $                 + cab100(l)*cc(l,i_oh)*Cc(l,i_hoch2co3h)
+     $                 + cab102(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
+     
+      loss(l,i_hox) = loss(l,i_hox)/cc(l,i_hox)
 c
-         loss(l,i_hox) = loss(l,i_hox)/cc(l,i_hox)
+
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C c        ch4
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c        ch4
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
-         production(l,i_ch4) = 0.
-c
-         loss(l,i_ch4) = j(l,j_ch4_ch3_h)
-     $                 + j(l,j_ch4_1ch2_h2)
-     $                 + j(l,j_ch4_3ch2_h_h)
-     $                 + j(l,j_ch4_ch_h2_h)
-     $                 + b007(l)*cc(l,i_o1d) 
+         production(l,i_ch4) = cab022(l)*cc(l,i_hco)*cc(l,i_ch3)
+     $                       + j(l,j_ch3cho_ch4)*cc(l,i_ch3cho)
+
+		
+         loss(l,i_ch4) = b007(l)*cc(l,i_o1d)
      $                 + b008(l)*cc(l,i_o1d)
      $                 + b009(l)*cc(l,i_o1d)
-     $                 + e003(l)*cc(l,i_oh)
-c
+     $                 + cab001(l)*cc(l,i_oh)
+     $                 + cab002(l)*cc(l,i_o)
+     $                 + j(l,j_ch4_1ch2_h2)
+     $                 + j(l,j_ch4_ch3_h)
+     $                 + j(l,j_ch4_3ch2_h_h)
+     $                 + j(l,j_ch4_ch_h2_h)
+     
+     
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C c        ch3
+C C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+
+          production(l,i_ch3) = b007(l)*cc(l,i_ch4)*cc(l,i_o1d)
+     $                        + cab001(l)*cc(l,i_ch4)*cc(l,i_oh)
+     $                        + 0.51*cab002(l)*cc(l,i_ch4)*cc(l,i_o)
+     $                        + j(l,j_ch4_ch3_h)*cc(l,i_ch4)
+     $                        + cab042(l)*cc(l,i_c2h5)*cc(l,i_h)*2.
+     $                        + 0.2*cab065(l)*cc(l,i_ch3choho2)
+     $                                       *cc(l,i_ho2)
+     $                        + cab066(l)*cc(l,i_ch3choho2)*cc(l,i_ro2)
+     $                        + cab067(l)*cc(l,i_ch3cooh)*cc(l,i_oh)
+     $                        + cab072(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
+     $                        + cab075(l)*cc(l,i_ch3cooo)*cc(l,i_ro2)
+     $                        + j(l,j_ch3o2h)*cc(l,i_ch3chohooh)
+     $                        + j(l,j_ch3cho_ch3)*cc(l,i_ch3cho)
+     $                        + j(l,j_ch3cooh)*cc(l,i_ch3cooh)
+     $                        + j(l,j_ch3coooh)*cc(l,i_ch3coooh)
+     $                        + 0.75*cab017(l)*cc(l,i_o)*cc(l,i_ch3o)
+     
+ 
+
+          loss(l,i_ch3) = cab003(l)*cc(l,i_o2)
+     $                  + cab004(l)*cc(l,i_o3)
+     $                  + cab005(l)*cc(l,i_o)
+     $                  + cab022(L)*cc(l,i_hco)
+     $                  + cab023(L)*cc(l,i_hco)
+     $                  + cab038(l)*cc(l,i_ch3)
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ch3o2
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+          production(l,i_ch3o2)=  cab003(l)*cc(l,i_ch3)*cc(l,i_o2)
+     $                         + 0.6*cab014(l)*cc(L,i_ch3ooh)*cc(l,i_oh)
+     $                         + cab016(l)*cc(l,i_ch3o)*cc(l,i_o3)
+     
+	 
+	 
+          loss(l,i_ch3o2) = cab006(l)*cc(l,i_ho2)
+     $                    + cab007(l)*cc(l,i_ho2)
+     $                    + cab008(l)*cc(l,i_ro2)
+     $                    + cab009(l)*cc(l,i_ro2)
+     $                    + cab010(l)*cc(l,i_o3)
+     $                    + cab011(l)*cc(l,i_oh)
+     $                    + cab012(l)*cc(l,i_o)
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ch3ooh
+Ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          
+          production(l,i_ch3ooh) = cab006(l)*cc(l,i_ch3o2)*cc(l,i_ho2)
+
+          loss(l,i_ch3ooh) = cab014(l)*cc(l,i_oh)
+     $                     + j(l,j_ch3o2h) 
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ch3oh
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+         production(l,i_ch3oh) = 0.5*cab009(l)*cc(l,i_ch3o2)*cc(l,i_ro2)
+     $                         + j(l,j_hoch2cho_co)*cc(l,i_hoch2cho)
+         
+         
+        loss(l,i_ch3oh) = cab013(l)*cc(l,i_oh)
+     $                  + j(l,j_ch3oh)
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ch3o
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+         production(l, i_ch3o) =  0.49*cab002(l)*cc(l,i_ch4)*cc(l,i_o)
+     $                         + b008(l)*cc(l,i_ch4)*cc(l,i_o1d)
+     $                         + 0.044*cab004(l)*cc(l,i_ch3)*cc(l,i_o3)
+     $                         + cab008(l)*cc(l,i_ch3o2)*cc(l,i_ro2)
+     $                         + cab010(l)*cc(l,i_ch3o2)*cc(l,i_o3)
+     $                         + cab011(l)*cc(l,i_ch3o2)*cc(l,i_oh)
+     $                         + cab012(l)*cc(l,i_ch3o2)*cc(l,i_o)
+     $                         + 0.15*cab013(l)*cc(l,i_ch3oh)*cc(l,i_oh)
+     $                         + j(l,j_ch3o2h)*cc(l,i_ch3ooh)
+     $                         + j(l,j_ch3oh)*cc(l,i_ch3oh)
+     $                         + j(l,j_hoch2cho_hco)*cc(l,i_hoch2cho)
+        
+         loss(l,i_ch3o) = cab015(l)*cc(l,i_o2)
+     $                  + cab016(l)*cc(l,i_o3)
+     $                  + cab017(l)*cc(l,i_o)
+     
+    
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hcho (formaldehyde)
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+          production(l,i_hcho) = b009(l)*cc(l,i_ch4)*cc(l,i_o1d)
+     $                   + 0.956*cab004(l)*cc(l,i_ch3)*cc(l,i_o3)
+     $                   + 0.83*cab005(l)*cc(l,i_ch3)*cc(l,i_o)     
+     $                   + cab007(L)*cc(l,i_ch3o2)*cc(l,i_ho2)
+     $                   + 0.5*cab009(l)*cc(l,i_ch3o2)*cc(l,i_ro2)
+     $                   + 0.85*cab013(l)*cc(l,i_ch3oh)*cc(l,i_oh)
+     $                   + 0.4*cab014(l)*cc(L,i_ch3ooh)*cc(l,i_oh)
+     $                   + cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
+     $                   + 0.25*cab017(l)*cc(l,i_ch3o)*cc(l,i_o)
+     $                   + cab024(l)*cc(l,i_hco)*cc(l,i_hco)
+     $                   + cab028(l)*cc(l,i_hoch2o2)
+     $                   + 2.*cab052(l)*cc(l,i_hoch2ch2o)
+     $                   + cab061(l)*cc(l,i_ch2choh)*cc(l,i_oh)
+     $                   + cab071(l)*cc(l,i_ch3co)*cc(l,i_o2)
+     $                   + 0.6*cab078(l)*cc(l,i_hcoch2o2)*cc(l,i_ro2)
+     $                   + cab080(l)*cc(l,i_hcoch2o2)*cc(l,i_ho2)
+     $                   + cab086(l)*cc(l,i_oh)*cc(l,i_hooch2cho)
+     $                   + j(l,j_ch3o2h)*cc(l,i_hoch2co3h)
+     $                   + cab092(l)*cc(l,i_hoch2co)*cc(l,i_o2)
+     $                   + cab093(l)*cc(l,i_hoch2co3)*cc(l,i_ro2)
+     $                   + cab095(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
+     $                   + 0.09*cab098(l)*cc(l,i_hoch2co2h)*cc(l,i_oh)
+     $                   + j(l,j_glyox_hcho)*cc(l,i_glyox)
+     $                   + ( j(l,j_ch3o2h)
+     $                   + j(l,j_hoch2cho_co)
+     $                   + j(l,j_hoch2cho_hco)
+     $                   + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
+     
+     
+          loss(l,i_hcho) = cab018(l)*cc(l,i_oh)
+     $                   + cab019(l)*cc(l,i_ho2)
+     $                   + cab020(l)*cc(l,i_o)
+     $                   + j(l,j_ch2o_co)
+     $                   + j(l,j_ch2o_hco)
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hco 
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+        production(l,i_hco) = cab018(l)*cc(l,i_hcho)*cc(l,i_oh)
+     $                      + cab020(l)*cc(l,i_hcho)*cc(l,i_o)
+     $                      + j(l,j_ch2o_co)*cc(l,i_hcho)
+     $                      + cab082(l)*cc(l,i_hcoco)
+     $                      + j(l,j_ch3cho_ch3)*cc(l,i_ch3cho)
+     $                      + j(l,j_hoch2cho_hco)*cc(l,i_hoch2cho)
+     $                      + 2.*j(l,j_glyox_hco)*cc(l,i_glyox)
+     
+        loss(l,i_hco) = cab021(l)*cc(l,i_o)
+     $                + cab022(l)*cc(l,i_ch3)
+     $                + cab023(l)*cc(l,i_ch3)
+     $                + cab024(l)*cc(l,i_hco)
+     $                + cab025(l)*cc(l,i_oh)
+     $                + cab026(l)*cc(l,i_o2)
+     $                + cab027(l)*cc(l,i_h)
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hoch2o2
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+        production(l,i_hoch2o2) = cab019(l)*cc(l,i_hcho)*cc(l,i_ho2)
+     $                          + cab033(l)*cc(l,i_hoch2ooh)*cc(l,i_oh)
+     
+        loss(l,i_hoch2o2) = cab028(l)
+     $                    + cab029(l)*cc(l,i_ho2)
+     $                    + cab030(l)*cc(l,i_ro2)
+     $                    + cab031(l)*cc(l,i_ro2)
+        
+
+ccccccccccccccccccccccccccccccccc
+c        hcooh
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l, i_hcooh) =
+     $              0.5*cab029(l)*cc(l,i_hoch2o2)*cc(l,i_ho2)
+     $            + cab030(l)*cc(l,i_hoch2o2)*cc(l,i_ro2)
+     $            + 0.5*cab031(l)*cc(l,i_hoch2o2)*cc(l,i_ro2)
+     $            + cab034(l)*cc(l,i_hoch2ooh)*cc(l,i_oh)
+     $            + cab035(l)*cc(l,i_hoch2oh)*cc(l,i_oh)
+     $            + cab061(l)*cc(L,i_ch2choh)*cc(l,i_oh)
+     $            + 0.2*cab065(l)*cc(l,i_ch3choho2)*cc(L,i_ho2)
+     $            + cab066(L)*cc(l,i_ch3choho2)*cc(l,i_ro2)
+     $            + j(l,j_hoch2ooh)*cc(l,j_hoch2ooh)
+     $                             *cc(l,i_o2)*3.5e-14 ! ADDED [06/09/2019]
+
+          loss(l,i_hcooh) = cab032(l)*cc(l,i_oh)
+          
+
+
+     
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hoch2oh
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+        production(l,i_hoch2oh) = 
+     $                   0.5*cab031(l)*cc(l,i_hoch2o2)*cc(l,i_ro2)
+        
+        loss(l,i_hoch2oh) = cab035(l)*cc(l,i_oh)
+        
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hoch2ooh
+Ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+        production(l,i_hoch2ooh) = 
+     $                0.5*cab029(l)*cc(l,i_hoch2o2)*cc(l,i_ho2)
+        
+        loss(l,i_hoch2ooh) = cab033(l)*cc(l,i_oh)
+     $                     + cab034(l)*cc(l,i_oh)
+     $                     + j(l,j_hoch2ooh)
+
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        c2h6
+C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+          production(l, i_c2h6) = cab038(l)*cc(l,i_ch3)*cc(l,i_ch3)
+     $                          + cab040(l)*cc(l,i_c2h5)*cc(l,i_c2h5)
+          
+          loss(l, i_c2h6) = j(l,j_c2h6)
+     $                    + cab036(l)*cc(l,i_oh)
+     $                    + cab037(l)*cc(l,i_o)
+         
+          
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        c2h5
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+        production(l,i_c2h5) = cab036(l)*cc(l,i_c2h6)*cc(l,i_oh)
+     $                       + cab037(l)*cc(l,i_c2h6)*cc(l,i_o)
+     
+        loss(l,i_c2h5) = cab039(l)*cc(l,i_o2)
+     $                 + cab040(l)*cc(l,i_c2h5)
+     $                 + cab041(l)*cc(l,i_o2)
+     $                 + cab042(l)*cc(l,i_h)
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        c2h5o2
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l, i_c2h5o2) = 
+     $              cab039(l)*cc(l,i_c2h5)*cc(l,i_o2)
+     $            + cab045(l)*cc(l,i_c2h5ooh)*cc(l,i_oh)
+     $            + 0.95*cab047(l)*cc(l,i_c2h5oh)*cc(l,i_oh)
+     
+          loss(l,i_c2h5o2) = cab043(l)*cc(l,i_ho2)
+     $                     + cab044(l)*cc(l,i_ro2)
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        c2h5ooh
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+         production(l, i_c2h5ooh) =
+     $                   cab043(l)*cc(l,i_ho2)*cc(l,i_c2h5o2)
+         
+         
+         loss(l,i_c2h5ooh) = cab045(l)*cc(l,i_oh)
+     $                     + cab046(l)*cc(l,i_oh)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        c2h5oh
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l, i_c2h5oh) =    
+     $                  + 0.2*cab044(l)*cc(l,i_c2h5o2)*cc(l,i_ro2)
+
+
+          loss(l,i_c2h5oh) = cab047(l)*cc(l,i_oh)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hoch2ch2o2
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hoch2ch2o2) = 
+     $              0.05*cab047(l)*cc(l,i_c2h5oh)*cc(l,i_oh)
+     $            + cab054(l)*cc(l,i_hyetho2h)*cc(l,i_oh)
+
+          loss(l,i_hoch2ch2o2) = cab048(l)*cc(L,i_ro2)
+     $                         + cab049(l)*cc(l,i_ho2)
+     $                         + cab050(l)*cc(l,i_ho2)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hoch2ch2o
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hoch2ch2o) = 
+     $              0.6*cab048(l)*cc(l,i_hoch2ch2o2)*cc(l,i_ro2)
+     $            + cab050(l)*cc(l,i_hoch2ch2o2)*cc(l,i_ho2)
+     $            + j(l,j_ch3o2h)*cc(l,i_hyetho2h)
+     
+          loss(l,i_hoch2ch2o) = cab051(l)*cc(l,i_o2)
+     $                        + cab052(l)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ethgly
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_ethgly) = 
+     $              0.2*cab048(l)*cc(l,i_hoch2ch2o2)*cc(l,i_ro2)
+
+
+          loss(l,i_ethgly) = cab053(l)*cc(l,i_oh)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hyetho2h
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hyetho2h) = 
+     $              cab049(l)*cc(l,i_hoch2ch2o2)*cc(l,i_ho2)
+
+          loss(l,i_hyetho2h) = cab054(l)*cc(l,i_oh)
+     $                       + cab055(l)*cc(l,i_oh)
+     $                       + cab056(l)*cc(l,i_oh)
+     $                       + j(l,j_ch3o2h)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ch3cho
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_ch3cho) = 
+     $                    cab023(l)*cc(l,i_hco)*cc(l,i_ch3)
+     $                  + 0.8*cab044(l)*cc(l,i_c2h5o2)*cc(l,i_ro2)
+     $                  + cab046(l)*cc(l,i_c2h5ooh)*cc(l,i_oh)
+     $                  + cab063(l)*cc(l,i_ch2choh)*cc(l,i_hcooh)
+     $                  + cab064(l)*cc(l,i_ch3choho2)
+     
+          loss(l,i_ch3cho) = cab057(l)*cc(l,i_oh)
+     $                     + cab058(l)*cc(l,i_oh)
+     $                     + cab059(l)*cc(l,i_ho2)
+     $                     + cab060(l)*cc(l,i_hcooh)
+     $                     + j(l,j_ch3cho_ch3)
+     $                     + j(l,j_ch3cho_ch4)
+     $                     + j(l,j_ch3cho_h)
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ch2choh
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_ch2choh) = 
+     $              cab060(l)*cc(l,i_ch3cho)*cc(l,i_hcooh)
+
+          loss(l,i_ch2choh) = cab061(l)*cc(l,i_oh)
+     $                      + cab062(l)*cc(l,i_oh)
+     $                      + cab063(l)*cc(l,i_hcooh)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ch3choho2
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_ch3choho2) = 
+     $       cab059(l)*cc(l,i_ch3cho)*cc(l,i_ho2)
+     $     + cab069(l)*cc(l,i_ch3chohooh)*cc(l,i_oh)
+
+          loss(l,i_ch3choho2) = cab064(l)
+     $                        + cab065(l)*cc(l,i_ho2)
+     $                        + cab066(l)*cc(l,i_ro2)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ch3cooh
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_ch3cooh) = 
+     $         0.3*cab065(l)*cc(l,i_ch3choho2)*cc(l,i_ho2)
+     $       + cab068(l)*cc(l,i_ch3chohooh)*cc(l,i_oh)
+     $       + cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
+     $       + cab076(l)*cc(l,i_ch3cooo)*cc(l,i_ro2)
+
+          loss(l,i_ch3cooh) = cab067(l)*cc(l,i_oh)
+     $                      + j(l,j_ch3cooh)
+     
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ch3chohooh
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_ch3chohooh) = 
+     $              0.5*cab065(l)*cc(l,i_ho2)*cc(l,i_ch3choho2)
+
+          loss(l,i_ch3chohooh) = cab068(l)*cc(l,i_oh)
+     $                         + cab069(l)*cc(l,i_oh)
+     $                         + j(l,j_ch3o2h)
+    
+     
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ch3co
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_ch3co) = 
+     $         cab057(l)*cc(l,i_oh)*cc(l,i_ch3cho)
+     $       + j(l,j_ch3cho_h)*cc(l,i_ch3cho)
+
+          loss(l,i_ch3co) =  cab070(l)*cc(l,i_o2)
+     $                    +  cab071(l)*cc(l,i_o2)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ch3cooo
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_ch3cooo) = 
+     $              cab070(l)*cc(l,i_o2)*cc(l,i_ch3co)
+     $            + cab077(l)*cc(l,i_oh)*cc(l,i_ch3coooh)
+
+          loss(l,i_ch3cooo) = cab072(l)*cc(l,i_ho2)
+     $                      + cab073(l)*cc(l,i_ho2)
+     $                      + cab074(l)*cc(l,i_ho2)
+     $                      + cab075(l)*cC(l,i_ro2)
+     $                      + cab076(l)*cc(l,i_ro2)
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        ch3coooh
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_ch3coooh) = 
+     $              cab073(l)*cc(l,i_ch3cooo)*cc(l,i_Ho2)
+
+          loss(l,i_ch3coooh) = cab077(l)*cc(l,i_oh)
+     $                       + j(l,j_ch3coooh)
+     
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hcoch2o2
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hcoch2o2) = 
+     $         cab058(l)*cc(l,i_ch3cho)*cc(l,i_oh)
+     $       + cab085(l)*cc(l,i_hooch2cho)*cc(l,i_oh)
+     $       + j(l,j_hoch2cho_oh)*cc(l,i_hoch2cho)
+     
+          loss(l,i_hcoch2o2) = cab078(l)*cc(l,i_ro2)
+     $                       + cab079(l)*cc(l,i_ho2)
+     $                       + cab080(l)*cc(l,i_ho2)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        glyox
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_glyox) =    
+     $              0.2*cab078(l)*cc(l,i_hcoch2o2)*cc(l,i_ro2)
+     $            + cab087(l)*cc(l,i_oh)*cc(l,i_hooch2cho)
+     $            + cab090(l)*cc(l,i_hochcho)
+     
+          loss(l,i_glyox) = cab081(l)*cc(l,i_oh)
+     $                    + j(l,j_glyox_h2)
+     $                    + j(l,j_glyox_hcho)
+     $                    + j(l,j_glyox_hco)
+     
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hcoco
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hcoco) = cab081(l)*cc(l,i_oh)*cc(l,i_glyox)
+
+          loss(l,i_hcoco) = cab082(l)
+     $                    + cab083(l)*cc(l,i_o2)
+     $                    + cab084(l)*cc(l,i_o2)
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hooch2cho
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hooch2cho) = 
+     $              cab056(l)*cc(l,i_oh)*cc(l,i_hyetho2h)
+     $            + cab079(l)*cc(l,i_hcoch2o2)*cc(l,i_ho2)
+     
+          loss(l,i_hooch2cho) = cab085(l)*cc(l,i_oh)
+     $                        + cab086(l)*cc(l,i_oh)
+     $                        + cab087(l)*cc(l,i_oh)
+     $                        + j(l,j_ch3o2h)
+     $                        + j(l,j_hoch2cho_co)
+     $                        + j(l,j_hoch2cho_hco)
+     $                        + j(l,j_hoch2cho_oh) 
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hoch2cho
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hoch2cho) = 
+     $              0.2*cab048(l)*cc(l,i_hoch2ch2o2)*cc(l,i_ro2)
+     $            + cab051(L)*cc(l,i_hoch2ch2o)*cc(l,i_o2)
+     $            + cab053(l)*cc(l,i_ethgly)*cc(l,i_oh)
+     $            + cab055(l)*cc(l,i_hyetho2h)*cc(l,i_oh)
+     $            + cab062(l)*cc(l,i_ch2choh)*cc(l,i_oh)
+     $            + 0.2*cab078(l)*cc(l,i_hcoch2o2)*cc(l,i_ro2)
+     
+          loss(l,i_hoch2cho) = cab088(l)*cc(l,i_oh)
+     $                       + cab089(l)*cc(l,i_oh)
+     $                       + j(l,j_hoch2cho_co)
+     $                       + j(l,j_hoch2cho_hco)
+     $                       + j(l,j_hoch2cho_oh)
+     
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hochcho
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hochcho) =
+     $              cab089(l)*cc(l,i_oh)*cc(l,i_hoch2cho)
+
+          loss(l,i_hochcho) = cab090(l)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hoch2co
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hoch2co) = 
+     $              cab088(l)*cc(l,i_oh)*cc(l,i_hoch2cho)
+
+          loss(l,i_hoch2co) = cab091(l)*cc(l,i_o2)
+     $                      + cab092(l)*cc(l,i_o2)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hoch2co3
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hoch2co3) = 
+     $              cab091(l)*cc(l,i_o2)*cc(l,i_hoch2co)
+     $            + cab100(l)*cc(l,i_oh)*Cc(l,i_hoch2co3h)
+
+          loss(l,i_hoch2co3) = 
+     $              cab093(l)*cc(l,i_ro2)
+     $            + cab094(l)*cc(l,i_ro2)
+     $            + cab095(l)*cc(l,i_ho2)
+     $            + cab096(l)*cc(l,i_ho2)
+     $            + cab097(l)*cc(l,i_ho2)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hoch2co2h 
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hoch2co2h) = 
+     $              cab094(l)*cc(l,i_hoch2co3)*cc(l,i_ro2)
+     $            + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
+     
+          loss(l,i_hoch2co2h) = cab098(l)*cc(l,i_oh)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hcoco2h
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hcoco2h) = 
+     $         0.91*cab098(l)*cc(l,i_hoch2co2h)*cc(l,i_oh)
+     $       + cab105(l)*cc(l,i_hcoco3)*cc(l,i_ro2)
+
+          loss(l,i_hcoco2h) = j(l,j_ch2o_co)*3.95
+     $                      + cab099(l)*cc(l,i_oh)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hoch2co3h 
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hoch2co3h) =
+     $         cab096(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
+
+          loss(l,i_hoch2co3h) = j(l,j_ch3o2h)
+     $                        + cab100(l)*cc(l,i_oh)
+     $                        + cab101(l)*cc(l,i_oh)
+          
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hcoco3h
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hcoco3h) =
+     $         cab101(l)*cc(l,i_hoch2co3h)*cc(l,i_oh)
+     
+          loss(l,i_hcoco3h) = cab102(l)*cc(l,i_oh)
+     $                      + cab103(l)*cc(l,i_oh)
+     $                      + j(l,j_ch3o2h)
+     $                      + j(l,j_hoch2cho_co)
+     $                      + j(l,j_hoch2cho_hco)
+     $                      + j(l,j_hoch2cho_oh)
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        hcoco3
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          production(l,i_hcoco3) = 
+     $              cab083(l)*cc(l,i_hcoco)*cc(l,i_o2)
+     $            + cab102(l)*cc(l,i_hcoco3h)*cc(l,i_oh)
+     
+          loss(l,i_hcoco3) = cab104(L)*cc(l,i_ro2)
+     $                     + cab105(l)*cc(l,i_ro2)
+     $                     + cab106(l)*cc(l,i_ho2)
+     
+  
       end do
-c
+
+      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     update number densities
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -722,6 +1936,7 @@ c
 c     long-lived species
 c
       do l = 1,lswitch-1
+                  
          cc(l,i_co2) = (cc0(l,i_co2) + production(l,i_co2)*dt)
      $              /(1. + loss(l,i_co2)*dt)
          cc(l,i_co)  = (cc0(l,i_co) + production(l,i_co)*dt)
@@ -734,18 +1949,191 @@ c
      $              /(1. + loss(l,i_h2o2)*dt)
          cc(l,i_h2o) = (cc0(l,i_h2o) + production(l,i_h2o)*dt)
      $              /(1. + loss(l,i_h2o)*dt)
+    
          cc(l,i_hox) = (cc0(l,i_hox) + production(l,i_hox)*dt)
      $              /(1. + loss(l,i_hox)*dt)
+     
+C !      Methane Oxidation
          cc(l,i_ch4) = (cc0(l,i_ch4) + production(l,i_ch4)*dt)
      $              /(1. + loss(l,i_ch4)*dt)
+     
+         cc(l,i_ch3) = production(l,i_ch3)/loss(l,i_ch3)
+         
+         cc(l,i_ch3o2) = production(l,i_ch3o2)/loss(l,i_ch3o2)
+         
+         cc(l,i_ch3ooh) = (cc0(l,i_ch3ooh) + production(l,i_ch3ooh)*dt)
+     $                  /(1. + loss(l,i_ch3ooh)*dt)
+     
+         cc(l,i_ch3oh) = (cc0(l,i_ch3oh) + production(l,i_ch3oh)*dt)
+     $              /(1. + loss(l,i_ch3oh)*dt)
+
+
+         cc(l,i_ch3o) =  production(l,i_ch3o)/loss(l,i_ch3o)
+         
+         cc(l,i_hcho) = (cc0(l,i_hcho) + production(l,i_hcho)*dt)
+     $              /(1. + loss(l,i_hcho)*dt)
+
+         cc(l,i_hco) = production(l,i_hco)/loss(l,i_hco)   
+
+         cc(l,i_hoch2o2) = production(l,i_hoch2o2)/loss(l,i_hoch2o2)
+     
+         cc(l,i_hcooh) = (cc0(l,i_hcooh) + production(l,i_hcooh)*dt)
+     $              /(1. + loss(l,i_hcooh)*dt)
+     
+         cc(l,i_hoch2oh) = (cc0(l,i_hoch2oh) 
+     $                   + production(l,i_hoch2oh)*dt)
+     $              /(1. + loss(l,i_hoch2oh)*dt)
+     
+         cc(l,i_hoch2ooh) = (cc0(l,i_hoch2ooh) 
+     $                    + production(l,i_hoch2ooh)*dt)
+     $              /(1. + loss(l,i_hoch2ooh)*dt)
+     
+
+C !     Alkane Oxidation
+         cc(l,i_c2h6) = (cc0(l,i_c2h6) + production(l,i_c2h6)*dt)
+     $              /(1. + loss(l,i_c2h6)*dt)
+
+         cc(l,i_c2h5) = production(l,i_c2h5)/loss(l,i_c2h5)   
+
+         cc(l,i_c2h5ooh) = (cc0(l,i_c2h5ooh) 
+     $                   + production(l,i_c2h5ooh)*dt)
+     $              /(1. + loss(l,i_c2h5ooh)*dt)
+     
+         cc(l,i_c2h5oh) = (cc0(l,i_c2h5oh) + production(l,i_c2h5oh)*dt)
+     $              /(1. + loss(l,i_c2h5oh)*dt)
+
+         cc(l,i_c2h5o2) = (cc0(l,i_c2h5o2) + production(l,i_c2h5o2)*dt)
+     $              /(1. + loss(l,i_c2h5o2)*dt)
+     
+C          cc(l,i_c2h5o2) = production(l,i_c2h5o2)/loss(l,i_c2h5o2)
+
+         cc(l,i_hoch2ch2o)=production(l,i_hoch2ch2o)/loss(l,i_hoch2ch2o)
+         
+         cc(l,i_hoch2ch2o2)=production(l,i_hoch2ch2o2)/
+     $                     loss(l,i_hoch2ch2o2)
+
+         cc(l,i_ethgly) = (cc0(l,i_ethgly) 
+     $                    + production(l,i_ethgly)*dt)
+     $              /(1. + loss(l,i_ethgly)*dt)
+     
+         cc(l,i_hyetho2h) = (cc0(l,i_hyetho2h) 
+     $                    + production(l,i_hyetho2h)*dt)
+     $              /(1. + loss(l,i_hyetho2h)*dt)
+     
+         cc(l,i_ch3cho) = (cc0(l,i_ch3cho) + production(l,i_ch3cho)*dt)
+     $              /(1. + loss(l,i_ch3cho)*dt)
+     
+        cc(l,i_ch2choh) =(cc0(l,i_ch2choh) + production(l,i_ch2choh)*dt)
+     $              /(1. + loss(l,i_ch2choh)*dt)
+     
+         cc(l,i_ch3choho2)=production(l,i_ch3choho2)/
+     $                     loss(l,i_ch3choho2)     
+     
+         cc(l,i_ch3cooh) = (cc0(l,i_ch3cooh) 
+     $                   + production(l,i_ch3cooh)*dt)
+     $              /(1. + loss(l,i_ch3cooh)*dt)
+     
+         cc(l,i_ch3chohooh) = (cc0(l,i_ch3chohooh) 
+     $                      + production(l,i_ch3chohooh)*dt)
+     $              /(1. + loss(l,i_ch3chohooh)*dt)
+     
+         cc(l,i_ch3co)=production(l,i_ch3co)/
+     $                     loss(l,i_ch3co)
+     
+         cc(l,i_ch3cooo)=production(l,i_ch3cooo)/
+     $                     loss(l,i_ch3cooo)
+     
+         cc(l,i_ch3coooh) = (cc0(l,i_ch3coooh) 
+     $                    + production(l,i_ch3coooh)*dt)
+     $              /(1. + loss(l,i_ch3coooh)*dt)
+     
+         cc(l,i_hcoch2o2)=production(l,i_hcoch2o2)/
+     $                     loss(l,i_hcoch2o2)
+     
+         cc(l,i_glyox) = (cc0(l,i_glyox) + production(l,i_glyox)*dt)
+     $              /(1. + loss(l,i_glyox)*dt)
+     
+         cc(l,i_hcoco)=production(l,i_hcoco)/
+     $                     loss(l,i_hcoco)
+     
+         cc(l,i_hooch2cho) = (cc0(l,i_hooch2cho) 
+     $                     + production(l,i_hooch2cho)*dt)
+     $              /(1. + loss(l,i_hooch2cho)*dt)
+
+         cc(l,i_hoch2cho) = (cc0(l,i_hoch2cho) 
+     $                    + production(l,i_hoch2cho)*dt)
+     $              /(1. + loss(l,i_hoch2cho)*dt)
+     
+         cc(l,i_hochcho)=production(l,i_hochcho)/
+     $                     loss(l,i_hochcho)
+
+         cc(l,i_hoch2co)=production(l,i_hoch2co)/
+     $                     loss(l,i_hoch2co)
+
+         cc(l,i_hoch2co3)=production(l,i_hoch2co3)/
+     $                     loss(l,i_hoch2co3)
+     
+         cc(l,i_hoch2co2h) = (cc0(l,i_hoch2co2h) 
+     $                     + production(l,i_hoch2co2h)*dt)
+     $              /(1. + loss(l,i_hoch2co2h)*dt)
+     
+         cc(l,i_hcoco2h) = (cc0(l,i_hcoco2h) 
+     $                   + production(l,i_hcoco2h)*dt)
+     $              /(1. + loss(l,i_hcoco2h)*dt)
+     
+         cc(l,i_hoch2co3h) = (cc0(l,i_hoch2co3h) 
+     $                     + production(l,i_hoch2co3h)*dt)
+     $              /(1. + loss(l,i_hoch2co3h)*dt)
+     
+         cc(l,i_hcoco3h) = (cc0(l,i_hcoco3h) 
+     $                   + production(l,i_hcoco3h)*dt)
+     $              /(1. + loss(l,i_hcoco3h)*dt)
+    
+         cc(l,i_hcoco3)=production(l,i_hcoco3)/
+     $                     loss(l,i_hcoco3)
+     
+C !    Sum Peroxy Radicals [R-O2]
+
+         cc(l,i_ro2) = 1.e-30*dens(l)
+         
+         if ( cc(l,i_ch3o2) .gt. 1.e-30*dens(l)) then 
+               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_ch3o2)
+              
+         elseif ( cc(l,i_hoch2o2) .gt. 1.e-30*dens(l)) then 
+               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hoch2o2)
+
+         elseif ( cc(l,i_c2h5o2) .gt. 1.e-30*dens(l)) then 
+               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_c2h5o2)
+
+         elseif ( cc(l,i_hoch2ch2o2) .gt. 1.e-30*dens(l)) then 
+               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hoch2ch2o2)
+
+         elseif ( cc(l,i_ch3choho2) .gt. 1.e-30*dens(l)) then 
+               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_ch3choho2)
+
+         elseif ( cc(l,i_ch3cooo) .gt. 1.e-30*dens(l)) then 
+               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_ch3cooo)
+
+         elseif (cc(l,i_hcoch2o2) .gt. 1.e-30*dens(l)) then 
+               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hcoch2o2)
+
+         elseif (cc(l,i_hcoco3) .gt. 1.e-30*dens(l)) then 
+               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hcoco3)
+
+         elseif (cc(l,i_hoch2co3) .gt. 1.e-30*dens(l)) then 
+               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hoch2co3)
+
+         endif 
+ 
+
       end do
-c
+
+       
 c     ox species
-c
       if (sza .le. 95.) then
          do l = 1,lswitch-1
             cc(l,i_ox) = (cc0(l,i_ox) + production(l,i_ox)*dt)
-     $                   /(1. + loss(l,i_ox)*dt)
+     $                   /(1. + loss(l,i_ox)*dt)         
          end do
       else
          do l = 1,lswitch-1
@@ -753,16 +2141,20 @@ c
      $                   /(1. + loss(l,i_o)*dt)
             cc(l,i_o3) = (cc0(l,i_o3) + production(l,i_o3)*dt)
      $                   /(1. + loss(l,i_o3)*dt)
-            cc(l,i_ox) = cc(l,i_o) + cc(l,i_o3)
+            cc(l,i_ox) = cc(l,i_o) + cc(l,i_o3)          
          end do
       end if 
-c
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     end of loop over iterations
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
+
+
       end do
-c
+      
+
+      
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     density -> volume mixing ratio conversion
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -772,6 +2164,7 @@ c
             rm(l,iesp) = max(cc(l,iesp)/dens(l), 1.e-30)
          end do
       end do
+
 c
       return
       end
@@ -832,6 +2225,7 @@ c     day/night criterion
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       if (sza .le. 95.) then 
+
 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     temperatures at 1.9 hPa in lookup table
@@ -975,6 +2369,9 @@ c
          ciozo = (ratio_o3(l) - table_ozo(indozo)*10.)
      $          /(table_ozo(indozo + 1)*10. - table_ozo(indozo)*10.)
 c
+
+
+
 cc    4-dimensional interpolation weights
 c
 c     poids(temp,sza,co2,o3,tau)
@@ -1115,25 +2512,29 @@ c
      $   + poids(2,2,2,2,2)
      $     *jphot(indtemp+1,indsza+1,indcol+1,indozo+1,indtau+1,ij)
          end do
+		 
+
 c
 cc    correction for sun distance
 c
          do ij = 1,nd
             j(l,ij) = j(l,ij)*(1.52/dist_sol)**2.
          end do 
-c
+              
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     end of loop over vertical levels
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       end do
 c
-      else
+
 c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     night
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
+      else
+
       do ij = 1,nd
          do l = 1,lswitch-1
             j(l,ij) = 0.
@@ -1166,7 +2567,6 @@ c
 c
       integer nesp             ! number of species in the chemistry
       integer lswitch          ! interface level between chemistries
-c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     outputs:
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1181,23 +2581,75 @@ c
       
 c     tracer indexes in the chemistry:
 
-      integer,parameter :: i_co2  =  1
-      integer,parameter :: i_co   =  2
-      integer,parameter :: i_o    =  3
-      integer,parameter :: i_o1d  =  4
-      integer,parameter :: i_o2   =  5
-      integer,parameter :: i_o3   =  6
-      integer,parameter :: i_h    =  7
-      integer,parameter :: i_h2   =  8
-      integer,parameter :: i_oh   =  9
-      integer,parameter :: i_ho2  = 10
-      integer,parameter :: i_h2o2 = 11
-      integer,parameter :: i_ch4  = 12
-      integer,parameter :: i_h2o  = 13
-      integer,parameter :: i_n2   = 14
-      integer,parameter :: i_hox  = 15
-      integer,parameter :: i_ox   = 16
-c      
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     tracer numbering in the chemistry
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c
+       integer, parameter :: i_co2  =  1
+       integer, parameter :: i_co   =  2
+       integer, parameter :: i_o    =  3
+       integer, parameter :: i_o1d  =  4
+       integer, parameter :: i_o2   =  5
+       integer, parameter :: i_o3   =  6
+       integer, parameter :: i_h    =  7
+       integer, parameter :: i_h2   =  8
+       integer, parameter :: i_oh   =  9
+       integer, parameter :: i_ho2  = 10
+       integer, parameter :: i_h2o2 = 11
+!      Methane Oxidation
+       integer, parameter :: i_ch4  = 12
+       integer, parameter :: i_ch3  = 13 
+       integer, parameter :: i_ch3o2 = 14
+       integer, parameter :: i_ch3ooh = 15
+       integer, parameter :: i_ch3oh= 16
+       integer, parameter :: i_ch3o  = 17
+       integer, parameter :: i_hcho = 18
+       integer, parameter :: i_hcooh = 19
+       integer, parameter :: i_hoch2o2 = 20
+       integer, parameter :: i_hoch2oh = 21 
+       integer, parameter :: i_hoch2ooh = 22 
+       integer, parameter :: i_hco = 23
+!      Alkane Oxidation
+       integer, parameter :: i_c2h6 = 24
+       integer, parameter :: i_c2h5 = 25
+       integer, parameter :: i_c2h5o2 = 26
+       integer, parameter :: i_c2h5ooh = 27
+       integer, parameter :: i_c2h5oh = 28
+       integer, parameter :: i_hoch2ch2o2 = 29
+       integer, parameter :: i_hoch2ch2o = 30
+       integer, parameter :: i_ethgly = 31
+       integer, parameter :: i_hyetho2h = 32
+       integer, parameter :: i_ch3cho = 33
+       integer, parameter :: i_ch3choho2 = 34
+       integer, parameter :: i_ch3cooh = 35
+       integer, parameter :: i_ch3chohooh = 36
+       integer, parameter :: i_ch3co = 37
+       integer, parameter :: i_ch3cooo = 38
+       integer, parameter :: i_ch3coooh = 39
+       integer, parameter :: i_hcoch2o2 = 40
+       integer, parameter :: i_glyox = 41
+       integer, parameter :: i_hcoco = 42
+       integer, parameter :: i_hooch2cho = 43
+       integer, parameter :: i_hoch2cho = 44
+       integer, parameter :: i_hochcho = 45
+       integer, parameter :: i_hoch2co = 46
+       integer, parameter :: i_hoch2co3 = 47
+       integer, parameter :: i_hoch2co2h = 48
+       integer, parameter :: i_hcoco2h = 49
+       integer, parameter :: i_hoch2co3h = 50
+       integer, parameter :: i_hcoco3h = 51
+       integer, parameter :: i_hcoco3 = 52
+       integer, parameter :: i_ch2choh = 53
+!      Water, nitrogen, and Families
+       integer, parameter :: i_h2o  = 54
+       integer, parameter :: i_n2   = 55
+       integer, parameter :: i_hox  = 56
+       integer, parameter :: i_ox   = 57
+       integer, parameter :: i_RO2  = 58
+
+      
+
+       
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     initialise chemical species
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1227,7 +2679,376 @@ c
             rm(l,i_ch4) = max(zycol(l,igcm_ch4), 1.e-30)
          end do
       end if
-c
+      if (igcm_ch3 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch3) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch3) = max(zycol(l,igcm_ch3), 1.e-30)
+         end do
+      end if
+      if (igcm_ch3o2 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch3o2) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch3o2) = max(zycol(l,igcm_ch3o2), 1.e-30)
+         end do
+      end if
+      if (igcm_ch3ooh .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch3ooh) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch3ooh) = max(zycol(l,igcm_ch3ooh), 1.e-30)
+         end do
+      end if
+      if (igcm_ch3oh .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch3oh) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch3oh) = max(zycol(l,igcm_ch3oh), 1.e-30)
+         end do
+      end if
+      if (igcm_ch3o .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch3o) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch3o) = max(zycol(l,igcm_ch3o), 1.e-30)
+         end do
+      end if
+      if (igcm_hcho .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hcho) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hcho) = max(zycol(l,igcm_hcho), 1.e-30)
+         end do
+      end if
+      if (igcm_hcooh .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hcooh) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hcooh) = max(zycol(l,igcm_hcooh), 1.e-30)
+         end do
+      end if
+      if (igcm_hoch2o2 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hoch2o2) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hoch2o2) = max(zycol(l,igcm_hoch2o2), 1.e-30)
+         end do
+      end if
+      if (igcm_hoch2oh .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hoch2oh) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hoch2oh) = max(zycol(l,igcm_hoch2oh), 1.e-30)
+         end do
+      end if
+      if (igcm_hoch2ooh .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hoch2ooh) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hoch2ooh) = max(zycol(l,igcm_hoch2ooh), 1.e-30)
+         end do
+      end if
+      if (igcm_hco .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hco) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hco) = max(zycol(l,igcm_hco), 1.e-30)
+         end do
+      end if
+      if (igcm_c2h6 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_c2h6) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_c2h6) = max(zycol(l,igcm_c2h6), 1.e-30)
+         end do
+      end if
+      if (igcm_c2h5 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_c2h5) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_c2h5) = max(zycol(l,igcm_c2h5), 1.e-30)
+         end do
+      end if
+      if (igcm_c2h5o2 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_c2h5o2) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_c2h5o2) = max(zycol(l,igcm_c2h5o2), 1.e-30)
+         end do
+      end if
+      if (igcm_c2h5ooh .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_c2h5ooh) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_c2h5ooh) = max(zycol(l,igcm_c2h5ooh), 1.e-30)
+         end do
+      end if
+      if (igcm_c2h5oh .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_c2h5oh) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_c2h5oh) = max(zycol(l,igcm_c2h5oh), 1.e-30)
+         end do
+      end if
+      if (igcm_hoch2ch2o2 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hoch2ch2o2) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hoch2ch2o2) = max(zycol(l,igcm_hoch2ch2o2), 1.e-30)
+         end do
+      end if
+      if (igcm_hoch2ch2o .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hoch2ch2o) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hoch2ch2o) = max(zycol(l,igcm_hoch2ch2o), 1.e-30)
+         end do
+      end if
+      if (igcm_ethgly .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ethgly) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ethgly) = max(zycol(l,igcm_ethgly), 1.e-30)
+         end do
+      end if
+      if (igcm_hyetho2h .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hyetho2h) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hyetho2h) = max(zycol(l,igcm_hyetho2h), 1.e-30)
+         end do
+      end if
+      if (igcm_ch3cho .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch3cho) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch3cho) = max(zycol(l,igcm_ch3cho), 1.e-30)
+         end do
+      end if
+      if (igcm_ch2choh .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch2choh) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch2choh) = max(zycol(l,igcm_ch2choh), 1.e-30)
+         end do
+      end if  
+      if (igcm_ch3choho2 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch3choho2) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch3choho2) = max(zycol(l,igcm_ch3choho2), 1.e-30)
+         end do
+      end if
+      if (igcm_ch3cooh .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch3cooh) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch3cooh) = max(zycol(l,igcm_ch3cooh), 1.e-30)
+         end do
+      end if
+      if (igcm_ch3chohooh .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch3chohooh) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch3chohooh) = max(zycol(l,igcm_ch3chohooh), 1.e-30)
+         end do
+      end if
+      if (igcm_ch3co .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch3co) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch3co) = max(zycol(l,igcm_ch3co), 1.e-30)
+         end do
+      end if
+      if (igcm_ch3cooo .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch3cooo) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch3cooo) = max(zycol(l,igcm_ch3cooo), 1.e-30)
+         end do
+      end if
+      if (igcm_ch3coooh .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_ch3coooh) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_ch3coooh) = max(zycol(l,igcm_ch3coooh), 1.e-30)
+         end do
+      end if
+      if (igcm_hcoch2o2 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hcoch2o2) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hcoch2o2) = max(zycol(l,igcm_hcoch2o2), 1.e-30)
+         end do
+      end if
+      if (igcm_glyox .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_glyox) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_glyox) = max(zycol(l,igcm_glyox), 1.e-30)
+         end do
+      end if
+      if (igcm_hcoco .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hcoco) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hcoco) = max(zycol(l,igcm_hcoco), 1.e-30)
+         end do
+      end if
+      if (igcm_hooch2cho .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hooch2cho) = 0.
+         end do
+      else
+         do l = 1,lswitch-1      
+            rm(l,i_hooch2cho) = max(zycol(l,igcm_hooch2cho), 1.e-30)
+         end do
+      end if
+      if (igcm_hoch2cho .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hoch2cho) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hoch2cho) = max(zycol(l,igcm_hoch2cho), 1.e-30)
+         end do
+      end if
+      if (igcm_hochcho .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hochcho) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hochcho) = max(zycol(l,igcm_hochcho), 1.e-30)
+         end do
+      end if
+      if (igcm_hoch2co .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hoch2co) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hoch2co) = max(zycol(l,igcm_hoch2co), 1.e-30)
+         end do
+      end if
+      if (igcm_hoch2co3 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hoch2co3) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hoch2co3) = max(zycol(l,igcm_hoch2co3), 1.e-30)
+         end do
+      end if
+      if (igcm_hoch2co2h .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hoch2co2h) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hoch2co2h) = max(zycol(l,igcm_hoch2co2h), 1.e-30)
+         end do
+      end if
+      if (igcm_hcoco2h .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hcoco2h) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hcoco2h) = max(zycol(l,igcm_hcoco2h), 1.e-30)
+         end do
+      end if
+      if (igcm_hcoco3h .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hcoco3h) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hcoco3h) = max(zycol(l,igcm_hcoco3h), 1.e-30)
+         end do
+      end if      
+      if (igcm_hcoco3 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hcoco3) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hcoco3) = max(zycol(l,igcm_hcoco3), 1.e-30)
+         end do
+      end if
+      if (igcm_hoch2co3h .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hoch2co3h) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hoch2co3h) = max(zycol(l,igcm_hoch2co3h), 1.e-30)
+         end do
+      end if
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     initialise chemical families                     c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1238,6 +3059,40 @@ c
      $               + rm(l,i_ho2)
          rm(l,i_ox)  = rm(l,i_o) 
      $               + rm(l,i_o3)
+     
+         rm(l,i_ro2) = 1.e-30
+         
+         if ( rm(l,i_ch3o2) .gt. 1.e-30) then 
+               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_ch3o2)
+               
+         elseif ( rm(l,i_hoch2o2) .gt. 1.e-30) then 
+               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hoch2o2)
+               
+         elseif ( rm(l,i_c2h5o2) .gt. 1.e-30) then 
+               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_c2h5o2)
+               
+         elseif ( rm(l,i_hoch2ch2o2) .gt. 1.e-30) then 
+               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hoch2ch2o2)
+               
+         elseif ( rm(l,i_ch3choho2) .gt. 1.e-30) then 
+               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_ch3choho2)
+
+         elseif ( rm(l,i_ch3cooo) .gt. 1.e-30) then 
+               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_ch3cooo)
+               
+         elseif (rm(l,i_hcoch2o2) .gt. 1.e-30) then 
+               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hcoch2o2)
+               
+         elseif (rm(l,i_hcoco3) .gt. 1.e-30) then 
+               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hcoco3)
+               
+         elseif (rm(l,i_hoch2co3) .gt. 1.e-30) then 
+               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hoch2co3)
+               
+         endif 
+         
+        rm(l,i_ro2) = max(rm(l,i_ro2),1.e-30)
+        
       end do
 c
       return
@@ -1279,23 +3134,72 @@ c
       
 c     tracer indexes in the chemistry:
 
-      integer,parameter :: i_co2  =  1
-      integer,parameter :: i_co   =  2
-      integer,parameter :: i_o    =  3
-      integer,parameter :: i_o1d  =  4
-      integer,parameter :: i_o2   =  5
-      integer,parameter :: i_o3   =  6
-      integer,parameter :: i_h    =  7
-      integer,parameter :: i_h2   =  8
-      integer,parameter :: i_oh   =  9
-      integer,parameter :: i_ho2  = 10
-      integer,parameter :: i_h2o2 = 11
-      integer,parameter :: i_ch4  = 12
-      integer,parameter :: i_h2o  = 13
-      integer,parameter :: i_n2   = 14
-      integer,parameter :: i_hox  = 15
-      integer,parameter :: i_ox   = 16
-c      
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     tracer numbering in the chemistry
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c
+       integer, parameter :: i_co2  =  1
+       integer, parameter :: i_co   =  2
+       integer, parameter :: i_o    =  3
+       integer, parameter :: i_o1d  =  4
+       integer, parameter :: i_o2   =  5
+       integer, parameter :: i_o3   =  6
+       integer, parameter :: i_h    =  7
+       integer, parameter :: i_h2   =  8
+       integer, parameter :: i_oh   =  9
+       integer, parameter :: i_ho2  = 10
+       integer, parameter :: i_h2o2 = 11
+!      Methane Oxidation
+       integer, parameter :: i_ch4  = 12
+       integer, parameter :: i_ch3  = 13 
+       integer, parameter :: i_ch3o2 = 14
+       integer, parameter :: i_ch3ooh = 15
+       integer, parameter :: i_ch3oh= 16
+       integer, parameter :: i_ch3o  = 17
+       integer, parameter :: i_hcho = 18
+       integer, parameter :: i_hcooh = 19
+       integer, parameter :: i_hoch2o2 = 20
+       integer, parameter :: i_hoch2oh = 21 
+       integer, parameter :: i_hoch2ooh = 22 
+       integer, parameter :: i_hco = 23
+!      Alkane Oxidation
+       integer, parameter :: i_c2h6 = 24
+       integer, parameter :: i_c2h5 = 25
+       integer, parameter :: i_c2h5o2 = 26
+       integer, parameter :: i_c2h5ooh = 27
+       integer, parameter :: i_c2h5oh = 28
+       integer, parameter :: i_hoch2ch2o2 = 29
+       integer, parameter :: i_hoch2ch2o = 30
+       integer, parameter :: i_ethgly = 31
+       integer, parameter :: i_hyetho2h = 32
+       integer, parameter :: i_ch3cho = 33
+       integer, parameter :: i_ch3choho2 = 34
+       integer, parameter :: i_ch3cooh = 35
+       integer, parameter :: i_ch3chohooh = 36
+       integer, parameter :: i_ch3co = 37
+       integer, parameter :: i_ch3cooo = 38
+       integer, parameter :: i_ch3coooh = 39
+       integer, parameter :: i_hcoch2o2 = 40
+       integer, parameter :: i_glyox = 41
+       integer, parameter :: i_hcoco = 42
+       integer, parameter :: i_hooch2cho = 43
+       integer, parameter :: i_hoch2cho = 44
+       integer, parameter :: i_hochcho = 45
+       integer, parameter :: i_hoch2co = 46
+       integer, parameter :: i_hoch2co3 = 47
+       integer, parameter :: i_hoch2co2h = 48
+       integer, parameter :: i_hcoco2h = 49
+       integer, parameter :: i_hoch2co3h = 50
+       integer, parameter :: i_hcoco3h = 51
+       integer, parameter :: i_hcoco3 = 52
+       integer, parameter :: i_ch2choh = 53
+!      Water, nitrogen, and Families
+       integer, parameter :: i_h2o  = 54
+       integer, parameter :: i_n2   = 55
+       integer, parameter :: i_hox  = 56
+       integer, parameter :: i_ox   = 57
+       integer, parameter :: i_RO2  = 58
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     save mixing ratios for the gcm
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1321,14 +3225,220 @@ c
             zycol(l,igcm_ch4) = rm(l,i_ch4)
          end do
       end if
-c
+      if (igcm_ch3 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch3) = rm(l,i_ch3)
+         end do
+      end if
+      if (igcm_ch3o2 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch3o2) = rm(l,i_ch3o2)
+         end do
+      end if
+      if (igcm_ch3ooh .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch3ooh) = rm(l,i_ch3ooh)
+         end do
+      end if
+      if (igcm_ch3oh .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch3oh) = rm(l,i_ch3oh)
+         end do
+      end if
+      if (igcm_ch3o .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch3o) = rm(l,i_ch3o)
+         end do
+      end if
+      if (igcm_hcho .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hcho) = rm(l,i_hcho)
+         end do
+      end if
+      if (igcm_hcooh .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hcooh) = rm(l,i_hcooh)
+         end do
+      end if
+      if (igcm_hoch2o2 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hoch2o2) = rm(l,i_hoch2o2)
+         end do
+      end if
+      if (igcm_hoch2oh .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hoch2oh) = rm(l,i_hoch2oh)
+         end do
+      end if
+      if (igcm_hoch2ooh .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hoch2ooh) = rm(l,i_hoch2ooh)
+         end do
+      end if
+      if (igcm_hco .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hco) = rm(l,i_hco)
+         end do
+      end if
+      if (igcm_c2h6 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_c2h6) = rm(l,i_c2h6)
+         end do
+      end if
+      if (igcm_c2h5 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_c2h5) = rm(l,i_c2h5)
+         end do
+      end if
+      if (igcm_c2h5o2 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_c2h5o2) = rm(l,i_c2h5o2)
+         end do
+      end if
+      if (igcm_c2h5ooh .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_c2h5ooh) = rm(l,i_c2h5ooh)
+         end do
+      end if
+      if (igcm_c2h5oh .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_c2h5oh) = rm(l,i_c2h5oh)
+         end do
+      end if
+      if (igcm_hoch2ch2o2 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hoch2ch2o2) = rm(l,i_hoch2ch2o2)
+         end do
+      end if
+      if (igcm_hoch2ch2o .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hoch2ch2o) = rm(l,i_hoch2ch2o)
+         end do
+      end if
+      if (igcm_ethgly .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ethgly) = rm(l,i_ethgly)
+         end do
+      end if
+      if (igcm_hyetho2h .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hyetho2h) = rm(l,i_hyetho2h)
+         end do
+      end if
+      if (igcm_ch3cho .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch3cho) = rm(l,i_ch3cho)
+         end do
+      end if
+      if (igcm_ch3choho2 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch3choho2) = rm(l,i_ch3choho2)
+         end do
+      end if
+      if (igcm_ch3cooh .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch3cooh) = rm(l,i_ch3cooh)
+         end do
+      end if
+      if (igcm_ch3chohooh .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch3chohooh) = rm(l,i_ch3chohooh)
+         end do
+      end if
+      if (igcm_ch3co .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch3co) = rm(l,i_ch3co)
+         end do
+      end if
+      if (igcm_ch3cooo .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch3cooo) = rm(l,i_ch3cooo)
+         end do
+      end if
+      if (igcm_ch3coooh .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch3coooh) = rm(l,i_ch3coooh)
+         end do
+      end if
+      if (igcm_hcoch2o2 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hcoch2o2) = rm(l,i_hcoch2o2)
+         end do
+      end if
+      if (igcm_glyox .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_glyox) = rm(l,i_glyox)
+         end do
+      end if
+      if (igcm_hcoco .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hcoco) = rm(l,i_hcoco)
+         end do
+      end if
+      if (igcm_hooch2cho .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hooch2cho) = rm(l,i_hooch2cho)
+         end do
+      end if
+      if (igcm_hoch2cho .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hoch2cho) = rm(l,i_hoch2cho)
+         end do
+      end if
+      if (igcm_hochcho .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hochcho) = rm(l,i_hochcho)
+         end do
+      end if
+      if (igcm_hoch2co .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hoch2co) = rm(l,i_hoch2co)
+         end do
+      end if
+      if (igcm_hoch2co3 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hoch2co3) = rm(l,i_hoch2co3)
+         end do
+      end if
+      if (igcm_hoch2co2h .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hoch2co2h) = rm(l,i_hoch2co2h)
+         end do
+      end if
+      if (igcm_hcoco2h .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hcoco2h) = rm(l,i_hcoco2h)
+         end do
+      end if
+      if (igcm_hoch2co3h .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hoch2co3h) = rm(l,i_hoch2co3h)
+         end do
+      end if
+      if (igcm_hcoco3h .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hcoco3h) = rm(l,i_hcoco3h)
+         end do
+      end if
+      if (igcm_hcoco3 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hcoco3) = rm(l,i_hcoco3)
+         end do
+      end if
+      if (igcm_ch2choh .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_ch2choh) = rm(l,i_ch2choh)
+         end do
+      end if
+      
       return
+      
       end
 c
 c*****************************************************************
 c
       subroutine chemrates(lswitch, dens, press, t,
-     $                     surfdust1d, surfice1d,
+     $                     surfdust1d, surfice1d, 
      $                     a001, a002, a003,
      $                     b001, b002, b003, b004, b005, b006,
      $                     b007, b008, b009,
@@ -1338,7 +3448,29 @@ c
      $                     d001, d002, d003,
      $                     e001, e002, e003,
      $                     h001, h002, h003, h004, h005,
-     $                     t001, t002, t003, tau)
+     $                     t001, t002, t003, tau,
+     $               cab001, cab002, cab003, cab004, cab005,
+     $               cab006, cab007, cab008, cab009, cab010,
+     $               cab011, cab012, cab013, cab014, cab015,
+     $               cab016, cab017, cab018, cab019, cab020,
+     $               cab021, cab022, cab023, cab024, cab025,
+     $               cab026, cab027, cab028, cab029, cab030,
+     $               cab031, cab032, cab033, cab034, cab035,
+     $               cab036, cab037, cab038, cab039, cab040,
+     $               cab041, cab042, cab043, cab044, cab045,
+     $               cab046, cab047, cab048, cab049, cab050,
+     $               cab051, cab052, cab053, cab054, cab055,
+     $               cab056, cab057, cab058, cab059, cab060,
+     $               cab061, cab062, cab063, cab064, cab065,
+     $               cab066, cab067, cab068, cab069, cab070,
+     $               cab071, cab072, cab073, cab074, cab075,
+     $               cab076, cab077, cab078, cab079, cab080,
+     $               cab081, cab082, cab083, cab084, cab085,
+     $               cab086, cab087, cab088, cab089, cab090,
+     $               cab091, cab092, cab093, cab094, cab095,
+     $               cab096, cab097, cab098, cab099, cab100,
+     $               cab101, cab102, cab103, cab104, cab105,
+     $               cab106)
 c
 c*****************************************************************
 c
@@ -1383,7 +3515,45 @@ c
       real h001(nlayermx), h002(nlayermx), h003(nlayermx),
      $     h004(nlayermx), h005(nlayermx)
       real t001(nlayermx), t002(nlayermx), t003(nlayermx)
-c
+
+      real cab001(nlayermx), cab002(nlayermx), cab003(nlayermx),
+     $     cab004(nlayermx), cab005(nlayermx), cab006(nlayermx),
+     $     cab007(nlayermx), cab008(nlayermx), cab009(nlayermx),
+     $     cab010(nlayermx), cab011(nlayermx), cab012(nlayermx),
+     $     cab013(nlayermx), cab014(nlayermx), cab015(nlayermx),
+     $     cab016(nlayermx), cab017(nlayermx), cab018(nlayermx), 
+     $     cab019(nlayermx), cab020(nlayermx), cab021(nlayermx), 
+     $     cab022(nlayermx), cab023(nlayermx), cab024(nlayermx), 
+     $     cab025(nlayermx), cab026(nlayermx), cab027(nlayermx), 
+     $     cab028(nlayermx), cab029(nlayermx), cab030(nlayermx),
+     $     cab031(nlayermx), cab032(nlayermx), cab033(nlayermx),
+     $     cab034(nlayermx), cab035(nlayermx), cab036(nlayermx),
+     $     cab037(nlayermx), cab038(nlayermx), cab039(nlayermx),
+     $     cab040(nlayermx), cab041(nlayermx), cab042(nlayermx),
+     $     cab043(nlayermx), cab044(nlayermx), cab045(nlayermx),
+     $     cab046(nlayermx), cab047(nlayermx), cab048(nlayermx),
+     $     cab049(nlayermx), cab050(nlayermx), cab051(nlayermx),
+     $     cab052(nlayermx), cab053(nlayermx), cab054(nlayermx),
+     $     cab055(nlayermx), cab056(nlayermx), cab057(nlayermx),
+     $     cab058(nlayermx), cab059(nlayermx), cab060(nlayermx),
+     $     cab061(nlayermx), cab062(nlayermx), cab063(nlayermx),
+     $     cab064(nlayermx), cab065(nlayermx), cab066(nlayermx),
+     $     cab067(nlayermx), cab068(nlayermx), cab069(nlayermx),
+     $     cab070(nlayermx), cab071(nlayermx), cab072(nlayermx),
+     $     cab073(nlayermx), cab074(nlayermx), cab075(nlayermx),
+     $     cab076(nlayermx), cab077(nlayermx), cab078(nlayermx),
+     $     cab079(nlayermx), cab080(nlayermx), cab081(nlayermx),
+     $     cab082(nlayermx), cab083(nlayermx), cab084(nlayermx),
+     $     cab085(nlayermx), cab086(nlayermx), cab087(nlayermx),
+     $     cab088(nlayermx), cab089(nlayermx), cab090(nlayermx),
+     $     cab091(nlayermx), cab092(nlayermx), cab093(nlayermx),
+     $     cab094(nlayermx), cab095(nlayermx), cab096(nlayermx),
+     $     cab097(nlayermx), cab098(nlayermx), cab099(nlayermx),
+     $     cab100(nlayermx), cab101(nlayermx), cab102(nlayermx),
+     $     cab103(nlayermx), cab104(nlayermx), cab105(nlayermx),
+     $     cab106(nlayermx)
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     local:                                                     c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1395,9 +3565,51 @@ c
       real k1a, k1b, k1a0, k1b0, k1ainf
       real x, y, fc, fx
 c
+c     KIE calculations for 13CH4 + OH / 13CH4 + O1D  
+      real dum(2)
+      real r_coef, theta
+      real kie_oh, kie_o1d
+      real, parameter :: KIE_OH_U = 1.00562 ! Mean KIE of 13CH4 + OH 
+      real, parameter :: KIE_OH_STD = 0.00042 ! STD of KIE_OH_U 
+                                              ! Values from https://doi.org/10.1029/JD095iD13p22455
+      real, parameter :: KIE_O1D_U = 1.013 ! Mean KIE of 13CH4 + O(1D)
+      real, parameter :: KIE_O1D_STD = 0.0006 ! STD of KIE_O1D_STD
+
+cccc Three-body calculator 
+      real k_3body  ! the function 
+cccc Organic parameters [CAABA v4.0]
+      real k_ch3o2, k_ch3ooh_oh, k_roohro, k_rohro,
+     $     k_s, k_RO2sORO2,
+     $     k_t, k_ro2rco3, k_ro2poro2,k_ro2ho2_1,
+     $     k_ro2ho2_2,  kapho2,
+     $     k_co2h, k_ch3co2h
+      real, parameter :: f_sooh = 8. 
+      real, parameter :: f_soh = 3.44
+      real, parameter :: k_rchohch2o2_oh = 0.1
+      real, parameter :: f_pch2oh = 1.29 
+      real, parameter :: f_tooh = 8.
+      real, parameter :: f_toh = 2.68
+      real, parameter :: rcoch2o2_oh = 0.15
+      real, parameter :: rcoch2o2_ooh = 0.85
+      real, parameter :: kdec = 1.e6
+      real, parameter :: rco3_o3 = 0.1
+      real, parameter :: rco3_oh = 0.69 
+      real, parameter :: rco3_ooh = 0.21 
+      real, parameter :: f_o = 8.15
+      real, parameter :: f_cho = 0.55
+      real, parameter :: f_co2h = 1.67
+     
+      real j_5_2, k0, kinf
+     
+
+
+     
+     
+     
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     compute reaction rates
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
 c
       do l = 1,lswitch-1
 c
@@ -1497,23 +3709,23 @@ c        jpl 2003
 c
          b006(l) = 1.2e-10
 c    
-ccc      b007: o(1d) + ch4 -> ch3 + oh
-c
-c        jpl 2003
-c
-         b007(l) = 1.5e-10*0.75
-c
-ccc      b008: o(1d) + ch4 -> ch3o + h
-c
-c        jpl 2003
-c
-         b008(l) = 1.5e-10*0.20
-c
-ccc      b009: o(1d) + ch4 -> ch2o + h2
-c
-c        jpl 2003
-c
-         b009(l) = 1.5e-10*0.05
+C ccc      b007: o(1d) + ch4 -> ch3 + oh
+C c
+C c        jpl 2003
+C c
+          b007(l) = 1.75e-10*0.75
+C c
+C ccc      b008: o(1d) + ch4 -> ch3o + h
+C c
+C c        jpl 2003
+C c
+          b008(l) = 1.75e-10*0.20
+C c
+C ccc      b009: o(1d) + ch4 -> ch2o + h2
+C c
+C c        jpl 2003
+C c
+          b009(l) = 1.75e-10*0.05
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        hydrogen compounds    
@@ -1522,6 +3734,7 @@ c
 ccc      c001: o + ho2 -> oh + o2
 c
 c        jpl 2003
+
 c 
          c001(l) = 3.0e-11*exp(200./t(l))
 c
@@ -1590,6 +3803,13 @@ c
 c        christensen et al., grl, 13, 2002
 c
          c008(l) = 1.5e-12*exp(19./t(l))
+         
+cccccc Water Vapor enhancement: 
+cccccc "The Effects of Water Vapor on the CH3O2 Self-Reaction 
+cccccc  and Reaction with HO2" - English, A. M. et al. [2008]
+cccccc DOI : 10.1021/jp800727a
+cccccc c008(l) = 3.4e-13*EXP(594/T(l))*(1. + 2.4e-21*exp(2200/T(l))*[H2O] )
+         
 c
 ccc      c009: oh + h2o2 -> h2o + ho2
 c
@@ -1610,7 +3830,7 @@ c
 c        jpl 2006
 c
          c010(l) = 2.8e-12*exp(-1800./t(l))
-c
+
 ccc      c011: h + o2 + co2 -> ho2 + co2
 c
 c        jpl 2011
@@ -1694,6 +3914,8 @@ c
          xpo = 1./(1. + alog10((ak0*dens(l))/ak1)**2)
          c017(l) = rate*0.6**xpo
 c
+
+
 ccc      c018: h + h + co2 -> h2 + co2
 c
 c        baulch et al., 1992
@@ -1749,7 +3971,7 @@ c
 c        e001(l) = 1.44e-13 + 3.43e-33*dens(l)
 c
 c        joshi et al., 2006
-c
+c         
          k1a0 = 1.34*2.5*dens(l)
      $         *1/(1/(3.62e-26*t(l)**(-2.739)*exp(-20./t(l)))
      $         + 1/(6.48e-33*t(l)**(0.14)*exp(-57./t(l))))   ! corrige de l'erreur publi
@@ -1785,8 +4007,572 @@ c        e003(l) = 2.45e-12*exp(-1775./t(l))
 c
 c        jpl 2003, three-parameter expression
 c
-         e003(l) = 2.80e-14*(t(l)**0.667)*exp(-1575./t(l))
-c
+c          e003(l) = 2.80e-14*(t(l)**0.667)*exp(-1575./t(l))
+
+	  
+C ! cccccccccccccccccccccc
+C ! ccccc 13CH4 Reactions 
+C ! cccccccccccccccccccccc
+       
+C ! c     13ch4 + oh -> ch3 + h2o
+C       ! CALL RANDOM_NUMBER(dum)
+
+C       ! r_coef = (-2.*LOG(dum(1)))**0.5
+
+C       ! theta = 2.*3.14159265359*dum(2)
+
+C       ! kie_oh = kie_oh_u + kie_oh_std*r_coef*sin(theta)
+
+     
+C ! c     13ch4 + o(1d) -> 0.75*ch3 + 0.75*oh + 0.2*ch3o + 0.2*h + 0.1*ch2o + 0.1*h2
+C       ! kie_o1d = kie_o1d_u + kie_o1d_std*r_coef*sin(theta)
+
+C       ! org037(l) = (b007(l) + b008(l) + b009(l))/kie_o1d 
+
+       
+       
+       
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c      Methane Oxidation - CAABA/MECCA  Version 4.0
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+cccccccc Parameter calculations
+         k_ch3o2 = 1.03e-13*exp(365./t(l))
+         k_ch3ooh_oh = 5.3e-12*exp(190./t(l))
+         k_ch3co2h = 4.e-14*exp(850./t(l))
+         k_roohro = 0.6*k_ch3ooh_oh
+         k_rohro = 2.1e-18*t(l)*t(l)*exp(-85./t(l))
+         k_s = 4.5e-18*t(l)*t(l)*exp(253./t(l))
+         k_RO2sORO2 = 2.*(7.7E-15*exp(1330./t(l))*k_ch3o2)**0.5
+         k_t = 2.12e-18*t(l)*t(l)*exp(696./t(l))
+         k_ro2rco3 = 2.*2.e-12*exp(500./t(l))
+         k_ro2poro2 = 2.*7.5e-13*exp(500./t(l))
+         k_ro2ho2_1 = 2.91e-13*exp(1300./t(l))*(1.-exp(-0.245*1.))
+         k_ro2ho2_2 = 2.91e-13*exp(1300./t(l))*(1.-exp(-0.245*2.))
+         kapho2 = 5.e-13*exp(980./t(l))
+         k_co2h = 0.7*k_ch3co2h
+
+         
+cccccccc
+cc ch4 
+cccccccc
+c        cab001: ch4 + oh -> ch3 + h2o
+         cab001(l) = 1.85e-20*EXP(2.82*LOG(t(l)) - 987./t(l))
+
+c        cab002: ch4 + o -> 0.51*ch3 + 0.51*oh + 0.49*ch3o + 0.49*h 
+         cab002(l) = 6.03e-18*(t(l)**2.17)*EXP(-3619./t(l))
+         
+cccccccc 
+cc ch3 
+cccccccc 
+c        cab003: ch3 + o2 + M -> ch3o2 + M 
+         cab003(l) = k_3body(t(l),dens(l), 7.e-31, 3.,
+     $              1.8e-12, -1.1, 0.33, .True.)
+          
+c        cab004: ch3 + o3 -> 0.956*hcho + 0.956*h + 0.044*ch3o + o2 
+         cab004(l) = 5.1e-12*EXP(-210./t(l))
+         
+c        cab005: ch3 + o -> 0.83*hcho + 0.83*h + 0.17*co + 0.17*h2 + 0.17*h 
+         cab005(l) = 1.3e-10
+         
+ccccccccc 
+cc ch3o2 
+ccccccccc 
+c        cab006: ch3o2 + ho2 -> ch3ooh + o2
+         cab006(l) = 3.8e-13*exp(780./t(l))
+     $             /( 1. + 1./(498.*exp(1160./t(l))))
+
+c        cab007: ch3o2 + ho2 -> hcho + h2o + o2 
+         cab007(l) = 3.8e-13*exp(780./t(l))
+     $             /( 1. + (498.*exp(-1160./t(l))))
+         
+c        cab008: ch3o2 + ro2 -> ch3o + 0.5*o2
+         cab008(l) = 7.4e-13*exp(-520./t(l))*2. ! *[RO2]
+         
+C        cab009: ch3o2 + ro2 -> 0.5*hcho + 0.5ch3oh + 0.5*o2  
+         cab009(l) = (k_ch3o2 - 7.4e-13*exp(-520./t(l)))*2. ! *[RO2]
+         
+c        cab010: ch3o2 + o3 -> ch3o + 2.*o2 
+         cab010(l) = 2.9e-16*exp(-1000./t(l))
+         
+c        cab011: ch3o2 + oh -> ch3o + ho2 
+         cab011(l) = 1.4e-10 
+         
+c        cab012: ch3o2 + o -> ch3o + o2 
+         cab012(l) = 4.3e-11 
+         
+ccccccccc
+cc ch3oh 
+ccccccccc
+c       cab013: ch3oh + oh -> 0.85*hcho + 0.85*ho2 + 0.15*ch3o h2o 
+        cab013(l) = 6.38e-18*(t(l)**2.)*exp(144./t(l))
+         
+ccccccccc
+cc ch3ooh 
+ccccccccc
+c       cab014: ch3ooh + oh -> 0.6*ch3o2 + 0.4*hcho + 0.4*oh + h2o 
+        cab014(l) = k_ch3ooh_oh
+         
+ccccccc
+cc ch3o
+ccccccc
+c       cab015: ch3o + o2 -> ho2 + hcho 
+        cab015(l) = 1.3e-14*exp(-663./t(l))
+
+c       cab016: ch3o + o3 -> ch3o2 + o2 
+        cab016(l) = 2.53e-14
+        
+c       cab017: ch3o + o -> 0.75*ch3 + 0.75*o2 + 0.25*hcho + 0.25*oh 
+        cab017(l) = 2.5e-11
+c        
+ccccccc
+cc hcho
+ccccccc
+c       cab018: hcho + oh -> hco + h2o
+        cab018(l) = 5.5e-12*exp(-125/t(L)) ! [JPL Atmospheric Handbook Evaluation 18]
+
+c       cab019: hcho + ho2 -> hoch2o2 
+        cab019(l) = 9.7e-15*exp(625./t(l)) 
+        
+c       cab020: hcho + o -> hco + oh 
+        cab020(l) = 2.99e-11*exp( -1.28e4/(8.314*t(l))) ! [Evaluated chemical kinetic data for the reactions of atomic oxygen O(3P) with saturated organic compounds in the gas phase]
+        
+ccccccc 
+cc hco 
+ccccccc
+c      cab021: hco + o -> co + oh 
+       cab021(l) = 5.e-11 ! [Evaluated kinetic data for combustion modelling]
+     
+c      cab022: hco + ch3 -> ch4 + co [The application of an intracavity laser spectroscopy method for elementary processes study in gas-phase reactions]
+       cab022(l) = 4.4e-11 
+    
+c      cab023: hco + ch3 -> ch3cho [ Investigation of the Recombination of the HCO Radical in an Atmosphere of Argon and Helium by the Method of Internal Resonator Laser Spectroscopy]
+       cab023(l) = 4.42e-11 
+       
+c      cab024: 2.*hco -> hcho + co [Quantitative Detection of HCO Behind Shock Waves: The Thermal Decomposition of HCO]
+       cab024(l) =  4.48e-11 
+       
+c      cab025: hco + oh -> co + h2o [Evaluated kinetic data for combustion modelling]
+       cab025(l) = 1.69e-10
+       
+c      cab026: hco + o2 -> co + ho2 [JPL Handbook Evaluation 18]
+       cab026(l) = 5.2e-12 
+       
+c      cab027: hco + h -> co + h2 [Quantitative Detection of HCO Behind Shock Waves: The Thermal Decomposition of HCO]
+       cab027(l) = 1.83e-10
+       
+cccccccccc 
+cc hoch2o2 
+cccccccccc 
+c     cab028: hoch2o2 -> hcho + ho2 
+      cab028(l) = 2.4e12*exp(-7000./t(l))
+      
+c     cab029: hoch2o2 + ho2 -> 0.5*hoch2ooh + 0.5*hcooh + 0.2*oh + 0.2*ho2 + 0.3*h2o + 0.8*o2 
+      cab029(l) = 5.6e-15*exp(2300./t(l))
+
+c     cab030: hoch2o2 + ro2 -> hcooh + ho2 
+      cab030(l) = 2.*(k_ch3o2*5.5e-12)**0.5
+      
+c     cab031: hoch2o2 + ro2 -> 0.5*hcooh + 0.5*hoch2oh + 0.5*o2 
+      cab031(l) = 2.*(k_ch3o2*5.7e-14*exp(750./t(l)))**0.5
+      
+cccccccccc
+cc hcooh 
+cccccccccc
+c     cab032: hcooh + oh  -> co2 + ho2 + h2o 
+      cab032(l) = 2.94e-14*exp(786./t(l)) 
+     $            + 9.85e-13*exp(-1036./t(l))
+     
+cccccccccc
+cc hoch2ooh
+cccccccccc
+c     cab033: hoch2ooh + oh -> hoch2o2 
+      cab033(l) = k_roohro
+      
+c     cab034: hoch2ooh + oh -> hcooh + h2o + oh     
+      cab034(l) = k_rohro + k_s*f_sooh*f_soh
+     
+cccccccccc
+cc hoch2oh
+cccccccccc
+c     cab035: hoch2oh + oh -> ho2 + hcooh + h2o     
+      cab035(l) = 2.*k_rohro + k_s*f_soh*f_soh
+      
+cccccccccc 
+cc c2h6 
+cccccccccc 
+c     cab036: c2h6 + oh -> c2h5 + h2o [JPL Data Evaluation 18]
+      cab036(l) = 7.66e-12*exp(-1020./t(l))
+      
+c     cab037: c2h6 + o -> c2h5 + oh [Chemical kinetic data sheets for high-temperature reactions. Part II] 
+      cab037(l) = (2.21e-15*(t(l)/298.)**6.5)*exp(-132./t(l))
+
+c     cab038: ch3 + ch3 + M -> c2h6 [Rate constant for the reaction CH3 + CH3 → C2H6 at T = 155 K and model calculation of the CH3 abundance in the atmospheres of Saturn and Neptune]
+      kinf = 4.504e-11*exp(70.12/t(l))
+      k0   =  9.682e-28*exp(569.4/t(l)) 
+      j_5_2 = 163.*exp(-1001./t(l))
+      
+      if ( j_5_2 <= 1.1) then 
+          j_5_2 = 1.1 
+      endif 
+      
+      cab038(l) = (-(kinf + k0*dens(l)*2.5) +
+     $          sqrt(
+     $               (kinf + k0*dens(l)*2.5)**2. 
+     $             + 4.*(j_5_2 -1.)*kinf*k0*dens(l)*2.5
+     $              ) )
+     $            /(2.*(j_5_2-1.))
+     
+ 
+cccccccccc 
+cc c2h5 
+cccccccccc 
+c     cab039: c2h5 + o2 + M -> c2h5o2 + M [JPL Data Evaluation 18]
+C        kinf = 8e-12*(t(l)/300.)
+C        k0 = 1.5e-28*(300./t(l))**3.
+       
+C        cab039(l) = (k0*dens(l)*2.5/(1. + (k0*dens(l)*2.5/kinf))) 
+C      $           *0.6
+C      $           **(1./(1. + log10(k0*dens(l)*2.5/kinf)**2.) )
+      cab039(l) = 1.5e-28*((298./t(l))**3.)*dens(l)*2.5
+
+
+
+c     cab040: c2h5 + c2h5 -> c2h6 + c2h4 [Temperature coefficients of the rates of Cl atom reactions with C2H6, C2H5, and C2H4. The rates of disproportionation and recombination of ethyl radicals]
+      cab040(l) = 2.01e-12 
+      
+c     cab041: c2h5 + o2 -> c2h4 + ho2 [JPL Data Evaluation 18 (UPPER LIMIT) ]
+      cab041(l) = 1.9e-14 
+      
+c     cab042: c2h5 + h -> ch3 + ch3 [ Kinetics of the reaction of methyl radicals with oxygen]
+      cab042(l) = 7.95e-11*exp(-132./t(l))
+      
+ccccccccc 
+cc c2h5o2 
+ccccccccc
+c     cab043: c2h5o2 + ho2 -> c2h5ooh + o2 
+      cab043(l) = 7.5e-13*exp(700./t(l))
+      
+c     cab044: c2h5o2 + ro2 -> 0.8*ch3cho + 0.6*ho2 + 0.2*c2h5oh + o2
+      cab044(l) = 2.*(7.6e-14*k_ch3o2)**0.5
+      
+ccccccccc
+cc c2h5ooh
+ccccccccc 
+c     cab045: c2h5ooh + oh -> c2h5o2 + h2o 
+      cab045(l) = k_roohro
+
+c     cab046: c2h5ooh + oh -> ch3cho + oh 
+      cab046(l) = k_s*f_sooh
+      
+ccccccccc
+cc c2h5oh
+ccccccccc 
+c     cab047: c2h5oh + oh -> 0.95*c2h5o2 + 0.95*ho2 + 0.05*hoch2ch2o2 + h2o 
+      cab047(l) = 3.e-12*exp(20./t(l))
+ 
+ccccccccc
+cc hoch2ch2o2
+ccccccccc 
+c     cab048: hoch2ch2o2 + ro2 -> 0.6*hoch2ch2o + 0.2*hoch2cho + 0.2*ethgly
+      cab048(l) = 2.*(7.8e-14*exp(1000./t(l))*k_ch3o2)**(0.5)
+      
+c     cab049: hoch2ch2o2 + ho2 -> HYETHO2H
+      cab049(l) = 1.53e-13*exp(1300./t(l))*(1.-k_rchohch2o2_oh)
+ 
+c     cab050: hoch2ch2o2 + ho2 -> hoch2ch2o + oh 
+      cab050(l) = 1.53e-13*exp(1300./t(l))*k_rchohch2o2_oh
+
+ccccccccc
+cc hoch2ch2o
+ccccccccc 
+c     cab051: hoch2ch2o + o2 -> ho2 + hoch2cho 
+      cab051(l) = 6e-14*exp(-550./t(l))
+      
+c     cab052: hoch2ch2o -> ho2 + hcho + hcho 
+      cab052(l) = 9.5e13*exp(-5988./t(l))
+
+ccccccccc
+cc ethgly
+ccccccccc 
+c     cab053: ethgly + oh -> hoch2cho + ho2 + h2o 
+      cab053(l) = 2.*k_s*f_soh*f_pch2oh + 2.*k_rohro
+
+ccccccccc
+cc hyetho2h
+ccccccccc 
+c     cab054: hyetho2h + oh -> hoch2ch2o2 + h2o 
+      cab054(l) = k_roohro
+      
+c     cab055: hyetho2h + oh -> hoch2cho + oh + h2o
+      cab055(l) = k_s*f_sooh*f_pch2oh
+      
+c     cab056: hyetho2h + oh -> hooch2cho + ho2 + h2o 
+      cab056(l) = k_s*f_soh*f_pch2oh + k_rohro
+      
+ccccccccc
+cc ch3cho
+ccccccccc 
+c     cab057: ch3cho + oh -> ch3co + h2o 
+      cab057(l) = 4.4e-12*exp(365./t(l))*0.95
+
+c     cab058: ch3cho + oh -> hcoch2o2 + h2o 
+      cab058(l) = 4.4e-12*exp(365./t(l))*0.05
+      
+c     cab059: ch3cho + ho2 -> ch3choho2 
+      cab059(l) = 3.46e12*exp(-12500./(t(l)*1.98))
+     $          /(6.34e26*exp(-1470./(t(l)*1.98)))
+
+c     cab060: ch3cho + hcooh -> ch2choh + hcooh  
+      cab060(l) = (1.17e-19*t(l)**2.209)*exp(-556./(1.987*t(l)))
+      
+ccccccccc 
+cc ch2choh 
+ccccccccc 
+c     cab061: ch2choh + oh -> hcooh + oh + hcho 
+      cab061(l) = 4.3e-11 
+      
+c     cab062: ch2choh + oh -> hoch2cho + ho2 
+      cab062(l) = 2.4e-11 
+      
+c     cab063: ch2choh + hcooh -> ch3cho + hcooh 
+      cab063(l) = (4.67e-26*t(l)**3.286)*exp(-556./(1.987*t(l)))
+
+ccccccccc 
+cc ch3choho2
+ccccccccc 
+c     cab064: ch3choho2 -> ch3cho + ho2 
+      cab064(l) = 3.46e12*exp(-12500./(t(l)*1.98))
+     
+c     cab065: ch3choho2 + ho2 -> 0.5*ch3chohooh + 0.3*ch3cooh + 0.2*ch3 + 0.2*hcooh + 0.2*oh + o2
+      cab065(l) = 5.6e-15*exp(2300./t(l))
+     
+c     cab066: ch3choho2 + ro2 -> ch3 + hcooh + oh 
+      cab066(L) = k_RO2sORO2
+
+ccccccccc 
+cc ch3cooh
+ccccccccc 
+c     cab067: ch3cooh + oh -> ch3 + co2 + h2o
+      cab067(l) =  4.e-14*exp(850./t(l))
+     
+ccccccccc 
+cc ch3chohooh
+ccccccccc 
+c     cab068: ch3chohooh + oh -> ch3cooh + oh 
+      cab068(l) = k_t*f_tooh*f_toh + k_rohro
+      
+c     cab069: ch3chohooh + oh -> ch3choho2 
+      cab069(l) = k_roohro 
+      
+ccccccccc 
+cc ch3c(o)
+ccccccccc 
+c     cab070: ch3c(o) + o2 + M -> ch3c(o)oo + M 
+      cab070(l) = 5.1e-12*(1. - 1./(1. + 9.4e-18*dens(l)*2.5))
+      
+c     cab070: ch3c(o) + o2 + M -> oh + hcho + co + M 
+      cab071(l) = 5.1e-12/(1.+9.4e-18*dens(l)*2.5)
+ 
+ccccccccc 
+cc ch3c(o)oo
+ccccccccc 
+c     cab072: ch3c(o)oo + ho2 -> oh + ch3 + co2 
+      cab072(L) = 5.2e-13*exp(980./t(l))*1.507*0.61
+
+c     cab073: ch3c(o)oo + ho2 -> ch3c(o)ooh
+      cab073(L) = cab072(l)*0.23/0.61
+
+c     cab074: ch3c(o)oo + ho2 -> ch3cooh + o3 
+      cab074(L) = cab074(l)*0.16/0.61
+
+c     cab075: ch3c(o)oo + ro2 -> ch3 + co2 
+      cab075(l) = k_ro2rco3*0.9
+     
+c     cab076: ch3c(o)oo + ro2 -> ch3cooh 
+      cab076(l) = k_ro2rco3*0.1 
+      
+ccccccccc 
+cc ch3c(o)ooh
+ccccccccc 
+c     cab077: ch3c(o)ooh + oh -> ch3c(o)oo + h2o 
+      cab077(l) = k_roohro 
+     
+ccccccccc 
+cc hcoch2o2
+ccccccccc 
+c     cab078: hcoch2o2 + ro2 -> 0.6*hcho + 0.6*co + 0.6*ho2 + 0.2*glyox + 0.2*hoch2cho 
+      cab078(l) = k_ro2poro2
+
+c     cab079: hcoch2o2 + ho2 -> hooch2cho 
+      cab079(l) = k_ro2ho2_2*rcoch2o2_ooh 
+     
+c     cab080: hcoch2o2 + ho2 -> hcho + co + ho2 + oh 
+      cab080(l) = k_ro2ho2_2*rcoch2o2_oh 
+      
+ccccccccc 
+cc glyox
+ccccccccc 
+c     cab081: glyox + oh -> hcoco + h2o 
+      cab081(l) = 3.1e-12*exp(340./t(l))
+      
+ccccccccc 
+cc hcoco 
+ccccccccc 
+c     cab082: hcoco -> co + co + ho2 [CAABA 4.0]
+c      cab082(l) = 7.e11*exp(-3160./t(l)) ! + 5.e-12*cc(l,i_o2)  
+c             hcoco -> hco + co [The Atmospheric Chemistry of the HC(O)CO Radical]
+       cab082(l) = 1.4e12*exp(-3159./(l))
+
+c     cab083: hcoco + o2 -> hcoco3 
+      cab083(l) = 5.e-12*3.2*exp(-550./t(l)) 
+ 
+c     cab084: hcoco + o2 -> oh + co + co2 
+      cab084(l) = 5.e-12*(1. - 3.2*exp(-550./t(l)))
+
+ccccccccccc
+cc hooch2cho
+ccccccccccc      
+c     cab085: hooch2cho + oh -> hcoch2o2 ! + h2o
+      cab085(l) = k_roohro 
+
+c     cab086: hooch2cho + oh -> hcho + co + oh ! + h2o 
+      cab086(l) = 0.8*8.e-12 
+     
+c     cab087: hooch2cho + oh -> glyox + oh ! + h2o 
+      cab087(l) = k_s*f_sooh*f_cho*0.55 
+       
+ccccccccccc
+cc hoch2cho
+ccccccccccc 
+c     cab088: hoch2cho + oh -> hoch2co + h2o 
+      cab088(l) = 8.e-12*0.8
+     
+c     cab089: hoch2cho + oh -> hochcho + h2o 
+      cab089(l) = 8.e-12*0.2
+
+ccccccccccc
+cc hochcho
+ccccccccccc 
+c     cab090: hochcho -> glyox + ho2 
+      cab090(l) = kdec 
+      
+ccccccccccc
+cc hoch2co
+ccccccccccc
+c     cab091: hoch2co + o2 + M -> hoch2co3 
+      cab091(l) = 5.1e-12*(1. - 1./(1. + 1.85e-18*dens(l)*2.5))
+      
+c     cab092: hoch2co + o2 + M -> oh + hcho + co2 + M 
+      cab092(l) = 5.1e-12/(1. + 1.85e-18*dens(l)*2.5)
+
+ccccccccccc
+cc hoch2co3
+ccccccccccc
+c     cab093: hoch2co3 + ro2 -> hcho + co2 + ho2 
+      cab093(l) = k_ro2rco3*0.9
+
+c     cab094: hoch2co3 + ro2 -> hoch2co2h 
+      cab094(l) = k_ro2rco3*0.1
+
+c     cab095: hoch2co3 + ho2 -> hcho + oh + ho2 + co2
+      cab095(l) = kapho2*rco3_oh
+
+c     cab096: hoch2co3 + ho2 -> hoch2co3h
+      cab096(l) = kapho2*rco3_ooh 
+      
+c     cab097: hoch2co3 + ho2 -> hoch2co2h + o3
+      cab097(l) = kapho2*rco3_o3 
+      
+ccccccccccc
+cc hoch2co2h
+ccccccccccc
+c     cab098: hoch2co2h + oh -> 0.09*hcho + 0.9*co2 + 0.91*hcoco2h + ho2 + h2o 
+      cab098(l) = k_co2h + k_s*f_soh*f_co2h 
+
+ccccccccccc
+cc hcoco2h
+ccccccccccc
+c     cab099: hcoco2h + oh -> co + ho2 + co2 + h2o 
+      cab099(l) = k_co2h + k_t*f_o*f_co2h 
+
+cccccccccccc
+cc hoch2co3h
+cccccccccccc
+c     cab100: hoch2co3h + oh -> hoch2co3 + h2o 
+      cab100(l) = k_roohro
+    
+c     cab101: hoch2co3h + oh -> hcoco3h + ho2 
+      cab101(l) = k_s*f_soh*f_co2h 
+  
+cccccccccccc  
+cc hcoco3h
+cccccccccccc
+c     cab102: hcoco3h + oh -> hcoco3 + h2o 
+      cab102(l) = k_roohro 
+      
+c     cab103: hcoco3h + oh -> co + co2 + h2o + oh 
+      cab103(l) = k_t*f_o*f_co2h 
+      
+cccccccccccc 
+cc hcoco3  
+cccccccccccc 
+c     cab104: hcoco3 + ro2 -> co + ho2 + co2 
+      cab104(l) = k_ro2rco3*0.9
+c     cab105: hcoco3 + ro2 -> hcoco2h + o2 
+      cab105(l) = k_ro2rco3*0.1 
+c     cab106: hcoco3 + ho2 -> ho2 + co + co2 + oh 
+      cab106(l) = kapho2
+       
+ccccccccccccc 
+cc c2h4 
+ccccccccccccc 
+c     cab107: c2h4 + o3 -> hcho + ch2oo*
+c     cab107(L) = 9.1e-15*exp(-2580./t(l)) 
+c     cab108: c2h4 + oh + M(o2) -> hoch2ch2o2
+c     cab108(l) = k_3body( t(l), cc(l,i_o2), 8.6e-29, 
+c                         3.1, 9.e-1, 0.85, 0.48, .true.)
+
+ccccccccccccc 
+cc ch2oo*
+ccccccccccccc 
+c    cab109: ch2oo* -> 0.37*ch2oo + 0.47*co + 0.47*h2o + 0.16*ho2 + 0.16*co + 0.16*oh 
+c    cab109(l) = kdec 
+ 
+ccccccccccccc 
+cc ch2oo
+ccccccccccccc 
+c    cab110: ch2oo -> co + ho2 + oh 
+c    cab110(l) = 1.124e14*exp(-10000./t(l))
+
+c    cab111: ch2oo + h2o -> hoch2ooh 
+c    cab111(l) = k_ch2oo_no2*3.6e-6 
+
+c    cab112: ch2oo + co -> hcho + co2 
+c    cab112(l) = 3.6e-14 
+
+c    cab113: ch2oo + hcooh -> 2.*hcooh 
+c    cab113(l) = 1.e-10 
+
+c    cab114: ch2oo + hcho -> 2.*LCARBON
+C    cab114(l) = 1.7e-12 
+
+C    cab115: ch2oo + ch3oh -> 2.*LCARBON 
+c    cab115(l) = 5.e-12 
+
+c    cab116: ch2oo + ch3o2 -> 2.*LCARBON
+c    cab116(L) = 5.e-12 
+
+c    cab117: ch2oo + ho2 -> LCARBON 
+c    cab117(l) = 5.e-12
+
+c    cab118: ch2oo + o3 -> hcho + 2.*o2 
+c    cab118(l) = 1.e-12 
+
+c    cab119: ch2oo + ch2oo -> 2.*hcho + o2 
+c    cab119(l) = 6.e-11 
+
+       
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        heterogenous chemistry
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1835,7 +4621,11 @@ c
          h005(l) = 0.     ! advised
 c
       end do
-c
+     
+     
+
+      
+
       if (tribo .eq. 1.) then
 c
 c        electrochemical reactions
@@ -1945,5 +4735,43 @@ c
          end do
       end if
 c
+
+      
       return
+
+
       end
+
+
+ccccccccccccccccccccccccccccccccccccc
+cc 2-body equivalent rate coefficient
+cc for 3 body reactions 
+ccccccccccccccccccccccccccccccccccccc
+      REAL FUNCTION k_3body(t_atm, M_dens, k0_300, n_3bod,
+     $              kinf_300, m_3bod, fc_3bod, iupac)
+     
+          IMPLICIT NONE 
+          
+          REAL t_atm, M_dens, k0_300, n_3bod, kinf_300, m_3bod, fc_3bod 
+          LOGICAL iupac
+          REAL ratio, k_holding 
+
+          REAL k0, kinf, N_cap 
+          
+          k0 = k0_300*(300./t_atm)**n_3bod
+          kinf = kinf_300*(300./t_atm)**m_3bod
+          ratio = k0*2.5*M_dens/kinf 
+          
+          IF ( iupac ) THEN 
+               N_cap = 0.75 - 1.27*log10(fc_3bod)
+               k_holding = 1./( 1. + ( log10(ratio)/N_cap)**2.)
+               k_3body = (2.5*M_dens*k0/(1. + ratio))*fc_3bod**k_holding
+          ELSE 
+               k_holding = 1./( 1. + ( log10(ratio))**2.)
+               k_3body = (2.5*M_dens*k0/(1. + ratio))*fc_3bod**k_holding
+          ENDIF 
+         
+          RETURN 
+      END 
+
+      

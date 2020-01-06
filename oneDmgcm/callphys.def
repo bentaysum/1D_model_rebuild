@@ -5,6 +5,7 @@ tracer=.true.
 
 #Where are the external files (dust, topography; chemistry,...)
 #datadir=/u/forget/WWW/datagcm/datafile
+datadir=/exports/csce/datastore/geos/users/s1215319/original_gcm/mgcm-datafile
 
 #Diurnal cycle ?  if diurnal=False, diurnal averaged solar heating
 diurnal=.true.
