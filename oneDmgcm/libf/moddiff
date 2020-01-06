@@ -1,0 +1,157 @@
+Files phymars/aerave.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/aerave.F differ
+Only in phymars: aerkind.h
+Files phymars/aeropacity.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/aeropacity.F differ
+Files phymars/aeroptproperties.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/aeroptproperties.F differ
+Files phymars/albedocaps.F90 and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/albedocaps.F90 differ
+Files phymars/blackl.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/blackl.F differ
+Files phymars/blendrad.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/blendrad.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: calladvect.F
+Files phymars/calldrag_noro.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/calldrag_noro.F differ
+Only in phymars: callkeys.h
+Files phymars/callradite.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/callradite.F differ
+Files phymars/callsedim.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/callsedim.F differ
+Only in phymars: calltherm_interface.F90
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: cbrt.F
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: checkphysiq
+Files phymars/co2snow.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/co2snow.F differ
+Only in phymars: comcstfi.h
+Only in phymars: comdiurn.h
+Only in phymars: comg1d.h
+Only in phymars: comgeomfi.h
+Only in phymars: comorbit.h
+Only in phymars: comsaison.h
+Only in phymars: comsoil.h
+Files phymars/convadj.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/convadj.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: ctotcalc.F
+Files phymars/cvmgp.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/cvmgp.F differ
+Files phymars/cvmgt.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/cvmgt.F differ
+Only in phymars: datafile.h
+Files phymars/datareadnc.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/datareadnc.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: datareadnetcdf.F
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: ddevlift_dth.F
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: ddevlift_size.F
+Files phymars/def_var.F90 and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/def_var.F90 differ
+Only in phymars: dimphys.h
+Only in phymars: dimradmars.h
+Files phymars/drag_noro.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/drag_noro.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: dump2d.F
+Files phymars/dustdevil.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/dustdevil.F differ
+Files phymars/dustlift.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/dustlift.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: dustlift_varutz0.F
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: dustlift_wd.F
+Files phymars/eofdump.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/eofdump.F differ
+Only in phymars: eofdump.h
+Files phymars/flusv.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/flusv.F differ
+Only in phymars: geticecover.F90
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: grid_noro.F
+Files phymars/growthrate.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/growthrate.F differ
+Files phymars/gwprofil.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/gwprofil.F differ
+Files phymars/gwstress.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/gwstress.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: hndlerr.F
+Only in phymars: improvedclouds.F
+Files phymars/ineofdump.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/ineofdump.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: iniadvtrac.F
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: ini_fi.F
+Files phymars/inifis.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/inifis.F differ
+Files phymars/iniorbit.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/iniorbit.F differ
+Files phymars/inistats.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/inistats.F differ
+Files phymars/initracer.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/initracer.F differ
+Files phymars/iniwrite.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/iniwrite.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: iniwritestartfi.F
+Files phymars/interp_line.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/interp_line.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: ioipsl_errioipsl.F90
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: ioipsl_getincom.F90
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: ioipsl_stringop.F90
+Files phymars/ismax.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/ismax.F differ
+Files phymars/ismin.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/ismin.F differ
+Files phymars/lwb.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/lwb.F differ
+Files phymars/lwdiff.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/lwdiff.F differ
+Files phymars/lwflux.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/lwflux.F differ
+Files phymars/lwi.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/lwi.F differ
+Files phymars/lwmain.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/lwmain.F differ
+Files phymars/lwtt.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/lwtt.F differ
+Files phymars/lwu.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/lwu.F differ
+Files phymars/lwxb.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/lwxb.F differ
+Files phymars/lwxn.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/lwxn.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: massbd.F
+Only in phymars: meso_inc
+Only in phymars: microphys.h
+Files phymars/mucorr.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/mucorr.F differ
+Files phymars/mufract.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/mufract.F differ
+Files phymars/multipl.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/multipl.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: multscal.F
+Files phymars/newcondens.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/newcondens.F differ
+Files phymars/newsedim.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/newsedim.F differ
+Files phymars/nirco2abs.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/nirco2abs.F differ
+Only in phymars: nirdata.h
+Only in phymars: nir_leedat.F
+Only in phymars: nlte_aux.F
+Only in phymars: nlte_calc.F
+Only in phymars: nlte_commons.h
+Files phymars/nltecool.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/nltecool.F differ
+Only in phymars: nltedata.h
+Only in phymars: nlte_paramdef.h
+Only in phymars: nlteparams.h
+Only in phymars: nlte_setup.F
+Only in phymars: nlte_tcool.F
+Files phymars/nlthermeq.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/nlthermeq.F differ
+Only in phymars: nuclea.F
+Files phymars/orbite.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/orbite.F differ
+Files phymars/orodrag.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/orodrag.F differ
+Files phymars/orosetup.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/orosetup.F differ
+Only in phymars: param_slope.F90
+Only in phymars: pbl_parameters.F
+Files phymars/phyetat0.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/phyetat0.F differ
+Files phymars/physdem1.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/physdem1.F differ
+Files phymars/physiq.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/physiq.F differ
+Only in phymars: planete.h
+Only in phymars: read_dust_scenario.F90
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: readtesassim.F90
+Only in phymars: scatterers
+Files phymars/scatter.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/scatter.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: scopy.F
+Files phymars/scopyi.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/scopyi.F differ
+Only in phymars: sig.F
+Only in phymars: simpleclouds.F
+Only in phymars: slope.h
+Files phymars/soil.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/soil.F differ
+Files phymars/soil_settings.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/soil_settings.F differ
+Files phymars/solang.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/solang.F differ
+Files phymars/solarlong.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/solarlong.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: ssum.F
+Only in phymars: statto.h
+Files phymars/suaer.F90 and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/suaer.F90 differ
+Files phymars/sugwd.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/sugwd.F differ
+Files phymars/sulw.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/sulw.F differ
+Only in phymars: surfdat.h
+Files phymars/surfini.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/surfini.F differ
+Only in phymars: .svn
+Files phymars/swmain.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/swmain.F differ
+Files phymars/swrayleigh.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/swrayleigh.F differ
+Files phymars/swr_fouquart.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/swr_fouquart.F differ
+Files phymars/swr_toon.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/swr_toon.F differ
+Files phymars/tabfi.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/tabfi.F differ
+Files phymars/testphys1d.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/testphys1d.F differ
+Only in phymars: thermcell_dqup.F90
+Only in phymars: thermcell_main_mars.F90
+Only in phymars: tracer.h
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: tracerstartfi.F
+Only in phymars: updaterad.F90
+Files phymars/updatereffrad.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/updatereffrad.F differ
+Files phymars/vdif_cd.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/vdif_cd.F differ
+Files phymars/vdifc.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/vdifc.F differ
+Files phymars/vdif_kc.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/vdif_kc.F differ
+Files phymars/vlz_fi.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/vlz_fi.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: vlz_fi.F_old
+Files phymars/watercloud.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/watercloud.F differ
+Files phymars/watersat.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/watersat.F differ
+Files phymars/writediagfi.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/writediagfi.F differ
+Files phymars/writediagsoil.F90 and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/writediagsoil.F90 differ
+Files phymars/writeg1d.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/writeg1d.F differ
+Only in /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/: writestartfi.F
+Files phymars/wstats.F90 and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/wstats.F90 differ
+Only in phymars: yamada4.F
+Only in phymars: yoegwd.h
+Only in phymars: yomaer.h
+Only in phymars: yomlw.h
+Files phymars/zerophys.F and /home/james/usb/mgcm/model_versions/mgcm_v_5.1/physrc/zerophys.F differ

@@ -1,0 +1,9 @@
+     $           ,nq,wdt
+     $           ,womeg,wmugaz
+     $           ,wyear_day,wperiheli,waphelie,wperi_day,wobliquit 
+     $           ,wz0,wemin_turb,wlmixmin
+     $           ,wemissiv,wemissiceN,wemissiceS,walbediceN,walbediceS 
+     $           ,wiceradiusN,wiceradiusS,wdtemisiceN,wdtemisiceS
+     $           ,walbedodat,wphisfi,wvolcapa,wz0tab 
+     $           ,wzmea,wzstd,wzsig,wzgam,wzthe
+     $           ,wtheta,wpsi
