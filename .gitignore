@@ -2,3 +2,5 @@
 testcode.tgz
 /oneDmgcm/libo
 /oneDmgcm/testphys1d.e
+/oneDmgcm/*.nc
+*.zip

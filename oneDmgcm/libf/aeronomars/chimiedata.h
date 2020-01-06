@@ -4,7 +4,7 @@
 
       integer nd, nozo, nr, nsza, ntemp, ntau
 
-      parameter (nd    = 29)
+      parameter (nd    = 42)
       parameter (nozo  = 7)
       parameter (nr    = nd + 28)
       parameter (nsza  = 27)

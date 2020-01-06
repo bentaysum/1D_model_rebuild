@@ -447,10 +447,11 @@ $(LIBF)/dyn3d/paramet.h \
 $(LIBF)/phymars/tracer.h \
 $(LIBF)/dyn3d/comvert.h \
 $(LIBF)/phymars/callkeys.h \
-$(LIBF)/phymars/datafile.h
+$(LIBF)/phymars/datafile.h \
+$(LIBO)/libbibio.a(ioipsl_getincom.o)
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libaeronomars.a inichim_newstart.o ; \
-	$(COMPILE) $(LIBF)/aeronomars/inichim_newstart.F90 ; \
+	$(COMPTRU90) $(LIBF)/aeronomars/inichim_newstart.F90 ; \
 	$(AR) r $(LIBO)/libaeronomars.a inichim_newstart.o ; $(RM) inichim_newstart.o ; \
 	cd $(GCM)
 

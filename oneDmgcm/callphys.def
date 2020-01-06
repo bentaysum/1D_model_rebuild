@@ -17,7 +17,7 @@ season = .true.
 lwrite = .false.    
 
 #Save statistics in file "stats.nc" ?
-callstats =.true.
+callstats =.false.
 
 #Save EOF profiles in file "profiles" for Climate Database?
 calleofdump = .false.

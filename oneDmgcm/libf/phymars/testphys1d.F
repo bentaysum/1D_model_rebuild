@@ -621,7 +621,6 @@ c altitude in km in profile: divide zlay by 1000
 c    Initialize traceurs
 c    ---------------------------
 
-      print*,'Paul'
       
       if (photochem.or.callthermos) then
          write(*,*) 'Initializing chemical species'
@@ -630,8 +629,7 @@ c    ---------------------------
          call inichim_newstart(q,qsurf,psurf,1,0)
       endif
 
-      print*,'Palmer'
-      stop
+
 
       
 c Check if the surface is a water ice reservoir 

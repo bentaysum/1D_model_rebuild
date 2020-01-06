@@ -117,6 +117,64 @@ c------------------------------------------------------------
       igcm_ho2=0
       igcm_h2o2=0
       igcm_ch4=0
+      igcm_hcooh=0
+      igcm_13ch4=0
+      igcm_ch3o2=0
+      igcm_ch3oh=0
+      igcm_ch3=0
+      igcm_hcho=0
+      igcm_ch3ooh=0
+      igcm_c2h6=0
+      igcm_c2h5=0
+      igcm_c2h5o2=0
+      igcm_c2h5ooh=0
+      igcm_c2h5oh=0
+      igcm_ch3cho=0
+      igcm_ch3cooo=0
+      igcm_ch3cooh=0
+      igcm_ch3coooh=0
+      igcm_ch3co=0
+      igcm_hco=0
+      igcm_ch3o=0
+      igcm_hoch2ch2o2=0
+      igcm_hoch2ch2o=0
+      igcm_ethgly=0
+      igcm_hyetho2h=0
+      igcm_ch3choho2=0
+      igcm_ch3chohooh=0
+      igcm_hcoch2o2=0
+      igcm_glyox=0
+      igcm_hcoco=0
+      igcm_hooch2cho=0
+      igcm_hoch2cho=0
+      igcm_hochcho=0
+      igcm_hoch2co=0
+      igcm_hoch2co3=0
+      igcm_hoch2co2h=0
+      igcm_hcoco2h=0
+      igcm_hoch2co3h=0
+      igcm_hcoco3h=0
+      igcm_hcoco3=0
+      igcm_ch2choh=0
+      igcm_ch2oo_e=0
+      igcm_ch2oo=0  
+      igcm_c2h4=0
+      igcm_c2h2=0
+      igcm_1ch2=0
+      igcm_3ch2=0
+      igcm_ch2=0
+      igcm_ch=0
+
+      igcm_c3h8=0
+      igcm_ic3h7o2=0
+      igcm_ic3h7ooh=0
+      igcm_ch3coch3=0
+      igcm_ch3coch2o2=0
+      igcm_hoch2o2=0
+      igcm_hoch2ooh=0
+      igcm_hoch2oh=0
+      igcm_c2h5o=0
+
       igcm_n2=0
       igcm_ar=0
       igcm_ar_n2=0
@@ -249,6 +307,213 @@ c------------------------------------------------------------
           mmol(igcm_ch4)=16.
           count=count+1
         endif
+        if (noms(iq).eq."ch3") then
+          igcm_ch3=iq
+          mmol(igcm_ch3)=15.
+          count=count+1
+        endif
+        if (noms(iq).eq."ch3o2") then
+          igcm_ch3o2=iq
+          mmol(igcm_ch3o2)=47.03
+          count=count+1
+        endif
+        if (noms(iq).eq."ch3ooh") then
+          igcm_ch3ooh=iq
+          mmol(igcm_ch3ooh)=60.
+          count=count+1
+        endif
+        if (noms(iq).eq."ch3oh") then
+          igcm_ch3oh=iq
+          mmol(igcm_ch3oh)=32.
+          count=count+1
+        endif
+        if (noms(iq).eq."ch3o") then
+          igcm_ch3o=iq
+          mmol(igcm_ch3o)=31.
+          count=count+1
+        endif
+        if (noms(iq).eq."hcho") then
+          igcm_hcho=iq
+          mmol(igcm_hcho)=30.
+          count=count+1
+        endif
+        if (noms(iq).eq."hcooh") then
+          igcm_hcooh=iq
+          mmol(igcm_hcooh)=46.
+          count=count+1
+        endif
+        if (noms(iq).eq."hoch2o2") then
+          igcm_hoch2o2=iq
+          mmol(igcm_hoch2o2)=63.
+          count=count+1
+        endif   
+        if (noms(iq).eq."hoch2oh") then
+          igcm_hoch2oh=iq
+          mmol(igcm_hoch2oh)=48.
+          count=count+1
+        endif 
+
+        if (noms(iq).eq."hoch2ooh") then
+          igcm_hoch2ooh=iq
+          mmol(igcm_hoch2ooh)=64.
+          count=count+1
+        endif  
+        if (noms(iq).eq."hco") then
+          igcm_hco=iq
+          mmol(igcm_hco)=29.
+          count=count+1
+        endif   
+        if (noms(iq).eq."c2h6") then
+          igcm_c2h6=iq
+          mmol(igcm_c2h6)=30.
+          count=count+1
+        endif
+        if (noms(iq).eq."c2h5") then
+          igcm_c2h5=iq
+          mmol(igcm_c2h5)=29.
+          count=count+1
+        endif   
+        if (noms(iq).eq."c2h5o2") then
+          igcm_c2h5o2=iq
+          mmol(igcm_c2h5o2)=61.
+          count=count+1
+        endif
+        if (noms(iq).eq."c2h5ooh") then
+          igcm_c2h5ooh=iq
+          mmol(igcm_c2h5ooh)=62.
+          count=count+1
+        endif
+        if (noms(iq).eq."c2h5oh") then
+          igcm_c2h5oh=iq
+          mmol(igcm_c2h5oh)=46.
+          count=count+1
+        endif  
+        if (noms(iq).eq."hoch2ch2o2") then
+          igcm_hoch2ch2o2=iq
+          mmol(igcm_hoch2ch2o2)=77.
+          count=count+1
+        endif  
+        if (noms(iq).eq."hoch2ch2o") then
+          igcm_hoch2ch2o=iq
+          mmol(igcm_hoch2ch2o)=61.
+          count=count+1
+        endif
+        if (noms(iq).eq."ethgly") then
+          igcm_ethgly=iq
+          mmol(igcm_ethgly)=78.
+          count=count+1
+        endif
+        if (noms(iq).eq."hyetho2h") then
+          igcm_hyetho2h=iq
+          mmol(igcm_hyetho2h)=78.
+          count=count+1
+        endif
+        if (noms(iq).eq."ch3cho") then
+          igcm_ch3cho=iq
+          mmol(igcm_ch3cho)=44.
+          count=count+1
+        endif
+        if (noms(iq).eq."ch2choh") then
+          igcm_ch2choh=iq
+          mmol(igcm_ch2choh)=44
+          count=count+1
+        endif
+        if (noms(iq).eq."ch3choho2") then
+          igcm_ch3choho2=iq
+          mmol(igcm_ch3choho2)=77.
+          count=count+1
+        endif  
+        if (noms(iq).eq."ch3cooh") then
+          igcm_ch3cooh=iq
+          mmol(igcm_ch3cooh)=60.
+          count=count+1
+        endif
+        if (noms(iq).eq."ch3chohooh") then
+          igcm_ch3chohooh=iq
+          mmol(igcm_ch3chohooh)=78.
+          count=count+1
+        endif
+        if (noms(iq).eq."ch3c(o)") then
+          igcm_ch3co=iq
+          mmol(igcm_ch3co)=43.
+          count=count+1
+        endif  
+        if (noms(iq).eq."ch3c(o)oo") then
+          igcm_ch3cooo=iq
+          mmol(igcm_ch3cooo)=75.
+          count=count+1
+        endif
+        if (noms(iq).eq."ch3c(o)ooh") then
+          igcm_ch3coooh=iq
+          mmol(igcm_ch3coooh)=76.
+          count=count+1
+        endif
+        if (noms(iq).eq."hcoch2o2") then
+          igcm_hcoch2o2=iq
+          mmol(igcm_hcoch2o2)=75.
+          count=count+1
+        endif
+        if (noms(iq).eq."glyox") then
+          igcm_glyox=iq
+          mmol(igcm_glyox)=58.
+          count=count+1
+        endif
+        if (noms(iq).eq."hcoco") then
+          igcm_hcoco=iq
+          mmol(igcm_hcoco)=57.
+          count=count+1
+        endif
+        if (noms(iq).eq."hooch2cho") then
+          igcm_hooch2cho=iq
+          mmol(igcm_hooch2cho)=76.
+          count=count+1
+        endif
+        if (noms(iq).eq."hoch2cho") then
+          igcm_hoch2cho=iq
+          mmol(igcm_hoch2cho)=60.
+          count=count+1
+        endif
+        if (noms(iq).eq."hochcho") then
+          igcm_hochcho=iq
+          mmol(igcm_hochcho)=59.
+          count=count+1
+        endif
+        if (noms(iq).eq."hoch2co") then
+          igcm_hoch2co=iq
+          mmol(igcm_hoch2co)=59.
+          count=count+1
+        endif
+        if (noms(iq).eq."hoch2co3") then
+          igcm_hoch2co3=iq
+          mmol(igcm_hoch2co3)=91.
+          count=count+1
+        endif
+        if (noms(iq).eq."hoch2co2h") then
+          igcm_hoch2co2h=iq
+          mmol(igcm_hoch2co2h)=91.
+          count=count+1
+        endif
+        if (noms(iq).eq."hcoco2h") then
+          igcm_hcoco2h=iq
+          mmol(igcm_hcoco2h)=74.
+          count=count+1
+        endif
+        if (noms(iq).eq."hcoco3h") then
+          igcm_hcoco3h=iq
+          mmol(igcm_hcoco3h)=90.
+          count=count+1
+        endif
+        if (noms(iq).eq."hcoco3") then
+          igcm_hcoco3=iq
+          mmol(igcm_hcoco3)=89.
+          count=count+1
+        endif        
+        if (noms(iq).eq."hoch2co3h") then
+          igcm_hoch2co3h=iq
+          mmol(igcm_hoch2co3h)=92.
+          count=count+1
+        endif        
+
         if (noms(iq).eq."ar") then
           igcm_ar=iq
           mmol(igcm_ar)=40.
