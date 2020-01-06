@@ -33,8 +33,10 @@ setenv LIBOGCM $LMDGCM/libo
 # 64 bit machines
   #setenv NCDFLIB /donnees/emlmd/netcdf64-4.0.1_gfortran/lib
   #setenv NCDFINC /donnees/emlmd/netcdf64-4.0.1_gfortran/include
-  setenv NCDFLIB /opt/local/lib
-  setenv NCDFINC /opt/local/include
+  setenv NCDFLIB /usr/lib64/gfortran/modules
+  setenv NCDFINC /usr/include
+  # setenv NCDFLIB /opt/local/lib
+  # setenv NCDFINC /opt/local/include
 #else
 #  setenv NCDFLIB /donnees/emlmd/netcdf-4.0.1_gfortran/lib
 #  setenv NCDFINC /donnees/emlmd/netcdf-4.0.1_gfortran/include
@@ -514,7 +516,7 @@ echo 'Paul Palmer'
 # path pour les #include
 ########################################################################
 
-set include="$include -I$NCDFINC "
+set include="$include -I$NCDFINC  -I /usr/lib64/gfortran/modules/ -lnetcdff"
 echo $include
 
 ########################################################################
