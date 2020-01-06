@@ -1,4 +1,6 @@
-      subroutine inichim_newstart(pq, qsurf, ps, flagh2o, flagthermo)
+ subroutine inichim_newstart(pq, qsurf, ps, flagh2o, flagthermo)
+
+      USE ioipsl_getincom 
 
       implicit none
 
@@ -56,6 +58,7 @@
       integer :: count, ierr, dummy
       real    :: mmean(iip1,jjp1,llm)             ! mean molecular mass (g)
       real    :: pgcm                             ! pressure at each layer in the gcm (Pa)
+      real    :: real_dummy
 
       integer, parameter         :: nalt = 252    ! number of altitudes in the initialization files
       integer                    :: nspe          ! number of species in the initialization files
@@ -70,14 +73,9 @@
       character(len=20)          :: txt           ! to store some text
       logical                    :: flagnitro     ! checks if N species present
 
-      print*,qsurf
-      print*,flagh2o
-      print*,flagthermo
-      print*,nqmx
-      print*,ngridmx
-      stop
-      
-      
+
+
+  
 ! 1. identify tracers by their names: (and set corresponding values of mmol)
 
 ! 1.1 initialize tracer indexes to zero:
@@ -104,6 +102,61 @@
       igcm_ho2         = 0
       igcm_h2o2        = 0
       igcm_ch4         = 0
+      igcm_ch3o2       = 0 ! Added 24/04/2018
+      igcm_ch3         = 0 ! Added 25/04/2018
+      igcm_ch3oh       = 0 ! Added 27/04/2018
+      igcm_hcho        = 0 ! Added 27/04/2018
+      igcm_ch3ooh      = 0 ! Added 27/04/2018
+      igcm_c2h6        = 0 ! Added 12/06/2018
+	  igcm_hoch2ch2o2  = 0
+	  igcm_hoch2ch2o   = 0
+	  igcm_ethgly 	   = 0
+	  igcm_hyetho2h    = 0
+	  igcm_ch3chohooh  = 0
+	  igcm_hcoch2o2    = 0 
+	  igcm_glyox       = 0
+	  igcm_hcoco       = 0
+	  igcm_hooch2cho   = 0
+	  igcm_hoch2cho    = 0
+	  igcm_hochcho 	   = 0
+	  igcm_hoch2co     = 0
+	  igcm_hoch2co3    = 0
+	  igcm_hoch2co2h   = 0
+	  igcm_hcoco2h     = 0
+	  igcm_hoch2co3h   = 0
+	  igcm_hcoco3h     = 0
+	  igcm_hcoco3 	   = 0
+      igcm_ch2choh     = 0
+      igcm_c2h4        = 0 ! Added 12/06/2018
+      igcm_c2h5o2      = 0 ! Added 12/06/2018
+      igcm_c2h2        = 0 ! Added 13/06/2018
+      igcm_hcooh       = 0 ! Added 08/07/2018
+      igcm_1ch2        = 0 ! Added 28/05/2018
+      igcm_3ch2        = 0 ! Added 28/05/2018
+      igcm_ch          = 0 ! Added 28/05/2018
+      igcm_ch2          = 0 ! Added 28/05/2018
+	  igcm_ch3o        = 0
+	  igcm_c2h5ooh     = 0
+	  igcm_ch3cho      = 0
+	  igcm_ch3cooo     = 0
+	  igcm_ch3cooh     = 0
+	  igcm_ch3coooh    = 0 
+	  igcm_c3h8        = 0 
+	  igcm_ic3h7o2     = 0
+	  igcm_ic3h7ooh    = 0
+	  igcm_ch3coch3    = 0
+	  igcm_ch3coch2o2  = 0
+      igcm_hoch2o2	   = 0
+      igcm_hoch2ooh	   = 0
+      igcm_hoch2oh	   = 0
+      igcm_c2h5o       = 0
+      igcm_c2h5oh      = 0
+      igcm_ch3co       = 0
+      igcm_ch3choho2   = 0 
+      igcm_ch2oo_e     = 0
+      igcm_ch2oo	   = 0
+	  igcm_hco  	   = 0
+      igcm_c2h5        = 0
       igcm_n2          = 0
       igcm_ar          = 0
       igcm_ar_n2       = 0
@@ -174,7 +227,6 @@
 ! 1.3 find chemistry and water tracers
 
       print*,noms
-      stop
 
       
       nbqchem = 0
@@ -251,6 +303,253 @@
            count = count + 1
            nbqchem = nbqchem + 1
         end if
+        if (noms(iq) == "ch3") then
+           igcm_ch3 = iq
+           mmol(igcm_ch3) = 15.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "ch3o2") then
+           igcm_ch3o2 = iq
+           mmol(igcm_ch3o2) = 47.03
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "ch3ooh") then
+           igcm_ch3ooh = iq
+           mmol(igcm_ch3ooh) = 48.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "ch3oh") then
+           igcm_ch3oh = iq
+           mmol(igcm_ch3oh) = 32.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "ch3o") then
+           igcm_ch3o = iq
+           mmol(igcm_ch3o) = 31.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "hcho") then
+           igcm_hcho = iq
+           mmol(igcm_hcho) = 30.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "hcooh") then
+           igcm_hcooh = iq
+           mmol(igcm_hcooh) = 46.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "hoch2o2") then
+           igcm_hoch2o2 = iq
+           mmol(igcm_hoch2o2) = 63.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "hoch2ooh") then
+           igcm_hoch2ooh = iq
+           mmol(igcm_hoch2ooh) = 64.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "hoch2oh") then
+           igcm_hoch2oh = iq
+           mmol(igcm_hoch2oh) = 48.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "hco") then
+           igcm_hco = iq
+           mmol(igcm_hco) = 29.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "c2h6") then
+           igcm_c2h6 = iq
+           mmol(igcm_c2h6) = 30.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "c2h5") then
+           igcm_c2h5 = iq
+           mmol(igcm_c2h5) = 29.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "c2h5o2") then
+           igcm_c2h5o2 = iq
+           mmol(igcm_c2h5o2) = 61.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "c2h5ooh") then
+           igcm_c2h5ooh = iq
+           mmol(igcm_c2h5ooh) = 62.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "c2h5oh") then
+           igcm_c2h5oh = iq
+           mmol(igcm_c2h5oh) = 46.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "hoch2ch2o2") then
+           igcm_hoch2ch2o2 = iq
+           mmol(igcm_hoch2ch2o2) = 77.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "hoch2ch2o") then
+           igcm_hoch2ch2o = iq
+           mmol(igcm_hoch2ch2o) = 61.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "ethgly") then
+           igcm_ethgly = iq
+           mmol(igcm_ethgly) = 62.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "hyetho2h") then
+           igcm_hyetho2h = iq
+           mmol(igcm_hyetho2h) = 78.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if		
+        if (noms(iq) == "ch3cho") then
+           igcm_ch3cho = iq
+           mmol(igcm_ch3cho) = 44.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "ch2choh") then
+           igcm_ch2choh = iq
+           mmol(igcm_ch2choh) = 44.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "ch3choho2") then
+           igcm_ch3choho2 = iq
+           mmol(igcm_ch3choho2) = 77.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "ch3cooh") then
+           igcm_ch3cooh = iq
+           mmol(igcm_ch3cooh) = 60.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "ch3chohooh") then
+           igcm_ch3chohooh = iq
+           mmol(igcm_ch3chohooh) = 78.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "ch3c(o)") then
+           igcm_ch3co = iq
+           mmol(igcm_ch3co) = 43.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "ch3c(o)oo") then
+           igcm_ch3cooo = iq
+           mmol(igcm_ch3cooo) = 75.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "ch3c(o)ooh") then
+           igcm_ch3coooh = iq
+           mmol(igcm_ch3coooh) = 76.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "hcoch2o2") then
+           igcm_hcoch2o2 = iq
+           mmol(igcm_hcoch2o2) = 75.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "glyox") then
+           igcm_glyox = iq
+           mmol(igcm_glyox) = 58.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "hcoco") then
+           igcm_hcoco = iq
+           mmol(igcm_hcoco) = 57.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "hooch2cho") then
+           igcm_hooch2cho = iq
+           mmol(igcm_hooch2cho) = 76.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "hoch2cho") then
+           igcm_hoch2cho = iq
+           mmol(igcm_hoch2cho) = 60.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "hochcho") then
+           igcm_hochcho = iq
+           mmol(igcm_hochcho) = 75.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "hoch2co") then
+           igcm_hoch2co = iq
+           mmol(igcm_hoch2co) = 59.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if
+        if (noms(iq) == "hoch2co3") then
+           igcm_hoch2co3 = iq
+           mmol(igcm_hoch2co3) = 91.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "hoch2co2h") then
+           igcm_hoch2co2h = iq
+           mmol(igcm_hoch2co2h) = 76.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "hcoco2h") then
+           igcm_hcoco2h = iq
+           mmol(igcm_hcoco2h) = 74.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "hoch2co3h") then
+           igcm_hoch2co3h = iq
+           mmol(igcm_hoch2co3h) = 92.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "hcoco3h") then
+           igcm_hcoco3h = iq
+           mmol(igcm_hcoco3h) = 90.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+        if (noms(iq) == "hcoco3") then
+           igcm_hcoco3 = iq
+           mmol(igcm_hcoco3) = 89.
+           count = count + 1
+           nbqchem = nbqchem + 1
+        end if	
+				
         if (noms(iq) == "n2") then
            igcm_n2 = iq
            mmol(igcm_n2) = 28.
@@ -299,12 +598,6 @@
            count = count + 1
            nbqchem = nbqchem + 1
         end if
-
-      print*,noms
-      print*,'Paul Palmer in inichem_newstart.F90'
-      stop
-      
-
 
         
 ! 1.4 find ions
@@ -382,9 +675,10 @@
            mmol(igcm_ar_n2) = 30.
            count = count + 1
         end if
-
+		
       end do ! of do iq=1,nqmx
-      
+
+	  
 ! 1.6 check that we identified all tracers:
 
       if (count /= nqmx) then
@@ -547,7 +841,7 @@
 
       read(220,*)
       do l = 1,nalt
-         read(220,*) dummy, (vmrinit(l,n), n = 8,14)
+         read(220,*) real_dummy, (vmrinit(l,n), n = 8,14)
       end do 
       close(220)
 
@@ -573,12 +867,17 @@
 
 ! 3.1 vertical interpolation
 
+
+
                do n = 1,nspe
-                  call intrplf(pgcm,vmr,pinit,vmrinit(:,n),nalt)
-                  vmrint(n) = vmr
-                  iq = niq(n)
-                  mmean(i,j,l) = mmean(i,j,l) + vmrint(n)*mmol(iq)
+          
+                       call intrplf(pgcm,vmr,pinit,vmrinit(:,n),nalt)
+                 
+                      vmrint(n) = vmr
+                      iq = niq(n)
+                      mmean(i,j,l) = mmean(i,j,l) + vmrint(n)*mmol(iq)
                end do
+
 
 ! 3.2 attribute mixing ratio: - all layers or only thermosphere
 !                             - with our without h2o 
@@ -608,10 +907,10 @@
 
 ! 3.3 initialization of tracers not contained in the initialization files
 
-! methane : 10 ppbv
+! methane : 0 ppbv
 
       if (igcm_ch4 /= 0) then
-         vmr = 10.e-9       
+         vmr = 14.e-9
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
@@ -623,6 +922,798 @@
          qsurf(1:ngridmx,igcm_ch4) = 0.
       end if
 
+! 13CH4
+      if (igcm_13ch4 /= 0) then
+         vmr =  0.!14.e-16
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_13ch4) = vmr*mmol(igcm_13ch4)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_13ch4) = 0.
+      end if
+	  
+! C3H8
+      if (igcm_c3h8 /= 0) then
+         vmr = 0.!2.25e-9       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_c3h8) = vmr*mmol(igcm_c3h8)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_c3h8) = 0.
+      end if  	
+	  
+! c2h6 : 0 ppbv
+
+      if (igcm_c2h6 /= 0) then
+         vmr =  0.!14.e-9
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_c2h6) = vmr*mmol(igcm_c2h6)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_c2h6) = 0.
+      end if
+
+! c2h4 : 0 ppbv
+
+      if (igcm_c2h4 /= 0) then
+         vmr = 0.!.e-12 
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_c2h4) = vmr*mmol(igcm_c2h4)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_c2h4) = 0.
+      end if
+
+! c2h2 : 0 ppbv
+
+      if (igcm_c2h2 /= 0) then
+         vmr = 0.!1.e-12
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_c2h2) = vmr*mmol(igcm_c2h2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_c2h2) = 0.
+      end if
+
+! ch3o2 : 0 ppbv
+
+      if (igcm_ch3o2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3o2) = vmr*mmol(igcm_ch3o2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3o2) = 0.
+      end if
+
+! ch3 : 0 ppbv
+
+      if (igcm_ch3 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3) = vmr*mmol(igcm_ch3)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3) = 0.
+      end if
+
+! ch3oh : 0 ppbv
+
+      if (igcm_ch3oh /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3oh) = vmr*mmol(igcm_ch3oh)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3oh) = 0.
+      end if
+
+! formaldehyde (hcho) : 0 ppbv
+
+      if (igcm_hcho /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hcho) = vmr*mmol(igcm_hcho)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hcho) = 0.
+      end if
+
+! CH3OOH
+      if (igcm_ch3ooh /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3ooh) = vmr*mmol(igcm_ch3ooh)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3ooh) = 0.
+      end if   
+
+! C2H5O2
+      if (igcm_c2h5o2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_c2h5o2) = vmr*mmol(igcm_c2h5o2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_c2h5o2) = 0.
+      end if   
+! 1CH2
+      if (igcm_1ch2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_1ch2) = vmr*mmol(igcm_1ch2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_1ch2) = 0.
+      end if  
+
+! 3CH2
+      if (igcm_3ch2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_3ch2) = vmr*mmol(igcm_3ch2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_3ch2) = 0.
+      end if 
+
+! CH2	  
+      if (igcm_ch2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch2) = vmr*mmol(igcm_ch2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch2) = 0.
+      end if  
+
+
+! CH
+      if (igcm_ch /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch) = vmr*mmol(igcm_ch)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch) = 0.
+      end if  
+
+! CH3O
+      if (igcm_ch3o /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3o) = vmr*mmol(igcm_ch3o)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3o) = 0.
+      end if  
+
+	  
+! HCOOH
+      if (igcm_hcooh /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hcooh) = vmr*mmol(igcm_hcooh)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hcooh) = 0.
+      end if  
+
+! C2H5OOH
+      if (igcm_c2h5ooh /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_c2h5ooh) = vmr*mmol(igcm_c2h5ooh)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_c2h5ooh) = 0.
+      end if  
+	  
+! CH3CHO
+      if (igcm_ch3cho /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3cho) = vmr*mmol(igcm_ch3cho)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3cho) = 0.
+      end if  
+
+! CH3COOO
+      if (igcm_ch3cooo /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3cooo) = vmr*mmol(igcm_ch3cooo)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3cooo) = 0.
+      end if  
+	  
+! CH3COOH
+      if (igcm_ch3cooh /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3cooh) = vmr*mmol(igcm_ch3cooh)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3cooh) = 0.
+      end if  
+	
+! CH3C(O)OOH
+      if (igcm_ch3coooh /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3coooh) = vmr*mmol(igcm_ch3coooh)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3coooh) = 0.
+      end if  	
+	  
+! HCO
+      if (igcm_hco /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hco) = vmr*mmol(igcm_hco)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hco) = 0.
+      end if  	
+	  
+! C2H5
+      if (igcm_c2h5 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_c2h5) = vmr*mmol(igcm_c2h5)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_c2h5) = 0.
+      end if  	
+	  
+! HOCH2O2
+      if (igcm_hoch2o2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hoch2o2) = vmr*mmol(igcm_hoch2o2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hoch2o2) = 0.
+      end if 
+	  
+! HOCH2OOH
+      if (igcm_hoch2ooh /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hoch2ooh) = vmr*mmol(igcm_hoch2ooh)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hoch2ooh) = 0.
+      end if 
+	  
+! HOCH2OH
+      if (igcm_hoch2oh /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hoch2oh) = vmr*mmol(igcm_hoch2oh)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hoch2oh) = 0.
+      end if 
+	  
+! C2H5O
+      if (igcm_c2h5o /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_c2h5o) = vmr*mmol(igcm_c2h5o)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_c2h5o) = 0.
+      end if 
+	  
+! C2H5OH
+      if (igcm_c2h5oh /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_c2h5oh) = vmr*mmol(igcm_c2h5oh)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_c2h5oh) = 0.
+      end if 
+	  
+! CH3CO
+      if (igcm_ch3co /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3co) = vmr*mmol(igcm_ch3co)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3co) = 0.
+      end if 
+	  
+! CH3CHOHO2
+      if (igcm_ch3choho2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3choho2) = vmr*mmol(igcm_ch3choho2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3choho2) = 0.
+      end if  
+	  
+! HOCH2CH2O2
+      if (igcm_hoch2ch2o2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hoch2ch2o2) = vmr*mmol(igcm_hoch2ch2o2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hoch2ch2o2) = 0.
+      end if  
+	  
+! HOCH2CH2O
+      if (igcm_hoch2ch2o /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hoch2ch2o) = vmr*mmol(igcm_hoch2ch2o2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hoch2ch2o) = 0.
+      end if  
+	  
+! ETHGLY
+      if (igcm_ethgly /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ethgly) = vmr*mmol(igcm_ethgly)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ethgly) = 0.
+      end if  
+	  
+! HYETHO2H
+      if (igcm_hyetho2h /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hyetho2h) = vmr*mmol(igcm_hyetho2h)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hyetho2h) = 0.
+      end if  
+	  
+! CH3CHOHOOH
+      if (igcm_ch3chohooh /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3chohooh) = vmr*mmol(igcm_ch3chohooh)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3chohooh) = 0.
+      end if  
+	  
+! HCOCH2O2
+      if (igcm_hcoch2o2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hcoch2o2) = vmr*mmol(igcm_hcoch2o2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hcoch2o2) = 0.
+      end if  
+	  
+! GLYOX
+      if (igcm_glyox /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_glyox) = vmr*mmol(igcm_glyox)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_glyox) = 0.
+      end if  
+	  
+! HCOCO
+      if (igcm_hcoco /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hcoco) = vmr*mmol(igcm_hcoco)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hcoco) = 0.
+      end if  
+	 
+! HOOCH2CHO
+      if (igcm_hooch2cho /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hooch2cho) = vmr*mmol(igcm_hooch2cho)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hooch2cho) = 0.
+      end if  
+	  
+! HOCH2CHO
+      if (igcm_hoch2cho /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hoch2cho) = vmr*mmol(igcm_hoch2cho)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hoch2cho) = 0.
+      end if  
+	  
+! HOCHCHO
+      if (igcm_hochcho /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hochcho) = vmr*mmol(igcm_hochcho)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hochcho) = 0.
+      end if 
+
+! HOCH2CO
+      if (igcm_hoch2co /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hoch2co) = vmr*mmol(igcm_hoch2co)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hoch2co) = 0.
+      end if  
+	  
+! HOCH2CO3
+      if (igcm_hoch2co3 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hoch2co3) = vmr*mmol(igcm_hoch2co3)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hoch2co3) = 0.
+      end if  
+	  
+! HOCH2CO2H
+      if (igcm_hoch2co2h /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hoch2co2h) = vmr*mmol(igcm_hoch2co2h)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hoch2co2h) = 0.
+      end if  
+	  
+! HCOCO2H
+      if (igcm_hcoco2h /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hcoco2h) = vmr*mmol(igcm_hcoco2h)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hcoco2h) = 0.
+      end if  
+
+! HOCH2CO3H
+      if (igcm_hoch2co3h /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hoch2co3h) = vmr*mmol(igcm_hoch2co3h)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hoch2co3h) = 0.
+      end if 
+	  
+! HCOCO3H
+      if (igcm_hcoco3h /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hcoco3h) = vmr*mmol(igcm_hcoco3h)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hcoco3h) = 0.
+      end if 
+	  
+! HCOCO3 
+      if (igcm_hcoco3 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hcoco3) = vmr*mmol(igcm_hcoco3)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hcoco3) = 0.
+      end if 
+	 
+	  
+! CH2OO*
+      if (igcm_ch2oo_e /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch2oo_e) = vmr*mmol(igcm_ch2oo_e)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch2oo_e) = 0.
+      end if  
+! CH2OO
+      if (igcm_ch2oo /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch2oo) = vmr*mmol(igcm_ch2oo)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch2oo) = 0.
+      end if  
+	  
+! i-C3H7O2
+      if (igcm_ic3h7o2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ic3h7o2) = vmr*mmol(igcm_ic3h7o2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ic3h7o2) = 0.
+      end if 
+	  
+! i-C3H7OOH
+      if (igcm_ic3h7ooh /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ic3h7ooh) = vmr*mmol(igcm_ic3h7ooh)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ic3h7ooh) = 0.
+      end if 
+	  
+! CH3COCH3
+      if (igcm_ch3coch3 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3coch3) = vmr*mmol(igcm_ch3coch3)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3coch3) = 0.
+      end if 
+
+! CH3COCH2O2
+      if (igcm_ch3coch2o2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3coch2o2) = vmr*mmol(igcm_ch3coch2o2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3coch2o2) = 0.
+      end if 
+	  
+! CH2CHOH
+      if (igcm_ch2choh /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch2choh) = vmr*mmol(igcm_ch2choh)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch2choh) = 0.
+      end if 
+	  
 ! ions: 0
 
       if (igcm_co2plus /= 0) then
@@ -690,5 +1781,6 @@
       deallocate(niq)
       deallocate(vmrinit)
       deallocate(vmrint)
+
 
       end

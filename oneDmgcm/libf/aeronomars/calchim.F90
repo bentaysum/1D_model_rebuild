@@ -110,7 +110,6 @@
       integer,save :: i_oh   = 0
       integer,save :: i_ho2  = 0
       integer,save :: i_h2o2 = 0
-      integer,save :: i_ch4  = 0
       integer,save :: i_n2   = 0
       integer,save :: i_h2o  = 0
       integer,save :: i_n    = 0
@@ -128,6 +127,52 @@
       integer,save :: i_hplus=0
       integer,save :: i_hco2plus=0
       integer,save :: i_elec=0
+	  
+! Organic Chemistry
+	  ! Methane Oxidation
+      integer,save :: i_ch4  = 0
+      integer,save :: i_ch3  = 0
+      integer,save :: i_ch3o2 = 0
+      integer,save :: i_ch3oh= 0
+      integer,save :: i_ch3o = 0
+      integer,save :: i_ch3ooh=0
+      integer,save :: i_hcho = 0
+      integer,save :: i_hcooh=0
+      integer,save :: i_hoch2o2=0 
+      integer,save :: i_hoch2oh=0
+      integer,save :: i_hoch2ooh=0
+      integer,save :: i_hco=0
+	  ! Ethane Oxidation 
+      integer,save :: i_c2h6=0
+      integer,save :: i_c2h5=0
+      integer,save :: i_c2h5o2=0
+      integer,save :: i_c2h5ooh=0
+      integer,save :: i_c2h5oh=0
+	  integer,save :: i_hoch2ch2o2  = 0
+	  integer,save :: i_hoch2ch2o   = 0
+	  integer,save :: i_ethgly 	   = 0
+	  integer,save :: i_hyetho2h    = 0
+      integer,save :: i_ch3cho=0
+      integer,save :: i_ch2choh    = 0
+      integer,save :: i_ch3choho2=0
+      integer,save :: i_ch3cooh=0
+	  integer,save :: i_ch3chohooh  = 0
+      integer,save :: i_ch3co=0
+      integer,save :: i_ch3cooo=0
+      integer,save :: i_ch3coooh=0
+	  integer,save :: i_hcoch2o2    = 0 
+	  integer,save :: i_glyox       = 0
+	  integer,save :: i_hcoco       = 0
+	  integer,save :: i_hooch2cho   = 0
+	  integer,save :: i_hoch2cho    = 0
+	  integer,save :: i_hochcho    = 0
+	  integer,save :: i_hoch2co     = 0
+	  integer,save :: i_hoch2co3    = 0
+	  integer,save :: i_hoch2co2h   = 0
+	  integer,save :: i_hcoco2h     = 0
+	  integer,save :: i_hcoco3h     = 0
+	  integer,save :: i_hcoco3 	   = 0 
+	  integer,save :: i_hoch2co3h   = 0
 
       integer :: ig_vl1
 
@@ -262,6 +307,7 @@
             nbq = nbq + 1
             niq(nbq) = i_h2o2
          end if
+		 
          i_ch4 = igcm_ch4
          if (i_ch4 == 0) then
             write(*,*) "calchim: Error; no CH4 tracer !!!"
@@ -269,6 +315,334 @@
          else
             nbq = nbq + 1
             niq(nbq) = i_ch4
+         end if
+         i_ch3 = igcm_ch3
+         if (i_ch3 == 0) then
+            write(*,*) "calchim: Error; no CH3 tracer !!!"
+            write(*,*) "CH3 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3
+         end if
+         i_ch3o2 = igcm_ch3o2
+         if (i_ch3o2 == 0) then
+            write(*,*) "calchim: Error; no CH3O2 tracer !!!"
+            write(*,*) "CH3O2 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3o2
+         end if
+         i_ch3ooh = igcm_ch3ooh
+         if (i_ch3ooh == 0) then
+            write(*,*) "calchim: Error; no CH3OOH tracer !!!"
+            write(*,*) "CH3OOH will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3ooh
+         end if
+         i_ch3oh = igcm_ch3oh
+         if (i_ch3oh == 0) then
+            write(*,*) "calchim: Error; no CH3OH tracer !!!"
+            write(*,*) "CH3OH will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3oh
+         end if
+         i_ch3o = igcm_ch3o
+         if (i_ch3o == 0) then
+            write(*,*) "calchim: Error; no CH3O tracer !!!"
+            write(*,*) "CH3O will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3o
+         end if
+         i_hcho = igcm_hcho
+         if (i_hcho == 0) then
+            write(*,*) "calchim: Error; no HCHO tracer !!!"
+            write(*,*) "HCHO will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hcho
+         end if
+          i_hcooh = igcm_hcooh
+         if (i_hcooh == 0) then
+            write(*,*) "calchim: Error; no hcooh tracer !!!"
+            write(*,*) "hcooh will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hcooh
+         end if
+          i_hoch2o2 = igcm_hoch2o2
+         if (i_hoch2o2 == 0) then
+            write(*,*) "calchim: Error; no hoch2o2 tracer !!!"
+            write(*,*) "hoch2o2 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hoch2o2
+         end if
+          i_hoch2oh = igcm_hoch2oh
+         if (i_hoch2oh == 0) then
+            write(*,*) "calchim: Error; no hoch2oh tracer !!!"
+            write(*,*) "hoch2oh will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hoch2oh
+         end if
+          i_hoch2ooh = igcm_hoch2ooh
+         if (i_hoch2ooh == 0) then
+            write(*,*) "calchim: Error; no hoch2ooh tracer !!!"
+            write(*,*) "hoch2ooh will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hoch2ooh
+         end if
+           i_hco = igcm_hco
+         if (i_hco == 0) then
+            write(*,*) "calchim: Error; no hco tracer !!!"
+            write(*,*) "hco will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hco
+         end if
+           i_c2h6 = igcm_c2h6
+         if (i_c2h6 == 0) then
+            write(*,*) "calchim: Error; no c2h6 tracer !!!"
+            write(*,*) "c2h6 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_c2h6
+         end if
+           i_c2h5 = igcm_c2h5
+         if (i_c2h5 == 0) then
+            write(*,*) "calchim: Error; no c2h5 tracer !!!"
+            write(*,*) "c2h5 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_c2h5
+         end if
+          i_c2h5o2 = igcm_c2h5o2
+         if (i_c2h5o2 == 0) then
+            write(*,*) "calchim: Error; no c2h5o2 tracer !!!"
+            write(*,*) "c2h5o2 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_c2h5o2
+         end if
+           i_c2h5ooh = igcm_c2h5ooh
+         if (i_c2h5ooh == 0) then
+            write(*,*) "calchim: Error; no c2h5ooh tracer !!!"
+            write(*,*) "c2h5ooh will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_c2h5ooh
+         end if
+           i_c2h5oh = igcm_c2h5oh
+         if (i_c2h5oh == 0) then
+            write(*,*) "calchim: Error; no c2h5oh tracer !!!"
+            write(*,*) "c2h5oh will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_c2h5oh
+         end if
+           i_hoch2ch2o2 = igcm_hoch2ch2o2
+         if (i_hoch2ch2o2 == 0) then
+            write(*,*) "calchim: Error; no hoch2ch2o2 tracer !!!"
+            write(*,*) "hoch2ch2o2 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hoch2ch2o2
+         end if
+           i_hoch2ch2o = igcm_hoch2ch2o
+         if (i_hoch2ch2o == 0) then
+            write(*,*) "calchim: Error; no hoch2ch2o tracer !!!"
+            write(*,*) "hoch2ch2o will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hoch2ch2o
+         end if
+          i_ethgly = igcm_ethgly
+         if (i_ethgly == 0) then
+            write(*,*) "calchim: Error; no ethgly tracer !!!"
+            write(*,*) "ethgly will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ethgly
+         end if 
+           i_hyetho2h = igcm_hyetho2h
+         if (i_hyetho2h == 0) then
+            write(*,*) "calchim: Error; no hyetho2h tracer !!!"
+            write(*,*) "hyetho2h will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hyetho2h
+         end if
+           i_ch3cho = igcm_ch3cho
+         if (i_ch3cho == 0) then
+            write(*,*) "calchim: Error; no ch3cho tracer !!!"
+            write(*,*) "ch3cho will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3cho
+         end if
+          i_ch2choh = igcm_ch2choh
+         if (i_ch2choh == 0) then
+            write(*,*) "calchim: Error; no ch2choh tracer !!!"
+            write(*,*) "ch2choh will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch2choh
+         end if
+           i_ch3choho2 = igcm_ch3choho2
+         if (i_ch3choho2 == 0) then
+            write(*,*) "calchim: Error; no ch3choho2 tracer !!!"
+            write(*,*) "ch3choho2 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3choho2
+         end if
+           i_ch3cooh = igcm_ch3cooh
+         if (i_ch3cooh == 0) then
+            write(*,*) "calchim: Error; no ch3cooh tracer !!!"
+            write(*,*) "ch3cooh will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3cooh
+         end if
+          i_ch3chohooh = igcm_ch3chohooh
+         if (i_ch3chohooh == 0) then
+            write(*,*) "calchim: Error; no ch3chohooh tracer !!!"
+            write(*,*) "ch3chohooh will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3chohooh
+         end if
+          i_ch3co = igcm_ch3co
+         if (i_ch3co == 0) then
+            write(*,*) "calchim: Error; no ch3c(o) tracer !!!"
+            write(*,*) "ch3c(o) will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3co
+         end if
+          i_ch3cooo = igcm_ch3cooo
+         if (i_ch3cooo == 0) then
+            write(*,*) "calchim: Error; no ch3c(o)oo tracer !!!"
+            write(*,*) "ch3c(o)oo will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3cooo
+         end if
+           i_ch3coooh = igcm_ch3coooh
+         if (i_ch3coooh == 0) then
+            write(*,*) "calchim: Error; no ch3c(o)ooh tracer !!!"
+            write(*,*) "ch3c(o)ooh will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3coooh
+         end if
+           i_hcoch2o2 = igcm_hcoch2o2
+         if (i_hcoch2o2 == 0) then
+            write(*,*) "calchim: Error; no hcoch2o2 tracer !!!"
+            write(*,*) "hcoch2o2 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hcoch2o2
+         end if
+           i_glyox = igcm_glyox
+         if (i_glyox == 0) then
+            write(*,*) "calchim: Error; no glyox tracer !!!"
+            write(*,*) "glyox will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_glyox
+         end if
+           i_hcoco = igcm_hcoco
+         if (i_hcoco == 0) then
+            write(*,*) "calchim: Error; no hcoco tracer !!!"
+            write(*,*) "hcoco will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hcoco
+         end if
+           i_hooch2cho = igcm_hooch2cho
+         if (i_hooch2cho == 0) then
+            write(*,*) "calchim: Error; no hooch2cho tracer !!!"
+            write(*,*) "hooch2cho will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hooch2cho
+         end if
+           i_hoch2cho = igcm_hoch2cho
+         if (i_hoch2cho == 0) then
+            write(*,*) "calchim: Error; no hoch2cho tracer !!!"
+            write(*,*) "hoch2cho will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hoch2cho
+         end if
+           i_hochcho = igcm_hochcho
+         if (i_hochcho == 0) then
+            write(*,*) "calchim: Error; no hochcho tracer !!!"
+            write(*,*) "hochcho will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hochcho
+         end if
+           i_hoch2co = igcm_hoch2co
+         if (i_hoch2co == 0) then
+            write(*,*) "calchim: Error; no hoch2co tracer !!!"
+            write(*,*) "hoch2co will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hoch2co
+         end if
+           i_hoch2co3 = igcm_hoch2co3
+         if (i_hoch2co3 == 0) then
+            write(*,*) "calchim: Error; no hoch2co3 tracer !!!"
+            write(*,*) "hoch2co3 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hoch2co3
+         end if
+            i_hoch2co2h = igcm_hoch2co2h
+         if (i_hoch2co2h == 0) then
+            write(*,*) "calchim: Error; no hoch2co2h tracer !!!"
+            write(*,*) "hoch2co2h will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hoch2co2h
+         end if
+           i_hcoco2h = igcm_hcoco2h
+         if (i_hcoco2h == 0) then
+            write(*,*) "calchim: Error; no hcoco2h tracer !!!"
+            write(*,*) "hcoco2h will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hcoco2h
+         end if
+           i_hcoco3h = igcm_hcoco3h
+         if (i_hcoco3h == 0) then
+            write(*,*) "calchim: Error; no hcoco3h tracer !!!"
+            write(*,*) "hcoco3h will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hcoco3h
+         end if
+           i_hcoco3 = igcm_hcoco3
+         if (i_hcoco3 == 0) then
+            write(*,*) "calchim: Error; no hcoco3 tracer !!!"
+            write(*,*) "hcoco3 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hcoco3
+         end if
+           i_hoch2co3h = igcm_hoch2co3h
+         if (i_hoch2co3h == 0) then
+            write(*,*) "calchim: Error; no hoch2co3h tracer !!!"
+            write(*,*) "hoch2co3h will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hoch2co3h
          end if
          i_n2 = igcm_n2
          if (i_n2 == 0) then
@@ -561,7 +935,6 @@
          endif      !Of thermochem
 
          write(*,*) 'calchim: found nbq    = ',nbq,' tracers'
-               
          firstcall = .false.
       end if ! if (firstcall)
 
