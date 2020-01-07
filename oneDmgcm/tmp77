@@ -265,6 +265,8 @@ libf/phymars/lwu.F
 libf/phymars/lwxb.F
 libf/phymars/lwxd.F
 libf/phymars/lwxn.F
+libf/phymars/mcd_phys.F
+libf/phymars/mcd_trac.F
 libf/phymars/meso_inc/meso_inc_caps.F
 libf/phymars/meso_inc/meso_inc_ini.F
 libf/phymars/meso_inc/meso_inc_inifisini.F

@@ -6,11 +6,11 @@
 
 # Repertoires :
 
-GCM     = /exports/csce/datastore/geos/users/s1215319/original_gcm/oneDmgcm
+GCM     = /exports/csce/datastore/geos/users/s1215319/cleaning_gcm/oneDmgcm
 MACHINE = sun4
 LIBF    = $(GCM)/libf
 LIBO    = $(LIBOGCM)/$(MACHINE)
-LOCAL_DIR=/exports/csce/datastore/geos/users/s1215319/original_gcm/oneDmgcm
+LOCAL_DIR=/exports/csce/datastore/geos/users/s1215319/cleaning_gcm/oneDmgcm
 BIBIO    = $(LIBF)/bibio
 AERONOMARS    = $(LIBF)/aeronomars
 FILTRE   = filtre
@@ -2436,6 +2436,10 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lwxd.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lwxn.o)
 
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(mcd_phys.o)
+
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(mcd_trac.o)
+
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(mucorr.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(mufract.o)
@@ -3074,6 +3078,20 @@ $(LIBF)/phymars/callkeys.h
 	$(AR) d $(LIBO)/libphymars.a lwxn.o ; \
 	$(COMPILE) $(LIBF)/phymars/lwxn.F ; \
 	$(AR) r $(LIBO)/libphymars.a lwxn.o ; $(RM) lwxn.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(mcd_phys.o) : $(LIBF)/phymars/mcd_phys.F
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a mcd_phys.o ; \
+	$(COMPILE) $(LIBF)/phymars/mcd_phys.F ; \
+	$(AR) r $(LIBO)/libphymars.a mcd_phys.o ; $(RM) mcd_phys.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(mcd_trac.o) : $(LIBF)/phymars/mcd_trac.F
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a mcd_trac.o ; \
+	$(COMPILE) $(LIBF)/phymars/mcd_trac.F ; \
+	$(AR) r $(LIBO)/libphymars.a mcd_trac.o ; $(RM) mcd_trac.o ; \
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(mucorr.o) : $(LIBF)/phymars/mucorr.F

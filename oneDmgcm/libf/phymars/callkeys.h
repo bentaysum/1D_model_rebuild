@@ -12,7 +12,7 @@
      &   ,callg2d,linear,rayleigh,tracer,active,doubleq,submicron       &
      &   ,lifting,callddevil,scavenging,sedimentation,activice,water    &
      &   ,tifeedback,microphys,caps,photochem,calltherm,outptherm       &
-     &   ,callrichsl,callslope,tituscap
+     &   ,callrichsl,callslope,tituscap,long_mean
      
       COMMON/callkeys_i/iradia,iaervar,iddist,ilwd,ilwb,ilwn,ncouche    &
      &   ,dustbin,nltemodel,nircorr,solvarmod,solvaryear
@@ -32,6 +32,8 @@
       logical callg2d
       logical linear
 
+      logical long_mean
+	  
       real topdustref
       real semi
       real alphan

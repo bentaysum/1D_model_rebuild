@@ -158,6 +158,11 @@
          call getin("season",season)
          write(*,*) " season = ",season
 
+         write(*,*) "Longitudinal mean values of MCD v5.3 variables?"
+         long_mean=.true. ! default value
+         call getin("long_mean",long_mean)
+         write(*,*) " long_mean = ",long_mean
+		 
          write(*,*) "Write some extra output to the screen ?"
          lwrite=.false. ! default value
          call getin("lwrite",lwrite)

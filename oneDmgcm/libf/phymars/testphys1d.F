@@ -411,13 +411,18 @@ c
       ndt=ndt*day_step     
       dtphys=daysec/day_step  
 
-c Imposed surface pressure
+c Imposed surface pressure [MOVED BELOW]
 c ------------------------------------
 c
-      psurf=610. ! default value for psurf
-      PRINT *,'Surface pressure (Pa) ?'
-      call getin("psurf",psurf)
-      write(*,*) " psurf = ",psurf
+C       psurf=610. ! default value for psurf
+C       PRINT *,'Surface pressure (Pa) ?'
+C       call getin("psurf",psurf)
+C       write(*,*) " psurf = ",psurf
+      
+      
+      
+      
+      
 c Reference pressures
       pa=20.   ! transition pressure (for hybrid coord.)
       preff=610.      ! reference surface pressure
@@ -558,6 +563,13 @@ c  ----------
 
 c  Compute pressures and altitudes of atmospheric levels 
 c  ----------------------------------------------------------------
+!     Initialise the surface pressure from the MCDv5.3 look-up table
+      CALL iniorbit(aphelie,periheli,year_day,peri_day,obliquit)
+      call solarlong(day+time,zls)
+      
+      call mcd_phys(time*24.,zlay,zls*180./pi,
+     &              temp, psurf, u, v, 
+     &              q2, day_step)
 
 c    Vertical Coordinates
 c    """"""""""""""""""""
@@ -587,20 +599,25 @@ c  --------------------------------------
       pks=psurf**rcp
 
 c altitude in km in profile: divide zlay by 1000
-      tmp1(0)=0.E+0
-      DO ilayer=1,nlayer
-        tmp1(ilayer)=zlay(ilayer)/1000.E+0
-      ENDDO
+C       tmp1(0)=0.E+0
+C       DO ilayer=1,nlayer
+C         tmp1(ilayer)=zlay(ilayer)/1000.E+0
+C       ENDDO
 
-      call profile(nlayer+1,tmp1,tmp2)
+C       call profile(nlayer+1,tmp1,tmp2)
 
-      tsurf=tmp2(0)
-      DO ilayer=1,nlayer
-        temp(ilayer)=tmp2(ilayer)
-      ENDDO
+C       tsurf=tmp2(0)
+C       DO ilayer=1,nlayer
+C         temp(ilayer)=tmp2(ilayer)
+C       ENDDO
+c        
+c     Second call to the MCD v5.3 routine will initialise the
+c     temperature, wind, and q2 profiles.
+      call mcd_phys(time*24.,zlay,zls*180./pi,
+     &              temp, psurf, u, v, 
+     &              q2, day_step)
+      tsurf = temp(1)
       
-
-
 ! Initialize soil properties and temperature
 ! ------------------------------------------
       volcapa=1.e6 ! volumetric heat capacity
@@ -661,7 +678,8 @@ c  It is needed to transfert physics variables to "physiq"...
      .              dtphys,float(day0),time,tsurf,
      .              tsoil,co2ice,emis,q2,qsurf,area,albedodat,
      .              inertiedat,zmea,zstd,zsig,zgam,zthe)
-
+     
+  
 c=======================================================================
 c  1D MODEL TIME STEPPING LOOP
 c=======================================================================
@@ -699,6 +717,14 @@ c     ~~~~~~~~~~~~~~~~~~~~~
 
       ENDDO
 
+     
+c  Begin the tracer interpolation routine for the MCD v5.3 look-up
+c  table for tracers CO2, CO, H2, H2O vapour, and O2.
+          call mcd_trac(time,zlay,zls*180./pi, 
+     &                     q(:,1), q(:,2), 
+     &                     q(:,5), q(:,8),
+     &                     q(:,15))
+      
 c       call physics
 c       --------------------
 !      write(*,*) "testphys1d avant q", q(1,:)
@@ -712,6 +738,11 @@ C - outputs
      s     du, dv, dtemp, dq,dpsurf,tracerdyn)
 !      write(*,*) "testphys1d apres q", q(1,:)
 
+c     Interpolate physical variables (temperature, wind,
+c     q2 and surface pressure) 
+      call mcd_phys(time*24.,zlay,zls*180./pi,
+     &              temp, psurf, u, v, 
+     &              q2, day_step)
 
 c       wind increment : specific for 1D
 c       --------------------------------
@@ -726,10 +757,10 @@ c       ENDDO
 
 c       For some tests : No coriolis force at equator
 c       if(lati(1).eq.0.) then
-          DO ilayer=1,nlayer
-             du(ilayer)=du(ilayer)+ (gru-u(ilayer))/1.e4
-             dv(ilayer)=dv(ilayer)+ (grv-v(ilayer))/1.e4
-          ENDDO
+C           DO ilayer=1,nlayer
+C              du(ilayer)=du(ilayer)+ (gru-u(ilayer))/1.e4
+C              dv(ilayer)=dv(ilayer)+ (grv-v(ilayer))/1.e4
+C           ENDDO
 c       end if
 c      
 c
@@ -745,16 +776,16 @@ c       ---------------------------------------
 c       compute winds and temperature for next time step
 c       ----------------------------------------------------------
 
-        DO ilayer=1,nlayer
-           u(ilayer)=u(ilayer)+dtphys*du(ilayer)
-           v(ilayer)=v(ilayer)+dtphys*dv(ilayer)
-           temp(ilayer)=temp(ilayer)+dtphys*dtemp(ilayer)
-        ENDDO
+C         DO ilayer=1,nlayer
+C            u(ilayer)=u(ilayer)+dtphys*du(ilayer)
+C            v(ilayer)=v(ilayer)+dtphys*dv(ilayer)
+C            temp(ilayer)=temp(ilayer)+dtphys*dtemp(ilayer)
+C         ENDDO
 
 c       compute pressure for next time step 
 c       ----------------------------------------------------------
 
-           psurf=psurf+dtphys*dpsurf   ! surface pressure change
+C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
            DO ilevel=1,nlevel
              plev(ilevel)=ap(ilevel)+psurf*bp(ilevel)
            ENDDO

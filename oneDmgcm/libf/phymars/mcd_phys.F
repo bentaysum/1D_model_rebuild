@@ -355,8 +355,8 @@ C ! 			  to extract the final values
 C !=======================================================================
       
 
-C       call interp_line(v5mcd_lt, zps(:), N_LT,
-C      &                     lt, ps, 1)
+      call interp_line(v5mcd_lt, zps(:), N_LT,
+     &                     lt, ps, 1)
 
       do y = 1, nlayermx
 		 
