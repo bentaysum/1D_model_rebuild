@@ -11,6 +11,6 @@
       INTEGER, parameter :: llm=25
       INTEGER, parameter :: ndm=1
 
-      integer, parameter :: nqmx=15
+      integer, parameter :: nqmx=57
 
 !-----------------------------------------------------------------------

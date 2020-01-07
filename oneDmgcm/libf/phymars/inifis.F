@@ -189,7 +189,36 @@
          
          ENDIF
          
+!        Plume parameters and keys 
+         write(*,*) "Introducing an instantaneous plume?"
+         plume=.False. ! default value
+         call getin("plume",plume)
+         write(*,*) " plume = ",plume 
          
+         IF ( plume ) THEN 
+         
+         write(*,*) "Days after day0 to release plume?"
+         plume_day= 0 ! default value
+         call getin("plume_day",plume_day)
+         write(*,*) " plume_day = ",plume_day 
+
+         write(*,*) "Local time to release plume?"
+         plume_lt= 0. ! default value
+         call getin("plume_lt",plume_lt)
+         write(*,*) " plume_lt = ",plume_lt 
+         
+         write(*,*) "Plume lower cell"
+         p_low= 1 ! default value
+         call getin("p_low",p_low)
+         write(*,*) " p_low = ",p_low 
+         
+         write(*,*) "Plume upper cell"
+         p_high= 1 ! default value
+         call getin("p_high",p_high)
+         write(*,*) " p_high = ",p_high 
+         
+         ENDIF 
+
          
          
          

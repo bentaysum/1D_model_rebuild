@@ -33,8 +33,25 @@ mcd_profiles = .true.
 long_mean = .true.
 
 ## Tracer interpolation shutdown parameters 
-mcd_dayfin = 1. 
+mcd_dayfin = 1 
 mcd_ltfin = 12.
+
+## Plume routines 
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#Introducing an instantaneous plume?
+plume = .false.
+
+#Days after day0 to release plume?
+plume_day = 1
+
+#Local time to release plume?
+plume_lt = 12.
+
+#Plume lower altitude (model layer index)
+p_low = 1
+
+#Plume upper altitude (model layer index)
+p_high = 25 
 
 
 ## Dust scenario. Used if the dust is prescribed (i.e. if tracer=F or active=F)

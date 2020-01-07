@@ -12,13 +12,14 @@
      &   ,callg2d,linear,rayleigh,tracer,active,doubleq,submicron       &
      &   ,lifting,callddevil,scavenging,sedimentation,activice,water    &
      &   ,tifeedback,microphys,caps,photochem,calltherm,outptherm       &
-     &   ,callrichsl,callslope,tituscap,long_mean,mcd_profiles
+     &   ,callrichsl,callslope,tituscap,long_mean,mcd_profiles,plume
      
       COMMON/callkeys_i/iradia,iaervar,iddist,ilwd,ilwb,ilwn,ncouche    &
-     &   ,dustbin,nltemodel,nircorr,solvarmod,solvaryear
+     &   ,dustbin,nltemodel,nircorr,solvarmod,solvaryear,plume_day      &
+     &   ,p_low,p_high
      
       COMMON/callkeys_r/topdustref,solarcondate,semi,alphan,euveff,     &
-     &   tke_heat_flux,mcd_dayfin,mcd_ltfin
+     &   tke_heat_flux,mcd_dayfin,mcd_ltfin,plume_lt 
      
       LOGICAL callrad,calldifv,calladj,callcond,callsoil,               &
      &   season,diurnal,lwrite,calllott                                 &
@@ -34,6 +35,7 @@
 
       logical long_mean
       logical mcd_profiles 
+      logical plume
 	  
       real topdustref
       real semi
@@ -44,6 +46,7 @@
 
       real mcd_dayfin
       real mcd_ltfin	  
+      real plume_lt 
 	
       integer iddist
       integer iaervar
@@ -55,6 +58,11 @@
       integer solvarmod   ! model for solar EUV variation
       integer solvaryear  ! mars year for realisticly varying solar EUV 
 
+      integer plume_day 
+      integer p_low 
+      integer p_high 
+
+	  
       logical rayleigh
       logical tracer
       integer dustbin
