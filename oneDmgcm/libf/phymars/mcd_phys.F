@@ -329,8 +329,8 @@ C !=======================================================================
 
       do x = 1,N_LT
       
-C           call interp_line(v5mcd_zls,int_lat_ps(x,:),N_ZLS
-C      &                       ,zls,zps(x),1) 
+          call interp_line(v5mcd_zls,int_lat_ps(x,:),N_ZLS
+     &                       ,zls,zps(x),1) 
       
           do y = 1, nlayermx
                   call interp_line(v5mcd_zls,fin_T(x,y,:),N_ZLS

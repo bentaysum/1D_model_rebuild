@@ -414,10 +414,10 @@ c
 c Imposed surface pressure [MOVED BELOW]
 c ------------------------------------
 c
-C       psurf=610. ! default value for psurf
-C       PRINT *,'Surface pressure (Pa) ?'
-C       call getin("psurf",psurf)
-C       write(*,*) " psurf = ",psurf
+      psurf=610. ! default value for psurf
+      PRINT *,'Surface pressure (Pa) ?'
+      call getin("psurf",psurf)
+      write(*,*) " psurf = ",psurf
       
       
       
@@ -598,25 +598,29 @@ c  Initialize temperature profile
 c  --------------------------------------
       pks=psurf**rcp
 
-c altitude in km in profile: divide zlay by 1000
-C       tmp1(0)=0.E+0
-C       DO ilayer=1,nlayer
-C         tmp1(ilayer)=zlay(ilayer)/1000.E+0
-C       ENDDO
+C altitude in km in profile: divide zlay by 1000
+      tmp1(0)=0.E+0
+      DO ilayer=1,nlayer
+        tmp1(ilayer)=zlay(ilayer)/1000.E+0
+      ENDDO
 
-C       call profile(nlayer+1,tmp1,tmp2)
+      call profile(nlayer+1,tmp1,tmp2)
 
-C       tsurf=tmp2(0)
-C       DO ilayer=1,nlayer
-C         temp(ilayer)=tmp2(ilayer)
-C       ENDDO
+      tsurf=tmp2(0)
+      DO ilayer=1,nlayer
+        temp(ilayer)=tmp2(ilayer)
+      ENDDO
+      
 c        
-c     Second call to the MCD v5.3 routine will initialise the
-c     temperature, wind, and q2 profiles.
+C     Second call to the MCD v5.3 routine will initialise the
+C     temperature, wind, and q2 profiles.
       call mcd_phys(time*24.,zlay,zls*180./pi,
      &              temp, psurf, u, v, 
      &              q2, day_step)
-      tsurf = temp(1)
+     
+
+
+C       tsurf = temp(1)
       
 ! Initialize soil properties and temperature
 ! ------------------------------------------
@@ -678,8 +682,7 @@ c  It is needed to transfert physics variables to "physiq"...
      .              dtphys,float(day0),time,tsurf,
      .              tsoil,co2ice,emis,q2,qsurf,area,albedodat,
      .              inertiedat,zmea,zstd,zsig,zgam,zthe)
-     
-  
+
 c=======================================================================
 c  1D MODEL TIME STEPPING LOOP
 c=======================================================================
@@ -750,10 +753,10 @@ c       --------------------------------
 c       The physics compute the tendencies on u and v,
 c       here we just add Coriolos effect
 c
-c       DO ilayer=1,nlayer
-c          du(ilayer)=du(ilayer)+ptif*(v(ilayer)-grv)
-c          dv(ilayer)=dv(ilayer)+ptif*(-u(ilayer)+gru)
-c       ENDDO
+C       DO ilayer=1,nlayer
+C          du(ilayer)=du(ilayer)+ptif*(v(ilayer)-grv)
+C          dv(ilayer)=dv(ilayer)+ptif*(-u(ilayer)+gru)
+C       ENDDO
 
 c       For some tests : No coriolis force at equator
 c       if(lati(1).eq.0.) then
