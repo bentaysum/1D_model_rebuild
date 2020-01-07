@@ -811,7 +811,7 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
       IF ( mcd_profiles ) THEN 
           date = idt*(dtphys/daysec) 
           
-          IF (  ( date > mcd_dayfin ) .and. 
+          IF (  ( date >= mcd_dayfin ) .and. 
      &      ( ABS(time*24. - mcd_ltfin) < 1.e-1 ) )
      &    mcd_profiles = .False.
          
