@@ -57,6 +57,7 @@ c
 c
       INTEGER day0          ! date initial (sol ; =0 a Ls=0)
       REAL day           ! date durant le run
+      REAL date          ! number of days (and fractions of) that have occured
       REAL time             ! time (0<time<1 ; time=0.5 a midi)
       REAL play(nlayermx)   ! Pressure at the middle of the layers (Pa)
       REAL plev(nlayermx+1) ! intermediate pressure levels (pa)
@@ -720,13 +721,15 @@ c     ~~~~~~~~~~~~~~~~~~~~~
 
       ENDDO
 
-     
 c  Begin the tracer interpolation routine for the MCD v5.3 look-up
 c  table for tracers CO2, CO, H2, H2O vapour, and O2.
+          IF ( mcd_profiles ) THEN 
           call mcd_trac(time,zlay,zls*180./pi, 
      &                     q(:,1), q(:,2), 
      &                     q(:,5), q(:,8),
      &                     q(:,15))
+          WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]"
+          ENDIF 
       
 c       call physics
 c       --------------------
@@ -803,6 +806,18 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
           ENDDO
         ENDDO
 
+!     Check if the MCD v5.3 tracer interpolation routine has reached
+!     the desired shutdown point 
+      IF ( mcd_profiles ) THEN 
+          date = idt*(dtphys/daysec) 
+          
+          IF (  ( date > mcd_dayfin ) .and. 
+     &      ( ABS(time*24. - mcd_ltfin) < 1.e-1 ) )
+     &    mcd_profiles = .False.
+         
+      ENDIF 
+        
+        
       ENDDO   ! of idt=1,ndt ! end of time stepping loop
 
 c    ========================================================

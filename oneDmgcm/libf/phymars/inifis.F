@@ -158,10 +158,41 @@
          call getin("season",season)
          write(*,*) " season = ",season
 
+!        MCD Interpolation keys
+         write(*,*) "MCD v5.3 tracer profiles of CO2, CO, O2, H2 and ",
+     &              "H2O vapour?"
+         mcd_profiles=.True. ! default value
+         call getin("mcd_profiles",mcd_profiles)
+         write(*,*) " mcd_profiles = ",mcd_profiles
+		 
          write(*,*) "Longitudinal mean values of MCD v5.3 variables?"
          long_mean=.true. ! default value
          call getin("long_mean",long_mean)
          write(*,*) " long_mean = ",long_mean
+		 
+         IF ( mcd_profiles ) THEN  
+         write(*,*) "Tracer interpolation shutdown parameters"
+         mcd_dayfin=100. ! default value
+         call getin("mcd_dayfin",mcd_dayfin)
+         write(*,*) " mcd_dayfin = ",mcd_dayfin
+         
+         mcd_ltfin= 0. ! default value
+         call getin("mcd_ltfin",mcd_ltfin)
+         write(*,*) " mcd_ltfin = ",mcd_ltfin
+         
+         IF ( mcd_ltfin > 24. .or. mcd_ltfin < 0. ) THEN 
+          WRITE(*,*) "ERROR: in callphys.def, mcd_ltfin must be",
+     &               " a floating point between 0 and 24 (time ",
+     &               "variable.)"
+          STOP         
+         ENDIF 
+         
+         ENDIF
+         
+         
+         
+         
+         
 		 
          write(*,*) "Write some extra output to the screen ?"
          lwrite=.false. ! default value

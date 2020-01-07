@@ -6,7 +6,7 @@
 #### Time integration parameters
 #
 # Initial date (in martian sols ; =0 at Ls=0)
-day0=0
+day0=100
 # Initial local time (in hours, between 0 and 24)
 time=12
 # Number of time steps per sol

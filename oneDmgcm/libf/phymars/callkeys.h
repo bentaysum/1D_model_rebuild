@@ -12,13 +12,13 @@
      &   ,callg2d,linear,rayleigh,tracer,active,doubleq,submicron       &
      &   ,lifting,callddevil,scavenging,sedimentation,activice,water    &
      &   ,tifeedback,microphys,caps,photochem,calltherm,outptherm       &
-     &   ,callrichsl,callslope,tituscap,long_mean
+     &   ,callrichsl,callslope,tituscap,long_mean,mcd_profiles
      
       COMMON/callkeys_i/iradia,iaervar,iddist,ilwd,ilwb,ilwn,ncouche    &
      &   ,dustbin,nltemodel,nircorr,solvarmod,solvaryear
      
       COMMON/callkeys_r/topdustref,solarcondate,semi,alphan,euveff,     &
-     &   tke_heat_flux
+     &   tke_heat_flux,mcd_dayfin,mcd_ltfin
      
       LOGICAL callrad,calldifv,calladj,callcond,callsoil,               &
      &   season,diurnal,lwrite,calllott                                 &
@@ -33,6 +33,7 @@
       logical linear
 
       logical long_mean
+      logical mcd_profiles 
 	  
       real topdustref
       real semi
@@ -41,6 +42,9 @@
       real euveff
       real tke_heat_flux
 
+      real mcd_dayfin
+      real mcd_ltfin	  
+	
       integer iddist
       integer iaervar
       integer iradia

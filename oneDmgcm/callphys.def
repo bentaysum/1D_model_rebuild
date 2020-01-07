@@ -33,8 +33,8 @@ mcd_profiles = .true.
 long_mean = .true.
 
 ## Tracer interpolation shutdown parameters 
-mcd_dayfin = 100 ## 
-mcd_ltfin = 0.
+mcd_dayfin = 1. 
+mcd_ltfin = 12.
 
 
 ## Dust scenario. Used if the dust is prescribed (i.e. if tracer=F or active=F)
