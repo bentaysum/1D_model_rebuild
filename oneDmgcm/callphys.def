@@ -39,7 +39,7 @@ mcd_ltfin = 12.
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Introducing an instantaneous plume?
-plume = .false.
+plume = .true.
 
 #Days after day0 to release plume?
 plume_day = 1

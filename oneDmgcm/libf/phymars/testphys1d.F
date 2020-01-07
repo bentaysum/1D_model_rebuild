@@ -799,6 +799,14 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
              play(ilayer)=aps(ilayer)+psurf*bps(ilayer)
            ENDDO
 
+           
+!      Plume/perturbation scenarios engaged here
+        IF ( plume ) THEN 
+           
+           call tracer_release(dq)
+           
+        ENDIF 
+        
 !       increment tracers
         DO iq = 1, nqmx
           DO ilayer=1,nlayer
@@ -816,6 +824,8 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
      &    mcd_profiles = .False.
          
       ENDIF 
+      
+      
         
         
       ENDDO   ! of idt=1,ndt ! end of time stepping loop

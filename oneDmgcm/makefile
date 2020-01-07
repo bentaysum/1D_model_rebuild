@@ -2518,6 +2518,8 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(swr_toon.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(tabfi.o)
 
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(tracer_release.o)
+
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(updatereffrad.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(vdif_cd.o)
@@ -3539,6 +3541,13 @@ $(LIBF)/phymars/yomaer.h
 	$(AR) d $(LIBO)/libphymars.a tabfi.o ; \
 	$(COMPILE) $(LIBF)/phymars/tabfi.F ; \
 	$(AR) r $(LIBO)/libphymars.a tabfi.o ; $(RM) tabfi.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(tracer_release.o) : $(LIBF)/phymars/tracer_release.F
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a tracer_release.o ; \
+	$(COMPILE) $(LIBF)/phymars/tracer_release.F ; \
+	$(AR) r $(LIBO)/libphymars.a tracer_release.o ; $(RM) tracer_release.o ; \
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(updatereffrad.o) : $(LIBF)/phymars/updatereffrad.F \

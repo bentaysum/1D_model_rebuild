@@ -1,0 +1,9 @@
+## Plume/perturbation concentration parameters.
+## Parameters governing spatial and temporal aspects 
+## of the plume releases are held within the callphys.def
+## file.
+## Format required is :
+## 		Gas name as in tracer.def - Gas concentration (in ppbv)
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ch3cho - 1.
+
