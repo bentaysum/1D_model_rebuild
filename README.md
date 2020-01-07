@@ -10,5 +10,14 @@ Module now interpolates from the MCD v5.3 offline look-up tables continuously fo
 profiles of CO2, CO, O2, H2 and H2O vapour as mixing ratios, and profiles of the
 physical variables Temperature, Q2, u, v and surface pressure. 
 
-Next step: establish a cut-off routine for tracer profile interpolation to enable
-the study of the natural evolution of the tracers. 
+Module now equipped with the callkeys mcd_dayfin and mcd_ltfin to indicate the 
+number of days the tracer interpolation routine runs for, and what local time (lt)
+we want the module to stop interpolating these tracer profiles at.
+
+tracer_release.F introduced to read concentration and tracer parameters from the plume.def
+file that will tell the model what gas will be inserted across layers p_low to p_high [defined
+in callphys.def] and at what VMR. 
+
+## ONGOING 
+finish the tracer_release.F file. Make it work for PROFILE concentrations, and also
+COLUMN VMR abundances concentrated in between layers p_low and p_high
