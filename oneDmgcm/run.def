@@ -8,11 +8,11 @@
 # Initial date (in martian sols ; =0 at Ls=0)
 day0=100
 # Initial local time (in hours, between 0 and 24)
-time=12
+time=0
 # Number of time steps per sol
 day_step=48
 # Number of sols to run 
-ndt = 100
+ndt = 20
 
 #### Physical parameters
 #
@@ -21,7 +21,7 @@ psurf= 610
 # Reference dust opacity at 610 Pa, in the visible (true tau~tauref*psurf/610)
 tauvis=0.2
 # latitude (in degrees)
-latitude= 30.
+latitude= 10.
 # Albedo of bare ground
 albedo=0.2
 # Soil thermal inertia (SI)

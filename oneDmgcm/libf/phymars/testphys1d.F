@@ -799,14 +799,19 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
              play(ilayer)=aps(ilayer)+psurf*bps(ilayer)
            ENDDO
 
-           
+          date = idt*(dtphys/daysec) 
+
 !      Plume/perturbation scenarios engaged here
         IF ( plume ) THEN 
            
+           IF ( (date >= plume_day ) .and. 
+     $          ( ABS(time*24. - plume_lt) < 1.e-1 ) ) THEN
            call tracer_release(dq)
            
            plume = .False.
+           mcd_profiles = .False. 
            
+           ENDIF
         ENDIF 
         
 !       increment tracers
@@ -819,7 +824,6 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
 !     Check if the MCD v5.3 tracer interpolation routine has reached
 !     the desired shutdown point 
       IF ( mcd_profiles ) THEN 
-          date = idt*(dtphys/daysec) 
           
           IF (  ( date >= mcd_dayfin ) .and. 
      &      ( ABS(time*24. - mcd_ltfin) < 1.e-1 ) )

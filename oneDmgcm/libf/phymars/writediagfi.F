@@ -82,7 +82,8 @@
       integer, save :: ntime=0
       integer :: idim,varid
       integer :: nid
-      character(len=*),parameter :: fichnom="diagfi.nc"
+      character(len=*),parameter :: fichnom="/scratch/local/s1215319/"
+     $                             //"organics/diagfi.nc"
       integer, dimension(4) :: id
       integer, dimension(4) :: edges,corner
 
