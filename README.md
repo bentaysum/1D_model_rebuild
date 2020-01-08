@@ -18,6 +18,9 @@ tracer_release.F introduced to read concentration and tracer parameters from the
 file that will tell the model what gas will be inserted across layers p_low to p_high [defined
 in callphys.def] and at what VMR. 
 
-## ONGOING 
-finish the tracer_release.F file. Make it work for PROFILE concentrations, and also
-COLUMN VMR abundances concentrated in between layers p_low and p_high
+## 08/01/202
+
+tracer_release.F finished for profile perturbations. Reads plume.def and deposits the specified
+abundance of the listed tracers instantaneously and homogeneously through layer p_low to p_high,
+provided in the callphys.def file. Once routine is called, the module immediately stops interpolating
+tracer profiles from the MCD v5.3 offline look-up table.
