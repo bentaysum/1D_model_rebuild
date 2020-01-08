@@ -48,10 +48,10 @@ plume_day = 1
 plume_lt = 12.
 
 #Plume lower altitude (model layer index)
-p_low = 1
+p_low = 10
 
 #Plume upper altitude (model layer index)
-p_high = 25 
+p_high = 12 
 
 
 ## Dust scenario. Used if the dust is prescribed (i.e. if tracer=F or active=F)

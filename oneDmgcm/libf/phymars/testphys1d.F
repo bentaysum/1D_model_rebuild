@@ -805,6 +805,8 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
            
            call tracer_release(dq)
            
+           plume = .False.
+           
         ENDIF 
         
 !       increment tracers

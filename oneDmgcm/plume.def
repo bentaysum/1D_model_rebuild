@@ -3,7 +3,8 @@
 ## of the plume releases are held within the callphys.def
 ## file.
 ## Format required is :
-## 		Gas name as in tracer.def - Gas concentration (in ppbv)
+## 		Gas name as in tracer.def - Gas concentration - unit
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ch3cho - 1.
 
+ch3cho = 100. ppb
+ch4 = 1. ppb
