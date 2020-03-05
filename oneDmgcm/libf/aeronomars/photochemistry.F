@@ -122,7 +122,7 @@ cc    reaction rates from CAABA/MECCA
      $     cab097(nlayermx), cab098(nlayermx), cab099(nlayermx),
      $     cab100(nlayermx), cab101(nlayermx), cab102(nlayermx),
      $     cab103(nlayermx), cab104(nlayermx), cab105(nlayermx),
-     $     cab106(nlayermx)
+     $     cab106(nlayermx), cab107(nlayermx)
 
 
 
@@ -189,7 +189,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $               cab091, cab092, cab093, cab094, cab095,
      $               cab096, cab097, cab098, cab099, cab100,
      $               cab101, cab102, cab103, cab104, cab105,
-     $               cab106)
+     $               cab106, cab107)
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     interpolation of photolysis rates in the lookup table      c
@@ -255,7 +255,7 @@ c =================================================================
      $               cab091, cab092, cab093, cab094, cab095,
      $               cab096, cab097, cab098, cab099, cab100,
      $               cab101, cab102, cab103, cab104, cab105,
-     $               cab106)
+     $               cab106, cab107)
       
       end do
 
@@ -307,7 +307,7 @@ c
      $               cab091, cab092, cab093, cab094, cab095,
      $               cab096, cab097, cab098, cab099, cab100,
      $               cab101, cab102, cab103, cab104, cab105,
-     $               cab106)
+     $               cab106, cab107)
 c
 c*****************************************************************
 c
@@ -317,7 +317,8 @@ c
 #include "dimphys.h"
 #include "chimiedata.h" 
 #include "callkeys.h" 
-c
+#include "tracer.h"
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     input/output:
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -393,7 +394,7 @@ c
      $     cab097(nlayermx), cab098(nlayermx), cab099(nlayermx),
      $     cab100(nlayermx), cab101(nlayermx), cab102(nlayermx),
      $     cab103(nlayermx), cab104(nlayermx), cab105(nlayermx),
-     $     cab106(nlayermx)
+     $     cab106(nlayermx), cab107(nlayermx)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     local:
@@ -815,6 +816,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $            + cab100(l)*cc(l,i_hoch2co3h)
      $            + cab101(l)*cc(l,i_hoch2co3h)*2.
      $            + cab102(l)*cc(l,i_hcoco3h)
+     $            + cab107(l)*cc(l,i_ch3)
      $            + (cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
      $                 + cab026(l)*cc(l,i_hco)*cc(l,i_o2)
      $                 + cab028(l)*cc(l,i_hoch2o2)
@@ -1308,7 +1310,7 @@ c
      $                 + cab106(l)*cc(l,i_ho2)*cc(l,i_hcoco3)
      $                 + j(l,j_ch3o2h)*cc(l,i_hyetho2h)
      $                 + j(l,j_ch3cho_h)*cc(l,i_ch3cho)
-     $                 + 2.*j(l,j_hoch2ooh)*cc(l,j_hoch2ooh)
+     $                 + 2.*j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
      $                 + j(l,j_hoch2cho_oh)*cc(l,i_hoch2cho)
      $                 + j(l,j_ch3coooh)*cc(l,i_ch3coooh)
      $                 + 2.*( j(l,j_ch3o2h)
@@ -1370,6 +1372,7 @@ c
      $                 + cab097(l)*cc(l,i_ho2)*cc(l,i_hoch2co3)
      $                 + cab100(l)*cc(l,i_oh)*Cc(l,i_hoch2co3h)
      $                 + cab102(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
+     $                 + cab107(l)*cc(l,i_oh)*cc(l,i_ch3)
      
       loss(l,i_hox) = loss(l,i_hox)/cc(l,i_hox)
 c
@@ -1423,6 +1426,7 @@ C C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                  + cab022(L)*cc(l,i_hco)
      $                  + cab023(L)*cc(l,i_hco)
      $                  + cab038(l)*cc(l,i_ch3)
+     $                  + cab107(l)*cc(l,i_oh)
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ch3o2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1456,7 +1460,7 @@ C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          production(l,i_ch3oh) = 0.5*cab009(l)*cc(l,i_ch3o2)*cc(l,i_ro2)
      $                         + j(l,j_hoch2cho_co)*cc(l,i_hoch2cho)
-         
+     $                         + cab107(l)*cc(l,i_oh)*cc(l,i_ch3)
          
         loss(l,i_ch3oh) = cab013(l)*cc(l,i_oh)
      $                  + j(l,j_ch3oh)
@@ -1563,7 +1567,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $            + cab061(l)*cc(L,i_ch2choh)*cc(l,i_oh)
      $            + 0.2*cab065(l)*cc(l,i_ch3choho2)*cc(L,i_ho2)
      $            + cab066(L)*cc(l,i_ch3choho2)*cc(l,i_ro2)
-     $            + j(l,j_hoch2ooh)*cc(l,j_hoch2ooh)
+     $            + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
      $                             *cc(l,i_o2)*3.5e-14 ! ADDED [06/09/2019]
 
           loss(l,i_hcooh) = cab032(l)*cc(l,i_oh)
@@ -1954,13 +1958,14 @@ c
      $              /(1. + loss(l,i_hox)*dt)
      
 C !      Methane Oxidation
-         cc(l,i_ch4) = (cc0(l,i_ch4) + production(l,i_ch4)*dt)
+         IF (igcm_ch4 .ne. 0 ) THEN  
+        cc(l,i_ch4) = (cc0(l,i_ch4) + production(l,i_ch4)*dt)
      $              /(1. + loss(l,i_ch4)*dt)
-     
+         
          cc(l,i_ch3) = production(l,i_ch3)/loss(l,i_ch3)
          
          cc(l,i_ch3o2) = production(l,i_ch3o2)/loss(l,i_ch3o2)
-         
+      
          cc(l,i_ch3ooh) = (cc0(l,i_ch3ooh) + production(l,i_ch3ooh)*dt)
      $                  /(1. + loss(l,i_ch3ooh)*dt)
      
@@ -1987,9 +1992,10 @@ C !      Methane Oxidation
          cc(l,i_hoch2ooh) = (cc0(l,i_hoch2ooh) 
      $                    + production(l,i_hoch2ooh)*dt)
      $              /(1. + loss(l,i_hoch2ooh)*dt)
-     
+        ENDIF 
 
 C !     Alkane Oxidation
+        IF (igcm_c2h6 .ne. 0 ) THEN 
          cc(l,i_c2h6) = (cc0(l,i_c2h6) + production(l,i_c2h6)*dt)
      $              /(1. + loss(l,i_c2h6)*dt)
 
@@ -2091,7 +2097,7 @@ C          cc(l,i_c2h5o2) = production(l,i_c2h5o2)/loss(l,i_c2h5o2)
     
          cc(l,i_hcoco3)=production(l,i_hcoco3)/
      $                     loss(l,i_hcoco3)
-     
+       ENDIF 
 C !    Sum Peroxy Radicals [R-O2]
 
          cc(l,i_ro2) = 1.e-30*dens(l)
@@ -3470,7 +3476,7 @@ c
      $               cab091, cab092, cab093, cab094, cab095,
      $               cab096, cab097, cab098, cab099, cab100,
      $               cab101, cab102, cab103, cab104, cab105,
-     $               cab106)
+     $               cab106, cab107)
 c
 c*****************************************************************
 c
@@ -3551,7 +3557,7 @@ c
      $     cab097(nlayermx), cab098(nlayermx), cab099(nlayermx),
      $     cab100(nlayermx), cab101(nlayermx), cab102(nlayermx),
      $     cab103(nlayermx), cab104(nlayermx), cab105(nlayermx),
-     $     cab106(nlayermx)
+     $     cab106(nlayermx), cab107(nlayermx)
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -4523,7 +4529,13 @@ c     cab105: hcoco3 + ro2 -> hcoco2h + o2
       cab105(l) = k_ro2rco3*0.1 
 c     cab106: hcoco3 + ho2 -> ho2 + co + co2 + oh 
       cab106(l) = kapho2
-       
+
+ccccccccccccccccccccccccccccccc 
+cc Additional Rate Coefficients
+ccccccccccccccccccccccccccccccc 
+c     cab107: CH3 + OH + M -> CH3OH 
+      cab107(l) = 2.5*dens(l)*2.48E-27*(298./t(l))**(3.8)
+      
 ccccccccccccc 
 cc c2h4 
 ccccccccccccc 

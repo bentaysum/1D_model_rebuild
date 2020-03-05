@@ -16,7 +16,6 @@
 #include "conc.h"
 #include "netcdf.inc"
 #include "comgeomfi.h"
-
 !     INPUT PARAMETERS
       real lt            ! 1D Model local time
       real alt(nlayermx) ! 1D Model altitude layers (km)
@@ -83,8 +82,7 @@
 ! 			  nal demand.
 !=======================================================================
       
-      FILE_NAME = "/home/s1215319/mgcm_v0.1/"
-     $  // "mcd-datafile/mcd_tracer_vmrs.nc"
+      FILE_NAME = "/home/s1215319/mgcm/mcd-datafile/mcd_tracervmrs.nc"
 	
       IF (first_call) THEN
       first_call = .false.
@@ -349,11 +347,12 @@ C !=======================================================================
           ! h2(y)  = h2(y)*mmean(1,y)/mmol(8)
           ! h2o(y)  = h2o(y)!*mmean(1,y)/mmol(15)
           co2(y) = co2(y)*mmol(1)/43.34
-          co(y)  = co(y)*mmol(2)/43.34
-          o2(y)  = o2(y)*mmol(5)/43.34
-          h2(y)  = h2(y)*mmol(8)/43.34
-          h2o(y)  = h2o(y)*mmol(15)/43.34
-				
+          co(y)  = co(y)*mmol(2)/43.34 
+          o2(y)  = o2(y)*mmol(5)/43.34 
+          h2(y)  = h2(y)*mmol(8)/43.34 
+          h2o(y)  = h2o(y)*mmol(15)/43.34 
+	     
+          
       end do
       
      

@@ -83,8 +83,8 @@
 ! 			  nal demand.
 !=======================================================================
       
-      FILE_NAME = "/home/s1215319/mgcm_v0.1/mcd-datafile/"
-     $                 // "mcd_T_PS_U_V_Q2.nc"
+      FILE_NAME = "/home/s1215319/mgcm/mcd-datafile/"
+     $                 // "mcd_physicals.nc"
 
 
       
@@ -104,32 +104,24 @@
            ! ID's
            retval = nf_inq_varid(ncid, 'ps_mean', psid)
            if (retval .ne. nf_noerr) call handle_err(retval)
-
            retval = nf_inq_varid(ncid, 'T_mean', Tid)
            if (retval .ne. nf_noerr) call handle_err(retval)
-
            retval = nf_inq_varid(ncid, 'Q2_mean', Q2id)
            if (retval .ne. nf_noerr) call handle_err(retval)
-
            retval = nf_inq_varid(ncid, 'zon_mean', zonid)
            if (retval .ne. nf_noerr) call handle_err(retval)
-
            retval = nf_inq_varid(ncid, 'mer_mean', merid)
            if (retval .ne. nf_noerr) call handle_err(retval)
-
           ! Extraction
            retval = nf_get_var_real(ncid, psid, int_long_ps)
            if (retval .ne. nf_noerr) call handle_err(retval)
-
            retval = nf_get_var_real(ncid, Tid, int_long_T)
            if (retval .ne. nf_noerr) call handle_err(retval)
-
            retval = nf_get_var_real(ncid, q2id, int_long_q2)
            if (retval .ne. nf_noerr) call handle_err(retval)
            
            retval = nf_get_var_real(ncid, merid, int_long_v)
            if (retval .ne. nf_noerr) call handle_err(retval)
-
            retval = nf_get_var_real(ncid, zonid, int_long_u)
            if (retval .ne. nf_noerr) call handle_err(retval)
       
@@ -398,4 +390,4 @@ C !=======================================================================
       stop 2
 
       END
-      
+     

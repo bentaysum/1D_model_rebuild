@@ -120,7 +120,9 @@ C     and multiply said perturbation by the relevant magnitude.
                     DO lyr = p_low, p_high 
                       dq_plume(lyr,iq) = gasconc*mmol(iq)/mmean(1,lyr)
                     ENDDO 
+                    
                     write(*,*) dq_plume(:,iq)
+                    stop
                     CYCLE
                ENDIF 
           ENDDO 

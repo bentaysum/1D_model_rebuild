@@ -97,6 +97,9 @@ c   Various intermediate variables
       !pip
       character(len=100) :: infile      
 
+      ! Plume Parameters
+      integer ndt_plume ! Time-step for tracer insertion 
+      
 c=======================================================================
 
 c=======================================================================
@@ -567,7 +570,6 @@ c  ----------------------------------------------------------------
 !     Initialise the surface pressure from the MCDv5.3 look-up table
       CALL iniorbit(aphelie,periheli,year_day,peri_day,obliquit)
       call solarlong(day+time,zls)
-      
       call mcd_phys(time*24.,zlay,zls*180./pi,
      &              temp, psurf, u, v, 
      &              q2, day_step)
@@ -683,6 +685,9 @@ c  It is needed to transfert physics variables to "physiq"...
      .              dtphys,float(day0),time,tsurf,
      .              tsoil,co2ice,emis,q2,qsurf,area,albedodat,
      .              inertiedat,zmea,zstd,zsig,zgam,zthe)
+
+     
+      ndt_plume =  (plume_day*day_step) + NINT((plume_lt/24.)*day_step)
 
 c=======================================================================
 c  1D MODEL TIME STEPPING LOOP
@@ -804,8 +809,9 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
 !      Plume/perturbation scenarios engaged here
         IF ( plume ) THEN 
            
-           IF ( (date >= plume_day ) .and. 
-     $          ( ABS(time*24. - plume_lt) < 1.e-1 ) ) THEN
+           IF ( idt == ndt_plume ) THEN
+
+           
            call tracer_release(dq)
            
            plume = .False.
