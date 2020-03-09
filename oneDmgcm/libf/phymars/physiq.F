@@ -2183,6 +2183,9 @@ c        ==========================================================
 
          write(*,'("Ls =",f11.6," tauref(",f4.0," Pa) =",f9.6)')
      &    zls*180./pi,odpref,tauref
+        CALL WRITEDIAGFI(ngridmx, "zls", 
+     &                   "Solar Zenith Angle", 'degs', 
+     &                   0, zls*180./pi)
 c      ----------------------------------------------------------------------
 c      Output in grads file "g1d" (ONLY when using testphys1d)
 c      (output at every X physical timestep)
@@ -2227,35 +2230,50 @@ c        CALL writeg1d(ngrid,nlayer,pw,'w','m.s-1')
      &                                      ,'kg/m-2',0,co2col)
          endif ! of if (calltherm)
 
-         call WRITEDIAGFI(ngrid,'w','vertical velocity'                 &
-     &                              ,'m/s',1,pw)
-         call WRITEDIAGFI(ngrid,"q2","q2","kg.m-3",1,q2)
-         call WRITEDIAGFI(ngrid,"tsurf","Surface temperature","K",0,
-     &                  tsurf)
-         call WRITEDIAGFI(ngrid,"u","u wind","m/s",1,zu)
-         call WRITEDIAGFI(ngrid,"v","v wind","m/s",1,zv)
+C          call WRITEDIAGFI(ngrid,'w','vertical velocity'                 &
+C      &                              ,'m/s',1,pw)
+C          call WRITEDIAGFI(ngrid,"q2","q2","kg.m-3",1,q2)
+C          call WRITEDIAGFI(ngrid,"tsurf","Surface temperature","K",0,
+C      &                  tsurf)
+C          call WRITEDIAGFI(ngrid,"u","u wind","m/s",1,zu)
+C          call WRITEDIAGFI(ngrid,"v","v wind","m/s",1,zv)
 
          call WRITEDIAGFI(ngrid,"pplay","Pressure","Pa",1,zplay)
          call WRITEDIAGFI(ngrid,"pplev","Pressure","Pa",1,zplev)
-         call WRITEDIAGFI(ngrid,"rho","rho","kg.m-3",1,rho)
-!         call WRITEDIAGFI(ngrid,"dtrad","rad. heat. rate",              &
-!     &              "K.s-1",1,dtrad/zpopsk)
-!        call WRITEDIAGFI(ngridmx,'sw_htrt','sw heat. rate',
-!     &                   'w.m-2',1,zdtsw/zpopsk)
-!        call WRITEDIAGFI(ngridmx,'lw_htrt','lw heat. rate',
-!     &                   'w.m-2',1,zdtlw/zpopsk)
-         call WRITEDIAGFI(ngrid,"co2ice","co2 ice thickness"
-     &                                   ,"kg.m-2",0,co2ice)
+C          call WRITEDIAGFI(ngrid,"rho","rho","kg.m-3",1,rho)
+C !         call WRITEDIAGFI(ngrid,"dtrad","rad. heat. rate",              &
+C !     &              "K.s-1",1,dtrad/zpopsk)
+C !        call WRITEDIAGFI(ngridmx,'sw_htrt','sw heat. rate',
+C !     &                   'w.m-2',1,zdtsw/zpopsk)
+C !        call WRITEDIAGFI(ngridmx,'lw_htrt','lw heat. rate',
+C !     &                   'w.m-2',1,zdtlw/zpopsk)
+C          call WRITEDIAGFI(ngrid,"co2ice","co2 ice thickness"
+C      &                                   ,"kg.m-2",0,co2ice)
 
 ! or output in diagfi.nc (for testphys1d)
          call WRITEDIAGFI(ngridmx,'ps','Surface pressure','Pa',0,ps)
          call WRITEDIAGFI(ngridmx,'temp','Temperature',
      &                       'K',1,zt)
      
+         colden(:,:) = 0.
          if(tracer) then
+         
 c           CALL writeg1d(ngrid,1,tau,'tau','SI')
             do iq=1,nq
 c              CALL writeg1d(ngrid,nlayer,zq(1,1,iq),noms(iq),'kg/kg') 
+
+          do l=1,nlayer                                    
+               do ig=1,ngrid                                  
+                    colden(ig,iq) = colden(ig,iq) + zq(ig,l,iq)
+     $                                  *(pplev(ig,l)-pplev(ig,l+1)) 
+     $                                 *6.022e22/(mmol(iq)*g)       
+               end do                                        
+          end do       
+               
+              
+               call WRITEDIAGFI(ngridmx,trim(noms(iq)) // "_col",
+     &              trim(noms(iq))//" column", 'cm-2',0,colden(1,iq))
+     
                call WRITEDIAGFI(ngridmx,trim(noms(iq)),
      &              trim(noms(iq)),'kg/kg',1,zq(1,1,iq))
             end do
@@ -2371,25 +2389,25 @@ cccc is weighted by total ice mass         (LESS GOOD)
              rave=max(rave/max(icetot,1.e-30),1.e-30) ! mass weight
            endif ! of if (scavenging)
 
-           CALL WRITEDIAGFI(ngridmx,'reffice',
-     &                      'reffice',
-     &                      'm',0,rave)
+C            CALL WRITEDIAGFI(ngridmx,'reffice',
+C      &                      'reffice',
+C      &                      'm',0,rave)
 
-           do iq=1,nq
-             call WRITEDIAGFI(ngridmx,trim(noms(iq))//'_s',
-     &            trim(noms(iq))//'_s','kg/kg',0,qsurf(1,iq))
-           end do
+C            do iq=1,nq
+C              call WRITEDIAGFI(ngridmx,trim(noms(iq))//'_s',
+C      &            trim(noms(iq))//'_s','kg/kg',0,qsurf(1,iq))
+C            end do
      
-        call WRITEDIAGFI(ngridmx,'zdqcloud_ice','cloud ice',
-     &            'kg.m-2.s-1',1,zdqcloud(1,:,igcm_h2o_ice))
-        call WRITEDIAGFI(ngridmx,'zdqcloud_vap','cloud vap',
-     &            'kg.m-2.s-1',1,zdqcloud(1,:,igcm_h2o_vap))
-        call WRITEDIAGFI(ngridmx,'zdqcloud','cloud ice',
-     &            'kg.m-2.s-1',1,zdqcloud(1,:,igcm_h2o_ice)
-     &                          +zdqcloud(1,:,igcm_h2o_vap))
+C         call WRITEDIAGFI(ngridmx,'zdqcloud_ice','cloud ice',
+C      &            'kg.m-2.s-1',1,zdqcloud(1,:,igcm_h2o_ice))
+C         call WRITEDIAGFI(ngridmx,'zdqcloud_vap','cloud vap',
+C      &            'kg.m-2.s-1',1,zdqcloud(1,:,igcm_h2o_vap))
+C         call WRITEDIAGFI(ngridmx,'zdqcloud','cloud ice',
+C      &            'kg.m-2.s-1',1,zdqcloud(1,:,igcm_h2o_ice)
+C      &                          +zdqcloud(1,:,igcm_h2o_vap))
      
-          call WRITEDIAGFI(ngrid,"rice","ice radius","m",1,
-     &                    rice)
+C           call WRITEDIAGFI(ngrid,"rice","ice radius","m",1,
+C      &                    rice)
          ENDIF ! of IF (water)
          
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

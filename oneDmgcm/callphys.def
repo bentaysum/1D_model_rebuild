@@ -11,7 +11,7 @@ datadir=/exports/csce/datastore/geos/users/s1215319/cleaning_gcm/mgcm-datafile
 diurnal=.true.
 
 #Seasonal cycle ? if season=False, Ls stays constant, to value set in "start"
-season = .true.   
+season = .false.   
 
 #write some more output on the screen ?
 lwrite = .false.    
@@ -42,16 +42,16 @@ mcd_ltfin = 12.
 plume = .true.
 
 #Days after day0 to release plume?
-plume_day = 5
+plume_day = 10
 
 #Local time to release plume?
-plume_lt = 6.
+plume_lt = 0.
 
 #Plume lower altitude (model layer index)
 p_low = 1
 
 #Plume upper altitude (model layer index)
-p_high = 6 
+p_high = 25 
 
 
 ## Dust scenario. Used if the dust is prescribed (i.e. if tracer=F or active=F)

@@ -910,7 +910,7 @@
 ! methane : 0 ppbv
 
       if (igcm_ch4 /= 0) then
-         vmr = 14.e-9
+         vmr = 0.!14.e-9
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
