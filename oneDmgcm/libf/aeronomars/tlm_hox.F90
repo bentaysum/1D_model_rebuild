@@ -1,8 +1,5 @@
 SUBROUTINE tlm_hox(iter, lyr_m, dens,sza,&
 					rh_ho2, roh_ho2, &
-					rh_ho2_denominator, roh_ho2_denominator, &
-					rh_ho2_cabN, rh_ho2_cabD, &
-					roh_ho2_cabN, roh_ho2_cabD,&
 					dt_c, dt_p, &
 					nesp, cc, cc_prev,&
 					j, &
@@ -329,15 +326,146 @@ IF ( iter == 1 ) THEN
 
 ENDIF 
 
-
-
-
-
 ! Forcing O(1D) to zero at night
 IF ( sza > 95. ) THEN 
 	dccn_dpq( (t_o1d-1)*nlayermx + lyr_m, : ) = 0.
 	dcc0_dpq( (t_o1d-1)*nlayermx + lyr_m, : ) = 0.
+	dccn_dpq( :, (t_o1d-1)*nlayermx + 1 : t_o1d*nlayermx) = 0.
+	dcc0_dpq( :, (t_o1d-1)*nlayermx + 1 : t_o1d*nlayermx) = 0.
 ENDIF 
+
+! =================================================!
+! Stage 0.1: Creating the segments of the partition
+! 	 		 functions 
+!
+! - rh_ho2 = (A + rh_ho2_cabN)/rh_ho2_denominator
+! 		   == (A + rh_ho2_cabN)/(B + rh_ho2_cabD)
+
+! - roh_ho2 = (B + roh_ho2_cabN)/roh_ho2_denominator
+!		    == (B + roh_ho2_cabN)/(B + roh_ho2_cabD)
+! =================================================! 
+rh_ho2_cabN = cab002*cc(i_o)*cc(i_ch4)*0.49 &
+                + cab005*cc(i_ch3)*cc(i_o3)*0.956 &
+                + cab006*cc(i_ch3)*cc(i_o) &
+                + j(j_ch4_ch3_h)*cc(i_ch4) &
+                + j(j_ch4_3ch2_h_h)*cc(i_ch4)*2. &
+                + j(j_ch4_ch_h2_h)*cc(i_ch4) &
+                + j(j_ch2o_hco)*cc(i_hcho) &
+                + j(j_ch3oh)*cc(i_ch3oh) &
+                + j(j_ch3cho_h)*cc(i_ch3cho)
+
+rh_ho2_cabD = cab011*cc(i_ch3o2)*cc(i_oh) &
+                + cab013*cc(i_ch3oh)*cc(i_oh) &
+                + cab015*cc(i_ch3o)*cc(i_o2) &
+                + cab028*cc(i_hoch2o2) &
+                + cab030*cc(i_hoch2o2)*cc(i_ro2) &
+                + cab032*cc(i_hcooh)*cc(i_oh) &
+                + cab035*cc(i_hoch2oh)*cc(i_oh) &
+                + cab041*cc(i_c2h5)*cc(i_o2) &
+                + 0.6*cab044*cc(i_c2h5o2)*cc(i_ro2) &
+                + 0.95*cab047*cc(i_c2h5oh)*cc(i_oh) &
+                + cab051*cc(i_hoch2ch2o)*cc(i_o2) &
+                + cab052*cc(i_hoch2ch2o) &
+                + cab053*cc(i_ethgly)*cc(i_oh) &
+                + cab056*cc(i_hyetho2h)*cc(i_oh) &
+                + cab062*cc(i_ch2choh)*cc(i_oh) &
+                + cab064*cc(i_ch3choho2) &
+                + cab078*cc(i_hcoch2o2)*cc(i_ro2)*0.6 &
+                + cab090*cc(i_hochcho) &
+                + cab093*cc(i_hoch2co3)*cc(i_ro2) &
+                + cab098*cc(i_hoch2co2h)*cc(i_oh) &
+                + cab099*cc(i_hcoco2h)*cc(i_oh) & 
+                + cab101*cc(i_hoch2co3h)*cc(i_oh) &
+                + cab104*cc(i_hcoco3)*cc(i_ro2) &
+                + j(j_hoch2ooh)*cc(i_hoch2ooh) &
+                + j(j_ch3o2h)*cc(i_hoch2ooh) &
+                + j(j_ch3o2h)*cc(i_hoch2co3h) &
+                + 2.*3.95*j(j_ch2o_co)*cc(i_hcoco2h) &
+                + (j(j_ch3o2h) + j(j_hoch2cho_co) &
+                   + j(j_hoch2cho_hco) + j(j_hoch2cho_oh)) &
+                   *cc(i_hcoco3h) &
+                + (j(j_ch3o2h) + j(j_hoch2cho_co) &
+                   + j(j_hoch2cho_hco) + j(j_hoch2cho_oh)) &
+                   *cc(i_hooch2cho) 
+
+rh_ho2_denominator = c011*cc(i_o2) &
+           + cab027*cc(i_hco) &
+           + cab042*cc(i_c2h5) &
+           + (rh_ho2_cabD)/MAX(cc_prev(i_h),dens*1.e-30)
+
+roh_ho2_cabN = cab002*cc(i_o)*cc(i_ch4)*0.51 &
+                 + cab017*cc(i_ch3o)*cc(i_o)*0.25 &
+                 + cab020*cc(i_hcho)*cc(i_o) &
+                 + cab021*cc(i_hco)*cc(i_o) &
+                 + cab037*cc(i_c2h6)*cc(i_o) &
+                 + cab066*cc(i_ch3choho2)*cc(i_ro2) &
+                 + cab071*cc(i_ch3co)*cc(i_o2) &
+                 + cab084*cc(i_hcoco)*cc(i_o2) &
+                 + cab092*cc(i_hoch2co)*cc(i_o2) &
+                 + j(j_ch3coooh)*cc(i_ch3coooh) &
+                 + j(j_ch3o2h)*cc(i_ch3ooh) &
+                 + j(j_hoch2cho_oh)*cc(i_hoch2cho) & 
+                 + j(j_ch3o2h)*cc(i_ch3chohooh) &
+                 + j(j_ch3o2h)*cc(i_hyetho2h) &
+                + 2.*b002*cc(i_o1d)*cc(i_h2o) &
+                    + b003*cc(i_o1d)*cc(i_h2) &
+                    + j(j_h2o)*cc(i_h2o) &
+               + b007*cc(i_ch4)*cc(i_o1d)
+
+
+roh_ho2_cabD = cab015*cc(i_ch3o)*cc(i_o2) &
+                 + cab026*cc(i_hco)*cc(i_o2) &
+                 + cab028*cc(i_hoch2o2) &
+                 + cab030*cc(i_hoch2o2)*cc(i_ro2) &
+                 + cab041*cc(i_c2h5)*cc(i_o2) &
+                 + 0.6*cab044*cc(i_c2h5o2)*cc(i_ro2) &
+                 + cab051*cc(i_hoch2ch2o)*cc(i_o2) &
+                 + cab052*cc(i_hoch2ch2o) &
+                 + cab064*cc(i_ch3choho2) &
+                 + cab078*cc(i_hcoch2o2)*cc(i_ro2)*0.6 &
+                 + cab090*cc(i_hochcho) &
+                 + cab093*cc(i_hoch2co3)*cc(i_ro2) &
+                 + cab104*cc(i_hcoco3)*cc(i_ro2) &
+                 + 2.*3.95*j(j_ch2o_co)*cc(i_hcoco2h) 
+
+roh_ho2_denominator = c002*cc(i_o) &
+            + c007*cc_prev(i_ho2) &
+            + c009*cc(i_h2o2) &        ! ajout 20090401
+            + 2.*c013*cc_prev(i_oh) &        ! ajout 20090401
+            + 2.*c017*cc_prev(i_oh) &        ! ajout 20090401
+            + e001*cc(i_co) &
+            + cab001*cc(i_ch4) &
+            + 2.*cab011*cc(i_ch3o2) &
+            + 0.15*cab013*cc(i_ch3oh) &
+            + 0.6*cab014*cc(i_ch3ooh) &
+            + cab018*cc(i_hcho) &
+            + cab025*cc(i_hco) &
+            + 2.*cab032*cc(i_hcooh) &
+            + cab033*cc(i_hoch2ooh) &
+            + 2.*cab035*cc(i_hoch2oh) &
+            + cab036*cc(i_c2h6) &
+            + cab045*cc(i_c2h5ooh) &
+            + cab047*cc(i_c2h5oh)*1.95 &
+            + 2.*cab053*cc(i_ethgly) &
+            + cab054*cc(i_hyetho2h) &
+            + 2.*cab056*cc(i_hyetho2h) &
+            + cab057*cc(i_ch3cho) &
+            + cab058*cc(i_ch3cho) &
+            + 2.*cab062*cc(i_ch2choh) &
+            + cab067*cc(i_ch3cooh) &
+            + cab069*cc(i_ch3chohooh) &
+            + cab077*cc(i_ch3coooh) &
+            + cab081*cc(i_glyox) &
+            + cab085*cc(i_hooch2cho) &
+            + cab088*cc(i_hoch2cho) &
+            + cab089*cc(i_hoch2cho) &
+            + cab098*cc(i_hoch2co2h)*2. &
+            + cab099*cc(i_hcoco2h)*.2 &
+            + cab100*cc(i_hoch2co3h) &
+            + cab101*cc(i_hoch2co3h)*2. &
+            + cab102*cc(i_hcoco3h) &
+            + cab107*cc(i_ch3) &
+            + (roh_ho2_cabD/MAX(cc_prev(i_oh),dens*1.e-30))
 
 ! ============================================ ! 
 ! STAGE 1: LINEARISING PARTITION FUNCTIONS 
