@@ -4,23 +4,19 @@ This git repository is initialised with the original model code as recieved from
 OU, and is altered to provide tracer support for organic chemistry routines involving
 CH4 and C2H6. 
 
-## 07/01/2020
+## Complaints
 
-Module now interpolates from the MCD v5.3 offline look-up tables continuously for
-profiles of CO2, CO, O2, H2 and H2O vapour as mixing ratios, and profiles of the
-physical variables Temperature, Q2, u, v and surface pressure. 
+Git is arguably the worst software I've ever encountered. This is not the README that
+all logical thought processes dictate should be here, but git doesn't work logically,
+it operates in some indecipherable way that's either mentally 1000's of years more
+advanced than current human thought, or 10000's of years backwards in time in the days
+of cavemen. This might be the 100th attempt I've made at creating a flowing TLM branch.
+This software is garbage to work with. It's added skip-fulls of stress onto my PhD, 
+and the people who make it should truly consider making it at least semi-operatable for
+people who haven't got Masters degrees in computing science. Here, I will attempt to
+record the building of the TLM. It won't work; it will become messy, convoluted, 
+non-navigatable, and at this point all I can see is: I don't frankly care anymore. Thank
+you github, for showing me how inept I truly am at the should-be-easy process of version
+control. I'm earnestly trying my best here.
 
-Module now equipped with the callkeys mcd_dayfin and mcd_ltfin to indicate the 
-number of days the tracer interpolation routine runs for, and what local time (lt)
-we want the module to stop interpolating these tracer profiles at.
 
-tracer_release.F introduced to read concentration and tracer parameters from the plume.def
-file that will tell the model what gas will be inserted across layers p_low to p_high [defined
-in callphys.def] and at what VMR. 
-
-## 08/01/202
-
-tracer_release.F finished for profile perturbations. Reads plume.def and deposits the specified
-abundance of the listed tracers instantaneously and homogeneously through layer p_low to p_high,
-provided in the callphys.def file. Once routine is called, the module immediately stops interpolating
-tracer profiles from the MCD v5.3 offline look-up table.
