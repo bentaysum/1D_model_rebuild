@@ -280,6 +280,9 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 ! ============================================ ! 
 ! STAGE 0: INITIALISATION OF THE ARRAYS 
 ! ============================================ ! 
+! Occurs for every atmospheric layer 1 =< lyr_m =< nlayermx 
+! in the model at the very first chemistry sub-iteration, 
+! iter == 1.
 !
 ! 0.1 : Linearised Odd-Hydrogen ( cc(i_hox) )
 ! -------------------------------------------
@@ -304,13 +307,14 @@ IF ( iter == 1 ) THEN
 					  *Avmr(lyr_m,t_ho2)*dens 
 					  
 	dHOX0_dPQ(lyr_m,:) = dHOX_dPQ(lyr_m,:)
-					  
+
 ! 0.2 : Linearised Number Densities ( cc(X) )
 ! -------------------------------------------
 !
 ! cc(X) is equal to:
 !	(mmean/mmol(X)) * ( PQ(X) ) * density 
 ! at very first time-step.
+
 	DO iq = 1, nqmx
 			
 		Avmr(lyr_m,iq) = mmol(iq)/mmean(1,lyr_m)
@@ -324,9 +328,15 @@ IF ( iter == 1 ) THEN
 		
 	ENDDO	
 
-ENDIF 
+ENDIF ! of the first sub-iteration.
 
-! Forcing O(1D) to zero at night
+
+! ==================================================
+! Stage 1: Forcing O(1D) to be non-sensitive to the 
+!		   model, and the model non-sensitive to 
+!		   O(1D), at night due to its complete sup-
+!		   ression. 
+! ==================================================
 IF ( sza > 95. ) THEN 
 	dccn_dpq( (t_o1d-1)*nlayermx + lyr_m, : ) = 0.
 	dcc0_dpq( (t_o1d-1)*nlayermx + lyr_m, : ) = 0.
@@ -335,14 +345,14 @@ IF ( sza > 95. ) THEN
 ENDIF 
 
 ! =================================================!
-! Stage 0.1: Creating the segments of the partition
-! 	 		 functions 
+! Stage 2.1: Creating the segments of the partition
+! 	 		 functions out of control run variables.
 !
 ! - rh_ho2 = (A + rh_ho2_cabN)/rh_ho2_denominator
-! 		   == (A + rh_ho2_cabN)/(B + rh_ho2_cabD)
+! 		   == (A + rh_ho2_cabN)/(B + rh_ho2_cabD/CC[H])
 
 ! - roh_ho2 = (B + roh_ho2_cabN)/roh_ho2_denominator
-!		    == (B + roh_ho2_cabN)/(B + roh_ho2_cabD)
+!		    == (B + roh_ho2_cabN)/(B + roh_ho2_cabD/CC[OH])
 ! =================================================! 
 rh_ho2_cabN = cab002*cc(i_o)*cc(i_ch4)*0.49 &
                 + cab005*cc(i_ch3)*cc(i_o3)*0.956 &
@@ -468,7 +478,7 @@ roh_ho2_denominator = c002*cc(i_o) &
             + (roh_ho2_cabD/MAX(cc_prev(i_oh),dens*1.e-30))
 
 ! ============================================ ! 
-! STAGE 1: LINEARISING PARTITION FUNCTIONS 
+! STAGE 2.2: LINEARISING PARTITION FUNCTIONS 
 ! ============================================ ! 
 !
 ! rh_ho2 and roh_ho2 have the form:
@@ -483,9 +493,9 @@ roh_ho2_denominator = c002*cc(i_o) &
 !					- A_RX(5) * dd/dPQ 
 !					+ A_RX(6) * d(cc(i_x))/dPQ 
 
-! ----------
-! 1.1 RH_HO2
-! ----------
+! ------------
+! 2.2.1 RH_HO2
+! ------------
 A_RH(1) = 1./rh_ho2_denominator 
 A_RH(2) = A_RH(1)/cc_prev(i_ho2) 
 A_RH(3) = A_RH(2)*rh_ho2_cabN/cc_prev(i_ho2)
@@ -567,9 +577,9 @@ drh_ho2 = A_RH(1)*dN_dPQ + A_RH(2)*dNn_dPQ &
 		+ A_RH(6)*dccn_dpq( (t_h-1)*nlayermx + lyr_m, :)
 		
 		
-! -----------
-! 1.2 ROH_HO2 
-! -----------
+! =============
+! 2.2.2 ROH_HO2 
+! =============
 A_roh(1) = 1./roh_ho2_denominator 
 A_roh(2) = A_roh(1)/cc_prev(i_ho2) 
 A_roh(3) = A_roh(2)*roh_ho2_cabN/cc_prev(i_ho2)
@@ -659,42 +669,55 @@ droh_ho2 = droh_ho2 + A_ROH(1)*c003*cc(i_o3)*drh_ho2
 			
 			
 ! ============================================ ! 
-! STAGE 2: LINEARISING HYDROGEN ATOMS  
+! STAGE 3: LINEARISING ATOMIC HYDROGEN   
 ! ============================================ ! 
+!
+! CC[H]^{n+1}' = GAMMA_H(1) * CC[HOX]^{n}' 
+!			   - GAMMA_H(2) * roh_ho2'
+!			   + GAMMA_H(3) * rh_ho2'
 !
 ! Equation Coefficients:
 GAMMA_H(1) = 1./(1. + (1.+roh_ho2)/rh_ho2) 
 GAMMA_H(2) = (GAMMA_H(1)**2.)*cc(i_hox)/rh_ho2
-GAMMA_H(3) = (GAMMA_H(1)**2.)*cc(i_hox)*(1.+roh_ho2)/(rh_ho2**2.)
+GAMMA_H(3) = GAMMA_H(2)*(1.+roh_ho2)/rh_ho2
 
 dH_dPQ = GAMMA_H(1)*dHOX_dPQ(lyr_m,:) &
 		- GAMMA_H(2)*droh_ho2 &
 		+ GAMMA_H(3)*drh_ho2
 
 ! ============================================ ! 
-! STAGE 3: LINEARISING 	HO2  
+! STAGE 4: LINEARISING HO2  
 ! ============================================ ! 
+!
+! CC[HO2]^{n+1}' = GAMMA_HO2(1) * CC[H]^{n+1}'
+!				 - GAMMA_HO2(2) * rh_ho2' 
+! Equation Coefficients
 GAMMA_HO2(1) = 1./rh_ho2
-GAMMA_HO2(2) = cc(i_h)/(rh_ho2**2)
+GAMMA_HO2(2) = cc(i_h)*GAMMA_HO2(1)**2.
 
 dHO2_dPQ = GAMMA_HO2(1)*dH_dPQ - GAMMA_HO2(2)*drh_ho2
 
 ! ============================================ ! 
-! STAGE 4: LINEARISING OH
+! STAGE 5: LINEARISING OH
 ! ============================================ ! 
+!
+! CC[OH]^{n+1}' = GAMMA_OH(1) * CC[HO2]^{n+1}' 
+! 				+ GAMMA_OH(2) * roh_ho2'
+!
+! Equation Coefficients
 GAMMA_OH(1) = roh_ho2
 GAMMA_OH(2) = cc(i_ho2)
 
 dOH_dPQ = GAMMA_OH(1)*dHO2_dPQ + GAMMA_OH(2)*droh_ho2
 
+! ============================================ ! 
+! STAGE 6: STORAGE IN THE LINEARISED DENSITY 
+! 		   ARRAY
+! ============================================ ! 
+! Row in the TLM for appropriate placement
 h_j = (t_h-1)*nlayermx + lyr_m
 oh_j = (t_oh-1)*nlayermx + lyr_m
 ho2_j = (t_ho2-1)*nlayermx + lyr_m
-
-! ============================================ ! 
-! STAGE 5: DEPOSIT VALUES
-! ============================================ ! 
-
 
 dccn_dpq( h_j, : ) = dH_dPQ
 dccn_dpq( oh_j, : ) = dOH_dPQ
