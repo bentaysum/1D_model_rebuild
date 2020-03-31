@@ -1015,8 +1015,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             cc(l,i_o) = cc(l,i_o3)*ro_o3
-     
-     
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ox = o + o3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1056,8 +1055,68 @@ c
 
             loss(l,i_ox) = loss(l,i_ox)/cc(l,i_ox)
 
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  
+c      Tangent Linear Model - Odd-Oxygen (daytime)
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
+            
+      IF ( tlm_on ) THEN
+     
+      
+       cc_ox_next = (cc0(l,i_ox) + production(l,i_ox)*dt)
+     $            /(1. + loss(l,i_ox)*dt)  
        
-       
+      call tlm_ox(iter, l, dens(l),
+     $  ro_o3,
+     $  dt, ptimestep,
+     $  nesp, cc(l,:), cc_prev(:),
+     $  j(l,:), loss(l,i_ox), cc_ox_next,
+     $  a001(l), a002(l), a003(l),
+     $  b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),
+     $  b007(l), b008(l), b009(l),
+     $  c001(l), c002(l), c003(l), c004(l), c005(l), c006(l), 
+     $  c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),
+     $  c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),
+     $  e001(l), e002(l), e003(l),
+     $  cab001(l), cab002(l), cab003(l),
+     $  cab004(l), cab005(l), cab006(l),
+     $  cab007(l), cab008(l), cab009(l),
+     $  cab010(l), cab011(l), cab012(l),
+     $  cab013(l), cab014(l), cab015(l),
+     $  cab016(l), cab017(l), cab018(l), 
+     $  cab019(l), cab020(l), cab021(l), 
+     $  cab022(l), cab023(l), cab024(l), 
+     $  cab025(l), cab026(l), cab027(l), 
+     $  cab028(l), cab029(l), cab030(l),
+     $  cab031(l), cab032(l), cab033(l),
+     $  cab034(l), cab035(l), cab036(l),
+     $  cab037(l), cab038(l), cab039(l),
+     $  cab040(l), cab041(l), cab042(l),
+     $  cab043(l), cab044(l), cab045(l),
+     $  cab046(l), cab047(l), cab048(l),
+     $  cab049(l), cab050(l), cab051(l),
+     $  cab052(l), cab053(l), cab054(l),
+     $  cab055(l), cab056(l), cab057(l),
+     $  cab058(l), cab059(l), cab060(l),
+     $  cab061(l), cab062(l), cab063(l),
+     $  cab064(l), cab065(l), cab066(l),
+     $  cab067(l), cab068(l), cab069(l),
+     $  cab070(l), cab071(l), cab072(l),
+     $  cab073(l), cab074(l), cab075(l),
+     $  cab076(l), cab077(l), cab078(l),
+     $  cab079(l), cab080(l), cab081(l),
+     $  cab082(l), cab083(l), cab084(l),
+     $  cab085(l), cab086(l), cab087(l),
+     $  cab088(l), cab089(l), cab090(l),
+     $  cab091(l), cab092(l), cab093(l),
+     $  cab094(l), cab095(l), cab096(l),
+     $  cab097(l), cab098(l), cab099(l),
+     $  cab100(l), cab101(l), cab102(l),
+     $  cab103(l), cab104(l), cab105(l),
+     $  cab106(l), cab107(L) )
+        ENDIF
+
+
+
          end do
 
       else
