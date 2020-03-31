@@ -105,12 +105,7 @@ ENDIF
 
 ! STAGE 2: ADD TO THE STORAGE STRUCTURE
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-IF ( tlm_save ) THEN 
 	tangent_matrix(:,:,t_idx) = TLM 
-ELSE ! Adjoint constructed via TLM transpose
-	TLM = transpose(TLM)
-	tangent_matrix(:,:,t_idx) = TLM
-ENDIF 
 
 loc_max = MAXLOC( tangent_matrix(:,:,t_idx) )
 loc_min = MINLOC( tangent_matrix(:,:,t_idx) ) 
@@ -129,16 +124,9 @@ write(*,*) "===================================="
 ! STAGE 3: CONSTRUCT THE BINARY FILE AND SAVE THE STRUCTURE
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 IF ( idt == ndt ) THEN 
-	
-	IF ( tlm_save ) THEN
-			
+				
 		filename = "tlm.bin"
 			
-	ELSE 
-		filename = "adj.bin"
-		
-	ENDIF 
-	
 	length = nx*ny*wl
 		
 	open (unit=11, file= directory // filename, access='direct', recl=length, iostat=iostat)

@@ -10,6 +10,9 @@
      &                ,flag_LES
 #endif
      &                )
+
+      USE TLMvars
+
       IMPLICIT NONE
 
 c=======================================================================
@@ -845,9 +848,24 @@ c           Starting upward calculations for simple mixing of tracer (dust)
                zq(ig,ilay,iq)=zc(ig,ilay)+zd(ig,ilay)*zq(ig,ilay-1,iq)
              ENDDO
           ENDDO
+
+
+!         -----------------------------------------------------------
+! 	      Tangent Linear Model calculations for vertical diffusion of
+!         trace gas species 
+!         -----------------------------------------------------------
+          IF (tlm_on) THEN
+               call TLM_vdif(iq, za(1,:), zb(1,:), zc(1,:),
+     &				zd(1,:),ptimestep)
+          ENDIF
+
+
+
         enddo ! of do iq=1,nq
       end if ! of if(tracer)
       
+
+
 
 c-----------------------------------------------------------------------
 c   8. calcul final des tendances de la diffusion verticale
