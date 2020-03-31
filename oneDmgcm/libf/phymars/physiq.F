@@ -11,7 +11,8 @@
 #endif
      $            )
 
-
+      USE TLMvars
+      
       IMPLICIT NONE
 c=======================================================================
 c
@@ -473,6 +474,13 @@ c        Initialize R and Cp as constant
                    
       ENDIF        !  (end of "if firstcall")
 
+
+c    Initialise the TLM
+c     -------------------
+       if (tlm_on) then
+          TLM(:,:) = 0.
+          TLM_photo(:,:) = 0.
+       endif   
 
 c ---------------------------------------------------
 c 1.2   Initializations done at every physical timestep:
@@ -1314,6 +1322,15 @@ c       Thermal inertia feedback
         ENDIF
       ENDIF
       
+c ======================================================================
+c 10.0: Construct the 1-D model Jacobian [TLM] and advance perturbation
+c       vector [PERTS] to next time-step then call the netCDF save routine
+c ======================================================================
+
+          IF (tlm_on) THEN
+               TLM = TLM + TLM_photo
+               TLM = tlm_ident + TLM*ptimestep
+          ENDIF
           
 c-----------------------------------------------------------------------
 c  10. Write output files

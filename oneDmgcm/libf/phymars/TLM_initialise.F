@@ -13,25 +13,12 @@
 #include "callkeys.h"
 #include "conc.h"
       
-! Indentation is all over the shop because notepad ++ is currently behaving like utter trash [24/04/2019]
-   
+ 
 ! ---------------
 ! Local Variables
 ! ---------------
-! Reading TLM.def
-      CHARACTER(LEN=100):: fileloc
-      LOGICAL, SAVE :: firstcall = .True.
-C       INTEGER :: npert ! Number of perturbed species
-C       CHARACTER(LEN=10), DIMENSION(:), ALLOCATABLE :: pertnoms ! Perturbed species
-C       REAL, DIMENSION(:), ALLOCATABLE :: pertsize ! Perturbation sizes (volume mix. ratio (ppb))
-C       INTEGER :: llayer, hlayer ! Upper and lower layers perturbations occur
-       INTEGER :: P, iq, lyr, a, b ! Loop iterators
+      INTEGER :: a, b, iq ! Loop iterators
       
-C           IF (Firstcall) THEN
-
-          firstcall = .False.
-
-C           ALLOCATE(perts(nqmx*nlayermx))
           ALLOCATE(tlm(nlayermx*nqmx,nlayermx*nqmx))
           ALLOCATE(dhox_dpq(nlayermx,nlayermx*nqmx))
           ALLOCATE(dhox0_dpq(nlayermx,nlayermx*nqmx))
@@ -48,7 +35,6 @@ C           ALLOCATE(perts(nqmx*nlayermx))
 
 
           ! Initialise to 0
-C           perts(:) = 0.
           tlm(:,:) = 0.
           dox_dpq(:,:) = 0.
 		  dox0_dpq(:,:) = 0.
@@ -240,98 +226,8 @@ C           perts(:) = 0.
 		  
 		  Avmr(:,iq) =mmol(iq)/mmean(1,:)
 		  
-          enddo	
-			
+          enddo
 
-
-          ! RETURN ! Return, as it may not yet be the time to place the perturbation 
-          ! ! sizes into the vector yet.
-
-          ! ! 1.0 : Reading in and assigning the perturbation magnitudes to the perts array
-
-          ! ELSE
-
-C           ! Location of TLM.def
-C           ! fileloc = "/home/s1215319/mgcm_v0.1/oneDmgcm_organics/TLM.def"
-C 		  fileloc = "TLM.def"
-C           OPEN(UNIT=150, FILE=TRIM(fileloc), ACTION='READ')
-
-C           ! Skip line
-C           READ(150,*)
-
-C           ! Read in npert
-C           READ(150,'(I2)') npert
-
-C           ! Allocate the pertnoms/pertsize their dimensions
-C           allocate(pertnoms(npert))
-C           allocate(pertsize(npert))
-
-C           ! Skip line
-C           READ(150,*)
-
-C           ! Read the species
-C           DO p = 1,npert
-C           READ(150,'(A10)') pertnoms(p)
-C           ENDDO
-			
-C 		  ! Skip line
-C 		  READ(150,*) 
-		  
-C 		  ! Read perturbation sizes
-C 		  DO p = 1, npert
-C 		  READ(150,'(F6.2)') pertsize(p)
-C 		  ENDDO 
-		  
-C           ! Skip line
-C           READ(150,*)
-
-C           ! Read lowest level of the perturbation
-C           READ(150,'(I2)') llayer
-
-C           ! Skip line
-C           READ(150,*)
-
-C           ! Read highest level of the perturbation
-C           READ(150,'(I2)') hlayer
-
-C           ! Close the file to save memory
-C           CLOSE(150)		
-
-
-C           DO  p = 1, npert
-
-C           DO iq = 1,nqmx
-
-C           IF (TRIM(noms(iq)) == TRIM(pertnoms(p))) THEN
-				
-C           DO lyr = llayer, hlayer 
-C           perts((iq-1)*nlayermx + lyr) =  
-C      $     (mmol(iq)/mmean(1,lyr))*pertsize(p)*1.e-9
-C           ENDDO ! of lyr
-
-          
-C           CYCLE
-
-C           ENDIF ! of IF (noms ...)
-
-C           ENDDO ! of iq
-
-C           ENDDO ! of p	
-
-
-	
-
-          ! Explanation of the perts array structure:
-          !
-          ! Unfortunately, every variable at every level is dependent on its abundance at 
-          ! every other level in the transport equation. To explain, consider nqmx = 1, i.e.
-          ! one tracer in the TLM:
-          !
-          ! perts = [nlayermx*nlayermx]
-          !
-          ! perts[1:nlayermx] - perturbations from layer 1 - nlayermx of tracer 1
-          ! perts[nlayermx(n+1):nlayermx*(n+1)] - perturbations of layers 1 - nlayermx of tracer n
-
-C           ENDIF ! end of first call
+          RETURN 
 
           END SUBROUTINE      

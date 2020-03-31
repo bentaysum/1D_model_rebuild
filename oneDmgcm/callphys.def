@@ -36,10 +36,17 @@ long_mean = .true.
 mcd_dayfin = 100 
 mcd_ltfin = 12.
 
+## Tangent Linear Model Routines
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+call_tlm = .True
+tlm_day = 1
+tlm_lt = 0.
+
+
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Introducing an instantaneous plume?
-plume = .true.
+plume = .false.
 
 #Days after day0 to release plume?
 plume_day = 10

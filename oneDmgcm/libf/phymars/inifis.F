@@ -189,6 +189,22 @@
          
          ENDIF
          
+!        Tangent Linear Model Parameters 
+         call_tlm = .False. ! default
+         call getin("call_tlm",call_tlm)
+         write(*,*) "call_tlm : ", call_tlm 
+
+         if ( call_tlm ) then 
+            tlm_day = 10 ! default 
+            call getin("tlm_day",tlm_day)
+            write(*,*) "tlm_day : ", tlm_day 
+
+            tlm_lt = 0.  ! default 
+            call getin("tlm_lt",tlm_lt)
+            write(*,*) "tlm_lt : ", tlm_lt 
+            
+         endif 
+
 !        Plume parameters and keys 
          write(*,*) "Introducing an instantaneous plume?"
          plume=.False. ! default value

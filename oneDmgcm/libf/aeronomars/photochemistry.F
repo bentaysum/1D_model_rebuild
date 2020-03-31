@@ -2074,8 +2074,6 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                     + cab105(l)*cc(l,i_ro2)
      $                     + cab106(l)*cc(l,i_ho2)
      
-  
-      end do
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  
 c      Tangent Linear Model - Inorganic/Long-lived species
@@ -2121,6 +2119,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 
       ENDIF 
+
+
+     
+  
+      end do
+
+
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     update number densities

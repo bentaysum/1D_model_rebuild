@@ -38,7 +38,8 @@
 !      dim : dimension de px : 0, 1, 2, ou 3 dimensions
 !
 !=================================================================
- 
+      USE TLMvars
+
       implicit none
 
 ! Commons
@@ -52,6 +53,7 @@
 #include "netcdf.inc"
 #include "temps.h"
 #include "surfdat.h"
+#include "callkeys.h"
 
 ! Arguments on input:
       integer,intent(in) :: ngrid
@@ -107,6 +109,14 @@
 !     irythme = periodav*day_step ! sortie au rythme des fichiers histmoy
 
 !***************************************************************
+
+!     Tangent Linear Model Runs 
+!     =========================
+!     If we have called the TLM of the 1-D model, we bypass all output
+!     during the initial spin-up period.
+      IF (call_tlm .and. .not. tlm_on) THEN 
+          return
+      ENDIF 
 
 ! At very first call, check if there is a "diagfi.def" to use and read it
 ! -----------------------------------------------------------------------

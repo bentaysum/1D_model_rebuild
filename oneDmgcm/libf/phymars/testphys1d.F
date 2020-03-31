@@ -1,6 +1,7 @@
 
       PROGRAM testphys1d
 ! to use  'getin'
+      USE TLMvars
       USE ioipsl_getincom 
       IMPLICIT NONE
 
@@ -99,6 +100,10 @@ c   Various intermediate variables
 
       ! Plume Parameters
       integer ndt_plume ! Time-step for tracer insertion 
+
+      ! TLM Parameters
+      integer ndt_tlm ! Time-step for tlm activation
+
       
 c=======================================================================
 
@@ -696,6 +701,13 @@ c
       firstcall=.true.
       lastcall=.false.
 
+      if ( call_tlm ) then
+c     Plume release activates after this many model steps 
+      ndt_plume =  (plume_day*day_step) + NINT((plume_lt/24.)*day_step)
+c     TLM activates after this many model steps 
+      ndt_tlm = (tlm_day*day_step) + NINT((tlm_lt/24.)*day_step)
+      endif 
+
       DO idt=1,ndt
 c        IF (idt.eq.ndt) lastcall=.true.
         IF (idt.eq.ndt-day_step-1) then       !test
@@ -736,6 +748,32 @@ c  table for tracers CO2, CO, H2, H2O vapour, and O2.
           WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]"
           ENDIF 
       
+
+c     Tangent Linear Model Activation
+c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+        IF ( call_tlm ) THEN 
+          IF ( idt == ndt_tlm ) THEN 
+               
+               call_tlm = .False.     ! Prevents multiple initialisations.
+               
+               tlm_on = .True.        ! Routines will now engage.
+               
+               mcd_profiles = .False. ! Interpolation routines will 
+                                      ! invalidate TLM results.
+               
+               calladj = .False. ! Convective adjustments require a 
+                                  ! conditional that the TLM will not
+                                  ! be capable of performing.
+               callcond = .False. ! Again, conditionals activate this 
+                                  ! module.
+               call TLM_initialise
+
+          ENDIF
+          
+        ENDIF 
+
+
 c       call physics
 c       --------------------
 !      write(*,*) "testphys1d avant q", q(1,:)
@@ -754,6 +792,10 @@ c     q2 and surface pressure)
       call mcd_phys(time*24.,zlay,zls*180./pi,
      &              temp, psurf, u, v, 
      &              q2, day_step)
+
+
+      IF (tlm_on) call TLM_ADJ_out(idt,time*24.)
+
 
 c       wind increment : specific for 1D
 c       --------------------------------
