@@ -3,6 +3,9 @@ libf/aeronomars/chemthermos.F90
 libf/aeronomars/euvheat.F90
 libf/aeronomars/inichim_newstart.F90
 libf/aeronomars/moldiff_red.F90
+libf/aeronomars/tlm_hox.F90
+libf/aeronomars/tlm_ox.F90
+libf/aeronomars/tlm_sibem.F90
 libf/bibio/ioipsl_errioipsl.F90
 libf/bibio/ioipsl_getincom.F90
 libf/bibio/ioipsl_stringop.F90
@@ -18,6 +21,9 @@ libf/phymars/read_dust_scenario.F90
 libf/phymars/suaer.F90
 libf/phymars/thermcell_dqup.F90
 libf/phymars/thermcell_main_mars.F90
+libf/phymars/TLM_ADJ_out.F90
+libf/phymars/TLMvars.F90
+libf/phymars/TLM_vdif.F90
 libf/phymars/updaterad.F90
 libf/phymars/writediagsoil.F90
 libf/phymars/wstats.F90

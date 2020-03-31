@@ -6,11 +6,11 @@
 
 # Repertoires :
 
-GCM     = /exports/csce/datastore/geos/users/s1215319/cleaning_gcm/oneDmgcm
+GCM     = /home/s1215319/mgcm/oneDmgcm
 MACHINE = sun4
 LIBF    = $(GCM)/libf
 LIBO    = $(LIBOGCM)/$(MACHINE)
-LOCAL_DIR=/exports/csce/datastore/geos/users/s1215319/cleaning_gcm/oneDmgcm
+LOCAL_DIR=/home/s1215319/mgcm/oneDmgcm
 BIBIO    = $(LIBF)/bibio
 AERONOMARS    = $(LIBF)/aeronomars
 FILTRE   = filtre
@@ -132,6 +132,8 @@ $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(surfacearea.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(thermosphere.o)
 
+$(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(write_ratecoefficient.o)
+
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(calchim.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(chemthermos.o)
@@ -141,6 +143,12 @@ $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(euvheat.o)
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(inichim_newstart.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(moldiff_red.o)
+
+$(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(tlm_hox.o)
+
+$(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(tlm_ox.o)
+
+$(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(tlm_sibem.o)
 
 .PRECIOUS	: $(LIBO)/libaeronomars.a
 
@@ -331,6 +339,7 @@ $(LIBF)/grid/dimensions.h \
 $(LIBF)/phymars/dimphys.h \
 $(LIBF)/aeronomars/chimiedata.h \
 $(LIBF)/phymars/callkeys.h \
+$(LIBF)/phymars/tracer.h \
 $(LIBF)/grid/dimensions.h \
 $(LIBF)/phymars/dimphys.h \
 $(LIBF)/aeronomars/chimiedata.h \
@@ -392,6 +401,17 @@ $(LIBF)/aeronomars/conc.h
 	$(AR) d $(LIBO)/libaeronomars.a thermosphere.o ; \
 	$(COMPILE) $(LIBF)/aeronomars/thermosphere.F ; \
 	$(AR) r $(LIBO)/libaeronomars.a thermosphere.o ; $(RM) thermosphere.o ; \
+	cd $(GCM)
+
+$(LIBO)/libaeronomars.a(write_ratecoefficient.o) : $(LIBF)/aeronomars/write_ratecoefficient.F \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h \
+$(LIBF)/aeronomars/chimiedata.h \
+$(LIBF)/phymars/callkeys.h
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libaeronomars.a write_ratecoefficient.o ; \
+	$(COMPILE) $(LIBF)/aeronomars/write_ratecoefficient.F ; \
+	$(AR) r $(LIBO)/libaeronomars.a write_ratecoefficient.o ; $(RM) write_ratecoefficient.o ; \
 	cd $(GCM)
 
 $(LIBO)/libaeronomars.a(calchim.o) : $(LIBF)/aeronomars/calchim.F90 \
@@ -474,6 +494,27 @@ $(LIBF)/grid/dimensions.h
 	$(AR) d $(LIBO)/libaeronomars.a moldiff_red.o ; \
 	$(COMPILE) $(LIBF)/aeronomars/moldiff_red.F90 ; \
 	$(AR) r $(LIBO)/libaeronomars.a moldiff_red.o ; $(RM) moldiff_red.o ; \
+	cd $(GCM)
+
+$(LIBO)/libaeronomars.a(tlm_hox.o) : $(LIBF)/aeronomars/tlm_hox.F90
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libaeronomars.a tlm_hox.o ; \
+	$(COMPTRU90) $(LIBF)/aeronomars/tlm_hox.F90 ; \
+	$(AR) r $(LIBO)/libaeronomars.a tlm_hox.o ; $(RM) tlm_hox.o ; \
+	cd $(GCM)
+
+$(LIBO)/libaeronomars.a(tlm_ox.o) : $(LIBF)/aeronomars/tlm_ox.F90
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libaeronomars.a tlm_ox.o ; \
+	$(COMPTRU90) $(LIBF)/aeronomars/tlm_ox.F90 ; \
+	$(AR) r $(LIBO)/libaeronomars.a tlm_ox.o ; $(RM) tlm_ox.o ; \
+	cd $(GCM)
+
+$(LIBO)/libaeronomars.a(tlm_sibem.o) : $(LIBF)/aeronomars/tlm_sibem.F90
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libaeronomars.a tlm_sibem.o ; \
+	$(COMPTRU90) $(LIBF)/aeronomars/tlm_sibem.F90 ; \
+	$(AR) r $(LIBO)/libaeronomars.a tlm_sibem.o ; $(RM) tlm_sibem.o ; \
 	cd $(GCM)
 
 
@@ -2518,6 +2559,8 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(swr_toon.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(tabfi.o)
 
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(TLM_initialise.o)
+
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(tracer_release.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(updatereffrad.o)
@@ -2563,6 +2606,12 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(suaer.o)
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(thermcell_dqup.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(thermcell_main_mars.o)
+
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(TLM_ADJ_out.o)
+
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(TLMvars.o)
+
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(TLM_vdif.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(updaterad.o)
 
@@ -3543,6 +3592,13 @@ $(LIBF)/phymars/yomaer.h
 	$(AR) r $(LIBO)/libphymars.a tabfi.o ; $(RM) tabfi.o ; \
 	cd $(GCM)
 
+$(LIBO)/libphymars.a(TLM_initialise.o) : $(LIBF)/phymars/TLM_initialise.F
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a TLM_initialise.o ; \
+	$(COMPILE90) $(LIBF)/phymars/TLM_initialise.F ; \
+	$(AR) r $(LIBO)/libphymars.a TLM_initialise.o ; $(RM) TLM_initialise.o ; \
+	cd $(GCM)
+
 $(LIBO)/libphymars.a(tracer_release.o) : $(LIBF)/phymars/tracer_release.F
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libphymars.a tracer_release.o ; \
@@ -3804,6 +3860,29 @@ $(LIBF)/phymars/callkeys.h
 	$(AR) d $(LIBO)/libphymars.a thermcell_main_mars.o ; \
 	$(COMPILE) $(LIBF)/phymars/thermcell_main_mars.F90 ; \
 	$(AR) r $(LIBO)/libphymars.a thermcell_main_mars.o ; $(RM) thermcell_main_mars.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(TLM_ADJ_out.o) : $(LIBF)/phymars/TLM_ADJ_out.F90 \
+$(LIBO)/libbibio.a(ioipsl_getincom.o)
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a TLM_ADJ_out.o ; \
+	$(COMPTRU90) $(LIBF)/phymars/TLM_ADJ_out.F90 ; \
+	$(AR) r $(LIBO)/libphymars.a TLM_ADJ_out.o ; $(RM) TLM_ADJ_out.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(TLMvars.o) : $(LIBF)/phymars/TLMvars.F90
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a TLMvars.o ; \
+	$(COMPTRU90) $(LIBF)/phymars/TLMvars.F90 ; \
+	mv $(MOD_LOC_DIR)/TLMvars.$(MOD_SUFFIX) $(LIBO)/TLMvars.$(MOD_SUFFIX) ; \
+	$(AR) r $(LIBO)/libphymars.a TLMvars.o ; $(RM) TLMvars.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(TLM_vdif.o) : $(LIBF)/phymars/TLM_vdif.F90
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a TLM_vdif.o ; \
+	$(COMPTRU90) $(LIBF)/phymars/TLM_vdif.F90 ; \
+	$(AR) r $(LIBO)/libphymars.a TLM_vdif.o ; $(RM) TLM_vdif.o ; \
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(updaterad.o) : $(LIBF)/phymars/updaterad.F90 \
