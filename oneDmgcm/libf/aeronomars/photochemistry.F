@@ -12,7 +12,7 @@ c
       subroutine photochemistry(lswitch, zycol, sza, ptimestep, 
      $                  press,temp, dens, dist_sol, surfdust1d,
      $                  surfice1d, jo3, tau,pq,pdq)
-
+          
       implicit none
 c
 #include "dimensions.h"
@@ -209,6 +209,10 @@ c
       call phot(lswitch, press, temp, sza, tau, dist_sol, 
      $          rmco2, rmo3, j)
       
+
+  
+     
+      
       j_o3_o1d = 5
       do lev = 1,lswitch-1
          jo3(lev) = j(lev,j_o3_o1d)
@@ -222,7 +226,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 c =================================================================
 
-         call chimie(lswitch,nesp, rm, j, dens, ctimestep,
+         call chimie(lswitch,nesp, rm, j, dens, ctimestep, ptimestep,
      $               press, temp, sza, dist_sol, 
      $               a001, a002, a003,
      $               b001, b002, b003, b004, b005, b006,
@@ -274,7 +278,7 @@ c
 c
 c*****************************************************************
 c
-      subroutine chimie(lswitch, nesp, rm, j, dens, dt,
+      subroutine chimie(lswitch, nesp, rm, j, dens, dt, ptimestep,
      $                  press, t, sza, dist_sol, 
      $                  a001, a002, a003,
      $                  b001, b002, b003, b004, b005, b006,
@@ -311,15 +315,16 @@ c
 c
 c*****************************************************************
 c
-      USE TLMvars
+      USE TLMvars 
+      
       implicit none 
 c
 #include "dimensions.h"
 #include "dimphys.h"
 #include "chimiedata.h" 
 #include "callkeys.h" 
-#include "tracer.h"
-
+#include "tracer.h" 	
+c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     input/output:
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -419,7 +424,7 @@ c
 
     
 c
-      parameter (hetero_ice  = 1.)   ! switch for het. chem. on ice clouds
+      parameter (hetero_ice  = 0.)!1.)   ! switch for het. chem. on ice clouds
       parameter (hetero_dust = 0.)   ! switch for het. chem. on dust
                                      ! hetero_dust = 0. advised for the moment
 c
@@ -434,7 +439,7 @@ c
       real loss(nlayermx,nesp)       ! loss rate
 c
       real ro_o3, rh_ho2, roh_ho2, rno2_no
-      
+            
 c     Tangent Linear Model variables
       real rh_ho2_denominator, roh_ho2_denominator ! Required for TLM equations
       real ro_o3_denominator
@@ -454,8 +459,7 @@ c     Tangent Linear Model variables
 
       real cc_ox_next    ! Next timestep cc(i_ox) value for TLM 
       real cc_hox_next   ! " " cc(i_hox) " "
-
-
+      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     tracer numbering in the chemistry
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -579,9 +583,9 @@ c
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c New rates : Tropospheric Photochemistry of Ozone, its
-c                   Precursors and the Hydroxyl Radical: A 3D
-c                   modeling Study Considering Non-methane 
-C                   Hydrocarbon - Rolf von Kuhlmann [2001]
+c  			  Precursors and the Hydroxyl Radical: A 3D
+c 			  modeling Study Considering Non-methane 
+C 			  Hydrocarbon - Rolf von Kuhlmann [2001]
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc =
 C                                ! hoch2ooh + hv -> hcooh + oh + ho2 [ = (ch3ooh + hv) ] (2)
 C                                ! hoch2co3h + hv -> hcho + ho2 + oh + co2 [ = (ch3ooh + hv) ] (2)
@@ -605,8 +609,6 @@ c
          end do
       end do
 c
-
-
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     co2 and nox number densities (cm-3)    
 c      
@@ -618,19 +620,15 @@ c
         
       end do 
 c
-
-
-c     Initialise the photochemistry Jacobian to 0 if the 
-c     TLM routine is ongoing.
-      if (tlm_on) tlm_photo(:,:) = 0.
-      if (tlm_on) dccn_dpq(:,:) = 0.
-
-
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     loop over iterations in the chemical scheme
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
 
+c     Initialise the photochemistry Jacobian to 0 if the 
+c     TLM routine is ongoing.
+      if (tlm_on) tlm_photo(:,:) = 0.
+      if (tlm_on) dccn_dpq(:,:) = 0.
 
       do iter = 1,niter
        
@@ -669,7 +667,7 @@ c        photochemical equilibrium for oh and ho2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        h/ho2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
+c_
 
       do l = 1,lswitch-1
       
@@ -752,7 +750,7 @@ c
      $                )
      $                /MAX(cc(l,i_h),dens(l)*1.e-30)
      $           )
-    
+  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        oh/ho2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -797,8 +795,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                 + j(l,j_ch3o2h)*cc(l,i_ch3chohooh)
      $                 + j(l,j_ch3o2h)*cc(l,i_hyetho2h)
      $                + 2.*b002(l)*cc(l,i_o1d)*cc(l,i_h2o)         ! ajout 20101210
-     $                    + b003(l)*cc(l,i_o1d)*cc(l,i_h2)             ! ajout 20101210
-     $                    + j(l,j_h2o)*cc(l,i_h2o)
+     $            	  + b003(l)*cc(l,i_o1d)*cc(l,i_h2)             ! ajout 20101210
+     $            	  + j(l,j_h2o)*cc(l,i_h2o)
      $               + b007(l)*cc(l,i_ch4)*cc(l,i_o1d))
      $                /MAX(cc(l,i_ho2),1.e-30*dens(l))
      $               )
@@ -856,12 +854,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                 + 2.*3.95*j(l,j_ch2o_co)*cc(l,i_hcoco2h))
      $                 /MAX(cc(l,i_oh),dens(l)*1.e-30)
      $            )
+     
+          IF ( tlm_on ) THEN 
 
-      IF ( tlm_on ) THEN
          cc_prev = cc(l,:)
-      ENDIF
 
-
+     
+         ENDIF
+         
+         
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        h
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -881,7 +882,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
          cc(l,i_oh) = cc(l,i_ho2)*roh_ho2
 c
-     
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  
 c      Tangent Linear Model - Odd-Hydrogen
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
@@ -937,10 +937,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  cab103(l), cab104(l), cab105(l),
      $  cab106(l), cab107(l) )
      
-      ENDIF
+     
+       ENDIF
 
       end do
-       
+      
        
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ox species
@@ -1003,8 +1004,22 @@ cccc Original Routine
      $              + (cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
      $               + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
      $                 )/MAX(cc(l,i_o),dens(l)*1.e-30)
-     $                  )
+     $			)
 
+       IF ( tlm_on ) THEN 
+          ro_o3_denominator = a001(l)*cc(l,i_o2)
+     $              + cab002(l)*cc(l,i_ch4)
+     $              + cab005(l)*cc(l,i_ch3)
+     $              + cab012(l)*cc(l,i_ch3o2)
+     $              + cab017(l)*cc(l,i_ch3o)
+     $              + cab020(l)*cc(l,i_hcho)
+     $              + cab021(l)*cc(l,i_hco)
+     $              + cab037(l)*cc(l,i_c2h6)
+     $              + (cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
+     $               + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
+     $                 )/MAX(cc(l,i_o),dens(l)*1.e-30)
+       ENDIF 
+     
      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o3
@@ -1015,7 +1030,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             cc(l,i_o) = cc(l,i_o3)*ro_o3
-
+     
+     
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ox = o + o3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1055,6 +1071,8 @@ c
 
             loss(l,i_ox) = loss(l,i_ox)/cc(l,i_ox)
 
+            
+            
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  
 c      Tangent Linear Model - Odd-Oxygen (daytime)
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
@@ -1066,10 +1084,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $            /(1. + loss(l,i_ox)*dt)  
        
       call tlm_ox(iter, l, dens(l),
-     $  ro_o3,
+     $  ro_o3, ro_o3_denominator,
      $  dt, ptimestep,
      $  nesp, cc(l,:), cc_prev(:),
-     $  j(l,:), loss(l,i_ox), cc_ox_next,
+     $  j(l,:), loss(l,i_ox), production(l,i_ox), cc_ox_next,
      $  a001(l), a002(l), a003(l),
      $  b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),
      $  b007(l), b008(l), b009(l),
@@ -1114,11 +1132,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  cab103(l), cab104(l), cab105(l),
      $  cab106(l), cab107(L) )
         ENDIF
-
-
-
+       
+       
          end do
-
+       
       else
 c
          do l = 1,lswitch-1
@@ -1455,7 +1472,7 @@ c
      $                 + cab106(l)*cc(l,i_ho2)*cc(l,i_hcoco3)
      $                 + j(l,j_ch3o2h)*cc(l,i_hyetho2h)
      $                 + j(l,j_ch3cho_h)*cc(l,i_ch3cho)
-     $                 + 2.*j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
+     $                 + 2.*j(l,j_hoch2ooh)*cc(l,j_hoch2ooh)
      $                 + j(l,j_hoch2cho_oh)*cc(l,i_hoch2cho)
      $                 + j(l,j_ch3coooh)*cc(l,i_ch3coooh)
      $                 + 2.*( j(l,j_ch3o2h)
@@ -1488,7 +1505,6 @@ c
      $                 + cab019(l)*cc(l,i_hcho)*cc(l,i_ho2)
      $                 + cab025(l)*cc(l,i_hco)*cc(l,i_oh)
      $                 + cab027(l)*cc(l,i_hco)*cc(l,i_h)
-     $                 + cab029(l)*cc(l,i_hoch2o2)*cc(l,i_ho2)
      $                 + 0.6*cab029(l)*cc(l,i_hoch2o2)*cc(l,i_ho2)
      $                 + cab034(l)*cc(l,i_hoch2ooh)*cc(l,i_oh)
      $                 + cab036(l)*cc(l,i_c2h6)*cc(l,i_oh)
@@ -1529,7 +1545,7 @@ c
          production(l,i_ch4) = cab022(l)*cc(l,i_hco)*cc(l,i_ch3)
      $                       + j(l,j_ch3cho_ch4)*cc(l,i_ch3cho)
 
-            
+		
          loss(l,i_ch4) = b007(l)*cc(l,i_o1d)
      $                 + b008(l)*cc(l,i_o1d)
      $                 + b009(l)*cc(l,i_o1d)
@@ -1576,12 +1592,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ch3o2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-          production(l,i_ch3o2)=  cab003(l)*cc(l,i_ch3)*cc(l,i_o2)
+          production(l,i_ch3o2) =  cab003(l)*cc(l,i_ch3)*cc(l,i_o2)
      $                         + 0.6*cab014(l)*cc(L,i_ch3ooh)*cc(l,i_oh)
      $                         + cab016(l)*cc(l,i_ch3o)*cc(l,i_o3)
      
-       
-       
+	 
+	 
           loss(l,i_ch3o2) = cab006(l)*cc(l,i_ho2)
      $                    + cab007(l)*cc(l,i_ho2)
      $                    + cab008(l)*cc(l,i_ro2)
@@ -1604,8 +1620,9 @@ c        ch3oh
 C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          production(l,i_ch3oh) = 0.5*cab009(l)*cc(l,i_ch3o2)*cc(l,i_ro2)
+     $                         + cab107(l)*cc(l,i_ch3)*cc(l,i_oh)
      $                         + j(l,j_hoch2cho_co)*cc(l,i_hoch2cho)
-     $                         + cab107(l)*cc(l,i_oh)*cc(l,i_ch3)
+         
          
         loss(l,i_ch3oh) = cab013(l)*cc(l,i_oh)
      $                  + j(l,j_ch3oh)
@@ -1613,7 +1630,7 @@ C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ch3o
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-         production(l, i_ch3o) =  0.49*cab002(l)*cc(l,i_ch4)*cc(l,i_o)
+         production(l,i_ch3o) =  0.49*cab002(l)*cc(l,i_ch4)*cc(l,i_o)
      $                         + b008(l)*cc(l,i_ch4)*cc(l,i_o1d)
      $                         + 0.044*cab004(l)*cc(l,i_ch3)*cc(l,i_o3)
      $                         + cab008(l)*cc(l,i_ch3o2)*cc(l,i_ro2)
@@ -1703,7 +1720,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ccccccccccccccccccccccccccccccccc
 c        hcooh
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-          production(l, i_hcooh) =
+          production(l,i_hcooh) =
      $              0.5*cab029(l)*cc(l,i_hoch2o2)*cc(l,i_ho2)
      $            + cab030(l)*cc(l,i_hoch2o2)*cc(l,i_ro2)
      $            + 0.5*cab031(l)*cc(l,i_hoch2o2)*cc(l,i_ro2)
@@ -2074,16 +2091,25 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                     + cab105(l)*cc(l,i_ro2)
      $                     + cab106(l)*cc(l,i_ho2)
      
-
+  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  
 c      Tangent Linear Model - Inorganic/Long-lived species
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
-      IF (tlm_on) THEN
+          IF (tlm_on) THEN 
+          
+  
+C           IF ( ITER == 1 ) THEN 
+C           DO IQ = 1, NQMX 
+C           WRITE(*,*) "OUT: ", l, trim(noms(iq)), 
+C      $     DCCN_DPQ( (T_H2OVAP-1)*NLAYERMX + l, (iq-1)*nlayermx + l)
+C           ENDDO 
+C           ENDIF 		
 
+          
       cc_hox_next = (cc0(l,i_hox) + production(l,i_hox)*dt)
      $            /(1. + loss(l,i_hox)*dt)
 
-       call tlm_sibem(iter,niter, l, dens(l), sza,
+               call tlm_sibem(iter,niter, l, dens(l), sza,
      $         dt, ptimestep,  
      $         nesp, cc(l,:), cc0(l,:), cc_hox_next,
      $         j(l,:), production(l,:), loss(l,:),  
@@ -2116,17 +2142,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $         cab096(l), cab097(l), cab098(l), cab099(l), cab100(l),   
      $         cab101(l), cab102(l), cab103(l), cab104(l), cab105(l),  
      $         cab106(l), cab107(l))
+            
 
-
-      ENDIF 
-
-
-     
+          ENDIF 
   
       end do
-
-
-
+      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     update number densities
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2152,44 +2173,52 @@ c
      $              /(1. + loss(l,i_hox)*dt)
      
 C !      Methane Oxidation
-         IF (igcm_ch4 .ne. 0 ) THEN  
-        cc(l,i_ch4) = (cc0(l,i_ch4) + production(l,i_ch4)*dt)
+         cc(l,i_ch4) = (cc0(l,i_ch4) + production(l,i_ch4)*dt)
      $              /(1. + loss(l,i_ch4)*dt)
          
-         cc(l,i_ch3) = production(l,i_ch3)/loss(l,i_ch3)
+         if ( igcm_ch3 .ne. 0 )
+     $   cc(l,i_ch3) = production(l,i_ch3)/loss(l,i_ch3)
          
-         cc(l,i_ch3o2) = production(l,i_ch3o2)/loss(l,i_ch3o2)
-      
-         cc(l,i_ch3ooh) = (cc0(l,i_ch3ooh) + production(l,i_ch3ooh)*dt)
+         if ( igcm_ch3o2 .ne. 0 )
+     $   cc(l,i_ch3o2) = production(l,i_ch3o2)/loss(l,i_ch3o2)
+         
+         if ( igcm_ch3ooh .ne. 0 )
+     $    cc(l,i_ch3ooh) = (cc0(l,i_ch3ooh) + production(l,i_ch3ooh)*dt)
      $                  /(1. + loss(l,i_ch3ooh)*dt)
      
-         cc(l,i_ch3oh) = (cc0(l,i_ch3oh) + production(l,i_ch3oh)*dt)
+         if ( igcm_ch3oh .ne. 0 )
+     $    cc(l,i_ch3oh) = (cc0(l,i_ch3oh) + production(l,i_ch3oh)*dt)
      $              /(1. + loss(l,i_ch3oh)*dt)
 
-
-         cc(l,i_ch3o) =  production(l,i_ch3o)/loss(l,i_ch3o)
+         if ( igcm_ch3o .ne. 0 )
+     $   cc(l,i_ch3o) =  production(l,i_ch3o)/loss(l,i_ch3o)
          
-         cc(l,i_hcho) = (cc0(l,i_hcho) + production(l,i_hcho)*dt)
+         if ( igcm_hcho .ne. 0 )
+     $   cc(l,i_hcho) = (cc0(l,i_hcho) + production(l,i_hcho)*dt)
      $              /(1. + loss(l,i_hcho)*dt)
 
-         cc(l,i_hco) = production(l,i_hco)/loss(l,i_hco)   
+         if ( igcm_hco .ne. 0 )
+     $   cc(l,i_hco) = production(l,i_hco)/loss(l,i_hco)   
 
-         cc(l,i_hoch2o2) = production(l,i_hoch2o2)/loss(l,i_hoch2o2)
+         if ( igcm_hoch2o2 .ne. 0 )
+     $    cc(l,i_hoch2o2) = production(l,i_hoch2o2)/loss(l,i_hoch2o2)
      
-         cc(l,i_hcooh) = (cc0(l,i_hcooh) + production(l,i_hcooh)*dt)
+         if ( igcm_hcooh .ne. 0 )
+     $    cc(l,i_hcooh) = (cc0(l,i_hcooh) + production(l,i_hcooh)*dt)
      $              /(1. + loss(l,i_hcooh)*dt)
-     
-         cc(l,i_hoch2oh) = (cc0(l,i_hoch2oh) 
+
+         if ( igcm_hoch2oh .ne. 0 )
+     $    cc(l,i_hoch2oh) = (cc0(l,i_hoch2oh) 
      $                   + production(l,i_hoch2oh)*dt)
      $              /(1. + loss(l,i_hoch2oh)*dt)
      
-         cc(l,i_hoch2ooh) = (cc0(l,i_hoch2ooh) 
+         if ( igcm_hoch2ooh .ne. 0 )
+     $    cc(l,i_hoch2ooh) = (cc0(l,i_hoch2ooh) 
      $                    + production(l,i_hoch2ooh)*dt)
      $              /(1. + loss(l,i_hoch2ooh)*dt)
-        ENDIF 
+     
 
 C !     Alkane Oxidation
-        IF (igcm_c2h6 .ne. 0 ) THEN 
          cc(l,i_c2h6) = (cc0(l,i_c2h6) + production(l,i_c2h6)*dt)
      $              /(1. + loss(l,i_c2h6)*dt)
 
@@ -2291,40 +2320,35 @@ C          cc(l,i_c2h5o2) = production(l,i_c2h5o2)/loss(l,i_c2h5o2)
     
          cc(l,i_hcoco3)=production(l,i_hcoco3)/
      $                     loss(l,i_hcoco3)
-       ENDIF 
+     
 C !    Sum Peroxy Radicals [R-O2]
 
          cc(l,i_ro2) = 1.e-30*dens(l)
          
-         if ( cc(l,i_ch3o2) .gt. 1.e-30*dens(l)) then 
-               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_ch3o2)
+         if ( cc(l,i_ch3o2) .gt. 1.e-30*dens(l))  
+     $          cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_ch3o2)
               
-         elseif ( cc(l,i_hoch2o2) .gt. 1.e-30*dens(l)) then 
-               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hoch2o2)
+         if ( cc(l,i_hoch2o2) .gt. 1.e-30*dens(l))  
+     $          cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hoch2o2)
 
-         elseif ( cc(l,i_c2h5o2) .gt. 1.e-30*dens(l)) then 
-               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_c2h5o2)
+         if ( cc(l,i_hoch2ch2o2) .gt. 1.e-30*dens(l))  
+     $          cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hoch2ch2o2)
 
-         elseif ( cc(l,i_hoch2ch2o2) .gt. 1.e-30*dens(l)) then 
-               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hoch2ch2o2)
+         if ( cc(l,i_ch3choho2) .gt. 1.e-30*dens(l))  
+     $          cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_ch3choho2)
 
-         elseif ( cc(l,i_ch3choho2) .gt. 1.e-30*dens(l)) then 
-               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_ch3choho2)
+         if ( cc(l,i_ch3cooo) .gt. 1.e-30*dens(l))  
+     $         cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_ch3cooo)
 
-         elseif ( cc(l,i_ch3cooo) .gt. 1.e-30*dens(l)) then 
-               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_ch3cooo)
+         if (cc(l,i_hcoch2o2) .gt. 1.e-30*dens(l))  
+     $          cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hcoch2o2)
 
-         elseif (cc(l,i_hcoch2o2) .gt. 1.e-30*dens(l)) then 
-               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hcoch2o2)
+         if (cc(l,i_hcoco3) .gt. 1.e-30*dens(l))  
+     $          cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hcoco3)
 
-         elseif (cc(l,i_hcoco3) .gt. 1.e-30*dens(l)) then 
-               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hcoco3)
+         if (cc(l,i_hoch2co3) .gt. 1.e-30*dens(l))  
+     $          cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hoch2co3)
 
-         elseif (cc(l,i_hoch2co3) .gt. 1.e-30*dens(l)) then 
-               cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hoch2co3)
-
-         endif 
- 
 
       end do
 
@@ -2351,8 +2375,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 
       end do
-      
-
       
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2712,7 +2734,7 @@ c
      $   + poids(2,2,2,2,2)
      $     *jphot(indtemp+1,indsza+1,indcol+1,indozo+1,indtau+1,ij)
          end do
-             
+		 
 
 c
 cc    correction for sun distance
@@ -3262,35 +3284,31 @@ c
      
          rm(l,i_ro2) = 1.e-30
          
-         if ( rm(l,i_ch3o2) .gt. 1.e-30) then 
-               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_ch3o2)
+         if ( rm(l,i_ch3o2) .gt. 1.e-30)  
+     $          rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_ch3o2)
                
-         elseif ( rm(l,i_hoch2o2) .gt. 1.e-30) then 
-               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hoch2o2)
+         if ( rm(l,i_hoch2o2) .gt. 1.e-30)  
+     $          rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hoch2o2)
                
-         elseif ( rm(l,i_c2h5o2) .gt. 1.e-30) then 
-               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_c2h5o2)
+         if ( rm(l,i_hoch2ch2o2) .gt. 1.e-30)  
+     $          rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hoch2ch2o2)
                
-         elseif ( rm(l,i_hoch2ch2o2) .gt. 1.e-30) then 
-               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hoch2ch2o2)
-               
-         elseif ( rm(l,i_ch3choho2) .gt. 1.e-30) then 
-               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_ch3choho2)
+         if ( rm(l,i_ch3choho2) .gt. 1.e-30)  
+     $          rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_ch3choho2)
 
-         elseif ( rm(l,i_ch3cooo) .gt. 1.e-30) then 
-               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_ch3cooo)
+         if ( rm(l,i_ch3cooo) .gt. 1.e-30)  
+     $          rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_ch3cooo)
                
-         elseif (rm(l,i_hcoch2o2) .gt. 1.e-30) then 
-               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hcoch2o2)
+         if (rm(l,i_hcoch2o2) .gt. 1.e-30)  
+     $          rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hcoch2o2)
                
-         elseif (rm(l,i_hcoco3) .gt. 1.e-30) then 
-               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hcoco3)
+         if (rm(l,i_hcoco3) .gt. 1.e-30)  
+     $          rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hcoco3)
                
-         elseif (rm(l,i_hoch2co3) .gt. 1.e-30) then 
-               rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hoch2co3)
+         if (rm(l,i_hoch2co3) .gt. 1.e-30)  
+     $          rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hoch2co3)
                
-         endif 
-         
+      
         rm(l,i_ro2) = max(rm(l,i_ro2),1.e-30)
         
       end do
@@ -4209,7 +4227,7 @@ c        jpl 2003, three-parameter expression
 c
 c          e003(l) = 2.80e-14*(t(l)**0.667)*exp(-1575./t(l))
 
-        
+	  
 C ! cccccccccccccccccccccc
 C ! ccccc 13CH4 Reactions 
 C ! cccccccccccccccccccccc
@@ -4723,11 +4741,11 @@ c     cab105: hcoco3 + ro2 -> hcoco2h + o2
       cab105(l) = k_ro2rco3*0.1 
 c     cab106: hcoco3 + ho2 -> ho2 + co + co2 + oh 
       cab106(l) = kapho2
-
+       
 ccccccccccccccccccccccccccccccc 
 cc Additional Rate Coefficients
 ccccccccccccccccccccccccccccccc 
-c     cab107: CH3 + OH + M -> CH3OH 
+c    cab107: CH3 + OH + M -> CH3OH 
       cab107(l) = 2.5*dens(l)*2.48E-27*(298./t(l))**(3.8)
       
 ccccccccccccc 

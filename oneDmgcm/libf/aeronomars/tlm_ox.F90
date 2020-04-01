@@ -1,8 +1,8 @@
 SUBROUTINE tlm_ox(iter, lyr_m, dens,&
-					ro_o3,&
+					ro_o3, ro_o3_denominator,&
 					dt_c, dt_p, &
-					nesp, cc, cc_prev,&
-					j, loss_ox, ccOX_tplus1,&
+					nesp, cc, cc0,&
+					j, loss_ox, prod_ox, ccOX_tplus1,&
 					a001, a002, a003, &
 					b001, b002, b003, b004, b005, b006, &
 					b007, b008, b009, &
@@ -54,10 +54,10 @@ real ro_o3 ! partition function of O and O3
 real ro_o3_denominator ! denominator value of ro_o3 
 real dt_c, dt_p ! chemical and physical timestep
 integer nesp ! number of species in the chemistry routines
-real cc(nesp), cc_prev(nesp) ! number density of species after and before the
+real cc(nesp), cc0(nesp) ! number density of species after and before the
 						 ! odd-hydrogen calculations (only H, OH and HO2 are effected)
 real j(nd) ! photolysis values 
-real loss_ox ! loss terms for the Odd Oxygen summed family
+real loss_ox, prod_ox ! loss and production terms for the Odd Oxygen summed family
 real ccOX_tplus1 ! next time-steps value for CC(OX)
 ! Oxygen Reaction Rates 
 real a001, a002, a003
@@ -267,13 +267,7 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 ! ============================================ ! 
 ! STAGE 0: INITIALISATION OF THE ARRAYS 
 ! ============================================ ! 
-! Occurs at the very first chemistry sub-
-! iteration. Arrays that require initialisat-
-! ion are limited to dOX0_dPQ and dOX_dPQ, 
-! where dOX0_dPQ is the linearised values at 
-! the first iteration, held constant through-
-! out the chemistry routine loop.
-
+!
 ! 0.1 : Linearised Odd-Oxygen ( cc(i_ox) )
 ! -------------------------------------------
 IF ( iter == 1 ) THEN 
@@ -324,15 +318,15 @@ loss_o1d = (b001*cc(i_co2) &
 			+ b002*cc(i_h2o) &
 			+ b003*cc(i_h2) &
 			+ b004*cc(i_o2) &
-			+ b005*cc_prev(i_o3) &
-			+ b006*cc_prev(i_o3) &
+			+ b005*cc0(i_o3) &
+			+ b006*cc0(i_o3) &
 			+ b007*cc(i_ch4) &
 			+ b008*cc(i_ch4) &
 			+ b009*cc(i_ch4))
 			
 production_o1d = j(j_co2_o1d)*cc(I_co2) &
                         + j(j_o2_o1d)*cc(i_o2) &
-                        + j(j_o3_o1d)*cc_prev(i_o3)
+                        + j(j_o3_o1d)*cc0(i_o3)
 	 
 
 A_O1D(1) =  1./loss_o1d
@@ -342,6 +336,9 @@ dO1D_dPQ = A_O1D(1)*dPo1d_dPQ - A_O1D(2)*dLo1d_dPQ
 
 dccn_dpq( (t_o1d-1)*nlayermx + lyr_m, : ) = dO1D_dPQ
 
+
+		
+		
 
 ! ============================================ ! 
 ! STAGE 2: LINEARISED PARTITION FUNCTION
@@ -388,27 +385,13 @@ DO iq = 1, nqmx
 	dDd_dPQ = dDd_dPQ + dDd_coef(iq)*dccn_dpq( x_j, : )
 ENDDO
 
-
-
-ro_o3_denominator = a001*cc(i_o2) &
-              + cab002*cc(i_ch4) &
-              + cab005*cc(i_ch3) &
-              + cab012*cc(i_ch3o2) &
-              + cab017*cc(i_ch3o) &
-              + cab020*cc(i_hcho) &
-              + cab021*cc(i_hco) &
-              + cab037*cc(i_c2h6) &
-              + (cab074*cc(i_ch3cooo)*cc(i_ho2) &
-               + cab097*cc(i_hoch2co3)*cc(i_ho2) &
-                 )/MAX(cc_prev(i_o),dens*1.e-30)
-
 ! Coefficients 
 ! ------------
 dro_o3_gamma(1) = 1./ro_o3_denominator
 dro_o3_gamma(2) = ro_o3*dro_o3_gamma(1)
-dro_o3_gamma(3) = dro_o3_gamma(2)/cc_prev(i_o)
+dro_o3_gamma(3) = dro_o3_gamma(2)/cc0(i_o)
 dro_o3_gamma(4) = dro_o3_gamma(3)*(cab074*cc(i_ch3cooo)*cc(i_ho2) &
-                     + cab097*cc(i_hoch2co3)*cc(i_ho2))/cc_prev(i_o)
+                     + cab097*cc(i_hoch2co3)*cc(i_ho2))/cc0(i_o)
 
 dro_o3_dPQ = dro_o3_gamma(1)*dN_dPQ &
 		   - dro_o3_gamma(2)*dD_dPQ &
@@ -489,9 +472,11 @@ dOX_dPQ(lyr_m,:) = ox_gamma(1)*dOX0_dPQ(lyr_m,:) &
 				- ox_gamma(3)*dLox_dPQ &
 				+ ox_gamma(4)*dOX_dPQ(lyr_m,:)
 
+				
 RETURN 
 
 
+		
 END 
 
 
