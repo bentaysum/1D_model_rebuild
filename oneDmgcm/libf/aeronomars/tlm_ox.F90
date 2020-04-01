@@ -1,5 +1,5 @@
 SUBROUTINE tlm_ox(iter, lyr_m, dens,&
-					ro_o3, ro_o3_denominator,&
+					ro_o3,&
 					dt_c, dt_p, &
 					nesp, cc, cc0,&
 					j, loss_ox, prod_ox, ccOX_tplus1,&
@@ -286,6 +286,23 @@ IF ( iter == 1 ) THEN
 	dOX0_dPQ(lyr_m,:) = dOX_dPQ(lyr_m,:)		
 			
 ENDIF 
+
+
+
+ro_o3_denominator = a001*cc(i_o2) &
+              + cab002*cc(i_ch4) &
+              + cab005*cc(i_ch3) &
+              + cab012*cc(i_ch3o2) &
+              + cab017*cc(i_ch3o) &
+              + cab020*cc(i_hcho) &
+              + cab021*cc(i_hco) &
+              + cab037*cc(i_c2h6) &
+              + (cab074*cc(i_ch3cooo)*cc(i_ho2) &
+               + cab097*cc(i_hoch2co3)*cc(i_ho2) &
+                 )/MAX(cc0(i_o),dens*1.e-30)
+
+
+
 
 ! ============================================ ! 
 ! STAGE 1: Excited Atomic Oxygen ( O(1D) )

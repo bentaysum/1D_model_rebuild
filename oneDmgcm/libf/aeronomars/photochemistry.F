@@ -439,23 +439,9 @@ c
       real loss(nlayermx,nesp)       ! loss rate
 c
       real ro_o3, rh_ho2, roh_ho2, rno2_no
-            
-c     Tangent Linear Model variables
-      real rh_ho2_denominator, roh_ho2_denominator ! Required for TLM equations
-      real ro_o3_denominator
-      
+
       integer iq
       real cc_prev(nesp)
-      
-      real rh_ho2_cabN   ! Addition to the numerator of the rh_ho2 partition
-                         ! function due to the effects of organic reaction 
-                         ! terms possessing units of molec. cm3 s-1. To include
-                         ! in the partition functions, these units need to be 
-                         ! cm3 molec.-1 s-1.
-      real rh_ho2_cabD   ! Addition to the denominator of the rh_ho2 partition
-                         ! function ....
-      real roh_ho2_cabN  ! Addition to the numerator of the roh_ho2 ...
-      real roh_ho2_cabD  ! Addition to the denominator of the roh_ho2 ...
 
       real cc_ox_next    ! Next timestep cc(i_ox) value for TLM 
       real cc_hox_next   ! " " cc(i_hox) " "
@@ -1005,20 +991,6 @@ cccc Original Routine
      $               + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
      $                 )/MAX(cc(l,i_o),dens(l)*1.e-30)
      $			)
-
-       IF ( tlm_on ) THEN 
-          ro_o3_denominator = a001(l)*cc(l,i_o2)
-     $              + cab002(l)*cc(l,i_ch4)
-     $              + cab005(l)*cc(l,i_ch3)
-     $              + cab012(l)*cc(l,i_ch3o2)
-     $              + cab017(l)*cc(l,i_ch3o)
-     $              + cab020(l)*cc(l,i_hcho)
-     $              + cab021(l)*cc(l,i_hco)
-     $              + cab037(l)*cc(l,i_c2h6)
-     $              + (cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
-     $               + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
-     $                 )/MAX(cc(l,i_o),dens(l)*1.e-30)
-       ENDIF 
      
      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1084,7 +1056,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $            /(1. + loss(l,i_ox)*dt)  
        
       call tlm_ox(iter, l, dens(l),
-     $  ro_o3, ro_o3_denominator,
+     $  ro_o3,
      $  dt, ptimestep,
      $  nesp, cc(l,:), cc_prev(:),
      $  j(l,:), loss(l,i_ox), production(l,i_ox), cc_ox_next,
