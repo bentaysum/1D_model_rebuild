@@ -357,7 +357,7 @@ $(LIBF)/phymars/dimphys.h \
 $(LIBF)/phymars/comcstfi.h
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libaeronomars.a photochemistry.o ; \
-	$(COMPILE) $(LIBF)/aeronomars/photochemistry.F ; \
+	$(COMPILE90) $(LIBF)/aeronomars/photochemistry.F ; \
 	$(AR) r $(LIBO)/libaeronomars.a photochemistry.o ; $(RM) photochemistry.o ; \
 	cd $(GCM)
 
@@ -2601,6 +2601,8 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(param_slope.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(read_dust_scenario.o)
 
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(scalar_perturbation.o)
+
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(suaer.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(thermcell_dqup.o)
@@ -3392,7 +3394,7 @@ $(LIBF)/phymars/slope.h \
 $(LIBF)/dyn3d/advtrac.h
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libphymars.a physiq.o ; \
-	$(COMPILE) $(LIBF)/phymars/physiq.F ; \
+	$(COMPILE90) $(LIBF)/phymars/physiq.F ; \
 	$(AR) r $(LIBO)/libphymars.a physiq.o ; $(RM) physiq.o ; \
 	cd $(GCM)
 
@@ -3642,7 +3644,7 @@ $(LIBF)/phymars/tracer.h \
 $(LIBF)/phymars/microphys.h
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libphymars.a vdifc.o ; \
-	$(COMPILE) $(LIBF)/phymars/vdifc.F ; \
+	$(COMPILE90) $(LIBF)/phymars/vdifc.F ; \
 	$(AR) r $(LIBO)/libphymars.a vdifc.o ; $(RM) vdifc.o ; \
 	cd $(GCM)
 
@@ -3698,10 +3700,11 @@ $(LIBF)/dyn3d/comvert.h \
 $(LIBF)/dyn3d/comgeom.h \
 $(LIBF)/dyn3d/description.h \
 $(LIBF)/dyn3d/temps.h \
-$(LIBF)/phymars/surfdat.h
+$(LIBF)/phymars/surfdat.h \
+$(LIBF)/phymars/callkeys.h
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libphymars.a writediagfi.o ; \
-	$(COMPILE) $(LIBF)/phymars/writediagfi.F ; \
+	$(COMPILE90) $(LIBF)/phymars/writediagfi.F ; \
 	$(AR) r $(LIBO)/libphymars.a writediagfi.o ; $(RM) writediagfi.o ; \
 	cd $(GCM)
 
@@ -3827,6 +3830,13 @@ $(LIBF)/phymars/callkeys.h
 	$(AR) r $(LIBO)/libphymars.a read_dust_scenario.o ; $(RM) read_dust_scenario.o ; \
 	cd $(GCM)
 
+$(LIBO)/libphymars.a(scalar_perturbation.o) : $(LIBF)/phymars/scalar_perturbation.F90
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a scalar_perturbation.o ; \
+	$(COMPILE) $(LIBF)/phymars/scalar_perturbation.F90 ; \
+	$(AR) r $(LIBO)/libphymars.a scalar_perturbation.o ; $(RM) scalar_perturbation.o ; \
+	cd $(GCM)
+
 $(LIBO)/libphymars.a(suaer.o) : $(LIBF)/phymars/suaer.F90 \
 $(LIBF)/phymars/callkeys.h \
 $(LIBF)/phymars/datafile.h \
@@ -3863,6 +3873,18 @@ $(LIBF)/phymars/callkeys.h
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(TLM_ADJ_out.o) : $(LIBF)/phymars/TLM_ADJ_out.F90 \
+$(LIBF)/phymars/callkeys.h \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h \
+$(LIBF)/dyn3d/paramet.h \
+$(LIBF)/dyn3d/control.h \
+$(LIBF)/dyn3d/comvert.h \
+$(LIBF)/dyn3d/comgeom.h \
+$(LIBF)/dyn3d/description.h \
+$(LIBF)/phymars/surfdat.h \
+$(LIBF)/aeronomars/chimiedata.h \
+$(LIBF)/phymars/tracer.h \
+$(LIBF)/aeronomars/conc.h \
 $(LIBO)/libbibio.a(ioipsl_getincom.o)
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libphymars.a TLM_ADJ_out.o ; \

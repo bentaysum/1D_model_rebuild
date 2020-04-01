@@ -103,7 +103,6 @@ c   Various intermediate variables
 
       ! TLM Parameters
       integer ndt_tlm ! Time-step for tlm activation
-
       
 c=======================================================================
 
@@ -184,6 +183,12 @@ c ------------------------------------------------------
       tracer=.false. ! default value
       call getin("tracer",tracer)
       write(*,*) " tracer = ",tracer
+
+! Is this part of a looping procedure to access TLM model
+! validity? 
+      pertloop=.false. ! default value
+      call getin("pertloop",pertloop)
+      write(*,*) "pertloop = ", pertloop
 
 ! while we're at it, check if there is a 'traceur.def' file
 ! and preocess it, if necessary. Otherwise initialize tracer names
@@ -701,7 +706,7 @@ c
       firstcall=.true.
       lastcall=.false.
 
-      if ( call_tlm ) then
+      if ( call_tlm .or. pertloop ) then
 c     Plume release activates after this many model steps 
       ndt_plume =  (plume_day*day_step) + NINT((plume_lt/24.)*day_step)
 c     TLM activates after this many model steps 
@@ -771,7 +776,28 @@ c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
           ENDIF
           
+c     Looping perturbations to assess 
+c     TLM accuracy
+c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
+        ELSEIF ( pertloop ) THEN 
+
+          IF ( idt == ndt_tlm ) THEN 
+
+              CALL scalar_perturbation(q)
+
+               mcd_profiles = .False. ! Interpolation routines will 
+                                      ! invalidate TLM results.
+               
+               calladj = .False. ! Convective adjustments require a 
+                                  ! conditional that the TLM will not
+                                  ! be capable of performing.
+               callcond = .False. ! Again, conditionals activate this 
+                                  ! module.
+               pertloop = .False. 
+
+          ENDIF 
         ENDIF 
+
 
 
 c       call physics
@@ -785,6 +811,7 @@ c       --------------------
      ,     w,
 C - outputs
      s     du, dv, dtemp, dq,dpsurf,tracerdyn)
+
 !      write(*,*) "testphys1d apres q", q(1,:)
 
 c     Interpolate physical variables (temperature, wind,

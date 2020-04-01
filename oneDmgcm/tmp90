@@ -18,6 +18,7 @@ libf/phymars/iniwritesoil.F90
 libf/phymars/mkstat.F90
 libf/phymars/param_slope.F90
 libf/phymars/read_dust_scenario.F90
+libf/phymars/scalar_perturbation.F90
 libf/phymars/suaer.F90
 libf/phymars/thermcell_dqup.F90
 libf/phymars/thermcell_main_mars.F90

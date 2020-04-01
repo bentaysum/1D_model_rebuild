@@ -67,3 +67,22 @@ Initialises the tangent linear model variables via allocation statements.
 Stores each model iterations TLM matrix into the tangent_matrix [nqmx*nlayermx,nqmx*nlayermx,ndt]
 (for ndt model time-steps) to be saved as a binary output file.
 
+## 01/04/2020 
+
+Routine now operates with a bash script that cycles through a user defined number of scalar 
+perturbations and stores them in the university datastore. These 1-D model outputs can be used to 
+assess the validity of the Tangent Linear Model code. The cycles perturb the species at the same
+time index that the TLM is supposed to be activated on.
+
+To access TLM validity, set up the bash script to specify the:
+	- TRACER [tracer to pertrub]
+	- LOW [smallest magnitude of perturbation]
+	- HIGH [largest magnitude of perturbation]
+	- L_1 [ lowest layer in model for perturbation]
+	- L_2 [ upper layer in model for perturbation]
+
+and also the day0 value. Then, activate the call_tlm callkey in callphys.def, DEACTIVATE THE 
+PERTLOOP KEY, and you have yourself:
+	- A tangent linear matrix (TLM.bin)
+	- Integrated model perturbation files
+	- A control run file

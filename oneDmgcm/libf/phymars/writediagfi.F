@@ -118,6 +118,14 @@
           return
       ENDIF 
 
+!     Perturbation loops 
+!     ==================
+!     Used to access TLM model validity by perturbing a select compound
+!     by a scalar.
+      IF (pertloop) THEN 
+        RETURN
+      ENDIF
+
 ! At very first call, check if there is a "diagfi.def" to use and read it
 ! -----------------------------------------------------------------------
       IF (firstcall) THEN
