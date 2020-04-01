@@ -857,17 +857,15 @@ DO iq = 1,nqmx
 	dlhox_dPQ = dLhox_dPQ + dLhox_coeff(iq)*dccn_dpq( x_j, : )
 ENDDO 					
 
-! Coefficients
-A_hox(1) = 1./(1. + loss(i_hox)*dt_c) 
-A_hox(2) = A_hox(1)*dt_c 
-A_hox(3) = dt_c*(cc0(i_hox) + production(i_hox)*dt_c)*(A_hox(1)**2)/cc(i_hox)
-A_hox(4) = dt_c*(cc0(i_hox) + production(i_hox)*dt_c)*(A_hox(1)**2)*loss(i_hox)/cc(i_hox)
-					
-! ! Calculations:
-dHOX_dPQ( lyr_m, : ) = A_hox(1)*dHOX0_dPQ(lyr_m,:) &
-					+ A_hox(2)*dPhox_dPQ &
-					- A_hox(3)*dLhox_dPQ &
-					+ A_hox(4)*dHOX_dPQ( lyr_m, : )
+
+! Coefficients for HOx 
+A_hox(1) = 1./( 1. + loss(i_hox)*dt_c )
+A_hox(2) = cc_hox_next*A_hox(1)*dt_c/cc(i_hox) 
+A_hox(3) = loss(i_hox)
+
+dHOX_dPQ(lyr_m,:) = A_hox(1)*( dHOX0_dPQ(lyr_m,:) + dPhox_dPQ*dt_c ) &
+                - A_hox(2)*( dLhox_dPQ - A_hox(3)*dHOX_dPQ(lyr_m,:) )
+
 
 
 ! ============================================
