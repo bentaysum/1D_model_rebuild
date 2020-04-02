@@ -141,6 +141,11 @@ IF ( idt == ndt ) THEN
 	CLOSE(11)
 	
 	write(*,*) SHAPE(tangent_matrix), SIZE(tangent_matrix)
+
+	DO t = 1,25 
+      WRITE(*,*) tangent_matrix(t,t,1)
+    ENDDO 
+    stop
 	
 ENDIF 
 

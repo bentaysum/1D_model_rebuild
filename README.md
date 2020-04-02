@@ -86,3 +86,9 @@ PERTLOOP KEY, and you have yourself:
 	- A tangent linear matrix (TLM.bin)
 	- Integrated model perturbation files
 	- A control run file
+
+## 02/04/2020
+
+Routine produces a .txt file containing the initial control state of the 1-D model to be used
+in TLM validation procedures. 
+	- Need to re-jig this to make it easier to use/more automated naming of file
