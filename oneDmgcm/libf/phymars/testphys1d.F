@@ -778,27 +778,27 @@ c     We do require the initial control state to be saved independently
 c     from the writediagfi file to prevent disruption to model time
 c     parameters 
 
-c 02/04/2020 : Requires refinement in terms of storage structure for
-c              later and easier use down the line.
-          OPEN(UNIT=212,FILE="/exports/csce/datastore/geos/users/"
-     $         // "s1215319/tlm_adjoint_storage/automated_tlm/"
-     $         // "initial_mmrs.txt",
-     $         ACTION="WRITE",
-     $         STATUS = "REPLACE")
+C c 02/04/2020 : Requires refinement in terms of storage structure for
+C c              later and easier use down the line.
+C           OPEN(UNIT=212,FILE="/exports/csce/datastore/geos/users/"
+C      $         // "s1215319/tlm_adjoint_storage/automated_tlm/"
+C      $         // "initial_mmrs.txt",
+C      $         ACTION="WRITE",
+C      $         STATUS = "REPLACE")
 
-          DO iq = 1, nqmx
-            WRITE(212,"(A20)",advance="no") trim(noms(iq))
-          ENDDO
-            WRITE(212,"(A)",advance="yes") ""
+C           DO iq = 1, nqmx
+C             WRITE(212,"(A20)",advance="no") trim(noms(iq))
+C           ENDDO
+C             WRITE(212,"(A)",advance="yes") ""
 
             
-          DO ilayer = 1, nlayermx
-            WRITE(212,"(27E20.7)") 
-     $                  ( q(ilayer,iq), iq = 1, nqmx )
-          ENDDO 
+C           DO ilayer = 1, nlayermx
+C             WRITE(212,"(27E20.7)") 
+C      $                  ( q(ilayer,iq), iq = 1, nqmx )
+C           ENDDO 
 
-          CLOSE(212)
-          STOP
+C           CLOSE(212)
+C           STOP
           ENDIF
           
 c     Looping perturbations to assess 
