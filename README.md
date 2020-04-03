@@ -19,6 +19,14 @@ non-navigatable, and at this point all I can see is: I don't frankly care anymor
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
 
+
+## 03/04/2020
+
+Attempting to make the TLM operate over the original number of discrete time-steps (48 physical)
+to enable the photochemistry routine to function over 3 chemistry time-steps, and also the 5 sub-
+timesteps within each chemistry timestep. 
+
+
 ## 31/03/2020
 
 I have inserted the files:
@@ -85,10 +93,4 @@ and also the day0 value. Then, activate the call_tlm callkey in callphys.def, DE
 PERTLOOP KEY, and you have yourself:
 	- A tangent linear matrix (TLM.bin)
 	- Integrated model perturbation files
-	- A control run file
-
-## 02/04/2020
-
-Routine produces a .txt file containing the initial control state of the 1-D model to be used
-in TLM validation procedures. 
-	- Need to re-jig this to make it easier to use/more automated naming of file
+	- A control run 

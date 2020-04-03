@@ -2,6 +2,7 @@
      $            ngrid,nlayer,nq
      $            ,firstcall,lastcall
      $            ,pday,ptime,ptimestep
+     $            ,idt,ndt_tlm
      $            ,pplev,pplay,pphi
      $            ,pu,pv,pt,pq
      $            ,pw
@@ -84,6 +85,10 @@ c    pday                  Number of days counted from the North. Spring
 c                          equinoxe.
 c    ptime                 Universal time (0<ptime<1): ptime=0.5 at 12:00 UT
 c    ptimestep             timestep (s)
+c  
+c    idt                   Model iteration 
+c    ndt_tlm               iteration to engage the TLM routines    
+c
 c    pplay(ngrid,nlayer)   Pressure at the middle of the layers (Pa)
 c    pplev(ngrid,nlayer+1) intermediate pressure levels (pa)
 c    pphi(ngrid,nlayer)    Geopotential at the middle of the layers (m2s-2)
@@ -162,6 +167,9 @@ c   -------
 
       REAL pday
       REAL ptime 
+
+      INTEGER idt, ndt_tlm 
+
       logical tracerdyn
 
 c   outputs:
@@ -1332,6 +1340,56 @@ c ======================================================================
                TLM = tlm_ident + TLM*ptimestep
           ENDIF
           
+
+c 10.1: Conditional activation of TLM routines
+c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       IF ( idt == ndt_tlm
+     $      .and. call_tlm ) THEN 
+            
+            call_tlm = .False.     ! Prevents multiple initialisations.
+            
+            tlm_on = .True.        ! Routines will now engage.
+            
+            mcd_profiles = .False. ! Interpolation routines will 
+                                   ! invalidate TLM results.
+            
+            calladj = .False. ! Convective adjustments require a 
+                               ! conditional that the TLM will not
+                               ! be capable of performing.
+            callcond = .False. ! Again, conditionals activate this 
+                               ! module.
+            call TLM_initialise
+
+       
+
+       ELSEIF ( idt == ndt_tlm 
+     $      .and. pertloop ) THEN 
+
+           CALL scalar_perturbation(pq(1,:,:))
+
+            mcd_profiles = .False. ! Interpolation routines will 
+                                   ! invalidate TLM results.
+            
+            calladj = .False. ! Convective adjustments require a 
+                               ! conditional that the TLM will not
+                               ! be capable of performing.
+            callcond = .False. ! Again, conditionals activate this 
+                               ! module.
+            pertloop = .False.
+
+       ENDIF 
+
+
+
+
+
+
+
+
+
+
+
+
 c-----------------------------------------------------------------------
 c  10. Write output files
 c  ----------------------

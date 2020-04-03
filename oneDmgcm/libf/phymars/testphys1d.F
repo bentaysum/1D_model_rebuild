@@ -710,7 +710,10 @@ c
 c     Plume release activates after this many model steps 
       ndt_plume =  (plume_day*day_step) + NINT((plume_lt/24.)*day_step)
 c     TLM activates after this many model steps 
-      ndt_tlm = (tlm_day*day_step) + NINT((tlm_lt/24.)*day_step)
+c     -1 ensures the model saves the perturbed initial 
+c     state, as opposed to saving it -after- it enters
+c     the chemistry routine.
+      ndt_tlm = (tlm_day*day_step) + NINT((tlm_lt/24.)*day_step) - 1
       endif 
 
       DO idt=1,ndt
@@ -753,84 +756,13 @@ c  table for tracers CO2, CO, H2, H2O vapour, and O2.
           WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]"
           ENDIF 
       
-
-c     Tangent Linear Model Activation
-c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      
-        IF ( call_tlm ) THEN 
-          IF ( idt == ndt_tlm ) THEN 
-               
-               call_tlm = .False.     ! Prevents multiple initialisations.
-               
-               tlm_on = .True.        ! Routines will now engage.
-               
-               mcd_profiles = .False. ! Interpolation routines will 
-                                      ! invalidate TLM results.
-               
-               calladj = .False. ! Convective adjustments require a 
-                                  ! conditional that the TLM will not
-                                  ! be capable of performing.
-               callcond = .False. ! Again, conditionals activate this 
-                                  ! module.
-               call TLM_initialise
-
-c     We do require the initial control state to be saved independently
-c     from the writediagfi file to prevent disruption to model time
-c     parameters 
-
-C c 02/04/2020 : Requires refinement in terms of storage structure for
-C c              later and easier use down the line.
-C           OPEN(UNIT=212,FILE="/exports/csce/datastore/geos/users/"
-C      $         // "s1215319/tlm_adjoint_storage/automated_tlm/"
-C      $         // "initial_mmrs.txt",
-C      $         ACTION="WRITE",
-C      $         STATUS = "REPLACE")
-
-C           DO iq = 1, nqmx
-C             WRITE(212,"(A20)",advance="no") trim(noms(iq))
-C           ENDDO
-C             WRITE(212,"(A)",advance="yes") ""
-
-            
-C           DO ilayer = 1, nlayermx
-C             WRITE(212,"(27E20.7)") 
-C      $                  ( q(ilayer,iq), iq = 1, nqmx )
-C           ENDDO 
-
-C           CLOSE(212)
-C           STOP
-          ENDIF
-          
-c     Looping perturbations to assess 
-c     TLM accuracy
-c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
-        ELSEIF ( pertloop ) THEN 
-
-          IF ( idt == ndt_tlm ) THEN 
-
-              CALL scalar_perturbation(q)
-
-               mcd_profiles = .False. ! Interpolation routines will 
-                                      ! invalidate TLM results.
-               
-               calladj = .False. ! Convective adjustments require a 
-                                  ! conditional that the TLM will not
-                                  ! be capable of performing.
-               callcond = .False. ! Again, conditionals activate this 
-                                  ! module.
-               pertloop = .False. 
-
-          ENDIF 
-        ENDIF 
-
-
-
 c       call physics
 c       --------------------
 !      write(*,*) "testphys1d avant q", q(1,:)
       CALL physiq (1,llm,nqmx,
      ,     firstcall,lastcall,
      ,     day,time,dtphys,
+     ,     idt,ndt_tlm, ! TLM activation requirements 
      ,     plev,play,phi,
      ,     u, v,temp, q,  
      ,     w,

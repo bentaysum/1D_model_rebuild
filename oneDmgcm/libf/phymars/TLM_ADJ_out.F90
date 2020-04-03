@@ -47,7 +47,7 @@ integer :: iq
 
 ! STORAGE 
 ! -------
-real, allocatable, save :: tangent_matrix(:,:,:)
+real*4, allocatable, save :: tangent_matrix(:,:,:)
 integer x, y, t ! Loop iterators
 integer, parameter :: wl = 4
 integer :: length
@@ -142,10 +142,6 @@ IF ( idt == ndt ) THEN
 	
 	write(*,*) SHAPE(tangent_matrix), SIZE(tangent_matrix)
 
-	DO t = 1,25 
-      WRITE(*,*) tangent_matrix(t,t,1)
-    ENDDO 
-    stop
 	
 ENDIF 
 

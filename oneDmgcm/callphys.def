@@ -38,15 +38,15 @@ mcd_ltfin = 12.
 
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call_tlm= .True.
+call_tlm= .true.
 tlm_day=10
 tlm_lt=0.
 
 ## Handled by bash script
 ## perturbation_cycle.sh 
 pertloop= .False.
-TRACER= ch4
-SCALAR= 1.E1
+PERTGAS= o2
+SCALAR= 1.E0
 L_1= 1
 L_2= 14
 
