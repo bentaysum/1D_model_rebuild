@@ -31,7 +31,8 @@ SUBROUTINE tlm_hox(iter, lyr_m, dens,sza,&
 					cab091, cab092, cab093, cab094, cab095, &
 					cab096, cab097, cab098, cab099, cab100, & 
 					cab101, cab102, cab103, cab104, cab105, &
-					cab106, cab107)
+					cab106, cab107, &
+                    dccn_dpq, dcc0_dpq)
 
 USE TLMvars
 
@@ -67,6 +68,7 @@ real dt_c, dt_p ! chemical and physical timestep
 integer nesp ! number of species in the chemistry routines
 real cc(nesp), cc_prev(nesp) ! number density of species after and before the
 						 ! odd-hydrogen calculations (only H, OH and HO2 are effected)
+real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx), dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 real j(nd) ! photolysis values 
 
 ! Oxygen Reaction Rates 

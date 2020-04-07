@@ -1,7 +1,7 @@
 MODULE TLMvars
 ! Matrixes
 ! TLM = TLMtrans + TLMphoto
-REAL, DIMENSION(:,:), allocatable,save :: tlm, tlm_photo, dhox_dpq, dox_dpq, dccn_dpq, dcc0_dpq
+REAL, DIMENSION(:,:), allocatable,save :: tlm, tlm_photo, dhox_dpq, dox_dpq
 REAL, DIMENSION(:,:), allocatable,save :: dhox0_dpq, dox0_dpq
 ! Perturbation Vectors
 !REAL, DIMENSION(:), allocatable,save :: perts

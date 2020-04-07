@@ -13,6 +13,7 @@ c
      $                  press,temp, dens, dist_sol, surfdust1d,
      $                  surfice1d, jo3, tau,pq,pdq)
           
+      USE TLMvars 
       implicit none
 c
 #include "dimensions.h"
@@ -124,7 +125,9 @@ cc    reaction rates from CAABA/MECCA
      $     cab103(nlayermx), cab104(nlayermx), cab105(nlayermx),
      $     cab106(nlayermx), cab107(nlayermx)
 
-
+c     Tangent Linear Model variables
+      REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      REAL dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     stimestep  : standard timestep for the chemistry (s)       c
@@ -222,9 +225,17 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     loop over time within the physical timestep                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       
+      if (tlm_on) then
+        dccn_dpq(:,:) = 0.
+        dcc0_dpq(:,:) = 0.
+      endif 
+
       do istep = 1,phychemrat
 
 c =================================================================
+
+c     Tangent Linear Model initialisation
+c     -----------------------------------
 
          call chimie(lswitch,nesp, rm, j, dens, ctimestep, ptimestep,
      $               press, temp, sza, dist_sol, 
@@ -259,7 +270,8 @@ c =================================================================
      $               cab091, cab092, cab093, cab094, cab095,
      $               cab096, cab097, cab098, cab099, cab100,
      $               cab101, cab102, cab103, cab104, cab105,
-     $               cab106, cab107)
+     $               cab106, cab107,
+     $               dccn_dpq, dcc0_dpq)
       
       end do
 
@@ -311,7 +323,8 @@ c
      $               cab091, cab092, cab093, cab094, cab095,
      $               cab096, cab097, cab098, cab099, cab100,
      $               cab101, cab102, cab103, cab104, cab105,
-     $               cab106, cab107)
+     $               cab106, cab107,
+     $               dccn_dpq, dcc0_dpq)
 c
 c*****************************************************************
 c
@@ -401,6 +414,10 @@ c
      $     cab100(nlayermx), cab101(nlayermx), cab102(nlayermx),
      $     cab103(nlayermx), cab104(nlayermx), cab105(nlayermx),
      $     cab106(nlayermx), cab107(nlayermx)
+
+c     Tangent Linear Model 
+      REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      REAL dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     local:
@@ -921,7 +938,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  cab097(l), cab098(l), cab099(l),
      $  cab100(l), cab101(l), cab102(l),
      $  cab103(l), cab104(l), cab105(l),
-     $  cab106(l), cab107(l) )
+     $  cab106(l), cab107(l),
+     $  dccn_dpq, dcc0_dpq)
      
      
        ENDIF
@@ -1102,7 +1120,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  cab097(l), cab098(l), cab099(l),
      $  cab100(l), cab101(l), cab102(l),
      $  cab103(l), cab104(l), cab105(l),
-     $  cab106(l), cab107(L) )
+     $  cab106(l), cab107(L),
+     $  dccn_dpq, dcc0_dpq )
         ENDIF
        
        
@@ -2113,8 +2132,8 @@ C           ENDIF
      $         cab091(l), cab092(l), cab093(l), cab094(l), cab095(l),  
      $         cab096(l), cab097(l), cab098(l), cab099(l), cab100(l),   
      $         cab101(l), cab102(l), cab103(l), cab104(l), cab105(l),  
-     $         cab106(l), cab107(l))
-            
+     $         cab106(l), cab107(l),
+     $         dccn_dpq, dcc0_dpq)          
 
           ENDIF 
   

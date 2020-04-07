@@ -27,6 +27,11 @@ to enable the photochemistry routine to function over 3 chemistry time-steps, an
 timesteps within each chemistry timestep. 
 
 
+## 07/04/2020
+
+dccn_dpq and dcc0_dpq are no longer global save variables.
+
+
 ## 31/03/2020
 
 I have inserted the files:

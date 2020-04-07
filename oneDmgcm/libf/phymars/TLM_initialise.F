@@ -29,9 +29,6 @@
           ALLOCATE(Avmr(nlayermx,nqmx))
 
           ALLOCATE(tlm_ident(nlayermx*nqmx,nlayermx*nqmx))
-		  
-          ALLOCATE(dccn_dpq(nlayermx*nqmx,nlayermx*nqmx))
-          ALLOCATE(dcc0_dpq(nlayermx*nqmx,nlayermx*nqmx))
 
 
           ! Initialise to 0
@@ -42,7 +39,6 @@
           dhox_dpq(:,:) = 0.
 		  dhox0_dpq(:,:) = 0.
           tlm_photo(:,:) = 0.
-          dccn_dpq(:,:) = 0.
           
           ! Establish the TLM identity matrix
           DO a = 1, nlayermx*nqmx 
