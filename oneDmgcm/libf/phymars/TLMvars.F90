@@ -1,8 +1,7 @@
 MODULE TLMvars
 ! Matrixes
 ! TLM = TLMtrans + TLMphoto
-REAL, DIMENSION(:,:), allocatable,save :: tlm, tlm_photo, dhox_dpq, dox_dpq
-REAL, DIMENSION(:,:), allocatable,save :: dhox0_dpq, dox0_dpq
+REAL, DIMENSION(:,:), allocatable,save :: tlm, tlm_photo
 ! Perturbation Vectors
 !REAL, DIMENSION(:), allocatable,save :: perts
 ! TLM semi-identity matrix

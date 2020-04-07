@@ -32,7 +32,8 @@ SUBROUTINE tlm_hox(iter, lyr_m, dens,sza,&
 					cab096, cab097, cab098, cab099, cab100, & 
 					cab101, cab102, cab103, cab104, cab105, &
 					cab106, cab107, &
-                    dccn_dpq, dcc0_dpq)
+                    dccn_dpq, dcc0_dpq, &
+                    dHOX_dPQ, dHOX0_dPQ)
 
 USE TLMvars
 
@@ -69,6 +70,8 @@ integer nesp ! number of species in the chemistry routines
 real cc(nesp), cc_prev(nesp) ! number density of species after and before the
 						 ! odd-hydrogen calculations (only H, OH and HO2 are effected)
 real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx), dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+real dHOX_dPQ(nlayermx, nqmx*nlayermx), dHOX0_dPQ(nlayermx,nqmx*nlayermx)
+
 real j(nd) ! photolysis values 
 
 ! Oxygen Reaction Rates 
@@ -296,8 +299,6 @@ IF ( iter == 1 ) THEN
 	oh_j = (t_oh-1)*nlayermx + lyr_m
  	ho2_j = (t_ho2-1)*nlayermx + lyr_m
 	
-	dHOX_dPQ(lyr_m,:) = 0. 
-
 	dHOX_dPQ(lyr_m,:) = (TLM_ident( h_j, : ) + TLM( h_j, :)*dt_p) &
 					  *Avmr(lyr_m,t_h)*dens  &
 					  + (TLM_ident( oh_j, : ) + TLM( oh_j, :)*dt_p) &

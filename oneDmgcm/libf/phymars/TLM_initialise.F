@@ -20,10 +20,6 @@
       INTEGER :: a, b, iq ! Loop iterators
       
           ALLOCATE(tlm(nlayermx*nqmx,nlayermx*nqmx))
-          ALLOCATE(dhox_dpq(nlayermx,nlayermx*nqmx))
-          ALLOCATE(dhox0_dpq(nlayermx,nlayermx*nqmx))
-          ALLOCATE(dox_dpq(nlayermx,nlayermx*nqmx))
-          ALLOCATE(dox0_dpq(nlayermx,nlayermx*nqmx))
           ALLOCATE(tlm_photo(nlayermx*nqmx,nlayermx*nqmx))
 
           ALLOCATE(Avmr(nlayermx,nqmx))
@@ -33,11 +29,6 @@
 
           ! Initialise to 0
           tlm(:,:) = 0.
-          dox_dpq(:,:) = 0.
-		  dox0_dpq(:,:) = 0.
-		 
-          dhox_dpq(:,:) = 0.
-		  dhox0_dpq(:,:) = 0.
           tlm_photo(:,:) = 0.
           
           ! Establish the TLM identity matrix

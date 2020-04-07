@@ -128,6 +128,10 @@ cc    reaction rates from CAABA/MECCA
 c     Tangent Linear Model variables
       REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
       REAL dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      REAL dHOX_dPQ(nlayermx,nlayermx*nqmx)
+      REAL dHOX0_dPQ(nlayermx,nlayermx*nqmx)
+      REAL dOX_dPQ(nlayermx,nlayermx*nqmx)
+      REAL dOX0_dPQ(nlayermx,nlayermx*nqmx)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     stimestep  : standard timestep for the chemistry (s)       c
@@ -271,7 +275,9 @@ c     -----------------------------------
      $               cab096, cab097, cab098, cab099, cab100,
      $               cab101, cab102, cab103, cab104, cab105,
      $               cab106, cab107,
-     $               dccn_dpq, dcc0_dpq)
+     $               dccn_dpq, dcc0_dpq,
+     $               dHOX_dPQ, dHOX0_dPQ,
+     $               dOX_dPQ, dOX0_dPQ)
       
       end do
 
@@ -324,7 +330,9 @@ c
      $               cab096, cab097, cab098, cab099, cab100,
      $               cab101, cab102, cab103, cab104, cab105,
      $               cab106, cab107,
-     $               dccn_dpq, dcc0_dpq)
+     $               dccn_dpq, dcc0_dpq,
+     $               dHOX_dPQ, dHOX0_dPQ,
+     $               dOX_dPQ, dOX0_dPQ)
 c
 c*****************************************************************
 c
@@ -418,6 +426,10 @@ c
 c     Tangent Linear Model 
       REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
       REAL dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      REAL dHOX_dPQ(nlayermx,nqmx*nlayermx)
+      REAL dHOX0_dPQ(nlayermx,nqmx*nlayermx)
+      REAL dOX_dPQ(nlayermx,nqmx*nlayermx)
+      REAL dOX0_dPQ(nlayermx,nqmx*nlayermx)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     local:
@@ -939,7 +951,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  cab100(l), cab101(l), cab102(l),
      $  cab103(l), cab104(l), cab105(l),
      $  cab106(l), cab107(l),
-     $  dccn_dpq, dcc0_dpq)
+     $  dccn_dpq, dcc0_dpq,
+     $  dHOX_dPQ, dHOX0_dPQ)
      
      
        ENDIF
@@ -1121,7 +1134,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  cab100(l), cab101(l), cab102(l),
      $  cab103(l), cab104(l), cab105(l),
      $  cab106(l), cab107(L),
-     $  dccn_dpq, dcc0_dpq )
+     $  dccn_dpq, dcc0_dpq,
+     $  dOX_dPQ, dOX0_dPQ)
         ENDIF
        
        
@@ -2133,7 +2147,8 @@ C           ENDIF
      $         cab096(l), cab097(l), cab098(l), cab099(l), cab100(l),   
      $         cab101(l), cab102(l), cab103(l), cab104(l), cab105(l),  
      $         cab106(l), cab107(l),
-     $         dccn_dpq, dcc0_dpq)          
+     $         dccn_dpq, dcc0_dpq,
+     $         dHOX_dPQ, dHOX0_dPQ)          
 
           ENDIF 
   

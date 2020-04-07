@@ -31,7 +31,8 @@ SUBROUTINE tlm_sibem(iter, niter, lyr_m, dens, sza, &
 					cab096, cab097, cab098, cab099, cab100, & 
 					cab101, cab102, cab103, cab104, cab105, &
 					cab106, cab107, &
-					dccn_dpq, dcc0_dpq)
+					dccn_dpq, dcc0_dpq, &
+					dHOX_dPQ, dHOX0_dPQ)
 
 USE TLMvars
 
@@ -57,6 +58,8 @@ real cc(nesp), cc0(nesp) ! number density of species after and before the
 						 ! odd-hydrogen calculations (only H, OH and HO2 are effected)
 real cc_hox_next ! cc(hox)^{t+1}
 real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx), dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+real dHOX_dPQ(nlayermx,nqmx*nlayermx), dHOX0_dPQ(nlayermx,nlayermx*nqmx)
+
 real j(nd), production(nesp), loss(nesp) ! photolysis, production and loss values 
 ! Oxygen Reaction Rates 
 real a001, a002, a003
