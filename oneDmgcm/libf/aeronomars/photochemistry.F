@@ -283,31 +283,12 @@ C     ------------------------------------------------------------------
         
       ENDDO 
 
-
-
-
-
-
       ENDIF ! sza
-
 
       ENDDO 
 
 c     ==================================================================
       ENDIF ! tlm_on 
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     loop over time within the physical timestep                c
@@ -358,6 +339,24 @@ c =================================================================
      $               dccn_dpq, dcc0_dpq,
      $               dHOX_dPQ, dHOX0_dPQ,
      $               dOX_dPQ, dOX0_dPQ)
+
+
+      IF ( tlm_on ) THEN
+        IF ( istep == phychemrat) THEN 
+        DO l = 1, nlayermx
+        DO iq = 1,nqmx 
+          x_j = (iq-1)*nlayermx + l
+
+          TLM_photo( X_J, : ) = (dccn_dpq(X_J,:) - dcc0_dpq(X_J,:)) 
+     $               /(Avmr(l,iq)*dens(L)*ptimestep)
+          
+        ENDDO 
+        ENDDO
+        ENDIF 
+      ENDIF 
+
+
+
       
       end do
 

@@ -975,17 +975,6 @@ IF ( igcm_hco .ne. 0 ) THEN
 	dccn_dpq( x_j, : ) = A(t_hco,1)*dP_dPQ(t_hco,:) - A(t_hco,2)*dL_dPQ(t_hco,:)
 ENDIF
 
-IF ( iter == niter ) THEN
-
-	DO iq_j = 1,nqmx 
-		x_i = (iq_j-1)*nlayermx + lyr_m
-
-		TLM_photo( x_i, : ) = (dccn_dpq(x_i,:) - dcc0_dpq(x_i,:)) & 
-							/(Avmr(lyr_m,iq_j)*dens*dt_p)
-		
-	ENDDO 
-	
-ENDIF 
 
 			
 

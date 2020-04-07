@@ -35,6 +35,8 @@ dOX_dpq and dOX0_dpq are no longer global saves.
 
 Linearised variables initialised outside of chemistry loop.
 
+Input into photochemistry matrix is outside of the chemistry loop.
+
 ## 31/03/2020
 
 I have inserted the files:
