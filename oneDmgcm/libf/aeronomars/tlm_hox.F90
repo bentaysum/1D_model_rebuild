@@ -295,37 +295,22 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 ! at very first time-step.
 
 IF ( iter == 1 ) THEN 
-	h_j = (t_h-1)*nlayermx + lyr_m
-	oh_j = (t_oh-1)*nlayermx + lyr_m
- 	ho2_j = (t_ho2-1)*nlayermx + lyr_m
-	
-	dHOX_dPQ(lyr_m,:) = (TLM_ident( h_j, : ) + TLM( h_j, :)*dt_p) &
-					  *Avmr(lyr_m,t_h)*dens  &
-					  + (TLM_ident( oh_j, : ) + TLM( oh_j, :)*dt_p) &
-					  *Avmr(lyr_m,t_oh)*dens & 
-					  + (TLM_ident( ho2_j, : ) + TLM( ho2_j, :)*dt_p) &
-					  *Avmr(lyr_m,t_ho2)*dens 
-					  
-	dHOX0_dPQ(lyr_m,:) = dHOX_dPQ(lyr_m,:)
-					  
-! 0.2 : Linearised Number Densities ( cc(X) )
-! -------------------------------------------
 !
 ! cc(X) is equal to:
 !	(mmean/mmol(X)) * ( PQ(X) ) * density 
 ! at very first time-step.
-	DO iq = 1, nqmx
+	! DO iq = 1, nqmx
 			
-		Avmr(lyr_m,iq) = mmol(iq)/mmean(1,lyr_m)
+	! 	Avmr(lyr_m,iq) = mmol(iq)/mmean(1,lyr_m)
 			
-		x_j = ( iq - 1 )*nlayermx + lyr_m 
+	! 	x_j = ( iq - 1 )*nlayermx + lyr_m 
 			
-		dccn_dpq( x_j, : ) = ( TLM_ident( x_j, :) + TLM( x_j, :)*dt_p) &
-							*Avmr(lyr_m,iq)*dens
+	! 	dccn_dpq( x_j, : ) = ( TLM_ident( x_j, :) + TLM( x_j, :)*dt_p) &
+	! 						*Avmr(lyr_m,iq)*dens
 		
-		dcc0_dpq( x_j, : ) = dccn_dpq( x_j, : )
+	! 	dcc0_dpq( x_j, : ) = dccn_dpq( x_j, : )
 		
-	ENDDO	
+	! ENDDO	
 
 ENDIF 
 

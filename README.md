@@ -33,6 +33,8 @@ dccn_dpq and dcc0_dpq are no longer global save variables.
 dHOX_dpq and dHOX0_dpq are no longer global saves.
 dOX_dpq and dOX0_dpq are no longer global saves.
 
+Linearised variables initialised outside of chemistry loop.
+
 ## 31/03/2020
 
 I have inserted the files:

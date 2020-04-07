@@ -21,7 +21,8 @@ c
 #include "chimiedata.h" 
 #include "callkeys.h"
 #include "tracer.h"
-c
+#include "conc.h"
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     input/output:
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -59,7 +60,7 @@ c
       integer nesp
       integer lswitch
 c
-      integer l
+      integer l, iq
       parameter (nesp = 58)      ! number of species in the chemistry (+1 for RO2)
 c
       real stimestep             ! standard timestep for the chemistry (s)
@@ -133,6 +134,9 @@ c     Tangent Linear Model variables
       REAL dOX_dPQ(nlayermx,nlayermx*nqmx)
       REAL dOX0_dPQ(nlayermx,nlayermx*nqmx)
 
+      integer h_j, oh_j, ho2_j
+      integer o_j, o3_j 
+      integer x_j 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     stimestep  : standard timestep for the chemistry (s)       c
 c     ctimestep  : real timestep for the chemistry (s)           c
@@ -225,21 +229,97 @@ c
          jo3(lev) = j(lev,j_o3_o1d)
       end do
 c
+
+      IF ( tlm_on ) THEN 
+c     ==================================================================
+c     Tangent Linear Model initialisation
+c     ==================================================================
+
+C     HOX 
+C     ------------------------------------------------------------------
+      DO l = 1, lswitch-1
+      h_j = (t_h-1)*nlayermx + l
+      oh_j = (t_oh-1)*nlayermx + l
+      ho2_j = (t_ho2-1)*nlayermx + l
+      
+      dHOX_dPQ(l,:) = (TLM_ident( h_j, : ) + TLM( h_j, :)*ptimestep) 
+     $       *Avmr(l,t_h)*dens(l)  
+     $       + (TLM_ident( oh_j, : ) + TLM( oh_j, :)*ptimestep) 
+     $       *Avmr(l,t_oh)*dens(l)  
+     $       + (TLM_ident( ho2_j, : ) + TLM( ho2_j, :)*ptimestep) 
+     $       *Avmr(l,t_ho2)*dens(l) 
+            
+
+      dHOX0_dPQ(l,:) = dHOX_dPQ(l,:)
+
+      IF (sza .le. 95.) THEN
+C     OX (daylight)
+C     ------------------------------------------------------------------
+      o_j = (t_o-1)*nlayermx + l
+      o3_j = (t_o3-1)*nlayermx + l
+    
+      dOX_dPQ(l,:) = 0.
+      dOX0_dPQ(l,:) = 0.
+      
+      dOX_dPQ(l,:) = (TLM_ident( o3_j, : ) + TLM( o3_j, :)*ptimestep) 
+     $           *Avmr(l,t_o3)*dens(l) 
+     $           + (TLM_ident( o_j, : ) + TLM( o_j, :)*ptimestep) 
+     $           *Avmr(l,t_o)*dens(l)
+
+      dOX0_dPQ(l,:) = dOX_dPQ(l,:)    
+
+C     All individual species
+C     ------------------------------------------------------------------
+      DO iq = 1, nqmx
+          
+        Avmr(l,iq) = mmol(iq)/mmean(1,l)
+          
+        x_j = ( iq - 1 )*nlayermx + l 
+          
+      dccn_dpq( x_j, : ) =( TLM_ident( x_j, :) + TLM( x_j, :)*ptimestep)
+     $                   *Avmr(l,iq)*dens(l)
+        
+      dcc0_dpq( x_j, : ) = dccn_dpq( x_j, : )
+        
+      ENDDO 
+
+
+
+
+
+
+      ENDIF ! sza
+
+
+      ENDDO 
+
+c     ==================================================================
+      ENDIF ! tlm_on 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     loop over time within the physical timestep                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       
-      if (tlm_on) then
-        dccn_dpq(:,:) = 0.
-        dcc0_dpq(:,:) = 0.
-      endif 
+
+
+
 
       do istep = 1,phychemrat
 
 c =================================================================
-
-c     Tangent Linear Model initialisation
-c     -----------------------------------
 
          call chimie(lswitch,nesp, rm, j, dens, ctimestep, ptimestep,
      $               press, temp, sza, dist_sol, 
