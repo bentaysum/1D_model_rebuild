@@ -874,8 +874,8 @@ dHOX_dPQ(lyr_m,:) = A_hox(1)*( dHOX0_dPQ(lyr_m,:) + dPhox_dPQ*dt_c ) &
 
 ! CO2
 x_j = (t_co2-1)*nlayermx + lyr_m 
-dccn_dpq( x_j, : ) = 0.!A(t_co2,1)*dcc0_dpq( x_j , : ) + A(t_co2,2)*dP_dPQ(t_co2,:) &
-					!- A(t_co2,3)*dL_dPQ( t_co2, :)
+dccn_dpq( x_j, : ) = A(t_co2,1)*dcc0_dpq( x_j , : ) + A(t_co2,2)*dP_dPQ(t_co2,:) &
+					- A(t_co2,3)*dL_dPQ( t_co2, :)
 ! CO
 x_j = (t_co-1)*nlayermx + lyr_m 
 dccn_dpq( x_j, : ) = A(t_co,1)*dcc0_dpq( x_j , : ) + A(t_co,2)*dP_dPQ(t_co,:) &
@@ -909,6 +909,12 @@ dccn_dpq( x_j, : ) = A(t_o,1)*dcc0_dpq( x_j , : ) + A(t_o,2)*dP_dPQ(t_o,:) &
 x_j = (t_o3-1)*nlayermx + lyr_m 
 dccn_dpq( x_j, : ) = A(t_o3,1)*dcc0_dpq( x_j , : ) + A(t_o3,2)*dP_dPQ(t_o3,:) &
 					- A(t_o3,3)*dL_dPQ( t_o3, :)
+! O1D forced to 0
+x_j = (t_o1d-1)*nlayermx + lyr_m 
+dccn_dpq( x_j, : ) = A(t_o1d,1)*dcc0_dpq( x_j, : ) + A(t_o1d,2)*dP_dPQ(t_o1d,:) &
+					- A(t_o1d,3)*dL_dPQ( t_o1d, :)
+
+
 ENDIF 
 					
 ! Organics 
