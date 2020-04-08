@@ -976,25 +976,4 @@ IF ( igcm_hco .ne. 0 ) THEN
 ENDIF
 
 
-			
-
-! IF ( lyr_m == 1 ) THEN 
-	! DO iq = 1, nqmx
-		! write(*,"(A15)",advance ="no") trim(noms(iq))
-	! ENDDO 
-! ENDIF 
-! write(*,"(A1)", advance = "yes") " "
-! DO iq = 1, nqmx
-	! x_j = (iq-1)*nlayermx + lyr_m
-		! WRITE(*,"(E15.7)",advance="no") tlm_photo( (t_h-1)*nlayermx + lyr_m, x_j ) 
-! ENDDO 			
-
-! IF ( lyr_m == nlayermx ) write(*,"(A1)", advance = "yes") " "
-
-
-! IF ( iter  == 5  .and. nlayermx == lyr_m ) STOP			
-
-					
-RETURN
-		
 END 

@@ -778,7 +778,6 @@ c     q2 and surface pressure)
      &              q2, day_step)
 
 
-      IF (tlm_on) call TLM_ADJ_out(idt,time*24.)
 
 
 c       wind increment : specific for 1D

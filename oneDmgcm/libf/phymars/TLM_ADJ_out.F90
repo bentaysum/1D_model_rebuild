@@ -96,7 +96,7 @@ IF ( firstcall ) THEN
 	enddo 
 	
 	CLOSE(15)
-	
+
 ENDIF
 ! write(*,*) "--------------------------------"
 ! write(*,*) "TLM MAX: ", MAXVAL(tangent_matrix)
@@ -106,6 +106,7 @@ ENDIF
 ! STAGE 2: ADD TO THE STORAGE STRUCTURE
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	tangent_matrix(:,:,t_idx) = TLM 
+
 
 loc_max = MAXLOC( tangent_matrix(:,:,t_idx) )
 loc_min = MINLOC( tangent_matrix(:,:,t_idx) ) 

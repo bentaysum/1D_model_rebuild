@@ -1336,8 +1336,14 @@ c       vector [PERTS] to next time-step then call the netCDF save routine
 c ======================================================================
 
           IF (tlm_on) THEN
+
+
                TLM = TLM + TLM_photo
                TLM = tlm_ident + TLM*ptimestep
+
+             call TLM_ADJ_out(idt,ptime*24.)
+
+
           ENDIF
           
 

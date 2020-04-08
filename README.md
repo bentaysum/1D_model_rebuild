@@ -37,6 +37,8 @@ Linearised variables initialised outside of chemistry loop.
 
 Input into photochemistry matrix is outside of the chemistry loop.
 
+Operational (no errors) with nsteps = 48 per sol!
+
 ## 31/03/2020
 
 I have inserted the files:

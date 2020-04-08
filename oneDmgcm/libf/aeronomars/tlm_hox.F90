@@ -282,37 +282,8 @@ j_ch3cooh      =  40     ! ch3cooh  + hv -> ch3 + cooh
 j_ch3coooh     =  41     ! ch3c(o)ooh + hv -> ch3 + oh + co2 
 j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products 
 
-! ============================================ ! 
-! STAGE 0: INITIALISATION OF THE ARRAYS 
-! ============================================ ! 
-!
-! 0.1 : Linearised Odd-Hydrogen ( cc(i_hox) )
-! -------------------------------------------
-!
-! cc(i_hox) is equal to:
-!			( VMR(H) + VMR(OH) + VMR(HO2) )*density 
-! 		=	( PQ(H)/mmol(H) + PQ(OH)/mmol(OH) + PQ(HO2)/mmol(HO2) )*mmean*density
-! at very first time-step.
 
-IF ( iter == 1 ) THEN 
-!
-! cc(X) is equal to:
-!	(mmean/mmol(X)) * ( PQ(X) ) * density 
-! at very first time-step.
-	! DO iq = 1, nqmx
-			
-	! 	Avmr(lyr_m,iq) = mmol(iq)/mmean(1,lyr_m)
-			
-	! 	x_j = ( iq - 1 )*nlayermx + lyr_m 
-			
-	! 	dccn_dpq( x_j, : ) = ( TLM_ident( x_j, :) + TLM( x_j, :)*dt_p) &
-	! 						*Avmr(lyr_m,iq)*dens
-		
-	! 	dcc0_dpq( x_j, : ) = dccn_dpq( x_j, : )
-		
-	! ENDDO	
 
-ENDIF 
 
 rh_ho2_cabN = cab002*cc(i_o)*cc(i_ch4)*0.49 &
                 + cab005*cc(i_ch3)*cc(i_o3)*0.956 &

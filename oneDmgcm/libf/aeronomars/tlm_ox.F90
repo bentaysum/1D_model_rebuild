@@ -272,27 +272,6 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 ! ============================================ ! 
 ! STAGE 0: INITIALISATION OF THE ARRAYS 
 ! ============================================ ! 
-!
-! 0.1 : Linearised Odd-Oxygen ( cc(i_ox) )
-! -------------------------------------------
-IF ( iter == 1 ) THEN 
-
-	! o_j = (t_o-1)*nlayermx + lyr_m
-	! o3_j = (t_o3-1)*nlayermx + lyr_m
-	
-	! dOX_dPQ(lyr_m,:) = 0.
-	! dOX0_dPQ(lyr_m,:) = 0.
-	
-	! dOX_dPQ(lyr_m,:) = (TLM_ident( o3_j, : ) + TLM( o3_j, :)*dt_p) &
-	! 				  *Avmr(lyr_m,t_o3)*dens  &
-	! 				  + (TLM_ident( o_j, : ) + TLM( o_j, :)*dt_p) &
-	! 				  *Avmr(lyr_m,t_o)*dens
-
-	! dOX0_dPQ(lyr_m,:) = dOX_dPQ(lyr_m,:)		
-			
-ENDIF 
-
-
 
 ro_o3_denominator = a001*cc(i_o2) &
               + cab002*cc(i_ch4) &

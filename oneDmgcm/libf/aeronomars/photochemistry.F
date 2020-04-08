@@ -129,6 +129,7 @@ cc    reaction rates from CAABA/MECCA
 c     Tangent Linear Model variables
       REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
       REAL dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      REAL dcc0_dpq_firstcall(nqmx*nlayermx,nlayermx*nqmx)
       REAL dHOX_dPQ(nlayermx,nlayermx*nqmx)
       REAL dHOX0_dPQ(nlayermx,nlayermx*nqmx)
       REAL dOX_dPQ(nlayermx,nlayermx*nqmx)
@@ -231,6 +232,8 @@ c
 c
 
       IF ( tlm_on ) THEN 
+      dccn_dpq(:,:) = 0.
+      dcc0_dpq_firstcall(:,:) = 0.
 c     ==================================================================
 c     Tangent Linear Model initialisation
 c     ==================================================================
@@ -280,7 +283,7 @@ C     ------------------------------------------------------------------
      $                   *Avmr(l,iq)*dens(l)
         
       dcc0_dpq( x_j, : ) = dccn_dpq( x_j, : )
-        
+
       ENDDO 
 
       ENDIF ! sza
@@ -341,18 +344,33 @@ c =================================================================
      $               dOX_dPQ, dOX0_dPQ)
 
 
+
       IF ( tlm_on ) THEN
+
         IF ( istep == phychemrat) THEN 
         DO l = 1, nlayermx
         DO iq = 1,nqmx 
           x_j = (iq-1)*nlayermx + l
 
-          TLM_photo( X_J, : ) = (dccn_dpq(X_J,:) - dcc0_dpq(X_J,:)) 
+      dcc0_dpq(x_j,:) = ( TLM_ident( x_j, :) + TLM( x_j, :)*ptimestep)
+     $                   *Avmr(l,iq)*dens(l)
+
+
+      TLM_photo( X_J, : ) =(dccn_dpq(X_J,:) - dcc0_dpq(X_J,:)) 
      $               /(Avmr(l,iq)*dens(L)*ptimestep)
           
         ENDDO 
         ENDDO
+
+        ELSE 
+
+        dcc0_dpq = dccn_dpq
+        dHOX0_dPQ = dHOX_dPQ
+        
+               IF ( sza .le. 95.) dOX0_dPQ = dOX_dPQ
+
         ENDIF 
+
       ENDIF 
 
 
@@ -2181,14 +2199,6 @@ c      Tangent Linear Model - Inorganic/Long-lived species
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
           IF (tlm_on) THEN 
           
-  
-C           IF ( ITER == 1 ) THEN 
-C           DO IQ = 1, NQMX 
-C           WRITE(*,*) "OUT: ", l, trim(noms(iq)), 
-C      $     DCCN_DPQ( (T_H2OVAP-1)*NLAYERMX + l, (iq-1)*nlayermx + l)
-C           ENDDO 
-C           ENDIF 		
-
           
       cc_hox_next = (cc0(l,i_hox) + production(l,i_hox)*dt)
      $            /(1. + loss(l,i_hox)*dt)
