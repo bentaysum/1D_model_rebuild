@@ -226,8 +226,8 @@ c     Initialisation of perturbation vector
 c     Manually change for respective test.
 c     Possibly make automatic? 
 c     Comment lines > 218 to turn this clunky routine off.
-          pertvector( (t_o2-1)*nlayermx + 10 )
-     $              = q(10,5)*1.e-1
+          pertvector( (t_o2-1)*nlayermx + 1 : (t_o2-1)*nlayermx + 14 )
+     $              = q(1:14,5)*1.e0
 
 
 

@@ -18,13 +18,7 @@ record the building of the TLM. It won't work; it will become messy, convoluted,
 non-navigatable, and at this point all I can see is: I don't frankly care anymore. Thank
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
-
-
-## 03/04/2020
-
-Attempting to make the TLM operate over the original number of discrete time-steps (48 physical)
-to enable the photochemistry routine to function over 3 chemistry time-steps, and also the 5 sub-
-timesteps within each chemistry timestep. 
+ 
 
 ## 08/04/2020
 
@@ -36,7 +30,9 @@ Created a quick routine that computes the perturbation vector within the 1-D Mod
 
 Bug stomped. Routine operation. 
 
-# VALIDATION PENDING
+Routine assessed : works for larger mixing ratios, fails for small values. 
+
+Solution : operate in units of number density?
 
 ## 07/04/2020
 
