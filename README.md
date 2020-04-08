@@ -26,6 +26,17 @@ Attempting to make the TLM operate over the original number of discrete time-ste
 to enable the photochemistry routine to function over 3 chemistry time-steps, and also the 5 sub-
 timesteps within each chemistry timestep. 
 
+## 08/04/2020
+
+Created a quick routine that computes the perturbation vector within the 1-D Model
+
+	- Lines 2358 in physiq.F
+	- pertvector in TLMvars and TLM_initialise
+	- Line 1344 in physiq.F 
+
+# BUG
+
+TLM Matrix becomes essentially 0 at the very first iteration. Why?
 
 ## 07/04/2020
 

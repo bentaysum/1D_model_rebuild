@@ -377,6 +377,10 @@ c Variables for PBL
 
 c=======================================================================
 
+       IF ( tlm_on ) THEN 
+          TLM(:,:) = 0.
+          TLM_photo(:,:) = 0.
+       ENDIF 
 c 1. Initialisation:
 c -----------------
 c  1.1   Initialisation only at first call
@@ -1341,7 +1345,14 @@ c ======================================================================
                TLM = TLM + TLM_photo
                TLM = tlm_ident + TLM*ptimestep
 
-             call TLM_ADJ_out(idt,ptime*24.)
+               WRITE(*,*) "==========================="
+               write(*,*) pertvector( (t_o2-1)*nlayermx + 2 ),
+     $           TLM( (t_o2-1)*nlayermx +2, 
+     $                         (t_o2-1)*nlayermx +2 )
+               pertvector = MATMUL(TLM,pertvector)
+               WRITE(*,*) "==========================="
+
+c             call TLM_ADJ_out(idt,ptime*24.)
 
 
           ENDIF
@@ -1364,7 +1375,7 @@ c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                ! be capable of performing.
             callcond = .False. ! Again, conditionals activate this 
                                ! module.
-            call TLM_initialise
+            call TLM_initialise(pq(1,:,:))
 
        
 
@@ -2351,12 +2362,24 @@ c              CALL writeg1d(ngrid,nlayer,zq(1,1,iq),noms(iq),'kg/kg')
                end do                                        
           end do       
                
-              
+c             ========================
+c             tlm perturbation outputs 
+              IF ( tlm_on )  THEN
+               call WRITEDIAGFI(ngridmx,trim(noms(iq)) // "_p",
+     &              trim(noms(iq)) // "_p",'kg/kg',1,
+     &              pertvector( (iq-1)*nlayermx + 1 :
+     &                          iq*nlayermx   ))
+              ELSE   
+
                call WRITEDIAGFI(ngridmx,trim(noms(iq)) // "_col",
      &              trim(noms(iq))//" column", 'cm-2',0,colden(1,iq))
      
                call WRITEDIAGFI(ngridmx,trim(noms(iq)),
      &              trim(noms(iq)),'kg/kg',1,zq(1,1,iq))
+
+             ENDIF 
+c            ===========================
+
             end do
            if (doubleq) then
              call WRITEDIAGFI(ngridmx,'rdust','rdust',

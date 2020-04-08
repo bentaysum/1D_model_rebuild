@@ -40,11 +40,11 @@ mcd_ltfin = 12.
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 call_tlm= .true.
 tlm_day=10
-tlm_lt=0.
+tlm_lt=0.5
 
 ## Handled by bash script
 ## perturbation_cycle.sh 
-pertloop= .False.
+pertloop= .false.
 PERTGAS= o2
 SCALAR= 1.E0
 L_1= 1

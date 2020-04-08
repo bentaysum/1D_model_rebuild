@@ -2,6 +2,7 @@ MODULE TLMvars
 ! Matrixes
 ! TLM = TLMtrans + TLMphoto
 REAL, DIMENSION(:,:), allocatable,save :: tlm, tlm_photo
+REAL, DIMENSION(:), allocatable,save :: pertvector
 ! Perturbation Vectors
 !REAL, DIMENSION(:), allocatable,save :: perts
 ! TLM semi-identity matrix

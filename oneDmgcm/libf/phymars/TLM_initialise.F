@@ -1,4 +1,4 @@
-      SUBROUTINE TLM_initialise
+      SUBROUTINE TLM_initialise(q)
       
       USE TLMvars
       
@@ -13,7 +13,10 @@
 #include "callkeys.h"
 #include "conc.h"
       
- 
+! ---------------
+! Input
+! ---------------
+      REAL q(nlayermx,nqmx)
 ! ---------------
 ! Local Variables
 ! ---------------
@@ -214,6 +217,21 @@
 		  Avmr(:,iq) =mmol(iq)/mmean(1,:)
 		  
           enddo
+
+c     Initialisation of perturbation vector 
+          allocate(pertvector(nqmx*nlayermx))
+
+          pertvector(:) = 0. 
+
+c     Manually change for respective test.
+c     Possibly make automatic? 
+c     Comment lines > 218 to turn this clunky routine off.
+          pertvector( (t_o2-1)*nlayermx + 1 
+     $              : (t_o2-1)*nlayermx + 14 )
+     $              = q(1:14,5)*1.e-7
+
+
+
 
           RETURN 
 
