@@ -1341,19 +1341,22 @@ c ======================================================================
 
           IF (tlm_on) THEN
 
+              WRITE(*,"(16A15)") ( TRIM(NOMS(IQ)), iq = 1, 16)
+              WRITE(*,"(16E15.7)") ( pertvector( (iq-1)*nlayermx + 10 ),
+     $                                          iq = 1, 16 )
+           
+             
 
                TLM = TLM + TLM_photo
                TLM = tlm_ident + TLM*ptimestep
 
-               WRITE(*,*) "==========================="
-               write(*,*) pertvector( (t_o2-1)*nlayermx + 2 ),
-     $           TLM( (t_o2-1)*nlayermx +2, 
-     $                         (t_o2-1)*nlayermx +2 )
+               TLM( (t_co2-1)*nlayermx + 1 :
+     $              t_co2*nlayermx, : ) = 0.
+
                pertvector = MATMUL(TLM,pertvector)
-               WRITE(*,*) "==========================="
 
 c             call TLM_ADJ_out(idt,ptime*24.)
-
+              
 
           ENDIF
           

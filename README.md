@@ -32,11 +32,11 @@ Created a quick routine that computes the perturbation vector within the 1-D Mod
 
 	- Lines 2358 in physiq.F
 	- pertvector in TLMvars and TLM_initialise
-	- Line 1344 in physiq.F 
+	- Line 1344 in physiq.F
 
-# BUG
+Bug stomped. Routine operation. 
 
-TLM Matrix becomes essentially 0 at the very first iteration. Why?
+# VALIDATION PENDING
 
 ## 07/04/2020
 

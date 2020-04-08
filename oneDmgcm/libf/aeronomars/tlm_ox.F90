@@ -58,7 +58,8 @@ real dt_c, dt_p ! chemical and physical timestep
 integer nesp ! number of species in the chemistry routines
 real cc(nesp), cc0(nesp) ! number density of species after and before the
 						 ! odd-hydrogen calculations (only H, OH and HO2 are effected)
-real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx), dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+real, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 real dOX_dPQ(nlayermx,nqmx*nlayermx), dOX0_dPQ(nlayermx,nqmx*nlayermx)
 
 real j(nd) ! photolysis values 

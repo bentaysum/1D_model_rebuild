@@ -69,7 +69,8 @@ real dt_c, dt_p ! chemical and physical timestep
 integer nesp ! number of species in the chemistry routines
 real cc(nesp), cc_prev(nesp) ! number density of species after and before the
 						 ! odd-hydrogen calculations (only H, OH and HO2 are effected)
-real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx), dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+real, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 real dHOX_dPQ(nlayermx, nqmx*nlayermx), dHOX0_dPQ(nlayermx,nqmx*nlayermx)
 
 real j(nd) ! photolysis values 
@@ -412,7 +413,6 @@ roh_ho2_denominator = c002*cc(i_o) &
 ! Forcing O(1D) to zero at night
 IF ( sza > 95. ) THEN 
 	dccn_dpq( (t_o1d-1)*nlayermx + lyr_m, : ) = 0.
-	dcc0_dpq( (t_o1d-1)*nlayermx + lyr_m, : ) = 0.
 ENDIF 
 
 ! ============================================ ! 

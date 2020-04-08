@@ -127,13 +127,13 @@ cc    reaction rates from CAABA/MECCA
      $     cab106(nlayermx), cab107(nlayermx)
 
 c     Tangent Linear Model variables
-      REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
-      REAL dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
-      REAL dcc0_dpq_firstcall(nqmx*nlayermx,nlayermx*nqmx)
-      REAL dHOX_dPQ(nlayermx,nlayermx*nqmx)
-      REAL dHOX0_dPQ(nlayermx,nlayermx*nqmx)
-      REAL dOX_dPQ(nlayermx,nlayermx*nqmx)
-      REAL dOX0_dPQ(nlayermx,nlayermx*nqmx)
+      REAL*4 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      REAL*4, save :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      REAL*4 dcc0_dpq_firstcall(nqmx*nlayermx,nlayermx*nqmx)
+      REAL*4 dHOX_dPQ(nlayermx,nlayermx*nqmx)
+      REAL*4 dHOX0_dPQ(nlayermx,nlayermx*nqmx)
+      REAL*4 dOX_dPQ(nlayermx,nlayermx*nqmx)
+      REAL*4 dOX0_dPQ(nlayermx,nlayermx*nqmx)
 
       integer h_j, oh_j, ho2_j
       integer o_j, o3_j 
@@ -237,10 +237,16 @@ c
 c     ==================================================================
 c     Tangent Linear Model initialisation
 c     ==================================================================
+      DO iq = 1, nqmx
+                Avmr(:,iq) = mmol(iq)/mmean(1,:)
+      ENDDO 
 
+      DO l = 1, nlayermx
 C     HOX 
 C     ------------------------------------------------------------------
-      DO l = 1, lswitch-1
+
+
+
       h_j = (t_h-1)*nlayermx + l
       oh_j = (t_oh-1)*nlayermx + l
       ho2_j = (t_ho2-1)*nlayermx + l
@@ -273,22 +279,25 @@ C     ------------------------------------------------------------------
 
 C     All individual species
 C     ------------------------------------------------------------------
+
       DO iq = 1, nqmx
           
-        Avmr(l,iq) = mmol(iq)/mmean(1,l)
           
-        x_j = ( iq - 1 )*nlayermx + l 
+      x_j = ( iq - 1 )*nlayermx + l 
           
       dccn_dpq( x_j, : ) =( TLM_ident( x_j, :) + TLM( x_j, :)*ptimestep)
      $                   *Avmr(l,iq)*dens(l)
         
       dcc0_dpq( x_j, : ) = dccn_dpq( x_j, : )
 
+
       ENDDO 
 
       ENDIF ! sza
 
       ENDDO 
+
+      dcc0_dpq_firstcall(:,:) = dcc0_dpq( :, : )
 
 c     ==================================================================
       ENDIF ! tlm_on 
@@ -347,38 +356,42 @@ c =================================================================
 
       IF ( tlm_on ) THEN
 
-        IF ( istep == phychemrat) THEN 
-        DO l = 1, nlayermx
+        dcc0_dpq = dccn_dpq
+        dHOX0_dPQ = dHOX_dPQ
+        
+          IF ( sza .le. 95.) dOX0_dPQ = dOX_dPQ
+
+      ENDIF 
+      
+      end do
+
+
+
+
+
+
+      if ( tlm_on ) then 
+
         DO iq = 1,nqmx 
+        DO l = 1, nlayermx
           x_j = (iq-1)*nlayermx + l
 
-      dcc0_dpq(x_j,:) = ( TLM_ident( x_j, :) + TLM( x_j, :)*ptimestep)
-     $                   *Avmr(l,iq)*dens(l)
 
-
-      TLM_photo( X_J, : ) =(dccn_dpq(X_J,:) - dcc0_dpq(X_J,:)) 
+      TLM_photo( X_J, : ) =(dccn_dpq(X_J,:) - dcc0_dpq_firstcall(X_J,:)) 
      $               /(Avmr(l,iq)*dens(L)*ptimestep)
+
+
+
+                    
+
+
           
         ENDDO 
         ENDDO
 
-        ELSE 
-
-        dcc0_dpq = dccn_dpq
-        dHOX0_dPQ = dHOX_dPQ
-        
-               IF ( sza .le. 95.) dOX0_dPQ = dOX_dPQ
-
-        ENDIF 
-
-      ENDIF 
+      endif 
 
 
-
-      
-      end do
-
-          
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     save chemical species for the gcm                          c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -522,7 +535,7 @@ c
 
 c     Tangent Linear Model 
       REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
-      REAL dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      REAL, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
       REAL dHOX_dPQ(nlayermx,nqmx*nlayermx)
       REAL dHOX0_dPQ(nlayermx,nqmx*nlayermx)
       REAL dOX_dPQ(nlayermx,nqmx*nlayermx)
@@ -2242,7 +2255,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
           ENDIF 
   
       end do
-      
+                
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     update number densities
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -5061,6 +5074,41 @@ c
 
       end
 
+
+
+
+
+
+      subroutine EQUALITY( i,j, A, B )
+
+      IMPLICIT NONE 
+
+      integer i, j ! Array size 
+      real A(i,j), B(i,j)
+      LOGICAL equal 
+
+      integer x,y 
+
+       
+      equal = .true. 
+      write(*,*) "EQUALITY"
+      DO x = 1, i
+          DO y = 1, j 
+
+            IF ( A(x,y) .ne. B(x,y) ) THEN
+              write(*,*) "UNEQUAL ", x, y, A(x,y), B(x,y), 
+     $                                     A(x,y) - B(x,y)
+              equal = .false. 
+            ENDIF 
+
+          ENDDO 
+      ENDDO 
+
+
+      if (.not. equal) stop
+
+
+      END 
 
 ccccccccccccccccccccccccccccccccccccc
 cc 2-body equivalent rate coefficient
