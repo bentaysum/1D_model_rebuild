@@ -48,9 +48,9 @@ integer :: iq
 
 ! STORAGE 
 ! -------
-real*4, allocatable, save :: tangent_matrix(:,:,:)
+real*8, allocatable, save :: tangent_matrix(:,:,:)
 integer x, y, t ! Loop iterators
-integer, parameter :: wl = 4
+integer, parameter :: wl = 8
 integer :: length
 integer :: l
 integer :: iostat

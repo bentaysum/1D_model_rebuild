@@ -1347,7 +1347,6 @@ c ======================================================================
                TLM( (t_co2-1)*nlayermx + 1 :
      $              t_co2*nlayermx, : ) = 0.
 
-               pertvector = MATMUL(TLM,pertvector)
 
               call TLM_ADJ_out(idt,ptime*24.)
               
@@ -2359,14 +2358,7 @@ c              CALL writeg1d(ngrid,nlayer,zq(1,1,iq),noms(iq),'kg/kg')
                end do                                        
           end do       
                
-c             ========================
-c             tlm perturbation outputs 
-              IF ( tlm_on )  THEN
-               call WRITEDIAGFI(ngridmx,trim(noms(iq)) // "_p",
-     &              trim(noms(iq)) // "_p",'kg/kg',1,
-     &              pertvector( (iq-1)*nlayermx + 1 :
-     &                          iq*nlayermx   ))
-              ELSE   
+
 
                call WRITEDIAGFI(ngridmx,trim(noms(iq)) // "_col",
      &              trim(noms(iq))//" column", 'cm-2',0,colden(1,iq))
@@ -2374,7 +2366,6 @@ c             tlm perturbation outputs
                call WRITEDIAGFI(ngridmx,trim(noms(iq)),
      &              trim(noms(iq)),'kg/kg',1,zq(1,1,iq))
 
-             ENDIF 
 c            ===========================
 
             end do
