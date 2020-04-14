@@ -48,9 +48,9 @@ integer :: iq
 
 ! STORAGE 
 ! -------
-real*8, allocatable, save :: tangent_matrix(:,:,:)
+real*4, allocatable, save :: tangent_matrix(:,:,:)
 integer x, y, t ! Loop iterators
-integer, parameter :: wl = 8
+integer, parameter :: wl = 4
 integer :: length
 integer :: l
 integer :: iostat
@@ -117,6 +117,8 @@ idx_j(2) = CEILING( loc_min(1)/FLOAT(nlayermx) )
 
 idx_i(1) = CEILING( loc_max(2)/FLOAT(nlayermx) ) 
 idx_i(2) = CEILING( loc_min(2)/FLOAT(nlayermx) ) 
+
+
 
 write(*,*) "===================================="
 write(*,"(F5.2,E15.7,2A10)") ptime, MAXVAL(tangent_matrix(:,:,t_idx)), trim(noms(idx_j(1))), trim(noms(idx_i(1)))

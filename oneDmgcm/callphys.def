@@ -34,21 +34,21 @@ long_mean = .true.
 
 ## Tracer interpolation shutdown parameters 
 mcd_dayfin = 100 
-mcd_ltfin = 12.
+mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
-## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call_tlm= .true.
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+call_tlm= .false.
 tlm_day=10
 tlm_lt=0.
 
 ## Handled by bash script
 ## perturbation_cycle.sh 
-pertloop= .false.
-PERTGAS= o2
-SCALAR= 1.E0
+pertloop= .True.
+PERTGAS= co
+SCALAR= 1.E1
 L_1= 1
-L_2= 14
+L_2= 20
 
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

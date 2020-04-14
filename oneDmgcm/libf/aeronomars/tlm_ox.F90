@@ -282,9 +282,9 @@ ro_o3_denominator = a001*cc(i_o2) &
               + cab020*cc(i_hcho) &
               + cab021*cc(i_hco) &
               + cab037*cc(i_c2h6) &
-              + (cab074*cc(i_ch3cooo)*cc(i_ho2) &
+              + ((cab074*cc(i_ch3cooo)*cc(i_ho2) &
                + cab097*cc(i_hoch2co3)*cc(i_ho2) &
-                 )/MAX(cc0(i_o),dens*1.e-30)
+                 )/MAX(cc0(i_o),dens*1.e-30))
 
 
 

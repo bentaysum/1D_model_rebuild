@@ -288,21 +288,21 @@ IF ( igcm_hco .ne. 0 ) dP_coeff(t_co,t_hco) = cab021*cc(i_o) + cab022*cc(i_ch3) 
 											+ 2.*cab024*cc(i_hco) + cab025*cc(i_oh) &
 											+ cab026*cc(i_o2) + cab027*cc(i_h)
 ! O2
-dP_coeff(t_o2,t_o1d) = 2.*b005*cc(i_o3) + b006*cc(i_o3)
+dP_coeff(t_o2,t_o1d) =  2.*b005*cc(i_o3) + b006*cc(i_o3)
 
 dP_coeff(t_o2,t_o) = 2.*a002*cc(i_o) + 2.*a003*cc(i_o3) &
 					+ c001*cc(i_ho2) + c002*cc(i_oh) &
 					+ cab012*cc(i_ch3o2) + 0.75*cab017*cc(i_ch3o)
 					
 					
-dP_coeff(t_o2,t_o3) = 2.*a003*cc(i_o) + j(j_o3_o) + j(j_o3_o1d) &
+dP_coeff(t_o2,t_o3) =  2.*a003*cc(i_o) + j(j_o3_o) + j(j_o3_o1d) &
 				+ 2.*b005*cc(i_o1d) + b006*cc(i_o1d) + c003*cc(i_h) &
 				+ c014*cc(i_oh) + 2.*c015*cc(i_ho2) + cab004*cc(i_ch3) &
 				+ 2.*cab010*cc(i_ch3o2) + cab016*cc(i_ch3o)
 				
 dP_coeff(t_o2,t_h) = c003*cc(i_o3) + c005*cc(i_ho2)
 
-dP_coeff(t_o2,t_oh) = c002*cc(i_o) + c007*cc(i_ho2) + c014*cc(i_o3)
+dP_coeff(t_o2,t_oh) =  c002*cc(i_o) + c007*cc(i_ho2) + c014*cc(i_o3)
 
 dP_coeff(t_o2,t_ho2) = c001*cc(i_o) + c005*cc(i_h) + c007*cc(i_oh) &
 					+ 2.*c008*cc(i_ho2) + 2.*c015*cc(i_o3) + 2.*c016*cc(i_ho2) &
@@ -327,7 +327,7 @@ dP_coeff(t_h2,t_ho2) = c005*cc(i_h)
 	
 dP_coeff(t_h2,t_ch4) = b009*cc(i_o1d) + j(j_ch4_1ch2_h2) + j(j_ch4_ch_h2_h)
 
-dP_coeff(t_h2,t_o) = 0.17*cab005*cc(i_ch3)
+dP_coeff(t_h2,t_o) =0.17*cab005*cc(i_ch3)
 
 dP_coeff(t_h2,t_o1d) = b009*cc(i_ch4)
 
@@ -541,7 +541,7 @@ IF ( igcm_hoch2ooh .ne. 0 ) dL_coeff(t_o2,t_hoch2ooh) = j(j_hoch2ooh)*3.5e-14
 IF (igcm_hco .ne. 0 ) dL_coeff(t_o2,t_hco) = cab026
 ! dL[h2]/dPQ coefficients 
 ! ------------------------
-dL_coeff(t_h2,t_o1d) = b003 
+dL_coeff(t_h2,t_o1d) =  b003 
 dL_coeff(t_h2,t_oh) = c010 
 ! dL[h2o]/dPQ coefficients 
 ! ------------------------
@@ -671,6 +671,14 @@ DO iq_j = 1,nqmx
 	ENDDO 
 
 ENDDO 
+
+
+! IF ( lyr_m == 12) THEN 
+
+! WRITE(*,*) dL_dPQ(t_h2, 87), dP_dPQ(t_h2,87), dcc0_dpq( (t_h2-1)*nlayermx + 12, 87 )
+
+! ENDIF 
+
 
 
 ! ============================================
@@ -975,6 +983,7 @@ IF ( igcm_hco .ne. 0 ) THEN
 	x_j = (t_hco-1)*nlayermx + lyr_m 
 	dccn_dpq( x_j, : ) = A(t_hco,1)*dP_dPQ(t_hco,:) - A(t_hco,2)*dL_dPQ(t_hco,:)
 ENDIF
+
 
 
 END 

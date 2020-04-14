@@ -238,7 +238,7 @@ c     ==================================================================
 c     Tangent Linear Model initialisation
 c     ==================================================================
       DO iq = 1, nqmx
-                Avmr(:,iq) = mmol(iq)/mmean(1,:)
+                Avmr(:,iq) = mmean(1,:)/mmol(iq) ! swapped
       ENDDO 
 
       DO l = 1, nlayermx
@@ -356,6 +356,7 @@ c =================================================================
 
       IF ( tlm_on ) THEN
 
+
         dcc0_dpq = dccn_dpq
         dHOX0_dPQ = dHOX_dPQ
         
@@ -370,8 +371,7 @@ c =================================================================
 
 
 
-      if ( tlm_on ) then 
-
+      if ( tlm_on ) then
         DO iq = 1,nqmx 
         DO l = 1, nlayermx
           x_j = (iq-1)*nlayermx + l
@@ -750,10 +750,10 @@ c     loop over iterations in the chemical scheme
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
 
-c     Initialise the photochemistry Jacobian to 0 if the 
-c     TLM routine is ongoing.
-      if (tlm_on) tlm_photo(:,:) = 0.
-      if (tlm_on) dccn_dpq(:,:) = 0.
+C c     Initialise the photochemistry Jacobian to 0 if the 
+C c     TLM routine is ongoing.
+C       if (tlm_on) tlm_photo(:,:) = 0.
+C       if (tlm_on) dccn_dpq(:,:) = 0.
 
       do iter = 1,niter
        
@@ -993,8 +993,9 @@ c        h
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
          cc(l,i_h) = cc(l,i_hox)
-     $                 /(1. + (1. + roh_ho2)/rh_ho2)
+     $                 /(1. + (1. + roh_ho2)/rh_ho2 ) 
 c
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ho2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc

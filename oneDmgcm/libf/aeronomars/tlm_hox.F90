@@ -410,11 +410,6 @@ roh_ho2_denominator = c002*cc(i_o) &
             + (roh_ho2_cabD/MAX(cc_prev(i_oh),dens*1.e-30))
 
 
-! Forcing O(1D) to zero at night
-IF ( sza > 95. ) THEN 
-	dccn_dpq( (t_o1d-1)*nlayermx + lyr_m, : ) = 0.
-ENDIF 
-
 ! ============================================ ! 
 ! STAGE 1: LINEARISING PARTITION FUNCTIONS 
 ! ============================================ ! 
@@ -435,11 +430,11 @@ ENDIF
 ! 1.1 RH_HO2
 ! ----------
 A_RH(1) = 1./rh_ho2_denominator 
-A_RH(2) = A_RH(1)/cc_prev(i_ho2) 
-A_RH(3) = A_RH(2)*rh_ho2_cabN/cc_prev(i_ho2)
+A_RH(2) = A_RH(1)/MAX(cc_prev(i_ho2),1.e-30*dens) 
+A_RH(3) = A_RH(2)*rh_ho2_cabN/MAX(cc_prev(i_ho2),1.e-30*dens)
 A_RH(4) = rh_ho2*A_RH(1) 
-A_RH(5) = A_RH(4)/cc_prev(i_h)
-A_RH(6) =  A_RH(5)*rh_ho2_cabD/cc_prev(i_h)
+A_RH(5) = A_RH(4)/MAX(cc_prev(i_h),1.e-30*dens)
+A_RH(6) =  A_RH(5)*rh_ho2_cabD/MAX(1.e-30*dens,cc_prev(i_h))
 
 ! N and D = a001 * cc(X) + a002 * cc(Y) ... 
 ! so d( N )/d(PQ) = SUM_{i=1}^{nqmx} B_i * d(cc(i))/d(PQ)
@@ -519,11 +514,11 @@ drh_ho2 = A_RH(1)*dN_dPQ + A_RH(2)*dNn_dPQ &
 ! 1.2 ROH_HO2 
 ! -----------
 A_roh(1) = 1./roh_ho2_denominator 
-A_roh(2) = A_roh(1)/cc_prev(i_ho2) 
-A_roh(3) = A_roh(2)*roh_ho2_cabN/cc_prev(i_ho2)
+A_roh(2) = A_roh(1)/MAX(1.e-30*dens,cc_prev(i_ho2)) 
+A_roh(3) = A_roh(2)*roh_ho2_cabN/MAX(1.e-30*dens,cc_prev(i_ho2))
 A_roh(4) = roh_ho2*A_roh(1) 
-A_roh(5) = A_roh(4)/cc_prev(i_oh)
-A_roh(6) =  A_roh(5)*roh_ho2_cabD/cc_prev(i_oh)
+A_roh(5) = A_roh(4)/MAX(1.e-30*dens,cc_prev(i_oh))
+A_roh(6) =  A_roh(5)*roh_ho2_cabD/MAX(1.e-30*dens,cc_prev(i_oh))
 
 ! ROH_HO2 : dN_dPQ
 B_OH(:,:) = 0. 
@@ -539,8 +534,10 @@ IF ( igcm_hoch2o2 .ne. 0 ) B_OH(1,t_hoch2o2) = 0.25*cab029
 B_OH(2,t_o) = 0.51*cab002*cc(i_ch4) + cab017*cc(i_ch3o)*0.25 &
 			+ cab020*cc(i_hcho) + cab021*cc(i_hco) &
 			+ cab037*cc(i_c2h6) 
+
 B_OH(2,t_o1d) = 2.*b002*cc(i_h2o) + b003*cc(i_h2) &
 				+ b007*cc(i_ch4)
+
 B_OH(2,t_o2) = cab071*cc(i_ch3co) + cab084*cc(i_hcoco) &
 				+ cab092*cc(i_hoch2co)
 B_OH(2,t_h2ovap) = 2.*b002*cc(i_o1d) + j(j_h2o)
@@ -602,22 +599,32 @@ droh_ho2 = A_ROH(1)*dN_dPQ + A_ROH(2)*dNn_dPQ &
 		+ A_ROH(6)*dccn_dpq( (t_oh-1)*nlayermx + lyr_m, :)
 			
 droh_ho2 = droh_ho2 + A_ROH(1)*c003*cc(i_o3)*drh_ho2
-			
 
-			
-			
+
 ! ============================================ ! 
 ! STAGE 2: LINEARISING HYDROGEN ATOMS  
 ! ============================================ ! 
 !
 ! Equation Coefficients:
-GAMMA_H(1) = 1./(1. + (1.+roh_ho2)/rh_ho2) 
+GAMMA_H(1) = 1./(1. + ((1.+roh_ho2)/rh_ho2))
 GAMMA_H(2) = (GAMMA_H(1)**2.)*cc(i_hox)/rh_ho2
 GAMMA_H(3) = (GAMMA_H(1)**2.)*cc(i_hox)*(1.+roh_ho2)/(rh_ho2**2.)
 
 dH_dPQ = GAMMA_H(1)*dHOX_dPQ(lyr_m,:) &
 		- GAMMA_H(2)*droh_ho2 &
 		+ GAMMA_H(3)*drh_ho2
+
+
+! IF ( lyr_m == 12 ) THEN 
+! write(*,*) "--------------------"
+! WRITE(*,*) MAXVAL(drh_ho2), MAXVAL(droh_ho2)
+
+! WRITE(*,*) MAXVAL(GAMMA_H(1)*dHOX_dPQ(lyr_m,:))
+! write(*,*) MAXVAL(GAMMA_H(2)*droh_ho2)
+! write(*,*) MAXVAL(GAMMA_H(3)*drh_ho2)
+
+! ENDIF 
+
 
 ! ============================================ ! 
 ! STAGE 3: LINEARISING 	HO2  
@@ -643,10 +650,10 @@ ho2_j = (t_ho2-1)*nlayermx + lyr_m
 ! STAGE 5: DEPOSIT VALUES
 ! ============================================ ! 
 
-
 dccn_dpq( h_j, : ) = dH_dPQ
 dccn_dpq( oh_j, : ) = dOH_dPQ
 dccn_dpq( ho2_j, : ) = dHO2_dPQ
+
 
 
 RETURN

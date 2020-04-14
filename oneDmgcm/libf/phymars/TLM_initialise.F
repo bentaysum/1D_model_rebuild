@@ -214,7 +214,7 @@
           endif
 		  
 		  
-		  Avmr(:,iq) =mmol(iq)/mmean(1,:)
+		  Avmr(:,iq) = mmean(1,:)/mmol(iq)
 		  
           enddo
 

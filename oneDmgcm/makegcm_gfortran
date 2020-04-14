@@ -9,7 +9,7 @@ set dim="25"
 set physique=mars
 set phys="PHYS=$physique"
 set include='-I$(LIBF)/grid -I$(LIBF)/bibio -I. -I$(LIBF)/aeronomars'
-set ntrac = 16
+set ntrac = 27
 set filtre=filtrez
 set grille=reg
 set dyntype="dyn"
