@@ -54,13 +54,13 @@ integer lyr_m ! layer we are differentiating
 real dens ! atmospheric number density 
 real sza 
 real rh_ho2, roh_ho2 ! partition functions for H, OH, HO2 
-real rh_ho2_denominator, roh_ho2_denominator ! Partition function denominators
-real rh_ho2_cabN, rh_ho2_cabD ! Additional terms from organic 
+real*8 rh_ho2_denominator, roh_ho2_denominator ! Partition function denominators
+real*8 rh_ho2_cabN, rh_ho2_cabD ! Additional terms from organic 
 							  ! CAABA reactions to the numerator (N)
 							  ! and denominator (D) of the rh_ho2 
 							  ! function, which require division
 							  ! via number density to be dimensionless.
-real roh_ho2_cabN, roh_ho2_cabD ! Additional terms from organic 
+real*8 roh_ho2_cabN, roh_ho2_cabD ! Additional terms from organic 
 							    ! CAABA reactions to the numerator (N)
 							    ! and denominator (D) of the roh_ho2 
 							    ! function, which require division
@@ -69,9 +69,9 @@ real dt_c, dt_p ! chemical and physical timestep
 integer nesp ! number of species in the chemistry routines
 real cc(nesp), cc_prev(nesp) ! number density of species after and before the
 						 ! odd-hydrogen calculations (only H, OH and HO2 are effected)
-real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
-real, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
-real dHOX_dPQ(nlayermx, nqmx*nlayermx), dHOX0_dPQ(nlayermx,nqmx*nlayermx)
+real*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+real*8, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+real*8 dHOX_dPQ(nlayermx, nqmx*nlayermx), dHOX0_dPQ(nlayermx,nqmx*nlayermx)
 
 real j(nd) ! photolysis values 
 
@@ -214,25 +214,25 @@ integer	iq ! Tracer iterations
 		
 ! Stage 1 
 ! -------
-REAL A_RH(6), A_ROH(6)
+REAL*8 A_RH(6), A_ROH(6)
 
-REAL B_H(4,nqmx), B_OH(4,nqmx)
-REAL dN_dPQ(nqmx*nlayermx), dNn_dPQ(nqmx*nlayermx), &
+REAL*8 B_H(4,nqmx), B_OH(4,nqmx)
+REAL*8 dN_dPQ(nqmx*nlayermx), dNn_dPQ(nqmx*nlayermx), &
 		dD_dPQ(nqmx*nlayermx), dDd_dPQ(nqmx*nlayermx)
-REAL drh_ho2(nqmx*nlayermx),droh_ho2(nqmx*nlayermx) ! Linearised partition functions
+REAL*8 drh_ho2(nqmx*nlayermx),droh_ho2(nqmx*nlayermx) ! Linearised partition functions
 		
 ! Stage 2
 ! -------
-REAL GAMMA_H(3) ! Coefficients 
-REAL dH_dPQ(nqmx*nlayermx) ! d( CC[H] )/d(PQ) 
+REAL*8 GAMMA_H(3) ! Coefficients 
+REAL*8 dH_dPQ(nqmx*nlayermx) ! d( CC[H] )/d(PQ) 
 ! Stage 3
 ! -------
-REAL GAMMA_HO2(2) ! Coefficients
-REAL dHO2_dPQ(nqmx*nlayermx) ! d( CC[HO2] )/d(PQ) 
+REAL*8 GAMMA_HO2(2) ! Coefficients
+REAL*8 dHO2_dPQ(nqmx*nlayermx) ! d( CC[HO2] )/d(PQ) 
 ! Stage 4
 ! -------
-REAL GAMMA_OH(2) ! Coefficients
-REAL dOH_dPQ(nqmx*nlayermx) ! d( CC[HO2] )/d(PQ) 
+REAL*8 GAMMA_OH(2) ! Coefficients
+REAL*8 dOH_dPQ(nqmx*nlayermx) ! d( CC[HO2] )/d(PQ) 
 
 		
 j_o2_o         =  1      ! o2 + hv     -> o + o

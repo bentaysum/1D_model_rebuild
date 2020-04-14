@@ -24,23 +24,25 @@
       
           ALLOCATE(tlm(nlayermx*nqmx,nlayermx*nqmx))
           ALLOCATE(tlm_photo(nlayermx*nqmx,nlayermx*nqmx))
+          ALLOCATE(tlm_trans(nlayermx*nqmx,nlayermx*nqmx))
 
           ALLOCATE(Avmr(nlayermx,nqmx))
 
           ALLOCATE(tlm_ident(nlayermx*nqmx,nlayermx*nqmx))
 
 
+
           ! Initialise to 0
-          tlm(:,:) = 0.
-          tlm_photo(:,:) = 0.
-          
+          tlm(:,:) = 0.D0
+          tlm_photo(:,:) = 0.D0
+          tlm_trans(:,:) = 0.D0
           ! Establish the TLM identity matrix
           DO a = 1, nlayermx*nqmx 
           DO b = 1, nlayermx*nqmx
           IF (a==b) THEN
-          TLM_ident(a,b) = 1.
+          TLM_ident(a,b) = 1.D0
           ELSE
-          TLM_ident(a,b) = 0.
+          TLM_ident(a,b) = 0.D0
           ENDIF
           ENDDO
           ENDDO
@@ -218,16 +220,16 @@
 		  
           enddo
 
-c     Initialisation of perturbation vector 
-          allocate(pertvector(nqmx*nlayermx))
+C c     Initialisation of perturbation vector 
+C           allocate(pertvector(nqmx*nlayermx))
 
-          pertvector(:) = 0. 
+C           pertvector(:) = 0. 
 
-c     Manually change for respective test.
-c     Possibly make automatic? 
-c     Comment lines > 218 to turn this clunky routine off.
-          pertvector( (t_o2-1)*nlayermx + 1 : (t_o2-1)*nlayermx + 14 )
-     $              = q(1:14,5)*1.e0
+C c     Manually change for respective test.
+C c     Possibly make automatic? 
+C c     Comment lines > 218 to turn this clunky routine off.
+C           pertvector( (t_o2-1)*nlayermx + 1 : (t_o2-1)*nlayermx + 14 )
+C      $              = q(1:14,5)*1.e0
 
 
 

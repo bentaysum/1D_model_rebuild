@@ -18,7 +18,7 @@
 c=======================================================================
 c
 c   subject:
-c   --------
+c   -------
 c
 c   Organisation of the physical parametrisations of the LMD 
 c   martian atmospheric general circulation model.
@@ -378,8 +378,7 @@ c Variables for PBL
 c=======================================================================
 
        IF ( tlm_on ) THEN 
-          TLM(:,:) = 0.
-          TLM_photo(:,:) = 0.
+          TLM(:,:) = 0.D0
        ENDIF 
 c 1. Initialisation:
 c -----------------
@@ -1341,11 +1340,11 @@ c ======================================================================
 
           IF (tlm_on) THEN
 
-               TLM = TLM + TLM_photo
-               TLM = tlm_ident + TLM*ptimestep
+C                TLM = TLM_trans + TLM_photo
+C                TLM = tlm_ident + TLM*ptimestep
 
                TLM( (t_co2-1)*nlayermx + 1 :
-     $              t_co2*nlayermx, : ) = 0.
+     $              t_co2*nlayermx, : ) = 0.D0
 
 
               call TLM_ADJ_out(idt,ptime*24.)

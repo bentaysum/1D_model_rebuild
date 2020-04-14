@@ -53,14 +53,14 @@ integer iter ! iteration in the chimie routine
 integer lyr_m ! layer we are differentiating 
 real dens ! atmospheric number density 
 real ro_o3 ! partition function of O and O3 
-real ro_o3_denominator ! denominator value of ro_o3 
+real*8 ro_o3_denominator ! denominator value of ro_o3 
 real dt_c, dt_p ! chemical and physical timestep
 integer nesp ! number of species in the chemistry routines
 real cc(nesp), cc0(nesp) ! number density of species after and before the
 						 ! odd-hydrogen calculations (only H, OH and HO2 are effected)
-real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
-real, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
-real dOX_dPQ(nlayermx,nqmx*nlayermx), dOX0_dPQ(nlayermx,nqmx*nlayermx)
+real*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+real*8, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+real*8 dOX_dPQ(nlayermx,nqmx*nlayermx), dOX0_dPQ(nlayermx,nqmx*nlayermx)
 
 real j(nd) ! photolysis values 
 real loss_ox, prod_ox ! loss and production terms for the Odd Oxygen summed family
@@ -127,22 +127,22 @@ integer o_j, o3_j, o1d_j ! Locations for arrays
 integer x_j 
 integer iq ! Tracer iterator
 ! O1D 
-real dPo1d_coeff(nqmx), dLo1d_coeff(nqmx) 
-real dPo1d_dPQ(nqmx*nlayermx), dLo1d_dPQ(nqmx*nlayermx)
-REAL loss_o1d, production_o1d
-real A_O1D(2)
-real dO1D_dPQ(nqmx*nlayermx)
+REAL*8 dPo1d_coeff(nqmx), dLo1d_coeff(nqmx) 
+REAL*8 dPo1d_dPQ(nqmx*nlayermx), dLo1d_dPQ(nqmx*nlayermx)
+REAL*8 loss_o1d, production_o1d
+REAL*8 A_O1D(2)
+REAL*8 dO1D_dPQ(nqmx*nlayermx)
 ! O3 and O 
-real dN_dPQ(nqmx*nlayermx), dD_dPQ(nlayermx*nqmx), dDd_dPQ(nlayermx*nqmx)
-real dN_coef(nqmx), dD_coef(nqmx), dDd_coef(nqmx)
-real dro_o3_gamma(4) ! Coefficients for linearising partition function ro_o3
-real dro_o3_dPQ(nqmx*nlayermx) ! d(ro_o3)/d(PQ)
-real A_O(2), A_O3(2) ! Coefficients for linearising O and O3 
-REAL dO_dPQ(nqmx*nlayermx), dO3_dPQ(nqmx*nlayermx) 
+REAL*8 dN_dPQ(nqmx*nlayermx), dD_dPQ(nlayermx*nqmx), dDd_dPQ(nlayermx*nqmx)
+REAL*8 dN_coef(nqmx), dD_coef(nqmx), dDd_coef(nqmx)
+REAL*8 dro_o3_gamma(4) ! Coefficients for linearising partition function ro_o3
+REAL*8 dro_o3_dPQ(nqmx*nlayermx) ! d(ro_o3)/d(PQ)
+REAL*8 A_O(2), A_O3(2) ! Coefficients for linearising O and O3 
+REAL*8 dO_dPQ(nqmx*nlayermx), dO3_dPQ(nqmx*nlayermx) 
 ! Odd-Oxygen Family
-real ox_gamma(4) ! Coefficients
-real dPox_dPQ(nqmx*nlayermx), dLox_dPQ(nqmx*nlayermx) ! Linearised loss and production 
-real dPox_coef(nqmx), dLox_coef(nqmx) ! Coefficients for linearised loss and prod.
+REAL*8 ox_gamma(4) ! Coefficients
+REAL*8 dPox_dPQ(nqmx*nlayermx), dLox_dPQ(nqmx*nlayermx) ! Linearised loss and production 
+REAL*8 dPox_coef(nqmx), dLox_coef(nqmx) ! Coefficients for linearised loss and prod.
 
 ! Tracer indexing as in photochemistry.F 
 ! ======================================

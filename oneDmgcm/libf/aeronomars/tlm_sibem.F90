@@ -57,9 +57,9 @@ integer nesp ! number of species in the chemistry routines
 real cc(nesp), cc0(nesp) ! number density of species after and before the
 						 ! odd-hydrogen calculations (only H, OH and HO2 are effected)
 real cc_hox_next ! cc(hox)^{t+1}
-real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
-real, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
-real dHOX_dPQ(nlayermx,nqmx*nlayermx), dHOX0_dPQ(nlayermx,nlayermx*nqmx)
+real*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+real*8, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+real*8 dHOX_dPQ(nlayermx,nqmx*nlayermx), dHOX0_dPQ(nlayermx,nlayermx*nqmx)
 
 real j(nd), production(nesp), loss(nesp) ! photolysis, production and loss values 
 ! Oxygen Reaction Rates 
@@ -118,14 +118,14 @@ real cab001, cab002, cab003, &
 ! ====================================================================================
 !									Local Variables
 ! ====================================================================================
-real dP_coeff(nqmx,nqmx), dL_coeff(nqmx,nqmx)
-real dP_dPQ(nqmx,nqmx*nlayermx), dL_dPQ(nqmx,nqmx*nlayermx)
+REAL*8 dP_coeff(nqmx,nqmx), dL_coeff(nqmx,nqmx)
+REAL*8 dP_dPQ(nqmx,nqmx*nlayermx), dL_dPQ(nqmx,nqmx*nlayermx)
 
-real A(nqmx,3) ! Coefficients
-real A_hox(4) 
+REAL*8 A(nqmx,3) ! Coefficients
+REAL*8 A_hox(4) 
 
-real dPhox_coeff(nqmx), dLhox_coeff(nqmx) 
-real dPhox_dPQ(nqmx*nlayermx), dLhox_dPQ(nqmx*nlayermx)
+REAL*8 dPhox_coeff(nqmx), dLhox_coeff(nqmx) 
+REAL*8 dPhox_dPQ(nqmx*nlayermx), dLhox_dPQ(nqmx*nlayermx)
 
 integer iq_j,iq_i, iq
 integer x_i, x_j

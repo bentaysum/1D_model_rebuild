@@ -127,13 +127,13 @@ cc    reaction rates from CAABA/MECCA
      $     cab106(nlayermx), cab107(nlayermx)
 
 c     Tangent Linear Model variables
-      REAL*4 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
-      REAL*4, save :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
-      REAL*4 dcc0_dpq_firstcall(nqmx*nlayermx,nlayermx*nqmx)
-      REAL*4 dHOX_dPQ(nlayermx,nlayermx*nqmx)
-      REAL*4 dHOX0_dPQ(nlayermx,nlayermx*nqmx)
-      REAL*4 dOX_dPQ(nlayermx,nlayermx*nqmx)
-      REAL*4 dOX0_dPQ(nlayermx,nlayermx*nqmx)
+      REAL*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      REAL*8, save :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      REAL*8 dcc0_dpq_firstcall(nqmx*nlayermx,nlayermx*nqmx)
+      REAL*8 dHOX_dPQ(nlayermx,nlayermx*nqmx)
+      REAL*8 dHOX0_dPQ(nlayermx,nlayermx*nqmx)
+      REAL*8 dOX_dPQ(nlayermx,nlayermx*nqmx)
+      REAL*8 dOX0_dPQ(nlayermx,nlayermx*nqmx)
 
       integer h_j, oh_j, ho2_j
       integer o_j, o3_j 
@@ -251,11 +251,11 @@ C     ------------------------------------------------------------------
       oh_j = (t_oh-1)*nlayermx + l
       ho2_j = (t_ho2-1)*nlayermx + l
       
-      dHOX_dPQ(l,:) = (TLM_ident( h_j, : ) + TLM( h_j, :)*ptimestep) 
+      dHOX_dPQ(l,:) = (TLM_ident( h_j, : )+TLM_trans( h_j, :)*ptimestep) 
      $       *Avmr(l,t_h)*dens(l)  
-     $       + (TLM_ident( oh_j, : ) + TLM( oh_j, :)*ptimestep) 
+     $       + (TLM_ident( oh_j, : ) + TLM_trans( oh_j, :)*ptimestep) 
      $       *Avmr(l,t_oh)*dens(l)  
-     $       + (TLM_ident( ho2_j, : ) + TLM( ho2_j, :)*ptimestep) 
+     $       + (TLM_ident( ho2_j, : ) + TLM_trans( ho2_j, :)*ptimestep) 
      $       *Avmr(l,t_ho2)*dens(l) 
             
 
@@ -270,9 +270,9 @@ C     ------------------------------------------------------------------
       dOX_dPQ(l,:) = 0.
       dOX0_dPQ(l,:) = 0.
       
-      dOX_dPQ(l,:) = (TLM_ident( o3_j, : ) + TLM( o3_j, :)*ptimestep) 
+      dOX_dPQ(l,:) =(TLM_ident( o3_j, : )+TLM_trans( o3_j, :)*ptimestep) 
      $           *Avmr(l,t_o3)*dens(l) 
-     $           + (TLM_ident( o_j, : ) + TLM( o_j, :)*ptimestep) 
+     $           + (TLM_ident( o_j, : )+ TLM_trans( o_j, :)*ptimestep) 
      $           *Avmr(l,t_o)*dens(l)
 
       dOX0_dPQ(l,:) = dOX_dPQ(l,:)    
@@ -285,7 +285,8 @@ C     ------------------------------------------------------------------
           
       x_j = ( iq - 1 )*nlayermx + l 
           
-      dccn_dpq( x_j, : ) =( TLM_ident( x_j, :) + TLM( x_j, :)*ptimestep)
+      dccn_dpq( x_j, : ) =
+     $      ( TLM_ident( x_j, :)+TLM_trans( x_j, :)*ptimestep)
      $                   *Avmr(l,iq)*dens(l)
         
       dcc0_dpq( x_j, : ) = dccn_dpq( x_j, : )
@@ -389,6 +390,9 @@ c =================================================================
         ENDDO 
         ENDDO
 
+               TLM = TLM_trans + TLM_photo
+               TLM = tlm_ident + TLM*ptimestep
+        
       endif 
 
 
@@ -534,12 +538,12 @@ c
      $     cab106(nlayermx), cab107(nlayermx)
 
 c     Tangent Linear Model 
-      REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
-      REAL, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
-      REAL dHOX_dPQ(nlayermx,nqmx*nlayermx)
-      REAL dHOX0_dPQ(nlayermx,nqmx*nlayermx)
-      REAL dOX_dPQ(nlayermx,nqmx*nlayermx)
-      REAL dOX0_dPQ(nlayermx,nqmx*nlayermx)
+      REAL*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      REAL*8, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      REAL*8 dHOX_dPQ(nlayermx,nqmx*nlayermx)
+      REAL*8 dHOX0_dPQ(nlayermx,nqmx*nlayermx)
+      REAL*8 dOX_dPQ(nlayermx,nqmx*nlayermx)
+      REAL*8 dOX0_dPQ(nlayermx,nqmx*nlayermx)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     local:

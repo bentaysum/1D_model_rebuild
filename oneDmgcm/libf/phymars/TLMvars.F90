@@ -1,17 +1,17 @@
 MODULE TLMvars
 ! Matrixes
 ! TLM = TLMtrans + TLMphoto
-REAL, DIMENSION(:,:), allocatable,save :: tlm, tlm_photo
+REAL*8, DIMENSION(:,:), allocatable,save :: tlm, tlm_photo, tlm_trans
 REAL, DIMENSION(:), allocatable,save :: pertvector
 ! Perturbation Vectors
 !REAL, DIMENSION(:), allocatable,save :: perts
 ! TLM semi-identity matrix
-REAL, DIMENSION(:,:), allocatable, save :: tlm_ident
+REAL*8, DIMENSION(:,:), allocatable, save :: tlm_ident
 ! Callkeys for TLM runs
 LOGICAL,SAVE :: TLM_on = .False.
 LOGICAL,SAVE :: TLM_read = .True.
 ! Conversion factors for mmr -> vmr 
-REAL, DIMENSION(:,:), allocatable, save :: Avmr
+REAL*8, DIMENSION(:,:), allocatable, save :: Avmr
 ! Indexes inside the tangent linear model 
 INTEGER t_co2, t_co, t_o, t_o1d, t_o2, t_o3, t_h, t_h2, t_oh, &
 	  t_ho2, t_h2o2, t_ch4, t_ch3, t_ch3o2, t_ch3ooh, t_ch3oh, &

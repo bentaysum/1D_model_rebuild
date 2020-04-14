@@ -48,9 +48,9 @@ integer :: iq
 
 ! STORAGE 
 ! -------
-real*4, allocatable, save :: tangent_matrix(:,:,:)
+real*8, allocatable, save :: tangent_matrix(:,:,:)
 integer x, y, t ! Loop iterators
-integer, parameter :: wl = 4
+integer, parameter :: wl = 8
 integer :: length
 integer :: l
 integer :: iostat
@@ -121,8 +121,8 @@ idx_i(2) = CEILING( loc_min(2)/FLOAT(nlayermx) )
 
 
 write(*,*) "===================================="
-write(*,"(F5.2,E15.7,2A10)") ptime, MAXVAL(tangent_matrix(:,:,t_idx)), trim(noms(idx_j(1))), trim(noms(idx_i(1)))
-write(*,"(F5.2,E15.7,2A10)") ptime, MINVAL(tangent_matrix(:,:,t_idx)), trim(noms(idx_j(2))), trim(noms(idx_i(2)))
+write(*,"(E15.7,2A10)")MAXVAL(tangent_matrix(:,:,t_idx)), trim(noms(idx_j(1))), trim(noms(idx_i(1)))
+write(*,"(E15.7,2A10)")MINVAL(tangent_matrix(:,:,t_idx)), trim(noms(idx_j(2))), trim(noms(idx_i(2)))
 write(*,*) "===================================="
 
 ! STAGE 3: CONSTRUCT THE BINARY FILE AND SAVE THE STRUCTURE

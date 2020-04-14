@@ -45,10 +45,10 @@ tlm_lt=0.
 ## Handled by bash script
 ## perturbation_cycle.sh 
 pertloop= .True.
-PERTGAS= co
+PERTGAS= o3
 SCALAR= 1.E1
-L_1= 1
-L_2= 20
+L_1= 8
+L_2= 15
 
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
