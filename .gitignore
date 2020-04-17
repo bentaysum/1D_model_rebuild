@@ -10,3 +10,9 @@ testcode.tgz
 /bash_scripts
 /oneDmgcm/*.sh
 /TLM
+/oneDmgcm/callphys.def
+/oneDmgcm/fort*
+/oneDmgcm/g1d.ctl
+/oneDmgcm/run.def
+/oneDmgcm/startfi.nc
+
