@@ -570,6 +570,33 @@ c    --------------------------------
          call concentrations(pplay,pt,pdt,pq,pdq,ptimestep)
       endif
 #endif
+
+
+
+c-----------------------------------------------------------------------
+c    1.2.6 Optional CH4 interpolation
+c    ----------------------------------
+c     Line of Best fit for surface CH4:
+c     values from Webster et. al 2018 analysis of Curiousity SAM 
+c     CH4 values. Line of best fit is a 6th degree polynomial.
+      DO iq = 1,nqmx
+        IF (TRIM(noms(iq)) == "ch4" ) THEN
+            zls = zls*180./pi
+            pq(1,1,iq) =  
+     $        (-8.1565118E-14*zls**6
+     $     +   8.3522676E-11*zls**5
+     $     -   3.0856216E-08*zls**4
+     $     +   4.8741198E-06*zls**3
+     $     -   2.9426485E-04*zls**2
+     $     +   4.6374896E-03*zls
+     $     +   2.8769755E-01)*1.e-9
+     $     *mmol(iq)/mmean(1,1)
+        ENDIF 
+      ENDDO
+        zls = zls*pi/180.
+
+
+
 c----------------------------------------------------------------------
 c    2. Compute radiative tendencies :
 c------------------------------------

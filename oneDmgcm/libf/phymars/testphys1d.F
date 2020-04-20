@@ -664,10 +664,8 @@ c    ---------------------------
          write(*,*) 'Initializing chemical species'
          ! thermo=0: initialize over all atmospheric layers
          thermo=0
-         call inichim_newstart(q,qsurf,psurf,1,0)
+         call inichim_newstart(q,qsurf,psurf,1,0, zls*180.)
       endif
-
-
 
       
 c Check if the surface is a water ice reservoir 

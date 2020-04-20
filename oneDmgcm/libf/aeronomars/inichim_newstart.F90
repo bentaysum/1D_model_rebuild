@@ -1,4 +1,4 @@
- subroutine inichim_newstart(pq, qsurf, ps, flagh2o, flagthermo)
+ subroutine inichim_newstart(pq, qsurf, ps, flagh2o, flagthermo, zls)
 
       USE ioipsl_getincom 
 
@@ -45,7 +45,7 @@
       real,intent(in) :: ps(iip1,jjp1)            ! surface pressure in the gcm (Pa)   
       integer,intent(in) :: flagh2o               ! flag for h2o initialisation
       integer,intent(in) :: flagthermo            ! flag for thermosphere initialisation only
-
+      real, intent(in) :: zls                     ! solar longitude (degrees)
 ! outputs :
 
       real,intent(out) :: pq(iip1,jjp1,llm,nqmx)  ! advected fields, ie chemical species
@@ -910,7 +910,17 @@
 ! methane : 0 ppbv
 
       if (igcm_ch4 /= 0) then
-         vmr = 50.e-12
+
+
+        ! Polynomial line of best fit of Webster 2018
+         vmr = (-8.1565118E-14*zls**6 &
+          +   8.3522676E-11*zls**5 &
+          -   3.0856216E-08*zls**4 &
+          +   4.8741198E-06*zls**3 &
+          -   2.9426485E-04*zls**2 &
+          +   4.6374896E-03*zls &
+          +   2.8769755E-01)*1.e-9
+
           do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
@@ -918,6 +928,7 @@
                end do
             end do
          end do
+         
          ! set surface value to zero
          qsurf(1:ngridmx,igcm_ch4) = 0.
       end if
