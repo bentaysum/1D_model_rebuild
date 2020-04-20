@@ -1343,8 +1343,8 @@ c ======================================================================
 C                TLM = TLM_trans + TLM_photo
 C                TLM = tlm_ident + TLM*ptimestep
 
-               TLM( (t_co2-1)*nlayermx + 1 :
-     $              t_co2*nlayermx, : ) = 0.D0
+C                TLM( (t_co2-1)*nlayermx + 1 :
+C      $              t_co2*nlayermx, : ) = 0.D0
 
 
               call TLM_ADJ_out(idt,ptime*24.)

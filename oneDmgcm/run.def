@@ -22,7 +22,7 @@ psurf= 610
 # Reference dust opacity at 610 Pa, in the visible (true tau~tauref*psurf/610)
 tauvis=0.2
 # latitude (in degrees)
-latitude= 5.0
+latitude= -5.4
 # Albedo of bare ground
 albedo=0.2
 # Soil thermal inertia (SI)

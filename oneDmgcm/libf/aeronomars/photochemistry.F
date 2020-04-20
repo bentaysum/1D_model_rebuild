@@ -357,14 +357,16 @@ c =================================================================
 
       IF ( tlm_on ) THEN
 
-
         dcc0_dpq = dccn_dpq
         dHOX0_dPQ = dHOX_dPQ
         
           IF ( sza .le. 95.) dOX0_dPQ = dOX_dPQ
+      
 
       ENDIF 
       
+
+
       end do
 
 
@@ -373,6 +375,7 @@ c =================================================================
 
 
       if ( tlm_on ) then
+        
         DO iq = 1,nqmx 
         DO l = 1, nlayermx
           x_j = (iq-1)*nlayermx + l
@@ -392,7 +395,7 @@ c =================================================================
 
                TLM = TLM_trans + TLM_photo
                TLM = tlm_ident + TLM*ptimestep
-        
+
       endif 
 
 
@@ -5078,42 +5081,6 @@ c
 
 
       end
-
-
-
-
-
-
-      subroutine EQUALITY( i,j, A, B )
-
-      IMPLICIT NONE 
-
-      integer i, j ! Array size 
-      real A(i,j), B(i,j)
-      LOGICAL equal 
-
-      integer x,y 
-
-       
-      equal = .true. 
-      write(*,*) "EQUALITY"
-      DO x = 1, i
-          DO y = 1, j 
-
-            IF ( A(x,y) .ne. B(x,y) ) THEN
-              write(*,*) "UNEQUAL ", x, y, A(x,y), B(x,y), 
-     $                                     A(x,y) - B(x,y)
-              equal = .false. 
-            ENDIF 
-
-          ENDDO 
-      ENDDO 
-
-
-      if (.not. equal) stop
-
-
-      END 
 
 ccccccccccccccccccccccccccccccccccccc
 cc 2-body equivalent rate coefficient

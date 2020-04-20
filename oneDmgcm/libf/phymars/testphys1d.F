@@ -472,8 +472,12 @@ c  ------------------
       PRINT *,'latitude (in degrees) ?'
       call getin("latitude",lati(1))
       write(*,*) " latitude = ",lati(1)
+      PRINT *,'longitude (in degrees) ?'
+      long(1)=0.E+0 ! default value for longi(1)
+      call getin("longitude",lati(1))
+      write(*,*) " longitude = ",lati(1)
+
       lati(1)=lati(1)*pi/180.E+0
-      long(1)=0.E+0
       long(1)=long(1)*pi/180.E+0
 
 c  Initialize albedo / soil thermal inertia
