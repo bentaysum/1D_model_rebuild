@@ -341,16 +341,12 @@ C !=======================================================================
           call interp_line(mcdv5_lt, zh2o(:,y), N_LT,
      &                     lt*24., h2o(y), 1)
      
-          ! co2(y) = co2(y)*mmean(1,y)/mmol(1)
-          ! co(y)  = co(y)*mmean(1,y)/mmol(2)
-          ! o2(y)  = o2(y)*mmean(1,y)/mmol(5)
-          ! h2(y)  = h2(y)*mmean(1,y)/mmol(8)
-          ! h2o(y)  = h2o(y)!*mmean(1,y)/mmol(15)
-          co2(y) = co2(y)*mmol(1)/43.34
-          co(y)  = co(y)*mmol(2)/43.34 
-          o2(y)  = o2(y)*mmol(5)/43.34 
-          h2(y)  = h2(y)*mmol(8)/43.34 
-          h2o(y)  = h2o(y)*mmol(15)/43.34 
+
+          co2(y) = co2(y)*mmol(1)/mmean(1,y)
+          co(y)  = co(y)*mmol(2)/mmean(1,y) 
+          o2(y)  = o2(y)*mmol(5)/mmean(1,y) 
+          h2(y)  = h2(y)*mmol(8)/mmean(1,y) 
+          h2o(y)  = h2o(y)*mmol(15)/mmean(1,y) 
 	     
           
       end do

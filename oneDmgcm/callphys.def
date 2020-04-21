@@ -30,7 +30,7 @@ calleofdump = .false.
 mcd_profiles = .true. 
 
 # Longitudinal mean values of all MCD v5.3 variables?
-long_mean = .true.
+long_mean = .false.
 
 ## Tracer interpolation shutdown parameters 
 mcd_dayfin = 100 

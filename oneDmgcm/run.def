@@ -24,7 +24,7 @@ tauvis=0.2
 # latitude (in degrees)
 latitude= -5.4
 # Longitude (in degrees)
-longitude= 0.
+longitude= 137.4
 # Albedo of bare ground
 albedo=0.2
 # Soil thermal inertia (SI)
