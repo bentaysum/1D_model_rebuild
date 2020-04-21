@@ -748,15 +748,7 @@ c     ~~~~~~~~~~~~~~~~~~~~~
 
       ENDDO
 
-c  Begin the tracer interpolation routine for the MCD v5.3 look-up
-c  table for tracers CO2, CO, H2, H2O vapour, and O2.
-          IF ( mcd_profiles ) THEN 
-          call mcd_trac(time,zlay,zls*180./pi, 
-     &                     q(:,1), q(:,2), 
-     &                     q(:,5), q(:,8),
-     &                     q(:,15))
-          WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]"
-          ENDIF 
+
       
 c       call physics
 c       --------------------
@@ -773,11 +765,7 @@ C - outputs
 
 !      write(*,*) "testphys1d apres q", q(1,:)
 
-c     Interpolate physical variables (temperature, wind,
-c     q2 and surface pressure) 
-      call mcd_phys(time*24.,zlay,zls*180./pi,
-     &              temp, psurf, u, v, 
-     &              q2, day_step)
+
 
 
 

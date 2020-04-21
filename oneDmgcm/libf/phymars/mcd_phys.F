@@ -1,6 +1,6 @@
       SUBROUTINE mcd_phys(lt,alt,zls,
      & 			      temp, ps, zonwind, merwind,
-     &                    q2, ndt)
+     &                    q2)
 
       IMPLICIT NONE
 
@@ -20,7 +20,6 @@
       real lt            ! 1D Model local time
       real alt(nlayermx) ! 1D Model altitude layers (km)
       real zls           ! 1D Model zls
-      integer ndt        ! number of timesteps per sol
 
 !     VALUES FOR THE 1D SUBMODULE
       real temp(nlayermx)                         ! Temperature
