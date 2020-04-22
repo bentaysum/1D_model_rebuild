@@ -579,9 +579,11 @@ c    ----------------------------------
 c     Line of Best fit for surface CH4:
 c     values from Webster et. al 2018 analysis of Curiousity SAM 
 c     CH4 values. Line of best fit is a 6th degree polynomial.
-      DO iq = 1,nqmx
-        IF (TRIM(noms(iq)) == "ch4" ) THEN
-            zls = zls*180./pi
+C     Requires to be turned off during TLM operation
+      IF ( .not. tlm_on ) THEN 
+        DO iq = 1,nqmx
+          IF (TRIM(noms(iq)) == "ch4" ) THEN
+              zls = zls*180./pi
             pq(1,1,iq) =  
      $        (-8.1565118E-14*zls**6
      $     +   8.3522676E-11*zls**5
@@ -591,10 +593,10 @@ c     CH4 values. Line of best fit is a 6th degree polynomial.
      $     +   4.6374896E-03*zls
      $     +   2.8769755E-01)*1.e-9
      $     *mmol(iq)/mmean(1,1)
-        ENDIF 
-      ENDDO
-        zls = zls*pi/180.
-
+          ENDIF 
+        ENDDO
+          zls = zls*pi/180.
+      ENDIF 
 
 c-----------------------------------------------------------------------
 c    1.2.7: MCDv5.3 Interpolation Routines
