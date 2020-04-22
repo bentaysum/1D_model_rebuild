@@ -16,4 +16,7 @@ testcode.tgz
 /oneDmgcm/run.def
 /oneDmgcm/startfi.nc
 /Chemistry_Schemes
-
+/oneDmgcm/g1d.ctl
+/oneDmgcm/profile.out
+/oneDmgcm/run.def
+/oneDmgcm/startfi.nc
