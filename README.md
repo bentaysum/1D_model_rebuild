@@ -7,6 +7,8 @@ CH4 and C2H6.
 Model version used in production of data used in the AGU submitted publication:
 "Photochemistry of Methane and Ethane in the Martian Atmosphere".
 
+for any issues encountered please contact : Ben.Taysum@ed.ac.uk
+
 ## Compilation and successful runs
 Model has been tailored to work with the gfortran compiler via the command inside of the oneDmgcm directory:
 
