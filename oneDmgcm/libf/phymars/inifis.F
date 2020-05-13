@@ -188,7 +188,12 @@
          ENDIF 
          
          ENDIF
-         
+        
+!     Option to output reaction rate coefficients instead of mmrs
+         save_rates = .false. ! Default
+         call getin("save_rates",save_rates)
+         write(*,*) "save_rates = ", save_rates
+
 !        Plume parameters and keys 
          write(*,*) "Introducing an instantaneous plume?"
          plume=.False. ! default value

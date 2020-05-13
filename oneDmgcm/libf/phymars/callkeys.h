@@ -12,7 +12,8 @@
      &   ,callg2d,linear,rayleigh,tracer,active,doubleq,submicron       &
      &   ,lifting,callddevil,scavenging,sedimentation,activice,water    &
      &   ,tifeedback,microphys,caps,photochem,calltherm,outptherm       &
-     &   ,callrichsl,callslope,tituscap,long_mean,mcd_profiles,plume
+     &   ,callrichsl,callslope,tituscap,long_mean,mcd_profiles,plume    &
+     &   ,save_rates
      
       COMMON/callkeys_i/iradia,iaervar,iddist,ilwd,ilwb,ilwn,ncouche    &
      &   ,dustbin,nltemodel,nircorr,solvarmod,solvaryear,plume_day      &
@@ -37,6 +38,8 @@
       logical mcd_profiles 
       logical plume
 	  
+      logical save_rates
+
       real topdustref
       real semi
       real alphan

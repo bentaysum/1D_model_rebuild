@@ -542,6 +542,12 @@ c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          ENDDO
       ENDDO
 
+c     Interpolate physical variables (temperature, wind,
+c     q2 and surface pressure) 
+      call mcd_phys(ptime*24.,zzlay,zls*180./pi,
+     &              pt(1,:), ps(1), pu(1,:), pv(1,:), 
+     &              q2(1,:))
+
 #ifndef MESOSCALE
 c-----------------------------------------------------------------------
 c    1.2.5 Compute mean mass, cp, and R
@@ -551,6 +557,17 @@ c    --------------------------------
          call concentrations(pplay,pt,pdt,pq,pdq,ptimestep)
       endif
 #endif
+
+c  Begin the tracer interpolation routine for the MCD v5.3 look-up
+c  table for tracers CO2, CO, H2, H2O vapour, and O2.
+          IF ( mcd_profiles ) THEN 
+          call mcd_trac(ptime,zzlay,zls*180./pi, 
+     &                     pq(1,:,1), pq(1,:,2), 
+     &                     pq(1,:,5), pq(1,:,8),
+     &                     pq(1,:,15))
+          WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]", MAXVAL(pq(1,:,1))
+          ENDIF 
+
 c----------------------------------------------------------------------
 c    2. Compute radiative tendencies :
 c------------------------------------
@@ -2255,9 +2272,9 @@ C      &                                   ,"kg.m-2",0,co2ice)
          call WRITEDIAGFI(ngridmx,'temp','Temperature',
      &                       'K',1,zt)
      
-         colden(:,:) = 0.
-         if(tracer) then
          
+         if(tracer .and. .not. save_rates) then
+         colden(:,:) = 0.
 c           CALL writeg1d(ngrid,1,tau,'tau','SI')
             do iq=1,nq
 c              CALL writeg1d(ngrid,nlayer,zq(1,1,iq),noms(iq),'kg/kg') 

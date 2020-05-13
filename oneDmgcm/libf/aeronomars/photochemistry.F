@@ -126,6 +126,7 @@ cc    reaction rates from CAABA/MECCA
 
 
 
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     stimestep  : standard timestep for the chemistry (s)       c
 c     ctimestep  : real timestep for the chemistry (s)           c
@@ -224,6 +225,7 @@ c =================================================================
 
          call chimie(lswitch,nesp, rm, j, dens, ctimestep,
      $               press, temp, sza, dist_sol, 
+     $               istep, phychemrat,
      $               a001, a002, a003,
      $               b001, b002, b003, b004, b005, b006,
      $               b007, b008, b009,
@@ -259,7 +261,45 @@ c =================================================================
       
       end do
 
-          
+
+      if ( save_rates ) then
+
+      call write_ratecoefficient(nesp,rm,dens,j,
+     $               a001, a002, a003,
+     $               b001, b002, b003, b004, b005, b006,
+     $               b007, b008, b009,
+     $               c001, c002, c003, c004, c005, c006,
+     $               c007, c008, c009, c010, c011, c012,
+     $               c013, c014, c015, c016, c017, c018,
+     $               d001, d002, d003,
+     $               e001, e002, e003,
+     $               h001, h002, h003, h004, h005,
+     $               t001, t002, t003,
+     $               cab001, cab002, cab003, cab004, cab005,
+     $               cab006, cab007, cab008, cab009, cab010,
+     $               cab011, cab012, cab013, cab014, cab015,
+     $               cab016, cab017, cab018, cab019, cab020,
+     $               cab021, cab022, cab023, cab024, cab025,
+     $               cab026, cab027, cab028, cab029, cab030,
+     $               cab031, cab032, cab033, cab034, cab035,
+     $               cab036, cab037, cab038, cab039, cab040,
+     $               cab041, cab042, cab043, cab044, cab045,
+     $               cab046, cab047, cab048, cab049, cab050,
+     $               cab051, cab052, cab053, cab054, cab055,
+     $               cab056, cab057, cab058, cab059, cab060,
+     $               cab061, cab062, cab063, cab064, cab065,
+     $               cab066, cab067, cab068, cab069, cab070,
+     $               cab071, cab072, cab073, cab074, cab075,
+     $               cab076, cab077, cab078, cab079, cab080,
+     $               cab081, cab082, cab083, cab084, cab085,
+     $               cab086, cab087, cab088, cab089, cab090,
+     $               cab091, cab092, cab093, cab094, cab095,
+     $               cab096, cab097, cab098, cab099, cab100,
+     $               cab101, cab102, cab103, cab104, cab105,
+     $               cab106, cab107)
+
+      endif 
+      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     save chemical species for the gcm                          c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -276,6 +316,7 @@ c*****************************************************************
 c
       subroutine chimie(lswitch, nesp, rm, j, dens, dt,
      $                  press, t, sza, dist_sol, 
+     $	 				istep, phychemrat,
      $                  a001, a002, a003,
      $                  b001, b002, b003, b004, b005, b006,
      $                  b007, b008, b009,
@@ -340,6 +381,8 @@ c
       real t(nlayermx)        ! temperature (k)
       real sza                ! solar zenith angle (deg)
       real dist_sol           ! sun distance (au) 
+      integer istep           ! Iteration
+      integer phychemrat      ! Max chemistry iterations
       real pq(nlayermx,nqmx)  ! mixing ratios (mmr)
       real pdq(nlayermx,nqmx) ! tracer tendency prior to photochem routine
 c     reaction rates
@@ -439,7 +482,9 @@ c
       integer activations, iq
       real cc_prev(nlayermx,nesp)
       
-      logical,save :: badvalues = .FALSE. 
+cccccc Atmospheric lifetimes 
+      real tau_local(nlayermx,nesp) ! Local atmospheric lifetime
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     tracer numbering in the chemistry
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2158,6 +2203,29 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       end do
       
+C 	  Atmospheric Lifetime Calculations
+      IF ( istep == phychemrat ) THEN 
+
+      tau_local = 1./loss
+
+c     Selective saves:
+      call WRITEDIAGFI(1,"ch4_tau","lifetime","s-1",
+     $                 1,tau_local(:,i_ch4))
+      call WRITEDIAGFI(1,"hcho_tau","lifetime","s-1",
+     $                 1,tau_local(:,i_hcho))
+      call WRITEDIAGFI(1,"hcooh_tau","lifetime","s-1",
+     $                 1,tau_local(:,i_hcooh))
+      call WRITEDIAGFI(1,"c2h6_tau","lifetime","s-1",
+     $                 1,tau_local(:,i_c2h6))
+      call WRITEDIAGFI(1,"ch3cho_tau","lifetime","s-1",
+     $                 1,tau_local(:,i_ch3cho))
+      call WRITEDIAGFI(1,"ch3cooh_tau","lifetime","s-1",
+     $                 1,tau_local(:,i_ch3cooh))
+
+
+
+      ENDIF 
+
 
       
 
