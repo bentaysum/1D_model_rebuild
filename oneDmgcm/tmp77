@@ -25,6 +25,7 @@ libf/aeronomars/photochemistry.F
 libf/aeronomars/read_phototable.F
 libf/aeronomars/surfacearea.F
 libf/aeronomars/thermosphere.F
+libf/aeronomars/write_ratecoefficient.F
 libf/bibio/cbrt.F
 libf/bibio/cvmgp.F
 libf/bibio/cvmgt.F

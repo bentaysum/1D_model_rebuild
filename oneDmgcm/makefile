@@ -6,11 +6,11 @@
 
 # Repertoires :
 
-GCM     = /exports/csce/datastore/geos/users/s1215319/cleaning_gcm/oneDmgcm
+GCM     = /home/s1215319/mgcm/oneDmgcm
 MACHINE = sun4
 LIBF    = $(GCM)/libf
 LIBO    = $(LIBOGCM)/$(MACHINE)
-LOCAL_DIR=/exports/csce/datastore/geos/users/s1215319/cleaning_gcm/oneDmgcm
+LOCAL_DIR=/home/s1215319/mgcm/oneDmgcm
 BIBIO    = $(LIBF)/bibio
 AERONOMARS    = $(LIBF)/aeronomars
 FILTRE   = filtre
@@ -131,6 +131,8 @@ $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(read_phototable.o)
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(surfacearea.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(thermosphere.o)
+
+$(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(write_ratecoefficient.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(calchim.o)
 
@@ -331,6 +333,7 @@ $(LIBF)/grid/dimensions.h \
 $(LIBF)/phymars/dimphys.h \
 $(LIBF)/aeronomars/chimiedata.h \
 $(LIBF)/phymars/callkeys.h \
+$(LIBF)/phymars/tracer.h \
 $(LIBF)/grid/dimensions.h \
 $(LIBF)/phymars/dimphys.h \
 $(LIBF)/aeronomars/chimiedata.h \
@@ -392,6 +395,17 @@ $(LIBF)/aeronomars/conc.h
 	$(AR) d $(LIBO)/libaeronomars.a thermosphere.o ; \
 	$(COMPILE) $(LIBF)/aeronomars/thermosphere.F ; \
 	$(AR) r $(LIBO)/libaeronomars.a thermosphere.o ; $(RM) thermosphere.o ; \
+	cd $(GCM)
+
+$(LIBO)/libaeronomars.a(write_ratecoefficient.o) : $(LIBF)/aeronomars/write_ratecoefficient.F \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h \
+$(LIBF)/aeronomars/chimiedata.h \
+$(LIBF)/phymars/callkeys.h
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libaeronomars.a write_ratecoefficient.o ; \
+	$(COMPILE) $(LIBF)/aeronomars/write_ratecoefficient.F ; \
+	$(AR) r $(LIBO)/libaeronomars.a write_ratecoefficient.o ; $(RM) write_ratecoefficient.o ; \
 	cd $(GCM)
 
 $(LIBO)/libaeronomars.a(calchim.o) : $(LIBF)/aeronomars/calchim.F90 \
