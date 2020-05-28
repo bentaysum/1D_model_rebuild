@@ -37,8 +37,7 @@ logical, save :: firstcall = .True.
 integer,save :: t_idx = 1
 integer, save :: ndt = 0
 character(len=20) filename
-character(len=*), parameter :: directory = "/exports/csce/datastore/geos/users/s1215319/" &
-                                        // "tlm_adjoint_projects/curiousity_oxygen/tlm_files/"
+character(len=*), parameter :: directory = "/exports/csce/datastore/geos/users/s1215319/paper2/tlmfiles/"
 integer, parameter :: nx = nlayermx*nqmx
 integer, parameter :: ny = nlayermx*nqmx
 integer, save :: nt 

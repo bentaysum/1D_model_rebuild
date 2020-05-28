@@ -378,6 +378,8 @@ c Variables for PBL
 c=======================================================================
 
        IF ( tlm_on ) THEN 
+          TLM_photo(:,:) = 0.D0
+          TLM_trans(:,:) = 0.D0
           TLM(:,:) = 0.D0
        ENDIF 
 c 1. Initialisation:
@@ -486,13 +488,6 @@ c        Initialize R and Cp as constant
       ENDIF        !  (end of "if firstcall")
 
 
-c    Initialise the TLM
-c     -------------------
-       if (tlm_on) then
-          TLM(:,:) = 0.
-          TLM_photo(:,:) = 0.
-       endif   
-
 c ---------------------------------------------------
 c 1.2   Initializations done at every physical timestep:
 c ---------------------------------------------------
@@ -573,30 +568,30 @@ c    --------------------------------
 
 
 
-c-----------------------------------------------------------------------
-c    1.2.6 Optional CH4 interpolation
-c    ----------------------------------
-c     Line of Best fit for surface CH4:
-c     values from Webster et. al 2018 analysis of Curiousity SAM 
-c     CH4 values. Line of best fit is a 6th degree polynomial.
-C     Requires to be turned off during TLM operation
-      IF ( .not. tlm_on ) THEN 
-        DO iq = 1,nqmx
-          IF (TRIM(noms(iq)) == "ch4" ) THEN
-              zls = zls*180./pi
-            pq(1,1,iq) =  
-     $        (-8.1565118E-14*zls**6
-     $     +   8.3522676E-11*zls**5
-     $     -   3.0856216E-08*zls**4
-     $     +   4.8741198E-06*zls**3
-     $     -   2.9426485E-04*zls**2
-     $     +   4.6374896E-03*zls
-     $     +   2.8769755E-01)*1.e-9
-     $     *mmol(iq)/mmean(1,1)
-          ENDIF 
-        ENDDO
-          zls = zls*pi/180.
-      ENDIF 
+C c-----------------------------------------------------------------------
+C c    1.2.6 Optional CH4 interpolation
+C c    ----------------------------------
+C c     Line of Best fit for surface CH4:
+C c     values from Webster et. al 2018 analysis of Curiousity SAM 
+C c     CH4 values. Line of best fit is a 6th degree polynomial.
+C C     Requires to be turned off during TLM operation
+C       IF ( .not. tlm_on ) THEN 
+C         DO iq = 1,nqmx
+C           IF (TRIM(noms(iq)) == "ch4" ) THEN
+C               zls = zls*180./pi
+C             pq(1,1,iq) =  
+C      $        (-8.1565118E-14*zls**6
+C      $     +   8.3522676E-11*zls**5
+C      $     -   3.0856216E-08*zls**4
+C      $     +   4.8741198E-06*zls**3
+C      $     -   2.9426485E-04*zls**2
+C      $     +   4.6374896E-03*zls
+C      $     +   2.8769755E-01)*1.e-9
+C      $     *mmol(iq)/mmean(1,1)
+C           ENDIF 
+C         ENDDO
+C           zls = zls*pi/180.
+C       ENDIF 
 
 c-----------------------------------------------------------------------
 c    1.2.7: MCDv5.3 Interpolation Routines
@@ -1419,7 +1414,7 @@ c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                ! be capable of performing.
             callcond = .False. ! Again, conditionals activate this 
                                ! module.
-            call TLM_initialise(pq(1,:,:))
+            call TLM_initialise
 
        
 

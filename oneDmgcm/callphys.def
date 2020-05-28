@@ -30,7 +30,7 @@ calleofdump = .false.
 mcd_profiles = .true. 
 
 # Longitudinal mean values of all MCD v5.3 variables?
-long_mean = .false.
+long_mean = .true.
 
 ## Tracer interpolation shutdown parameters 
 mcd_dayfin = 10000 
@@ -38,17 +38,17 @@ mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call_tlm= .true.
+call_tlm=.False.
 tlm_day=10
-tlm_lt=0.
+tlm_lt=0
 
 ## Handled by bash script
 ## perturbation_cycle.sh 
-pertloop= .False.
-PERTGAS= ch4
-SCALAR= 1.E1
-L_1= 1
-L_2= 3
+pertloop= .true.
+PERTGAS=co
+SCALAR=1.E1
+L_1=20
+L_2=20
 
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,9 +101,9 @@ callnirco2 = .false.
 # NIR NLTE correction ? matters only if callnirco2=T
 nircorr=1
 # call turbulent vertical diffusion ?
-calldifv  = .true.
+calldifv  = .False.
 # call convective adjustment ?
-calladj  = .true.
+calladj  = .True.
 # call CO2 condensation ?
 callcond =.true.
 # call thermal conduction in the soil ?
