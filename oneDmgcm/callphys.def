@@ -38,17 +38,17 @@ mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call_tlm=.False.
+call_tlm=.true.
 tlm_day=10
 tlm_lt=0
 
 ## Handled by bash script
 ## perturbation_cycle.sh 
-pertloop= .true.
-PERTGAS=co
-SCALAR=1.E1
-L_1=20
-L_2=20
+pertloop=.false.
+PERTGAS=h2o_vap
+SCALAR=1.E-1
+L_1=1
+L_2=3
 
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,7 +101,7 @@ callnirco2 = .false.
 # NIR NLTE correction ? matters only if callnirco2=T
 nircorr=1
 # call turbulent vertical diffusion ?
-calldifv  = .False.
+calldifv  = .True.
 # call convective adjustment ?
 calladj  = .True.
 # call CO2 condensation ?

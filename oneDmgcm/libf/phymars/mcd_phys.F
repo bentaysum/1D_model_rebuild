@@ -71,7 +71,10 @@
       logical, save :: first_call = .True.
       logical, save :: secondcall = .False.
 
-	  
+!     0: IF THE MODEL IS NOT OPERATING VIA DIURNAL CHEMISTRY, LT = 12:00
+      if ( .not. diurnal ) lt = 12.
+
+
 !=======================================================================
 !     STAGE 1
 !           - read in the netCDF file if this is the first time the 

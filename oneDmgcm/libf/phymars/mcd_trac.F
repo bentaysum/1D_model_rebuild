@@ -72,6 +72,11 @@
 !     OTHER
       logical, save :: first_call = .True.
 
+
+!     0: IF THE MODEL IS NOT OPERATING VIA DIURNAL CHEMISTRY, LT = 12:00
+      if ( .not. diurnal ) lt = 12.
+
+
 !=======================================================================
 !     STAGE 1
 !           - read in the netCDF file if this is the first time the 
@@ -342,7 +347,7 @@ C !=======================================================================
      &                     lt*24., h2o(y), 1)
      
 
-          co2(y) = co2(y)*mmol(1)/mmean(1,y)
+          co2(y) = co2(y)*mmol(1)/43.34!mmean(1,y)
           co(y)  = co(y)*mmol(2)/mmean(1,y) 
           o2(y)  = o2(y)*mmol(5)/mmean(1,y) 
           h2(y)  = h2(y)*mmol(8)/mmean(1,y) 
