@@ -18,7 +18,12 @@ record the building of the TLM. It won't work; it will become messy, convoluted,
 non-navigatable, and at this point all I can see is: I don't frankly care anymore. Thank
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
- 
+
+## 03/06/2020
+
+Routine has been working and producing valid output for 1 month. Paper in production.
+
+Routine is being fitted with an optimisation procedure using the L-BFGS-B method. 
 
 ## 08/04/2020
 
