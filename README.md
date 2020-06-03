@@ -25,6 +25,24 @@ Routine has been working and producing valid output for 1 month. Paper in produc
 
 Routine is being fitted with an optimisation procedure using the L-BFGS-B method. 
 
+### Requirements 
+
+1. Compile L-BFGS-M file alongside 1-D model upon conditional build
+2. Create conditionally compiled iterative loop in testphys1d.F 
+3. Create cost function calculator
+4. Create cost function gradient calculator 
+5. Create capability for model to update control variables with new best-guess atmospheric state
+6. Make as user friendly as possible, i.e. definable lower/upper bounds etc. etc.
+
+### Notes
+
+- No seperate read routine required for control state. 
+- Surpress output of 1-D model
+
+
+
+
+
 ## 08/04/2020
 
 Created a quick routine that computes the perturbation vector within the 1-D Model
