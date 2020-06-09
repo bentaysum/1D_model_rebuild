@@ -2451,6 +2451,8 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(aeroptproperties.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(blackl.o)
 
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(blas.o)
+
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(blendrad.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(calldrag_noro.o)
@@ -2506,6 +2508,10 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(interp_line.o)
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(ismax.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(ismin.o)
+
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lbfgsb.o)
+
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(linpack.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lwb.o)
 
@@ -2608,6 +2614,8 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(swr_fouquart.o)
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(swr_toon.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(tabfi.o)
+
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(timer.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(TLM_initialise.o)
 
@@ -2718,6 +2726,13 @@ $(LIBO)/libphymars.a(blackl.o) : $(LIBF)/phymars/blackl.F
 	$(AR) d $(LIBO)/libphymars.a blackl.o ; \
 	$(COMPILE) $(LIBF)/phymars/blackl.F ; \
 	$(AR) r $(LIBO)/libphymars.a blackl.o ; $(RM) blackl.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(blas.o) : $(LIBF)/phymars/blas.F
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a blas.o ; \
+	$(COMPILE) $(LIBF)/phymars/blas.F ; \
+	$(AR) r $(LIBO)/libphymars.a blas.o ; $(RM) blas.o ; \
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(blendrad.o) : $(LIBF)/phymars/blendrad.F \
@@ -3054,6 +3069,20 @@ $(LIBO)/libphymars.a(ismin.o) : $(LIBF)/phymars/ismin.F
 	$(AR) d $(LIBO)/libphymars.a ismin.o ; \
 	$(COMPILE) $(LIBF)/phymars/ismin.F ; \
 	$(AR) r $(LIBO)/libphymars.a ismin.o ; $(RM) ismin.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(lbfgsb.o) : $(LIBF)/phymars/lbfgsb.F
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a lbfgsb.o ; \
+	$(COMPILE) $(LIBF)/phymars/lbfgsb.F ; \
+	$(AR) r $(LIBO)/libphymars.a lbfgsb.o ; $(RM) lbfgsb.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(linpack.o) : $(LIBF)/phymars/linpack.F
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a linpack.o ; \
+	$(COMPILE) $(LIBF)/phymars/linpack.F ; \
+	$(AR) r $(LIBO)/libphymars.a linpack.o ; $(RM) linpack.o ; \
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(lwb.o) : $(LIBF)/phymars/lwb.F \
@@ -3642,6 +3671,13 @@ $(LIBF)/phymars/yomaer.h
 	$(AR) d $(LIBO)/libphymars.a tabfi.o ; \
 	$(COMPILE) $(LIBF)/phymars/tabfi.F ; \
 	$(AR) r $(LIBO)/libphymars.a tabfi.o ; $(RM) tabfi.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(timer.o) : $(LIBF)/phymars/timer.F
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a timer.o ; \
+	$(COMPILE) $(LIBF)/phymars/timer.F ; \
+	$(AR) r $(LIBO)/libphymars.a timer.o ; $(RM) timer.o ; \
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(TLM_initialise.o) : $(LIBF)/phymars/TLM_initialise.F

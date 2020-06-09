@@ -103,7 +103,32 @@ c   Various intermediate variables
 
       ! TLM Parameters
       integer ndt_tlm ! Time-step for tlm activation
-      
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c 	 Conditionally activated L-BFGS-B model parameters
+cccccccccccccccccccccccccccccccccccccccccccccccccccccc 
+#ifdef lbfgsb 
+      INTEGER, PARAMETER :: nmax = 1024
+      INTEGER, PARAMETER :: mmax = 17
+
+      CHARACTER(len=60) task, csave
+      LOGICAL lsave(4)  
+      INTEGER n, m, iprint, nbd(nmax), iwa(3*nmax), isave(44)
+      REAL*8 f, factr, pgtol, 
+     $       x(nmax), l(nmax), u_bfgs(nmax), g_lbfgs(nmax), dsave(29),
+     $       wa(2*mmax*nmax + 5*nmax + 11*mmax*mmax + 8*mmax)
+#endif 
+	  
+	  
+	  
+	  
+C       call setulb(n,m,x,l,u,nbd,f,g,factr,pgtol,wa,iwa,task,iprint,
+C      +            csave,lsave,isave,dsave)
+	  
+	  
+	  
+	  
+	  
 c=======================================================================
 
 c=======================================================================
@@ -633,6 +658,8 @@ C     temperature, wind, and q2 profiles.
 
 #ifdef lbfgsb 
 		write(*,*) "Good! (on)"
+      call setulb(n,m,x,l,u,nbd,f,g,factr,pgtol,wa,iwa,task,iprint,
+     +            csave,lsave,isave,dsave)
 		stop
 #else 
 		write(*,*) "Good! (off)"

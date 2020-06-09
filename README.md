@@ -21,6 +21,10 @@ control. I'm earnestly trying my best here.
 
 ## 09/06/2020
 
+Optional compilation works as intended. ALl L-BFGS-B files included in libf/phymars for now
+until we can figure out a better approach (eg. place in own directory/compile via symbolic
+link)
+
 makegcm_gfortran can now be activated with the flag -lbfgsb which will trigger a conditional
 #ifdef routine in which the L-BFGS-B optimisation routine shall be placed.
 

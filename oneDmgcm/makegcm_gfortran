@@ -14,7 +14,6 @@ set filtre=filtrez
 set grille=reg
 set dyntype="dyn"
 set scatterers="1"
-set lbfgsb=""
 ########################################################################
 # path a changer contenant les sources et les objets du modele
 ########################################################################
@@ -381,8 +380,12 @@ exit
      case -link
         set opt_link="$opt_link $2" ; shift ; shift ; goto top
 	 
+########################################################################
+# Compile the L-BFGS-B files in the symbolic linked directory for optim-
+# ization routines [BMT 09/06/2020]
+########################################################################
 	 case -lbfgsb
-		set lbfgsb="lbfgsb"
+		set include="$include -Dlbfgsb=.True." ; shift ; goto top
 	 
      case -debug
         if $HP then
@@ -625,19 +628,6 @@ echo "MACRO FILTRE $filtre"
 
 echo "dimc $dimc"
 
-########################################################################
-# Compile the L-BFGS-B files in the symbolic linked directory for optim-
-# ization routines [BMT 09/06/2020]
-########################################################################
-
-if ( "$lbfgsb" == "lbfgsb" ) then 
-	set lbfgsb_symdir="L-BFGS-B/" ## SYMBOLIC LINK TO L-BFGS-B ROUTINES 
-	set include="$include -Dlbfgsb=.True."
-	# set LBFGSB=$lbfgsb_symdir"lbfgsb.F" 
-	# set LINPACK=$lbfgsb_symdir"linpack.F" 
-	# set BLAS=$lbfgsb_symdir"blas.f" 
-	# set TIMER=$lbfgsb_symdir"timer.f"	
-endif 
 
 ########################################################################
 #  Avant de lancer le make, on recree le makefile si necessaire
@@ -656,9 +646,6 @@ find libf -name '*.[Fh]' -print | sort >! tmp77
 #find libf -name '*.[Fh]' -exec egrep -i " *use *ioipsl" {} \; -print >! tmp90
 find libf -name '*.[Fh]90' -print | sort >> tmp90
 
-if ( $lbfgsb == "lbfgsb" ) then 
-	find libf/$lbfgsb_symdir -name '*.[Fh]' -print | sort >> tmp77
-endif 
 
 
 if (    `diff tmp77 liste_des_sources_f77 | wc -w` \
