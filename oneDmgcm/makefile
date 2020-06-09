@@ -335,6 +335,7 @@ $(LIBF)/phymars/dimphys.h \
 $(LIBF)/aeronomars/chimiedata.h \
 $(LIBF)/phymars/callkeys.h \
 $(LIBF)/phymars/tracer.h \
+$(LIBF)/aeronomars/conc.h \
 $(LIBF)/grid/dimensions.h \
 $(LIBF)/phymars/dimphys.h \
 $(LIBF)/aeronomars/chimiedata.h \
@@ -2390,6 +2391,55 @@ $(LIBO)/libfiltrez.a(jacobi.o) : $(LIBF)/filtrez/jacobi.F
 
 
 #=======================================================================
+# Contenu de la bibliotheque correspondant au Directory L-BFGS-B
+#=======================================================================
+
+$(LIBO)/libL-BFGS-B.a :  $(LIBO)/libL-BFGS-B.a(blas.o)
+
+$(LIBO)/libL-BFGS-B.a :  $(LIBO)/libL-BFGS-B.a(lbfgsb.o)
+
+$(LIBO)/libL-BFGS-B.a :  $(LIBO)/libL-BFGS-B.a(linpack.o)
+
+$(LIBO)/libL-BFGS-B.a :  $(LIBO)/libL-BFGS-B.a(timer.o)
+
+.PRECIOUS	: $(LIBO)/libL-BFGS-B.a
+
+
+# Compilation des membres de la bibliotheque libL-BFGS-B.a
+
+$(LIBO)/libL-BFGS-B.a(blas.o) : $(LIBF)/L-BFGS-B/blas.F
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libL-BFGS-B.a blas.o ; \
+	$(COMPILE) $(LIBF)/L-BFGS-B/blas.F ; \
+	$(AR) r $(LIBO)/libL-BFGS-B.a blas.o ; $(RM) blas.o ; \
+	cd $(GCM)
+
+$(LIBO)/libL-BFGS-B.a(lbfgsb.o) : $(LIBF)/L-BFGS-B/lbfgsb.F
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libL-BFGS-B.a lbfgsb.o ; \
+	$(COMPILE) $(LIBF)/L-BFGS-B/lbfgsb.F ; \
+	$(AR) r $(LIBO)/libL-BFGS-B.a lbfgsb.o ; $(RM) lbfgsb.o ; \
+	cd $(GCM)
+
+$(LIBO)/libL-BFGS-B.a(linpack.o) : $(LIBF)/L-BFGS-B/linpack.F
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libL-BFGS-B.a linpack.o ; \
+	$(COMPILE) $(LIBF)/L-BFGS-B/linpack.F ; \
+	$(AR) r $(LIBO)/libL-BFGS-B.a linpack.o ; $(RM) linpack.o ; \
+	cd $(GCM)
+
+$(LIBO)/libL-BFGS-B.a(timer.o) : $(LIBF)/L-BFGS-B/timer.F
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libL-BFGS-B.a timer.o ; \
+	$(COMPILE) $(LIBF)/L-BFGS-B/timer.F ; \
+	$(AR) r $(LIBO)/libL-BFGS-B.a timer.o ; $(RM) timer.o ; \
+	cd $(GCM)
+
+
+
+
+
+#=======================================================================
 # Contenu de la bibliotheque correspondant au Directory phymars
 #=======================================================================
 
@@ -3830,10 +3880,11 @@ $(LIBF)/phymars/callkeys.h
 	$(AR) r $(LIBO)/libphymars.a read_dust_scenario.o ; $(RM) read_dust_scenario.o ; \
 	cd $(GCM)
 
-$(LIBO)/libphymars.a(scalar_perturbation.o) : $(LIBF)/phymars/scalar_perturbation.F90
+$(LIBO)/libphymars.a(scalar_perturbation.o) : $(LIBF)/phymars/scalar_perturbation.F90 \
+$(LIBO)/libbibio.a(ioipsl_getincom.o)
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libphymars.a scalar_perturbation.o ; \
-	$(COMPILE) $(LIBF)/phymars/scalar_perturbation.F90 ; \
+	$(COMPTRU90) $(LIBF)/phymars/scalar_perturbation.F90 ; \
 	$(AR) r $(LIBO)/libphymars.a scalar_perturbation.o ; $(RM) scalar_perturbation.o ; \
 	cd $(GCM)
 

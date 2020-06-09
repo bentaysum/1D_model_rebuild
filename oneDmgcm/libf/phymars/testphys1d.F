@@ -630,7 +630,6 @@ C     temperature, wind, and q2 profiles.
       call mcd_phys(time*24.,zlay,zls*180./pi,
      &              temp, psurf, u, v, 
      &              q2, day_step)
-     
 
 
 C       tsurf = temp(1)

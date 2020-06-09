@@ -19,6 +19,12 @@ non-navigatable, and at this point all I can see is: I don't frankly care anymor
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
 
+## 09/06/2020
+
+Lots of warnings appear with the optionally compiled L-BFGS-B routines when placed in
+the libf directories. Hopefully nothing code-breaking, possibly just looks ugly at 
+compile time. Compilation is successful. 
+
 ## 03/06/2020
 
 Routine has been working and producing valid output for 1 month. Paper in production.
