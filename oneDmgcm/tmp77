@@ -347,7 +347,3 @@ libf/phymars/yoegwd.h
 libf/phymars/yomaer.h
 libf/phymars/yomlw.h
 libf/phymars/zerophys.F
-libf/L-BFGS-B/blas.F
-libf/L-BFGS-B/lbfgsb.F
-libf/L-BFGS-B/linpack.F
-libf/L-BFGS-B/timer.F

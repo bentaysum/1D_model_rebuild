@@ -632,6 +632,7 @@ echo "dimc $dimc"
 
 if ( "$lbfgsb" == "lbfgsb" ) then 
 	set lbfgsb_symdir="L-BFGS-B/" ## SYMBOLIC LINK TO L-BFGS-B ROUTINES 
+	set include="$include -Dlbfgsb=.True."
 	# set LBFGSB=$lbfgsb_symdir"lbfgsb.F" 
 	# set LINPACK=$lbfgsb_symdir"linpack.F" 
 	# set BLAS=$lbfgsb_symdir"blas.f" 

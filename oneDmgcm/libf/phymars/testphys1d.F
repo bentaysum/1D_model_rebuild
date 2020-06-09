@@ -631,6 +631,14 @@ C     temperature, wind, and q2 profiles.
      &              temp, psurf, u, v, 
      &              q2, day_step)
 
+#ifdef lbfgsb 
+		write(*,*) "Good! (on)"
+		stop
+#else 
+		write(*,*) "Good! (off)"
+		stop
+#endif
+
 
 C       tsurf = temp(1)
       

@@ -21,6 +21,9 @@ control. I'm earnestly trying my best here.
 
 ## 09/06/2020
 
+makegcm_gfortran can now be activated with the flag -lbfgsb which will trigger a conditional
+#ifdef routine in which the L-BFGS-B optimisation routine shall be placed.
+
 Lots of warnings appear with the optionally compiled L-BFGS-B routines when placed in
 the libf directories. Hopefully nothing code-breaking, possibly just looks ugly at 
 compile time. Compilation is successful. 
