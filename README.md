@@ -21,6 +21,9 @@ control. I'm earnestly trying my best here.
 
 ## 09/06/2020
 
+Initialisation routine now finds best day0 to start routines at for user specified
+curiosity rover data point.
+
 Initialisation routine began. User selects data point of curiosity rover to work with.
 
 Optional compilation works as intended. ALl L-BFGS-B files included in libf/phymars for now

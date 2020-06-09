@@ -1,4 +1,4 @@
-SUBROUTINE ini_lbfgsb() 
+SUBROUTINE ini_lbfgsb(day0) 
 
 ! BMT - 09/06/2020
 ! 
@@ -13,9 +13,15 @@ SUBROUTINE ini_lbfgsb()
 
 IMPLICIT NONE 
 
+! Input Variables
+! ===============
+INTEGER, INTENT(INOUT) :: day0
+
 ! Local Variables 
 ! ===============
 INTEGER i ! Loop iterator 
+
+REAL day0_float 
 
 CHARACTER(len=200), PARAMETER :: CURIOSITY_DIRECT = &
 				"/exports/csce/datastore/geos/users/s1215319/paper2/curiousity_oxygen/curiosity_SAM_data/"
@@ -42,6 +48,11 @@ REAL sol
 INTEGER data_point
 INTEGER iostat 
 CHARACTER(len=1) confirm
+
+REAL day0s(668)
+REAL zls_grid(668) ! Arrays to interpolate our day0 from 
+
+INTEGER fortran_is_a_fussy_diva(1)
 
 ! =============================================================
 ! Stage One: Reading the Curiosity Data Table 
@@ -94,7 +105,28 @@ J_o2 = curiosity_o2_array(data_point)
 J_lt = curiosity_lt_array(data_point)
 J_ls = curiosity_zls_array(data_point)
 
+! ==========================================================================
+! Stage 2 : Establishing the spatial and temporal variables of the 1-D model
+! 		    which [obviously] will be fixed throughout the L-BFGS-B optimis-
+!			ation process.
+! ==========================================================================
 
+! 2 : Create a grid of day0 vs. zls in the 1-D model to interpolate the app-
+!	  ropriate day0 to begin with for this analysis.
+
+day0s(1) = 0.
+zls_grid(1) = 0.
+DO i = 2, 668 
+	day0s(i) = (i-1)*1.e0 
+	call solarlong(day0s(i), zls_grid(i) )
+	zls_grid(i) = zls_grid(i)*180./3.14
+ENDDO
+
+call interp_line(zls_grid,day0s,668,J_ls,day0_float,1)
+
+day0 = INT(day0_float)
+
+write(*,*) day0, J_ls, zls_grid(day0)
 
 stop 
 

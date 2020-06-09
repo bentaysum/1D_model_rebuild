@@ -539,6 +539,33 @@ c
       zgam(1)=0.E+0
       zthe(1)=0.E+0
 
+      CALL iniorbit(aphelie,periheli,year_day,peri_day,obliquit)
+
+C  L-BFGS-B Optimization Initialisation routines
+C -----------------------------------------------
+C Will overwrite certain spatial and temporal vars
+C namely day0 and latitude.
+#ifdef lbfgsb 
+       write(*,*) "---- L-BFGS-B ON ----"
+		
+	   ! Curiosity Rover presently at ~ 4.5 South 
+       lati(1) = 4.5*pi/180.E0
+	   
+       call ini_lbfgsb(day0)
+
+       stop
+#else  
+        write(*,*) "Good! (off)"
+#endif
+
+
+      stop 
+
+
+
+
+
+
 
 c   Specific initializations for "physiq"
 c   -------------------------------------
@@ -603,7 +630,6 @@ c  ----------
 c  Compute pressures and altitudes of atmospheric levels 
 c  ----------------------------------------------------------------
 !     Initialise the surface pressure from the MCDv5.3 look-up table
-      CALL iniorbit(aphelie,periheli,year_day,peri_day,obliquit)
       call solarlong(day+time,zls)
       call mcd_phys(time*24.,zlay,zls*180./pi,
      &              temp, psurf, u, v, 
@@ -658,25 +684,6 @@ C     temperature, wind, and q2 profiles.
 
 
 
-
-
-
-
-
-
-
-#ifdef lbfgsb 
-       write(*,*) "---- L-BFGS-B ON ----"
-
-       call ini_lbfgsb
-
-       stop
-#else  
-        write(*,*) "Good! (off)"
-#endif
-
-
-      stop 
 
 C       tsurf = temp(1)
       
