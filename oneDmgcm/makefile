@@ -2651,6 +2651,8 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(def_var.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(geticecover.o)
 
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(ini_lbfgsb.o)
+
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(iniwritesoil.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(mkstat.o)
@@ -3873,6 +3875,13 @@ $(LIBO)/libphymars.a(geticecover.o) : $(LIBF)/phymars/geticecover.F90
 	$(AR) d $(LIBO)/libphymars.a geticecover.o ; \
 	$(COMPILE) $(LIBF)/phymars/geticecover.F90 ; \
 	$(AR) r $(LIBO)/libphymars.a geticecover.o ; $(RM) geticecover.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(ini_lbfgsb.o) : $(LIBF)/phymars/ini_lbfgsb.F90
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a ini_lbfgsb.o ; \
+	$(COMPILE) $(LIBF)/phymars/ini_lbfgsb.F90 ; \
+	$(AR) r $(LIBO)/libphymars.a ini_lbfgsb.o ; $(RM) ini_lbfgsb.o ; \
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(iniwritesoil.o) : $(LIBF)/phymars/iniwritesoil.F90 \

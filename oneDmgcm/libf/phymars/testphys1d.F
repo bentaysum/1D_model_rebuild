@@ -105,7 +105,7 @@ c   Various intermediate variables
       integer ndt_tlm ! Time-step for tlm activation
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c 	 Conditionally activated L-BFGS-B model parameters
+c    Conditionally activated L-BFGS-B model parameters
 cccccccccccccccccccccccccccccccccccccccccccccccccccccc 
 #ifdef lbfgsb 
       INTEGER, PARAMETER :: nmax = 1024
@@ -118,17 +118,17 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $       x(nmax), l(nmax), u_bfgs(nmax), g_lbfgs(nmax), dsave(29),
      $       wa(2*mmax*nmax + 5*nmax + 11*mmax*mmax + 8*mmax)
 #endif 
-	  
-	  
-	  
-	  
+      
+      
+      
+      
 C       call setulb(n,m,x,l,u,nbd,f,g,factr,pgtol,wa,iwa,task,iprint,
 C      +            csave,lsave,isave,dsave)
-	  
-	  
-	  
-	  
-	  
+      
+      
+      
+      
+      
 c=======================================================================
 
 c=======================================================================
@@ -253,11 +253,11 @@ c ------------------------------------------------------
         enddo
         close(90)
 
-		! Added in so that noms and tnom are both filled JAH 6/16
+        ! Added in so that noms and tnom are both filled JAH 6/16
         do iq=1,nqmx
             noms(iq) = tnom(iq)
         enddo
-		
+        
         ! initialize tracers here:
         write(*,*) "testphys1d: initializing tracers"
         q(:,:)=0 ! default, set everything to zero
@@ -656,16 +656,27 @@ C     temperature, wind, and q2 profiles.
      &              temp, psurf, u, v, 
      &              q2, day_step)
 
+
+
+
+
+
+
+
+
+
 #ifdef lbfgsb 
-		write(*,*) "Good! (on)"
-      call setulb(n,m,x,l,u,nbd,f,g,factr,pgtol,wa,iwa,task,iprint,
-     +            csave,lsave,isave,dsave)
-		stop
-#else 
-		write(*,*) "Good! (off)"
-		stop
+       write(*,*) "---- L-BFGS-B ON ----"
+
+       call ini_lbfgsb
+
+       stop
+#else  
+        write(*,*) "Good! (off)"
 #endif
 
+
+      stop 
 
 C       tsurf = temp(1)
       

@@ -21,6 +21,8 @@ control. I'm earnestly trying my best here.
 
 ## 09/06/2020
 
+Initialisation routine began. User selects data point of curiosity rover to work with.
+
 Optional compilation works as intended. ALl L-BFGS-B files included in libf/phymars for now
 until we can figure out a better approach (eg. place in own directory/compile via symbolic
 link)
