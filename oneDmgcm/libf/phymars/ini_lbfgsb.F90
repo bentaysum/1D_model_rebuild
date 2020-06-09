@@ -27,11 +27,13 @@ REAL array_zls(668)     ! user selected Curiosity data point.
 CHARACTER(len=18) DUMMY 
 
 INTEGER, PARAMETER :: N_curiosity = 19 ! Number of data points collected in trainer_tables_S1.txt 
-REAL curiosity_zls(N_curiosity) 	   ! Solar Longitude of curiosity collected points 
-REAL curiosity_lt(N_curiosity) 		   ! local Time of curiosity collected points 
-REAL curiosity_o2(N_curiosity) 		   ! Curiosity collected value of surface O2 VMR
-REAL curiosity_co2(N_curiosity) 	   ! Curiosity collected value of surface CO2 VMR [Constraint for L-BFGS-B] 
-REAL curiosity_co(N_curiosity) 		   ! Curiosity collected value of surface CO VMR [Constraint for L-BFGS-B] 
+REAL curiosity_zls_array(N_curiosity) 	   ! Solar Longitude of curiosity collected points 
+REAL curiosity_lt_array(N_curiosity) 		   ! local Time of curiosity collected points 
+REAL curiosity_o2_array(N_curiosity) 		   ! Curiosity collected value of surface O2 VMR
+REAL curiosity_co2_array(N_curiosity) 	   ! Curiosity collected value of surface CO2 VMR [Constraint for L-BFGS-B] 
+REAL curiosity_co_array(N_curiosity) 		   ! Curiosity collected value of surface CO VMR [Constraint for L-BFGS-B] 
+
+REAL J_ls, J_lt, J_o2, J_co2, J_co ! Selected individual values of the forecast from the above arrays
 
 INTEGER tid
 REAL fp, co2_er, ar, ar_er, n2, n2_er, co_er, o2_er(2)  ! Other data not needed at present
@@ -54,14 +56,14 @@ write(*,"(A54)") "==========================================================="
 WRITE(*,"(A4,5A10)") "", "ZLS", "CO2 VMR", "O2 VMR", "CO VMR", "LT (hrs)"
 write(*,"(A54)") "-------------------------------------------------------------"
 DO i = 1, 19 
-	READ(10,*) curiosity_zls(i), sol, tid, fp, curiosity_co2(i), co2_er, &
-														ar, ar_er, n2, n2_er, curiosity_o2(i), o2_er(1), o2_er(2), &
-														curiosity_co(i), co_er
+	READ(10,*) curiosity_zls_array(i), sol, tid, fp, curiosity_co2_array(i), co2_er, &
+														ar, ar_er, n2, n2_er, curiosity_o2_array(i), o2_er(1), o2_er(2), &
+														curiosity_co_array(i), co_er
 																	
-	curiosity_lt(i) = (sol - floor(sol))*24. 
+	curiosity_lt_array(i) = (sol - floor(sol))*24. 
 	
-	write(*,"(I4,F10.2,F10.4,F10.5,F10.5, F10.2)") i, curiosity_zls(i), curiosity_co2(i),&
-											curiosity_o2(i), curiosity_co(i), curiosity_lt(i)
+	write(*,"(I4,F10.2,F10.4,F10.5,F10.5, F10.2)") i, curiosity_zls_array(i), curiosity_co2_array(i),&
+											curiosity_o2_array(i), curiosity_co_array(i), curiosity_lt_array(i)
 ENDDO 
 CLOSE(10)
 
@@ -77,17 +79,20 @@ CLOSE(10)
 write(*,"(A54)") "--------------------------------------------------------"
 WRITE(*,*) "User choices:" 
 WRITE(*,"(A4,5A10)") "", "ZLS", "CO2 VMR", "O2 VMR", "CO VMR", "LT (hrs)"
-write(*,"(I4,F10.2,F10.4,F10.5,F10.5, F10.2)") data_point, curiosity_zls(data_point), curiosity_co2(data_point),&
-										curiosity_o2(data_point), curiosity_co(data_point), curiosity_lt(data_point)
+write(*,"(I4,F10.2,F10.4,F10.5,F10.5, F10.2)") data_point, curiosity_zls_array(data_point), curiosity_co2_array(data_point),&
+										curiosity_o2_array(data_point), curiosity_co_array(data_point), curiosity_lt_array(data_point)
 222 write(*,*) "Correct [ y/n ] ? : "
 READ(*,"(A1)") confirm
 IF ( confirm == "n" .or. confirm == "N" ) GOTO 111 
 IF ( confirm == "y" .or. confirm == "Y" ) GOTO 333
 GOTO 222
 333 write(*,"(A54)") "--------------------------------------------------------"
-
-
-
+! 1.1.3 : Set these values as the forecast values 
+J_co = curiosity_co_array(data_point)
+J_co2 = curiosity_co2_array(data_point)
+J_o2 = curiosity_o2_array(data_point)
+J_lt = curiosity_lt_array(data_point)
+J_ls = curiosity_zls_array(data_point)
 
 
 
