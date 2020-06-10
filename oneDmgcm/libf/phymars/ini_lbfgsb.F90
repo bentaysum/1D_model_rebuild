@@ -24,43 +24,32 @@ INTEGER, INTENT(OUT) :: t_0, t_N ! Backtrace and forecast time-steps
 ! Local Variables 
 ! ===============
 REAL, PARAMETER :: spin_up = 10. ! Number of sols allowed for model spin-up 
-INTEGER sol_backtrace 
-REAL lt_backtrace
-
-INTEGER i ! Loop iterator 
-
-REAL day0_float 
-
+INTEGER sol_backtrace ! Sol after spin-up we want the backtrace to go towards 
+REAL lt_backtrace ! Local time on the sol_backtrace to backtrace towards 
+INTEGER i ! Loop iterator
+REAL day0_float ! Used for zls/day0 interpolation routine 
 CHARACTER(len=200), PARAMETER :: CURIOSITY_DIRECT = &
 				"/exports/csce/datastore/geos/users/s1215319/paper2/curiousity_oxygen/curiosity_SAM_data/"
-
-
 INTEGER array_days(668) ! Use to correctly assign day0 for the
 REAL array_zls(668)     ! user selected Curiosity data point. 
-
-CHARACTER(len=18) DUMMY 
-
+CHARACTER(len=18) DUMMY ! Holds skipable file lines 
 INTEGER, PARAMETER :: N_curiosity = 19 ! Number of data points collected in trainer_tables_S1.txt 
 REAL curiosity_zls_array(N_curiosity) 	   ! Solar Longitude of curiosity collected points 
 REAL curiosity_lt_array(N_curiosity) 		   ! local Time of curiosity collected points 
 REAL curiosity_o2_array(N_curiosity) 		   ! Curiosity collected value of surface O2 VMR
 REAL curiosity_co2_array(N_curiosity) 	   ! Curiosity collected value of surface CO2 VMR [Constraint for L-BFGS-B] 
 REAL curiosity_co_array(N_curiosity) 		   ! Curiosity collected value of surface CO VMR [Constraint for L-BFGS-B] 
-
 REAL J_ls, J_lt, J_o2, J_co2, J_co ! Selected individual values of the forecast from the above arrays
-
-INTEGER tid
+INTEGER tid ! Not needed at present 
 REAL fp, co2_er, ar, ar_er, n2, n2_er, co_er, o2_er(2)  ! Other data not needed at present
-REAL sol 
-
-INTEGER data_point
+REAL sol ! For finding curiosity_lt values
+INTEGER data_point ! User choice of datapoint 
 INTEGER iostat 
-CHARACTER(len=1) confirm
-
-REAL day0s(668)
+CHARACTER(len=1) confirm ! y/n confirmation string 
+REAL day0s(668) ! Grid of day0 values to get zls values from 
 REAL zls_grid(668) ! Arrays to interpolate our day0 from 
+INTEGER fortran_is_a_fussy_diva(1) ! Because FORTRAN is difficult 
 
-INTEGER fortran_is_a_fussy_diva(1)
 
 ! =============================================================
 ! Stage One: Reading the Curiosity Data Table 
@@ -78,9 +67,7 @@ DO i = 1, 19
 	READ(10,*) curiosity_zls_array(i), sol, tid, fp, curiosity_co2_array(i), co2_er, &
 														ar, ar_er, n2, n2_er, curiosity_o2_array(i), o2_er(1), o2_er(2), &
 														curiosity_co_array(i), co_er
-																	
 	curiosity_lt_array(i) = (sol - floor(sol))*24. 
-	
 	write(*,"(I4,F10.2,F10.4,F10.5,F10.5, F10.2)") i, curiosity_zls_array(i), curiosity_co2_array(i),&
 											curiosity_o2_array(i), curiosity_co_array(i), curiosity_lt_array(i)
 ENDDO 
@@ -175,6 +162,6 @@ GOTO 444
 
 
 	
-555 stop 
+555 RETURN  
 
 END SUBROUTINE 
