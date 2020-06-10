@@ -1377,6 +1377,8 @@ c       Thermal inertia feedback
         ENDIF
       ENDIF
       
+      
+#ifndef lbfgsb
 c ======================================================================
 c 10.0: Construct the 1-D model Jacobian [TLM] and advance perturbation
 c       vector [PERTS] to next time-step then call the netCDF save routine
@@ -1434,7 +1436,7 @@ c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             pertloop = .False.
 
        ENDIF 
-
+#endif
 
 
 

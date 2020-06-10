@@ -14,8 +14,8 @@ libf/phymars/albedocaps.F90
 libf/phymars/calltherm_interface.F90
 libf/phymars/def_var.F90
 libf/phymars/geticecover.F90
-libf/phymars/ini_lbfgsb.F90
 libf/phymars/iniwritesoil.F90
+libf/phymars/lbfgsb_initialise.F90
 libf/phymars/lbfgsb-module.F90
 libf/phymars/mkstat.F90
 libf/phymars/param_slope.F90

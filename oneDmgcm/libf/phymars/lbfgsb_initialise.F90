@@ -1,4 +1,4 @@
-SUBROUTINE ini_lbfgsb(day0, day_step) 
+SUBROUTINE lbfgsb_initialise(day0, day_step) 
 
 USE lbfgsb_module
 ! BMT - 09/06/2020
@@ -134,7 +134,7 @@ write(*,"(A54)") "--------------------------------------------------------"
 ! 		Model should always begin at LT = 00:00 hrs. The model will exit spin-up,
 ! 		run for day_step time-steps (1 sol), then continue to the temporal location
 !		(lt index) of the Curiosity data point.
-t_N = (spin_up + 1)*day_step + INT( (24./day_step )*J_lt )*day_step
+t_N = (spin_up + 1)*day_step + INT( day_step*(J_lt/24. ) ) 
 
 ! 3.2 : Ask for number of sols after spin-up and local time to backtrace model to 
 444 write(*,*) "Sols (INT) and LT (FLOAT) after spin-up to backtrace model towards:" 
@@ -145,7 +145,7 @@ t_N = (spin_up + 1)*day_step + INT( (24./day_step )*J_lt )*day_step
 		GOTO 444
 	ENDIF
 	
-	t_0 = (spin_up)*day_step + day_step*sol_backtrace + INT( (24./day_step )*lt_backtrace )*day_step
+	t_0 = (spin_up)*day_step + day_step*sol_backtrace + INT( day_step*(lt_backtrace/24. ) ) 
 	
 	IF ( t_0 >= t_N ) THEN 
 		write(*,"(A19,I4,A9, I4)") "t_0 >= t_N | t_0 = ", t_0, " , t_N = ", t_N 

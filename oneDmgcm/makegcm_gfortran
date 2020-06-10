@@ -14,6 +14,7 @@ set filtre=filtrez
 set grille=reg
 set dyntype="dyn"
 set scatterers="1"
+set lbfgsb=""
 ########################################################################
 # path a changer contenant les sources et les objets du modele
 ########################################################################
@@ -137,7 +138,7 @@ endif
 if ( ! -d $libo )  then
    mkdir $libo
 endif
-
+    
 if $VPP then
 set netcdf=netcdf_v
 else 
@@ -385,7 +386,7 @@ exit
 # ization routines [BMT 09/06/2020]
 ########################################################################
 	 case -lbfgsb
-		set include="$include -Dlbfgsb=.True." ; shift ; goto top
+		set include="$include -Dlbfgsb=.True." ; set lbfgsb="lbfgsb" ; shift ; goto top
 	 
      case -debug
         if $HP then
@@ -499,6 +500,11 @@ if ( $NEC || $XNEC ) then
     set nomlib=F90_${dim_}_t${ntrac}
 endif
 
+# BMT 10/06/2020 
+# L-BFGS-B case 
+if ( $lbfgsb == "lbfgsb" ) then 
+    set nomlib=${nomlib}_$lbfgsb
+endif 
 
 
 echo "calcul de la dimension"
@@ -751,6 +757,8 @@ else if $LINUX then
 # Ehouarn: remove set mod_loc_dir def below; mod_loc_dir=$localdir (set above)
 # set mod_loc_dir=$libo
 endif
+
+
 
 set link="$f90 $optim90"
 

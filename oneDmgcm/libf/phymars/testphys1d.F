@@ -543,31 +543,34 @@ c
       CALL iniorbit(aphelie,periheli,year_day,peri_day,obliquit)
 
 
+
+
 #ifdef lbfgsb 
+C ================================================================
 C  L-BFGS-B Optimization Initialisation routines
-C -----------------------------------------------
-C Routines let the user select a Curiosity data-
-C point for a measured VMR of O2
+C ----------------------------------------------------------------
+C Routines let the user select a Curiosity data-point for a meas-
+C ured VMR of O2, and defines a backtrace timestep, t_0, and a 
+C forecast time-step, t_N , such that 1 <= t_0 < t_N
 
        write(*,*) "---- L-BFGS-B ON ----"
 		
-	   ! Curiosity Rover presently at ~ 4.5 South 
+       ! =========================================  
+	  ! Curiosity Rover presently at ~ 4.5 South 
        lati(1) = -4.5*pi/180.E0
-	   
-       call ini_lbfgsb(day0, day_step)
-
-       stop
-#else  
-        write(*,*) "Good! (off)"
+	  ! =========================================
+       
+       call lbfgsb_initialise(day0, day_step)
+       
+       ! ===============================================
+       ! For computational efficiency, only activate the 
+       ! TLM/Adjoint routines when inside the L-BFGS-B 
+       ! temporal domain.
+       ! ===============================================
+       call_tlm = .False.
+     
+C ================================================================
 #endif
-
-
-      stop 
-
-
-
-
-
 
 
 c   Specific initializations for "physiq"
@@ -752,10 +755,7 @@ c  It is needed to transfert physics variables to "physiq"...
      
       ndt_plume =  (plume_day*day_step) + NINT((plume_lt/24.)*day_step)
 
-c=======================================================================
-c  1D MODEL TIME STEPPING LOOP
-c=======================================================================
-c
+
       firstcall=.true.
       lastcall=.false.
 
@@ -768,9 +768,111 @@ c     state, as opposed to saving it -after- it enters
 c     the chemistry routine.
       ndt_tlm = (tlm_day*day_step) + NINT((tlm_lt/24.)*day_step) - 1
       endif 
+      
+#ifdef lbfgsb
+456       tlm_on = .False.
 
+          mcd_profiles = .True.
+          
+          calladj = .True. 
+                                                    
+          callcond = .True.
+          
+          day = Float(day0)
+          
+          time = 0.E0 ! ASSUMPTION THAT ALL RUNS BEGIN WITH LT = 00:00 HRS [10/06/2020]
+#endif 
+      
 
+c=======================================================================
+c  1D MODEL TIME STEPPING LOOP
+c=======================================================================
+c
       DO idt=1,ndt
+      
+#ifdef lbfgsb 
+C ***************************************************
+C L-BFGS-B AT BACKTRACE TIME-STEP  
+C ***************************************************
+      IF ( idt == t_0 ) THEN 
+      
+c     First loop of the L-BFGS-B iterative process 
+c     ============================================
+      IF ( LBFGSB_firstcall ) THEN 
+
+
+          ALLOCATE(LBFGSB_FIRSTGUESS(nqmx*nlayermx)) 
+          LBFGSB_FIRSTGUESS(:) = 0.D0 
+		  
+          u_bfgs(:) = 0.D0 
+          l_bfgs(:) = 0.D0 
+          
+          x(:) = 0.D0 
+          
+          DO iq = 1, nqmx 
+		  
+c     Define a first guess of the solution vector x(:) 
+c     ------------------------------------------------
+		    LBFGSB_FIRSTGUESS( (iq-1)*nlayermx + 1 : iq*nlayermx ) 
+     $      = q(:,iq)*1.D0
+		    x( (iq-1)*nlayermx + 1 : iq*nlayermx ) 
+     $      = q(:,iq)*1.D0
+     
+c     Establish upper and lower limits [BLANKET FOR NOW 10/06/2020] 
+C     Tracers given a 50% margin of adjustment 
+C     -------------------------------------------------------------
+          DO ilayer = 1, nlayermx 
+               u_bfgs( (iq-1)*nlayermx + ilayer ) = 
+     $               MAX( q(ilayer,iq)*1.5D0 , 0.99D0 ) 
+               l_bfgs( (iq-1)*nlayermx + ilayer ) = 
+     $               MAX( q(ilayer,iq)*0.5D0 , 1.D-31 )
+          ENDDO 
+ 
+          ENDDO 
+         
+		 
+		 
+          LBFGSB_firstcall = .False. 
+		  
+      ENDIF 
+	  
+C     Every L-BFGS-B iteration 
+C     ======================== 
+
+c     Trigger conditionals for the activation of the Tangent Linear Model
+c     which in turn shall compute the gradient for our L-BFGS-B routines.
+!     -------------------------------------------------------------------
+
+          call_tlm = .False.     ! Prevents multiple initialisations.
+
+          tlm_on = .True.        ! Routines will now engage.
+
+          mcd_profiles = .False. ! Interpolation routines will 
+                              ! invalidate TLM results.
+
+          calladj = .False. ! Convective adjustments require a 
+                          ! conditional that the TLM will not
+                          ! be capable of performing.
+          callcond = .False. ! Again, conditionals activate this 
+                          ! module.
+          call TLM_initialise
+
+       
+      ENDIF 
+	  
+#endif 
+C ***************************************************
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
 c        IF (idt.eq.ndt) lastcall=.true.
         IF (idt.eq.ndt-day_step-1) then       !test
          lastcall=.true.
@@ -800,55 +902,6 @@ c     ~~~~~~~~~~~~~~~~~~~~~
 
       ENDDO
 
-
-#ifdef lbfgsb 
-C ***************************************************
-C L-BFGS-B ROUTINE 
-C ***************************************************
-C 	  BACKTRACE TIMESTEP 
-C 	  ==================
-      IF ( idt == t_0 ) THEN 
-      
-
-      IF ( LBFGSB_firstcall ) THEN 
-
-          ALLOCATE(LBFGSB_FIRSTGUESS(nqmx*nlayermx)) 
-          LBFGSB_FIRSTGUESS(:) = 0.D0 
-		  
-          u_bfgs(:) = 0.D0 
-          l_bfgs(:) = 0.D0 
-          x(:) = 0.D0 
-          
-          DO iq = 1, nqmx 
-		  
-C 	  Set first guess of input vector
-C     -------------------------------
-		    LBFGSB_FIRSTGUESS( (iq-1)*nlayermx + 1 : iq*nlayermx ) 
-     $      = q(:,iq)*1.D0
-		    x( (iq-1)*nlayermx + 1 : iq*nlayermx ) 
-     $      = q(:,iq)*1.D0
-     
-c     Establish upper and lower limits [BLANKET FOR NOW 10/06/2020] 
-C     Tracers given a 50% margin of adjustment 
-          DO ilayer = 1, nlayermx 
-               u_bfgs( (iq-1)*nlayermx + ilayer ) = 
-     $               MAX( q(ilayer,iq)*1.5D0 , 0.99D0 ) 
-               l_bfgs( (iq-1)*nlayermx + ilayer ) = 
-     $               MAX( q(ilayer,iq)*0.5D0 , 1.D-31 )
-          ENDDO 
- 
-          ENDDO 
-         
-		 
-		 
-          LBFGSB_firstcall = .False. 
-		  
-      ENDIF 
-	  
-      ENDIF 
-	  
-#endif 
-C ***************************************************
 
 c       call physics
 c       --------------------
@@ -952,7 +1005,17 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
          
       ENDIF 
       
+     
+#ifdef lbfgsb
+      write(*,*) " STEPS : ", idt, t_0 , t_ N
+      IF ( idt == t_N ) THEN 
       
+      WRITE(*,*) "SEEMS TO BE OKAY..." 
+      stop
+      ENDIF 
+
+#endif 
+
         
         
       ENDDO   ! of idt=1,ndt ! end of time stepping loop

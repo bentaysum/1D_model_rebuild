@@ -22,7 +22,7 @@ control. I'm earnestly trying my best here.
 ## 10/06/2020 
 
 
-First guess rouintes started.
+First guess rouintes started. TLM activates successfully. 
 
 Initialisation complete, forecast and backtrace timesteps are produced.
 

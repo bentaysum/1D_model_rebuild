@@ -114,7 +114,11 @@
       end if         ! of microphys
 
 ! write diagnostics in micron2/cm3
-      
+
+#ifdef lbfgsb
+      goto 10
+#endif
+
       if (callstats) then
         call wstats(ngrid,"surfdust", "Dust surface area",
      $            "micron2 cm-3",3,surfdust*1.e6)
@@ -126,5 +130,5 @@
       call writediagfi(ngrid,"surfice", "Ice cloud surface area",
      $            "micron2 cm-3",3,surfice*1.e6)
 
-      return
+10      return
       end

@@ -2651,9 +2651,9 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(def_var.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(geticecover.o)
 
-$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(ini_lbfgsb.o)
-
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(iniwritesoil.o)
+
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lbfgsb_initialise.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lbfgsb-module.o)
 
@@ -3879,13 +3879,6 @@ $(LIBO)/libphymars.a(geticecover.o) : $(LIBF)/phymars/geticecover.F90
 	$(AR) r $(LIBO)/libphymars.a geticecover.o ; $(RM) geticecover.o ; \
 	cd $(GCM)
 
-$(LIBO)/libphymars.a(ini_lbfgsb.o) : $(LIBF)/phymars/ini_lbfgsb.F90
-	cd $(LOCAL_DIR); \
-	$(AR) d $(LIBO)/libphymars.a ini_lbfgsb.o ; \
-	$(COMPTRU90) $(LIBF)/phymars/ini_lbfgsb.F90 ; \
-	$(AR) r $(LIBO)/libphymars.a ini_lbfgsb.o ; $(RM) ini_lbfgsb.o ; \
-	cd $(GCM)
-
 $(LIBO)/libphymars.a(iniwritesoil.o) : $(LIBF)/phymars/iniwritesoil.F90 \
 $(LIBF)/grid/dimensions.h \
 $(LIBF)/phymars/dimphys.h \
@@ -3897,6 +3890,13 @@ $(LIBF)/phymars/comsoil.h
 	$(AR) d $(LIBO)/libphymars.a iniwritesoil.o ; \
 	$(COMPILE) $(LIBF)/phymars/iniwritesoil.F90 ; \
 	$(AR) r $(LIBO)/libphymars.a iniwritesoil.o ; $(RM) iniwritesoil.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(lbfgsb_initialise.o) : $(LIBF)/phymars/lbfgsb_initialise.F90
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a lbfgsb_initialise.o ; \
+	$(COMPTRU90) $(LIBF)/phymars/lbfgsb_initialise.F90 ; \
+	$(AR) r $(LIBO)/libphymars.a lbfgsb_initialise.o ; $(RM) lbfgsb_initialise.o ; \
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(lbfgsb-module.o) : $(LIBF)/phymars/lbfgsb-module.F90
