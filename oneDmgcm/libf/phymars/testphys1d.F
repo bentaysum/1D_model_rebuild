@@ -111,6 +111,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccc
       INTEGER, PARAMETER :: nmax = 1024
       INTEGER, PARAMETER :: mmax = 17
 
+	  INTEGER t_0, t_N ! Backtrace and forecast time-steps 
+
       CHARACTER(len=60) task, csave
       LOGICAL lsave(4)  
       INTEGER n, m, iprint, nbd(nmax), iwa(3*nmax), isave(44)
@@ -120,10 +122,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccc
 #endif 
       
       
-      
-      
-C       call setulb(n,m,x,l,u,nbd,f,g,factr,pgtol,wa,iwa,task,iprint,
-C      +            csave,lsave,isave,dsave)
       
       
       
@@ -549,9 +547,9 @@ C namely day0 and latitude.
        write(*,*) "---- L-BFGS-B ON ----"
 		
 	   ! Curiosity Rover presently at ~ 4.5 South 
-       lati(1) = 4.5*pi/180.E0
+       lati(1) = -4.5*pi/180.E0
 	   
-       call ini_lbfgsb(day0)
+       call ini_lbfgsb(day0, day_step, t_0, t_N)
 
        stop
 #else  

@@ -19,6 +19,10 @@ non-navigatable, and at this point all I can see is: I don't frankly care anymor
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
 
+## 10/06/2020 
+
+Initialisation complete, forecast and backtrace timesteps are produced.
+
 ## 09/06/2020
 
 Initialisation routine now finds best day0 to start routines at for user specified

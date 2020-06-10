@@ -1,4 +1,4 @@
-SUBROUTINE ini_lbfgsb(day0) 
+SUBROUTINE ini_lbfgsb(day0, day_step, t_0, t_N) 
 
 ! BMT - 09/06/2020
 ! 
@@ -10,15 +10,23 @@ SUBROUTINE ini_lbfgsb(day0)
 !		  calculations of HOx and Ox abundances.
 !
 ! 1.0) Select Curiosity data point to steady
+! 2.0) Acquire day0 point for 1-D model with regard to Curiosity datapoint selected 
+! 3.0) Choose forecast time-step (time-steps AFTER 10 sol spin-up) and backtrace 
+!	   time-step (time-steps AFTER 10 sol spin-up) 
 
 IMPLICIT NONE 
 
 ! Input Variables
 ! ===============
-INTEGER, INTENT(INOUT) :: day0
-
+INTEGER, INTENT(INOUT) :: day0  
+INTEGER, INTENT(IN) :: day_step ! Time-steps per sol 
+INTEGER, INTENT(OUT) :: t_0, t_N ! Backtrace and forecast time-steps
 ! Local Variables 
 ! ===============
+REAL, PARAMETER :: spin_up = 10. ! Number of sols allowed for model spin-up 
+INTEGER sol_backtrace 
+REAL lt_backtrace
+
 INTEGER i ! Loop iterator 
 
 REAL day0_float 
@@ -97,13 +105,12 @@ READ(*,"(A1)") confirm
 IF ( confirm == "n" .or. confirm == "N" ) GOTO 111 
 IF ( confirm == "y" .or. confirm == "Y" ) GOTO 333
 GOTO 222
-333 write(*,"(A54)") "--------------------------------------------------------"
 ! 1.1.3 : Set these values as the forecast values 
-J_co = curiosity_co_array(data_point)
-J_co2 = curiosity_co2_array(data_point)
-J_o2 = curiosity_o2_array(data_point)
-J_lt = curiosity_lt_array(data_point)
-J_ls = curiosity_zls_array(data_point)
+333 J_co = curiosity_co_array(data_point)
+    J_co2 = curiosity_co2_array(data_point)
+    J_o2 = curiosity_o2_array(data_point)
+	J_lt = curiosity_lt_array(data_point)
+	J_ls = curiosity_zls_array(data_point)
 
 ! ==========================================================================
 ! Stage 2 : Establishing the spatial and temporal variables of the 1-D model
@@ -111,7 +118,7 @@ J_ls = curiosity_zls_array(data_point)
 !			ation process.
 ! ==========================================================================
 
-! 2 : Create a grid of day0 vs. zls in the 1-D model to interpolate the app-
+! 2.1 : Create a grid of day0 vs. zls in the 1-D model to interpolate the app-
 !	  ropriate day0 to begin with for this analysis.
 
 day0s(1) = 0.
@@ -121,13 +128,53 @@ DO i = 2, 668
 	call solarlong(day0s(i), zls_grid(i) )
 	zls_grid(i) = zls_grid(i)*180./3.14
 ENDDO
-
+! 2.2 : Interpolate the value of day0 using the Curiosity data point's solar longitude.
 call interp_line(zls_grid,day0s,668,J_ls,day0_float,1)
 
-day0 = INT(day0_float)
+! 2.3 : Set day0 as integer (floor) of the interpolated day0_float 
+call solarlong(day0_float, sol )
+day0 = INT(day0_float) 
+write(*,*) "day0 = ", day0,  " | Ls = ", sol*180./3.14
+write(*,"(A54)") "--------------------------------------------------------"
 
-write(*,*) day0, J_ls, zls_grid(day0)
 
-stop 
+! ==========================================================================
+! Stage 3 : What time-steps in 1-D model space are we forecasting from and 
+! 			backtracing towards?
+! ==========================================================================
+
+! 3.1 : Forecast time-step ( t_N ) 
+! 		Model should always begin at LT = 00:00 hrs. The model will exit spin-up,
+! 		run for day_step time-steps (1 sol), then continue to the temporal location
+!		(lt index) of the Curiosity data point.
+t_N = (spin_up + 1)*day_step + INT( (24./day_step )*J_lt )*day_step
+
+! 3.2 : Ask for number of sols after spin-up and local time to backtrace model to 
+444 write(*,*) "Sols (INT) and LT (FLOAT) after spin-up to backtrace model towards:" 
+	READ(*,"(I2,F5.2)", iostat = iostat) sol_backtrace, lt_backtrace 
+	IF ( iostat .ne. 0 ) GOTO 444
+	IF ( lt_backtrace < 0. .or. lt_backtrace > 24. ) THEN 
+		WRITE(*,*) "0. <= LT <= 24." 
+		GOTO 444
+	ENDIF
+	
+	t_0 = (spin_up)*day_step + day_step*sol_backtrace + INT( (24./day_step )*lt_backtrace )*day_step
+	
+	IF ( t_0 >= t_N ) THEN 
+		write(*,"(A19,I4,A9, I4)") "t_0 >= t_N | t_0 = ", t_0, " , t_N = ", t_N 
+		GOTO 444
+	ENDIF 
+write(*,"(A63)") "--------------------------------------------------------"
+WRITE(*,"(A30, A3, A30)")  "BACKTRACE", " | ", "FORECAST"
+WRITE(*,"(2A15, A3, 2A15)") "SOL", "LT" , " | ", "SOL", "LT"
+WRITE(*,"(I15, F15.2, A3, I15, F15.2)") 1, J_lt , " | ", sol_backtrace, lt_backtrace 
+write(*,*) "Correct [y/n] ? : "
+READ(*,*) confirm 
+IF ( confirm == "y" .or. confirm == "Y" ) GOTO 555
+GOTO 444
+
+
+	
+555 stop 
 
 END SUBROUTINE 
