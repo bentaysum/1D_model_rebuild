@@ -119,7 +119,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccc
       LOGICAL lsave(4)  
       INTEGER n, m, iprint, nbd(nmax), iwa(3*nmax), isave(44)
       REAL*8 f, factr, pgtol, 
-     $       x(nmax), l(nmax), u_bfgs(nmax), g_lbfgs(nmax), dsave(29),
+     $       x(nmax), l_bfgs(nmax), u_bfgs(nmax), g_lbfgs(nmax),
+     $       dsave(29),
      $       wa(2*mmax*nmax + 5*nmax + 11*mmax*mmax + 8*mmax)
 #endif 
       
@@ -800,15 +801,55 @@ c     ~~~~~~~~~~~~~~~~~~~~~
       ENDDO
 
 
-#IFDEF lbfgsb 
+#ifdef lbfgsb 
 C ***************************************************
 C L-BFGS-B ROUTINE 
 C ***************************************************
-
-
-
-#ENDIF 
+C 	  BACKTRACE TIMESTEP 
+C 	  ==================
+      IF ( idt == t_0 ) THEN 
       
+
+      IF ( LBFGSB_firstcall ) THEN 
+
+          ALLOCATE(LBFGSB_FIRSTGUESS(nqmx*nlayermx)) 
+          LBFGSB_FIRSTGUESS(:) = 0.D0 
+		  
+          u_bfgs(:) = 0.D0 
+          l_bfgs(:) = 0.D0 
+          x(:) = 0.D0 
+          
+          DO iq = 1, nqmx 
+		  
+C 	  Set first guess of input vector
+C     -------------------------------
+		    LBFGSB_FIRSTGUESS( (iq-1)*nlayermx + 1 : iq*nlayermx ) 
+     $      = q(:,iq)*1.D0
+		    x( (iq-1)*nlayermx + 1 : iq*nlayermx ) 
+     $      = q(:,iq)*1.D0
+     
+c     Establish upper and lower limits [BLANKET FOR NOW 10/06/2020] 
+C     Tracers given a 50% margin of adjustment 
+          DO ilayer = 1, nlayermx 
+               u_bfgs( (iq-1)*nlayermx + ilayer ) = 
+     $               MAX( q(ilayer,iq)*1.5D0 , 0.99D0 ) 
+               l_bfgs( (iq-1)*nlayermx + ilayer ) = 
+     $               MAX( q(ilayer,iq)*0.5D0 , 1.D-31 )
+          ENDDO 
+ 
+          ENDDO 
+         
+		 
+		 
+          LBFGSB_firstcall = .False. 
+		  
+      ENDIF 
+	  
+      ENDIF 
+	  
+#endif 
+C ***************************************************
+
 c       call physics
 c       --------------------
 !      write(*,*) "testphys1d avant q", q(1,:)
