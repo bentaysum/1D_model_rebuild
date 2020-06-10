@@ -2655,6 +2655,8 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(ini_lbfgsb.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(iniwritesoil.o)
 
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lbfgsb-module.o)
+
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(mkstat.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(param_slope.o)
@@ -3880,7 +3882,7 @@ $(LIBO)/libphymars.a(geticecover.o) : $(LIBF)/phymars/geticecover.F90
 $(LIBO)/libphymars.a(ini_lbfgsb.o) : $(LIBF)/phymars/ini_lbfgsb.F90
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libphymars.a ini_lbfgsb.o ; \
-	$(COMPILE) $(LIBF)/phymars/ini_lbfgsb.F90 ; \
+	$(COMPTRU90) $(LIBF)/phymars/ini_lbfgsb.F90 ; \
 	$(AR) r $(LIBO)/libphymars.a ini_lbfgsb.o ; $(RM) ini_lbfgsb.o ; \
 	cd $(GCM)
 
@@ -3895,6 +3897,14 @@ $(LIBF)/phymars/comsoil.h
 	$(AR) d $(LIBO)/libphymars.a iniwritesoil.o ; \
 	$(COMPILE) $(LIBF)/phymars/iniwritesoil.F90 ; \
 	$(AR) r $(LIBO)/libphymars.a iniwritesoil.o ; $(RM) iniwritesoil.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(lbfgsb-module.o) : $(LIBF)/phymars/lbfgsb-module.F90
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a lbfgsb-module.o ; \
+	$(COMPTRU90) $(LIBF)/phymars/lbfgsb-module.F90 ; \
+	mv $(MOD_LOC_DIR)/lbfgsb-module.$(MOD_SUFFIX) $(LIBO)/lbfgsb-module.$(MOD_SUFFIX) ; \
+	$(AR) r $(LIBO)/libphymars.a lbfgsb-module.o ; $(RM) lbfgsb-module.o ; \
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(mkstat.o) : $(LIBF)/phymars/mkstat.F90 \

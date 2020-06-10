@@ -1535,6 +1535,16 @@ c ******* TEST ******************************************************
       end if
 c *******************************************************************
       
+	  
+	  
+#ifdef lbfgsb 
+C********************************************************************
+c TEMPORARY L-BFGS-B OPTIMIZATION WORK IN PROGRESS : BOYCOTT OUTPUT 
+c OF 1-D MODEL FOR NOW 
+C********************************************************************
+      GOTO 123 
+#else 
+
 c     ---------------------
 c     Outputs to the screen 
 c     ---------------------
@@ -2575,6 +2585,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       END IF       ! if(ngrid.ne.1)
 
-      icount=icount+1
+C L-BFGS-B [BMT 10/06/2020]	 	 
+#endif 
+123   icount=icount+1
       RETURN
+
       END

@@ -2,6 +2,9 @@
       PROGRAM testphys1d
 ! to use  'getin'
       USE TLMvars
+#ifdef lbfgsb
+	  USE lbfgsb_module
+#endif 
       USE ioipsl_getincom 
       IMPLICIT NONE
 
@@ -108,11 +111,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c    Conditionally activated L-BFGS-B model parameters
 cccccccccccccccccccccccccccccccccccccccccccccccccccccc 
 #ifdef lbfgsb 
+      LOGICAL, SAVE :: LBFGSB_firstcall = .TRUE.
+
       INTEGER, PARAMETER :: nmax = 1024
       INTEGER, PARAMETER :: mmax = 17
-
-	  INTEGER t_0, t_N ! Backtrace and forecast time-steps 
-
       CHARACTER(len=60) task, csave
       LOGICAL lsave(4)  
       INTEGER n, m, iprint, nbd(nmax), iwa(3*nmax), isave(44)
@@ -539,17 +541,19 @@ c
 
       CALL iniorbit(aphelie,periheli,year_day,peri_day,obliquit)
 
+
+#ifdef lbfgsb 
 C  L-BFGS-B Optimization Initialisation routines
 C -----------------------------------------------
-C Will overwrite certain spatial and temporal vars
-C namely day0 and latitude.
-#ifdef lbfgsb 
+C Routines let the user select a Curiosity data-
+C point for a measured VMR of O2
+
        write(*,*) "---- L-BFGS-B ON ----"
 		
 	   ! Curiosity Rover presently at ~ 4.5 South 
        lati(1) = -4.5*pi/180.E0
 	   
-       call ini_lbfgsb(day0, day_step, t_0, t_N)
+       call ini_lbfgsb(day0, day_step)
 
        stop
 #else  
@@ -764,6 +768,7 @@ c     the chemistry routine.
       ndt_tlm = (tlm_day*day_step) + NINT((tlm_lt/24.)*day_step) - 1
       endif 
 
+
       DO idt=1,ndt
 c        IF (idt.eq.ndt) lastcall=.true.
         IF (idt.eq.ndt-day_step-1) then       !test
@@ -795,6 +800,14 @@ c     ~~~~~~~~~~~~~~~~~~~~~
       ENDDO
 
 
+#IFDEF lbfgsb 
+C ***************************************************
+C L-BFGS-B ROUTINE 
+C ***************************************************
+
+
+
+#ENDIF 
       
 c       call physics
 c       --------------------

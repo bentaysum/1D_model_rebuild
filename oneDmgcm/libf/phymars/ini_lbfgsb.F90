@@ -1,5 +1,6 @@
-SUBROUTINE ini_lbfgsb(day0, day_step, t_0, t_N) 
+SUBROUTINE ini_lbfgsb(day0, day_step) 
 
+USE lbfgsb_module
 ! BMT - 09/06/2020
 ! 
 ! Initialisation of the L-BFGS-B optimization routines. 
@@ -20,7 +21,6 @@ IMPLICIT NONE
 ! ===============
 INTEGER, INTENT(INOUT) :: day0  
 INTEGER, INTENT(IN) :: day_step ! Time-steps per sol 
-INTEGER, INTENT(OUT) :: t_0, t_N ! Backtrace and forecast time-steps
 ! Local Variables 
 ! ===============
 REAL, PARAMETER :: spin_up = 10. ! Number of sols allowed for model spin-up 
