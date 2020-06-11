@@ -21,6 +21,8 @@ control. I'm earnestly trying my best here.
 
 ## 11/06/2020 
 
+Loop established, compiles fine; code is ugly
+
 Graddient calculated; figure out how to loop across L-BFGS-B iterations
 
 MCD physical and tracer routines now interpolate with a specified longitude when long_mean

@@ -1,4 +1,4 @@
-SUBROUTINE lbfgsb_forecast(PQi, x, f)  
+SUBROUTINE lbfgsb_forecast(PQi, f)  
 
 USE lbfgsb_module 
 
@@ -31,7 +31,6 @@ IMPLICIT NONE
 ! Input Variables
 ! ===============
 REAL, INTENT(IN) :: PQi( nlayermx, nqmx ) ! End state of 1-D forward model 
-REAL*8, INTENT(INOUT) :: x( nmax ) ! Input vector of this model run 
 REAL*8, INTENT(INOUT) :: f ! Cost function 
 
 ! Local Variables

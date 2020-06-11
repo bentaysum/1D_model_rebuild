@@ -113,9 +113,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccc
 #ifdef lbfgsb 
       CHARACTER(len=60) task, csave
       LOGICAL lsave(4)  
-      INTEGER n, m, iprint, nbd(nmax), iwa(3*nmax), isave(44)
-      REAL*8 f, factr, pgtol, 
-     $       x(nmax), l_bfgs(nmax), u_bfgs(nmax),
+      INTEGER n, m,  iwa(3*nmax), isave(44)
+      REAL*8 f, 
+     $       l_bfgs(nmax), u_bfgs(nmax),
      $       dsave(29),
      $       wa(2*mmax*nmax + 5*nmax + 11*mmax*mmax + 8*mmax) 
      
@@ -828,8 +828,20 @@ c     which in turn shall compute the gradient for our L-BFGS-B routines.
 c     First loop of the L-BFGS-B iterative process 
 c     --------------------------------------------
       IF ( lbfgsb_firstcall_logical ) THEN 
-          CALL lbfgsb_firstcall( q, l_bfgs, u_bfgs, x)
+          CALL lbfgsb_firstcall( q, l_bfgs, u_bfgs)
+          
+          TASK = 'START'
+          
           lbfgsb_firstcall_logical = .False. 
+          
+      ELSE 
+
+               
+      do iq = 1,nqmx
+          q(:,iq) = REAL(x( (iq-1)*nlayermx + 1 : iq*nlayermx))
+      enddo 
+              
+  
       ENDIF 
       
 C      ******************************
@@ -837,13 +849,21 @@ C      L-BFGS-B AT FORECAST TIME-STEP
 C      ******************************
       ELSEIF ( idt == t_N ) THEN 
           CALL LBFGSB_GRAD( idt )
-          CALL lbfgsb_forecast( q, x, f) 
+          CALL lbfgsb_forecast( q, f) 
           
 c     CALL THE L-BFGS-B FOR THE NEXT GUESS OF X 
       call setulb(n,m,x,l_bfgs,u_bfgs,nbd,f,g_lbfgsb
      +            ,factr,pgtol,wa,iwa,task,iprint,
      +            csave,lsave,isave,dsave)
+
+      IF ( task(1:2) .eq. 'FG' ) THEN 
+           ! START 1-D MODEL AGAIN
+           GOTO 456
       ENDIF 
+
+
+      ENDIF 
+
 
       IF ( idt > t_0 ) CALL LBFGSB_GRAD( idt )
 

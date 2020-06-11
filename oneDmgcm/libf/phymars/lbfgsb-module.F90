@@ -11,5 +11,19 @@ INTEGER, PARAMETER :: mmax = 17 ! "  "  "  "
 REAL*8 J_o2 ! Curiosity O2 mixing ratio
 
 REAL*8, ALLOCATABLE :: Adjoint_Transition(:,:) 
+
+! *************************************************
+! Variables for the call to the setulb() subroutine
+! *************************************************
+REAL*8 X(nmax) ! Solution vector
 REAL*8 g_lbfgsb(nmax) ! Gradient of the cost function
+INTEGER, PARAMETER :: iprint = 1
+
+! ************ Stopping Criteria *************** !
+REAL*8, PARAMETER :: factr=1.0d+7
+REAL*8, PARAMETER :: pgtol=1.0d-5
+! ********************************************* !
+INTEGER nbd(nmax)
+
+
 END 

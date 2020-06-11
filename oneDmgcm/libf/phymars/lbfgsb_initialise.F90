@@ -168,7 +168,7 @@ END SUBROUTINE
 
 ! =========================================================================== !
 
-SUBROUTINE lbfgsb_firstcall( pq , l, u, x) 
+SUBROUTINE lbfgsb_firstcall( pq , l, u) 
 
 ! Subroutine is only called at the very first iteration of the L-BFGS-B optim-
 ! ization routines; NOT the first call of the forward model. 
@@ -183,7 +183,6 @@ IMPLICIT NONE
 ! Input Variables 
 ! =============== 
 REAL, INTENT(IN) :: pq(nlayermx,nqmx) ! Intitial mixing ratios of 1-D model
-REAL*8, INTENT(INOUT) :: x(nmax) ! Solution for the L-BFGS-B routines 
 REAL*8, INTENT(INOUT) :: u(nmax), l(nmax) ! Limits for x
 ! Local Variables
 ! ===============
@@ -218,7 +217,7 @@ DO iq = 1, nqmx
                     
 ENDDO 
 
-
+nbd( 1 : nqmx*nlayermx) = 2 ! Lower AND upper bounds present
 
 
 RETURN 
