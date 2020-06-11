@@ -166,6 +166,14 @@ GOTO 444
 
 END SUBROUTINE 
 
+
+
+
+
+
+
+
+
 ! =========================================================================== !
 
 SUBROUTINE lbfgsb_firstcall( pq , l, u) 
@@ -179,6 +187,7 @@ IMPLICIT NONE
 
 #include "dimensions.h"
 #include "dimphys.h"
+#include "tracer.h"
 
 ! Input Variables 
 ! =============== 
@@ -195,22 +204,28 @@ INTEGER idx
 ALLOCATE( LBFGSB_FIRSTGUESS( nqmx*nlayermx ) ) 
 
 DO iq = 1, nqmx
-     ! L-BFGS-B works in Double Precision ergo the 1.D0 
-     LBFGSB_FIRSTGUESS(  (iq-1)*nlayermx + 1 : iq*nlayermx ) = &
-                    pq(:,iq)*1.D0 
-     ! Establish this in the input array for the L-BFGS-B routine 
-     x((iq-1)*nlayermx + 1 : iq*nlayermx ) = &
-                    MAX( pq(:,iq)*1.D0, 1.D-30)
-                    
      ! Prescribe limits (Upper and Lower) on the solution vector x 
      ! ===========================================================
      ! 11/06/2020 : +/- 50% initially; make interactive/smarter.
      DO lyr = 1, nlayermx 
-         
+     
           idx = ( iq - 1 )*nlayermx + lyr 
+
+          ! L-BFGS-B works in Double Precision ergo the 1.D0 
+          LBFGSB_FIRSTGUESS(idx) = MAX(pq(lyr,iq)*1.D0,1.E-31)  
+          ! Establish this in the input array for the L-BFGS-B routine 
+          x(idx) = LBFGSB_FIRSTGUESS(idx)
           
-          u(idx) = MIN( pq(lyr,iq)*1.5D0, 0.99D0 )
-          l(idx) = MAX( pq(lyr,iq)*0.5D0, 1.D-30) 
+          
+          u(idx) = MIN( x(idx)*1.5D0, 0.99D0 )
+          l(idx) =  MIN( x(idx)*0.5D0, u(idx) )
+          
+          IF ( u(idx) < l(idx) ) THEN 
+          
+               WRITE(*,*) trim(noms(iq)) 
+               write(*,*) pq(lyr,iq), u(idx), l(idx) 
+               stop
+          ENDIF 
           
      ENDDO
                     
