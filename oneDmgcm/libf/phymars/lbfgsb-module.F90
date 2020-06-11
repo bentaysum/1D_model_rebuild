@@ -10,4 +10,6 @@ INTEGER, PARAMETER :: mmax = 17 ! "  "  "  "
 
 REAL*8 J_o2 ! Curiosity O2 mixing ratio
 
+REAL*8, ALLOCATABLE :: Adjoint_Transition(:,:) 
+REAL*8 g_lbfgsb(nmax) ! Gradient of the cost function
 END 

@@ -21,6 +21,8 @@ control. I'm earnestly trying my best here.
 
 ## 11/06/2020 
 
+Graddient calculated; figure out how to loop across L-BFGS-B iterations
+
 MCD physical and tracer routines now interpolate with a specified longitude when long_mean
 is switched to .FALSE. . SZA routines are -not- affected as mcd_longitude is a variable
 restricted to the scope of the MCD interpolation routines. 

@@ -115,7 +115,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccc
       LOGICAL lsave(4)  
       INTEGER n, m, iprint, nbd(nmax), iwa(3*nmax), isave(44)
       REAL*8 f, factr, pgtol, 
-     $       x(nmax), l_bfgs(nmax), u_bfgs(nmax), g_lbfgs(nmax),
+     $       x(nmax), l_bfgs(nmax), u_bfgs(nmax),
      $       dsave(29),
      $       wa(2*mmax*nmax + 5*nmax + 11*mmax*mmax + 8*mmax) 
      
@@ -798,7 +798,8 @@ C ******************************
 C     *******************************
 C     L-BFGS-B AT BACKTRACE TIME-STEP  
 C     *******************************
-
+      WRITE(*,"(3A5)") "idt" , "t_0", "t_N" 
+      WRITE(*,"(3I5)") idt, t_0, t_N
       IF ( idt == t_0 ) THEN 
           
 
@@ -808,22 +809,22 @@ C     ========================
 c     Trigger conditionals for the activation of the Tangent Linear Model
 c     which in turn shall compute the gradient for our L-BFGS-B routines.
 !     -------------------------------------------------------------------
+      ALLOCATE( Adjoint_Transition( nqmx*nlayermx, nqmx*nlayermx) )
 
-C       call_tlm = .False.     ! Prevents multiple initialisations.
+      call_tlm = .False.     ! Prevents multiple initialisations.
 
-C       tlm_on = .True.        ! Routines will now engage.
+      tlm_on = .True.        ! Routines will now engage.
 
-C       mcd_profiles = .False. ! Interpolation routines will 
-C                               ! invalidate TLM results.
+      mcd_profiles = .False. ! Interpolation routines will 
+                              ! invalidate TLM results.
 
-C       calladj = .False. ! Convective adjustments require a 
-C                           ! conditional that the TLM will not
-C                           ! be capable of performing.
-C       callcond = .False. ! Again, conditionals activate this 
-C                           ! module.
-C       call TLM_initialise
-          
-      
+      calladj = .False. ! Convective adjustments require a 
+                          ! conditional that the TLM will not
+                          ! be capable of performing.
+      callcond = .False. ! Again, conditionals activate this 
+                          ! module.
+      call TLM_initialise
+                
 c     First loop of the L-BFGS-B iterative process 
 c     --------------------------------------------
       IF ( lbfgsb_firstcall_logical ) THEN 
@@ -835,15 +836,13 @@ C      ******************************
 C      L-BFGS-B AT FORECAST TIME-STEP 
 C      ******************************
       ELSEIF ( idt == t_N ) THEN 
-          
-
+          CALL LBFGSB_GRAD( idt )
           CALL lbfgsb_forecast( q, x) 
-         
-        write(*,*) "weird" 
-        STOP
-          
-         
+     
       ENDIF 
+
+      IF ( idt > t_0 ) CALL LBFGSB_GRAD( idt )
+
       	  
 #endif 
 C ***************************************************
