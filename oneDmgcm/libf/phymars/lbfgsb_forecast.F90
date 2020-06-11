@@ -1,4 +1,4 @@
-SUBROUTINE lbfgsb_forecast(PQi, x, f, g)  
+SUBROUTINE lbfgsb_forecast(PQi, x, f)  
 
 USE lbfgsb_module 
 
@@ -33,7 +33,6 @@ IMPLICIT NONE
 REAL, INTENT(IN) :: PQi( nlayermx, nqmx ) ! End state of 1-D forward model 
 REAL*8, INTENT(INOUT) :: x( nmax ) ! Input vector of this model run 
 REAL*8, INTENT(INOUT) :: f ! Cost function 
-REAL*8, INTENT(INOUT) :: g( nmax ) ! Gradient 
 
 ! Local Variables
 ! ===============
@@ -43,9 +42,12 @@ DO iq = 1, nqmx
 
      IF ( trim(noms(iq)) == "o2" ) THEN 
           call LBFGSB_COST( PQi(1,iq)*1.D0, f)
+          EXIT 
      ENDIF 
      
 ENDDO 
+
+
 
 END SUBROUTINE 
 

@@ -837,8 +837,12 @@ C      L-BFGS-B AT FORECAST TIME-STEP
 C      ******************************
       ELSEIF ( idt == t_N ) THEN 
           CALL LBFGSB_GRAD( idt )
-          CALL lbfgsb_forecast( q, x) 
-     
+          CALL lbfgsb_forecast( q, x, f) 
+          
+c     CALL THE L-BFGS-B FOR THE NEXT GUESS OF X 
+      call setulb(n,m,x,l_bfgs,u_bfgs,nbd,f,g_lbfgsb
+     +            ,factr,pgtol,wa,iwa,task,iprint,
+     +            csave,lsave,isave,dsave)
       ENDIF 
 
       IF ( idt > t_0 ) CALL LBFGSB_GRAD( idt )
