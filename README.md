@@ -19,8 +19,15 @@ non-navigatable, and at this point all I can see is: I don't frankly care anymor
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
 
-## 10/06/2020 
+## 11/06/2020 
 
+MCD physical and tracer routines now interpolate with a specified longitude when long_mean
+is switched to .FALSE. . SZA routines are -not- affected as mcd_longitude is a variable
+restricted to the scope of the MCD interpolation routines. 
+
+Forecast time-step routine and cost function calculations perfromed. 
+
+## 10/06/2020 
 
 First guess rouintes started. TLM activates successfully. 
 

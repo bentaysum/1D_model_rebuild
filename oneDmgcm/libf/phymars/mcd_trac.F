@@ -3,6 +3,10 @@
      &                        o2, h2,
      &                        h2o)
 
+      ! To acquire longitude...
+      USE ioipsl_getincom 
+
+
       IMPLICIT NONE
 
 
@@ -25,6 +29,8 @@
       real co2(nlayermx), co(nlayermx), o2(nlayermx)
       real h2(nlayermx), h2o(nlayermx)
 ! 	  LOCAL VARIABLES
+!     === longitude ===
+      real, save :: mcd_longitude 
 !     === netCDF parameters ===
       integer N_LT, N_ALT, N_ZLS, N_LAT, N_LONG
       parameter (N_LT =4, N_ALT = 30, N_ZLS = 37, 
@@ -136,6 +142,10 @@
            if (retval .ne. nf_noerr) call get_error_hand(retval)
            
       else 
+          ! Read longitude for MCD parameters
+           mcd_longitude=0. ! default value for ndt
+           call getin("longitude",mcd_longitude) 
+     
            ! Get IDs
            retval = nf_inq_varid(ncid, 'co2', co2id)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
@@ -219,19 +229,19 @@ C !=======================================================================
                          do w = 1, N_LAT  
                          
                        CALL interp_line(mcdv5_long,mcdv5_co2(x,y,z,w,:),
-     $                                    N_LONG, long(1)*180./pi, 
+     $                                    N_LONG, mcd_longitude, 
      $                                    int_long_co2(x,y,z,w), 1)
                        CALL interp_line(mcdv5_long,mcdv5_co(x,y,z,w,:),
-     $                                    N_LONG, long(1)*180./pi, 
+     $                                    N_LONG, mcd_longitude, 
      $                                    int_long_co(x,y,z,w), 1)
                        CALL interp_line(mcdv5_long,mcdv5_o2(x,y,z,w,:),
-     $                                    N_LONG, long(1)*180./pi, 
+     $                                    N_LONG, mcd_longitude, 
      $                                    int_long_o2(x,y,z,w), 1)
                        CALL interp_line(mcdv5_long,mcdv5_h2(x,y,z,w,:),
-     $                                    N_LONG, long(1)*180./pi, 
+     $                                    N_LONG, mcd_longitude, 
      $                                    int_long_h2(x,y,z,w), 1)     
                        CALL interp_line(mcdv5_long,mcdv5_h2o(x,y,z,w,:),
-     $                                    N_LONG, long(1)*180./pi, 
+     $                                    N_LONG, mcd_longitude, 
      $                                    int_long_h2o(x,y,z,w), 1)
      
                          

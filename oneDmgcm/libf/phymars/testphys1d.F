@@ -111,17 +111,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c    Conditionally activated L-BFGS-B model parameters
 cccccccccccccccccccccccccccccccccccccccccccccccccccccc 
 #ifdef lbfgsb 
-      LOGICAL, SAVE :: LBFGSB_firstcall = .TRUE.
-
-      INTEGER, PARAMETER :: nmax = 1024
-      INTEGER, PARAMETER :: mmax = 17
       CHARACTER(len=60) task, csave
       LOGICAL lsave(4)  
       INTEGER n, m, iprint, nbd(nmax), iwa(3*nmax), isave(44)
       REAL*8 f, factr, pgtol, 
      $       x(nmax), l_bfgs(nmax), u_bfgs(nmax), g_lbfgs(nmax),
      $       dsave(29),
-     $       wa(2*mmax*nmax + 5*nmax + 11*mmax*mmax + 8*mmax)
+     $       wa(2*mmax*nmax + 5*nmax + 11*mmax*mmax + 8*mmax) 
+     
+      LOGICAL, SAVE :: lbfgsb_firstcall_logical = .True.  
 #endif 
       
       
@@ -546,6 +544,7 @@ c
 
 
 #ifdef lbfgsb 
+       IF ( lbfgsb_firstcall_logical ) THEN 
 C ================================================================
 C  L-BFGS-B Optimization Initialisation routines
 C ----------------------------------------------------------------
@@ -568,7 +567,7 @@ C forecast time-step, t_N , such that 1 <= t_0 < t_N
        ! temporal domain.
        ! ===============================================
        call_tlm = .False.
-     
+       ENDIF 
 C ================================================================
 #endif
 
@@ -790,52 +789,19 @@ c=======================================================================
 c
       DO idt=1,ndt
       
-#ifdef lbfgsb 
-C ***************************************************
-C L-BFGS-B AT BACKTRACE TIME-STEP  
-C ***************************************************
-      IF ( idt == t_0 ) THEN 
       
-c     First loop of the L-BFGS-B iterative process 
-c     ============================================
-      IF ( LBFGSB_firstcall ) THEN 
-
-
-          ALLOCATE(LBFGSB_FIRSTGUESS(nqmx*nlayermx)) 
-          LBFGSB_FIRSTGUESS(:) = 0.D0 
-		  
-          u_bfgs(:) = 0.D0 
-          l_bfgs(:) = 0.D0 
-          
-          x(:) = 0.D0 
-          
-          DO iq = 1, nqmx 
-		  
-c     Define a first guess of the solution vector x(:) 
-c     ------------------------------------------------
-		    LBFGSB_FIRSTGUESS( (iq-1)*nlayermx + 1 : iq*nlayermx ) 
-     $      = q(:,iq)*1.D0
-		    x( (iq-1)*nlayermx + 1 : iq*nlayermx ) 
-     $      = q(:,iq)*1.D0
-     
-c     Establish upper and lower limits [BLANKET FOR NOW 10/06/2020] 
-C     Tracers given a 50% margin of adjustment 
-C     -------------------------------------------------------------
-          DO ilayer = 1, nlayermx 
-               u_bfgs( (iq-1)*nlayermx + ilayer ) = 
-     $               MAX( q(ilayer,iq)*1.5D0 , 0.99D0 ) 
-               l_bfgs( (iq-1)*nlayermx + ilayer ) = 
-     $               MAX( q(ilayer,iq)*0.5D0 , 1.D-31 )
-          ENDDO 
  
-          ENDDO 
-         
-		 
-		 
-          LBFGSB_firstcall = .False. 
-		  
-      ENDIF 
-	  
+C ******************************
+c L-BFGS-B Optimization Routines
+C ****************************** 
+#ifdef lbfgsb      
+C     *******************************
+C     L-BFGS-B AT BACKTRACE TIME-STEP  
+C     *******************************
+
+      IF ( idt == t_0 ) THEN 
+          
+
 C     Every L-BFGS-B iteration 
 C     ======================== 
 
@@ -843,23 +809,42 @@ c     Trigger conditionals for the activation of the Tangent Linear Model
 c     which in turn shall compute the gradient for our L-BFGS-B routines.
 !     -------------------------------------------------------------------
 
-          call_tlm = .False.     ! Prevents multiple initialisations.
+C       call_tlm = .False.     ! Prevents multiple initialisations.
 
-          tlm_on = .True.        ! Routines will now engage.
+C       tlm_on = .True.        ! Routines will now engage.
 
-          mcd_profiles = .False. ! Interpolation routines will 
-                              ! invalidate TLM results.
+C       mcd_profiles = .False. ! Interpolation routines will 
+C                               ! invalidate TLM results.
 
-          calladj = .False. ! Convective adjustments require a 
-                          ! conditional that the TLM will not
-                          ! be capable of performing.
-          callcond = .False. ! Again, conditionals activate this 
-                          ! module.
-          call TLM_initialise
-
-       
+C       calladj = .False. ! Convective adjustments require a 
+C                           ! conditional that the TLM will not
+C                           ! be capable of performing.
+C       callcond = .False. ! Again, conditionals activate this 
+C                           ! module.
+C       call TLM_initialise
+          
+      
+c     First loop of the L-BFGS-B iterative process 
+c     --------------------------------------------
+      IF ( lbfgsb_firstcall_logical ) THEN 
+          CALL lbfgsb_firstcall( q, l_bfgs, u_bfgs, x)
+          lbfgsb_firstcall_logical = .False. 
       ENDIF 
-	  
+      
+C      ******************************
+C      L-BFGS-B AT FORECAST TIME-STEP 
+C      ******************************
+      ELSEIF ( idt == t_N ) THEN 
+          
+
+          CALL lbfgsb_forecast( q, x) 
+         
+        write(*,*) "weird" 
+        STOP
+          
+         
+      ENDIF 
+      	  
 #endif 
 C ***************************************************
       
@@ -1006,15 +991,6 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
       ENDIF 
       
      
-#ifdef lbfgsb
-      write(*,*) " STEPS : ", idt, t_0 , t_ N
-      IF ( idt == t_N ) THEN 
-      
-      WRITE(*,*) "SEEMS TO BE OKAY..." 
-      stop
-      ENDIF 
-
-#endif 
 
         
         

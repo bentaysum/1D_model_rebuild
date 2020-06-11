@@ -2653,6 +2653,8 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(geticecover.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(iniwritesoil.o)
 
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lbfgsb_forecast.o)
+
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lbfgsb_initialise.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lbfgsb-module.o)
@@ -3890,6 +3892,15 @@ $(LIBF)/phymars/comsoil.h
 	$(AR) d $(LIBO)/libphymars.a iniwritesoil.o ; \
 	$(COMPILE) $(LIBF)/phymars/iniwritesoil.F90 ; \
 	$(AR) r $(LIBO)/libphymars.a iniwritesoil.o ; $(RM) iniwritesoil.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(lbfgsb_forecast.o) : $(LIBF)/phymars/lbfgsb_forecast.F90 \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a lbfgsb_forecast.o ; \
+	$(COMPTRU90) $(LIBF)/phymars/lbfgsb_forecast.F90 ; \
+	$(AR) r $(LIBO)/libphymars.a lbfgsb_forecast.o ; $(RM) lbfgsb_forecast.o ; \
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(lbfgsb_initialise.o) : $(LIBF)/phymars/lbfgsb_initialise.F90

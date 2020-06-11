@@ -39,7 +39,7 @@ REAL curiosity_lt_array(N_curiosity) 		   ! local Time of curiosity collected po
 REAL curiosity_o2_array(N_curiosity) 		   ! Curiosity collected value of surface O2 VMR
 REAL curiosity_co2_array(N_curiosity) 	   ! Curiosity collected value of surface CO2 VMR [Constraint for L-BFGS-B] 
 REAL curiosity_co_array(N_curiosity) 		   ! Curiosity collected value of surface CO VMR [Constraint for L-BFGS-B] 
-REAL J_ls, J_lt, J_o2, J_co2, J_co ! Selected individual values of the forecast from the above arrays
+REAL J_ls, J_lt, J_co2, J_co ! Selected individual values of the forecast from the above arrays
 INTEGER tid ! Not needed at present 
 REAL fp, co2_er, ar, ar_er, n2, n2_er, co_er, o2_er(2)  ! Other data not needed at present
 REAL sol ! For finding curiosity_lt values
@@ -95,7 +95,7 @@ GOTO 222
 ! 1.1.3 : Set these values as the forecast values 
 333 J_co = curiosity_co_array(data_point)
     J_co2 = curiosity_co2_array(data_point)
-    J_o2 = curiosity_o2_array(data_point)
+    J_o2 = curiosity_o2_array(data_point)*1.D0
 	J_lt = curiosity_lt_array(data_point)
 	J_ls = curiosity_zls_array(data_point)
 
@@ -165,3 +165,63 @@ GOTO 444
 555 RETURN  
 
 END SUBROUTINE 
+
+! =========================================================================== !
+
+SUBROUTINE lbfgsb_firstcall( pq , l, u, x) 
+
+! Subroutine is only called at the very first iteration of the L-BFGS-B optim-
+! ization routines; NOT the first call of the forward model. 
+
+use lbfgsb_module
+
+IMPLICIT NONE 
+
+#include "dimensions.h"
+#include "dimphys.h"
+
+! Input Variables 
+! =============== 
+REAL, INTENT(IN) :: pq(nlayermx,nqmx) ! Intitial mixing ratios of 1-D model
+REAL*8, INTENT(INOUT) :: x(nmax) ! Solution for the L-BFGS-B routines 
+REAL*8, INTENT(INOUT) :: u(nmax), l(nmax) ! Limits for x
+! Local Variables
+! ===============
+INTEGER iq, lyr ! Tracer and layer iterators 
+INTEGER idx 
+
+
+! Stash the very first guess of the initial mixing ratio solution
+! in the LBFGSB_FIRSTGUESS array 
+ALLOCATE( LBFGSB_FIRSTGUESS( nqmx*nlayermx ) ) 
+
+DO iq = 1, nqmx
+     ! L-BFGS-B works in Double Precision ergo the 1.D0 
+     LBFGSB_FIRSTGUESS(  (iq-1)*nlayermx + 1 : iq*nlayermx ) = &
+                    pq(:,iq)*1.D0 
+     ! Establish this in the input array for the L-BFGS-B routine 
+     x((iq-1)*nlayermx + 1 : iq*nlayermx ) = &
+                    MAX( pq(:,iq)*1.D0, 1.D-30)
+                    
+     ! Prescribe limits (Upper and Lower) on the solution vector x 
+     ! ===========================================================
+     ! 11/06/2020 : +/- 50% initially; make interactive/smarter.
+     DO lyr = 1, nlayermx 
+         
+          idx = ( iq - 1 )*nlayermx + lyr 
+          
+          u(idx) = MIN( pq(lyr,iq)*1.5D0, 0.99D0 )
+          l(idx) = MAX( pq(lyr,iq)*0.5D0, 1.D-30) 
+          
+     ENDDO
+                    
+                    
+ENDDO 
+
+
+
+
+RETURN 
+
+END SUBROUTINE
+
