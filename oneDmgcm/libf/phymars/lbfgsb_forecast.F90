@@ -98,6 +98,7 @@ IF ( i < t_N ) THEN
      
      P = MATMUL( TLM, P ) 
 
+     RETURN
 ! On the forecast time-step we calculate the  gradient of the cost 
 ! function, i.e. the sensitivity vector from the adjoint model. 
 ELSEIF ( i == t_N ) THEN

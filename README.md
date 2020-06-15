@@ -23,6 +23,8 @@ control. I'm earnestly trying my best here.
 
 COst and gradient calculations hooked up ; get the loop working properly now...
 
+Loop is difficult to navigate and figure out.
+
 ## 11/06/2020 
 
 Loop established, compiles fine; code looks nicer; need to complete:

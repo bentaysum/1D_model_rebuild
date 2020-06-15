@@ -839,12 +839,18 @@ c                 1-D forward model
 c         1.1.5 : Close this segment 
           lbfgsb_firstcall_logical = .False.
           
-
+      GOTO 789 
       ENDIF 
+
+          call setulb(n,m,x,l_bfgs,u_bfgs,nbd,f,g_lbfgsb
+     +            ,factr,pgtol,wa,iwa,task,iprint,
+     +            csave,lsave,isave,dsave)
+      
+      IF ( TASK(1:5) .EQ. 'NEW_X' ) GOTO 456
       
 C    1.2 : Every L-BFGS-B loop iteration [ 1 <= i <= t_N - t_0 ]
 c    -----------------------------------------------------------
-      call_tlm = .False.     ! Prevents multiple initialisations.
+789   call_tlm = .False.     ! Prevents multiple initialisations.
 
       tlm_on = .True.        ! Routines will now engage.
 
@@ -1016,25 +1022,30 @@ C C      L-BFGS-B AT FORECAST TIME-STEP
 C C      ******************************
       IF ( idt == t_N ) THEN
 
+      IF ( task == 'FG' ) THEN 
 C      2.1 : Calculate the value of the Cost Function     
           F = lbfgsb_cost(q)
 
 C      2.2 : Calculate the value of the Gradient 
           CALL lbfgsb_grad(idt) 
           
-C C      2.3 : Call the L-BFGS-B procedure with X, f, and g 
-C C            from 2.1 and 2.2
-C           call setulb(n,m,x,l_bfgs,u_bfgs,nbd,f,g_lbfgsb
-C      +            ,factr,pgtol,wa,iwa,task,iprint,
-C      +            csave,lsave,isave,dsave)
+C      2.3 : Call the L-BFGS-B procedure with X, f, and g 
+C            from 2.1 and 2.2
+          GOTO 456 
  
- 
+      ELSEIF ( task == 'NEW_X' ) THEN 
+              GOTO 456
+      ELSE 
+          write(*,*) "L-BFGS-B COMPLETE?"
+          STOP 
+      
+      ENDIF 
 C     2.4 : Revert to 456, and set PQ to values of x at 
 C           time-step idt == t_0 [ i.e. 1.3 ] 
      
      
      
-      ELSE 
+      ELSEIF ( idt .ge. t_0 ) THEN
       
       CALL lbfgsb_grad(idt)
      
@@ -1042,40 +1053,6 @@ C           time-step idt == t_0 [ i.e. 1.3 ]
      
       ENDIF
 #endif 
-
-     
-     
-     
-c     2.0 : Call the L-BFGS-B procedure 
-C       call setulb(n,m,x,l_bfgs,u_bfgs,nbd,f,g_lbfgsb
-C      +            ,factr,pgtol,wa,iwa,task,iprint,
-C      +            csave,lsave,isave,dsave)
-
-     
-C       ELSEIF ( idt == t_N ) THEN 
-C           CALL LBFGSB_GRAD( idt )
-C           CALL lbfgsb_forecast( q, f) 
-          
-C c     CALL THE L-BFGS-B FOR THE NEXT GUESS OF X 
-C       call setulb(n,m,x,l_bfgs,u_bfgs,nbd,f,g_lbfgsb
-C      +            ,factr,pgtol,wa,iwa,task,iprint,
-C      +            csave,lsave,isave,dsave)
-
-C       IF ( task(1:2) .eq. 'FG' ) THEN
-C           GOTO 456  
-C       ELSEIF (task(1:5) .eq. 'NEW_X') THEN
-C           GOTO 456
-C       ELSE 
-C           WRITE(*,*) "DONE?"
-C           STOP 
-C       ENDIF 
-
-
-C       ENDIF 
-
-
-C       IF ( idt > t_0 ) CALL LBFGSB_GRAD( idt )
-
 C ***************************************************
       
            
