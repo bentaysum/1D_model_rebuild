@@ -1,157 +1,146 @@
-! SUBROUTINE lbfgsb_forecast(PQi, f)  
+! ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!  Subroutines for the L-BFGS-B Optimisation loop that occur cc
+!  during the forecast time-step, t_N. This routines are :   cc
+!                                                            cc
+!  1) lbfgsb_cost   : Calculates the cost function value     cc 
+!  2) lbfgsb_grad   : Calculates the gradient                cc 
+!                                                            cc       
+! ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
 
-! USE lbfgsb_module 
+REAL*8 FUNCTION lbfgsb_cost( PQi )
 
-! IMPLICIT NONE 
+USE lbfgsb_module
 
-! #include "dimensions.h"
-! #include "dimphys.h"
-! #include "conc.h" 
-! #include "tracer.h"
-! ! ====================================================
-! ! Takes the passed mixing ratio vector PQ_{i} that
-! ! comes from the optimization routines, and 
-! ! calculate the value of the Cost Function
-! ! COST. The gradient of COST is then found 
-! ! via the 1-D model adjoint matrix; these are
-! ! both passed to the L-BFGS-B routine which 
-! ! will construct a new guess of vector PQ_{i+1}, 
-! ! the 1-D model will rewind, and PQ_{i+1} will be
-! ! used in the forward model. The new COST and 
-! ! gradient will be calculated, and the process
-! ! repeats until an ideal PQ_{I} is found to 
-! ! minimize the value of COST.
+IMPLICIT NONE 
 
-! ! COST = ABS( PQ( O2 )_i - [Curiosity O2] ) 
+#include "dimensions.h"
+#include "dimphys.h"
+#include "tracer.h"
+#include "conc.h" 
 
-! ! GRAD = d(PQ(O2)_i)/d(PQ) (from Adjoint calculations)
+! Input 
+! =====
+REAL, intent(in) :: PQi(nlayermx,nqmx)
 
-! ! ====================================================
+! Local 
+! =====
+INTEGER iq ! Loop iterator
 
-! ! Input Variables
-! ! ===============
-! REAL, INTENT(IN) :: PQi( nlayermx, nqmx ) ! End state of 1-D forward model 
-! REAL*8, INTENT(INOUT) :: f ! Cost function 
+! Output 
+! ======
+REAL*8 COST 
+REAL*8 vmr_mmr ! VMR -> MMR conversion factor 
 
-! ! Local Variables
-! ! ===============
-! INTEGER iq, lyr ! tracer and layer iterators 
+! ----------------------------------------------------------------! 
+DO iq = 1, nqmx 
 
-! DO iq = 1, nqmx
+     IF ( trim(noms(iq)) == "o2" ) THEN 
+          vmr_mmr = (1.D0*mmol(iq))/(1.0D0*mmean(1,iq)) 
+          COST = ABS( (1.D0*PQi(1,iq)) - (J_o2*vmr_mmr) ) 
+          exit
+     ENDIF 
 
-     ! IF ( trim(noms(iq)) == "o2" ) THEN 
-          ! call LBFGSB_COST( PQi(1,iq)*1.D0, f)
-          ! EXIT 
-     ! ENDIF 
+ENDDO 
+
+
+lbfgsb_cost = COST 
+
+RETURN 
+
+END FUNCTION lbfgsb_cost
+
+
+! CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+
+SUBROUTINE lbfgsb_grad( i ) 
+
+USE TLMvars 
+USE lbfgsb_module
+
+IMPLICIT NONE 
+
+#include "dimensions.h"
+#include "dimphys.h"
+#include "tracer.h"
+#include "conc.h" 
+
+! Use the Adjoint equation to backtrace the sensitivity of the 1-D model's
+! forecast element at the forecast time-step t_N to the previously defined
+! backtrace time-step t_0. 
+
+! INPUT VARIABLES 
+! ---------------
+INTEGER, INTENT(IN) :: i ! 1-D model time-step 
+
+! LOCAL VARIABLES 
+! ---------------
+REAL*8, SAVE :: P(nqmx*nlayermx,nqmx*nlayermx) 
+LOGICAL, SAVE :: FIRSTCALL = .TRUE. 
+INTEGER iq ! Loop iterator 
+
+! ---------------------------------------------------------------------
+
+! On first entry ( i == t_0 ) we initialise the transition matrix P 
+! as the 1st TLM and return ( gradient only calculated at forecast 
+! time-step t_N 
+IF ( FIRSTCALL ) THEN 
+     FIRSTCALL = .False. 
      
-! ENDDO 
+     P = TLM 
+   
+     RETURN 
+ENDIF 
 
-
-
-! END SUBROUTINE 
-
-
-
-
-
-! SUBROUTINE LBFGSB_COST(PQi_O2, COST)
-
-! use lbfgsb_module
-
-! IMPLICIT NONE 
-
-! #include "dimensions.h"
-! #include "dimphys.h"
-! #include "conc.h" 
-
-
-! ! Input 
-! ! =====
-! REAL*8, INTENT(IN) :: PQi_O2
-! ! Local 
-! ! =====
-! REAL*8, PARAMETER :: mmol_o2 = 32.D0
-! ! Ouput 
-! ! =====
-! REAL*8 COST ! Cost function value
-! REAL*8 GRAD(nmax) ! Gradient of Cost-Function  
-
-! ! *****************************
-! ! COST FUNCTION VALUE [SCALAR] 
-! ! *****************************
-! COST = PQi_O2 - (J_O2*mmol_o2/(mmean(1,1)*1.D0)) 
-! ! COST = ABS( PQi_O2 - (J_O2*mmol_o2/(mmean(1,1)*1.D0)) ) 
-
-
-
-! RETURN 
-
-! END 
-
-
-
-! SUBROUTINE LBFGSB_GRAD(iter) 
-
-! use lbfgsb_module
-! use TLMvars 
- 
-! IMPLICIT NONE 
-
-! #include "dimensions.h"
-! #include "dimphys.h"
-! #include "conc.h" 
-! #include "tracer.h"
-
-! ! Input 
-! ! =====
-! INTEGER iter 
-
-! ! Local
-! ! =====
-! LOGICAL, SAVE :: FIRSTCALL = .TRUE. 
-! INTEGER t ! Time iterator 
-! INTEGER iq ! Tracer iterator
-
-
-! ! Firstcall : Adjoint Transition Matrix is simply the transpose of the first TLM matrix 
-! IF ( firstcall ) THEN 
-     ! firstcall = .False. 
+! On following entries, we calculate this time-step's (i) transition 
+! matrix P^i via the formula:
+!         P^i = TLM^i x P^{i-1} 
+IF ( i < t_N ) THEN 
      
-     ! Adjoint_Transition = TRANSPOSE( TLM ) 
-     ! RETURN 
+     P = MATMUL( TLM, P ) 
+
+! On the forecast time-step we calculate the  gradient of the cost 
+! function, i.e. the sensitivity vector from the adjoint model. 
+ELSEIF ( i == t_N ) THEN
+
+     P = MATMUL( TLM, P ) 
+
+     ! Initialise the gradient vector 
+     g_lbfgsb( : nqmx*nlayermx ) = 0.D0 
+     ! At the forecast time-step the sensitivity vector is trivial
+     DO iq = 1, nqmx
+          IF ( trim(noms(iq)) == "o2" ) THEN
+               g_lbfgsb( (iq-1)*nlayermx + 1 ) = 1.D0 
+               EXIT 
+          ENDIF 
+     ENDDO 
      
-! ELSE 
-     ! Adjoint_Transition = MATMUL( Adjoint_Transition, TRANSPOSE(TLM) )
-    
-! ENDIF 
-
-
-! ! If the time-step is the forecast time, we construct the adjoint sensitivity vector 
-! ! which equals the gradient vector g for the cost-function of L-BFGS-B routines.
-! IF ( iter .ne. t_N ) THEN 
-     ! RETURN
-! ELSE 
+     ! Transpose the transition matrix 
+     P = Transpose(P) 
      
-     ! write(*,*) "SENSITIVITY CONSTRUCTION..."
-     ! g_lbfgsb(:) = 0.D0 
+     ! Calculation of the gradient vector
+     g_lbfgsb(:nqmx*nlayermx) = MATMUL( P , g_lbfgsb(:nqmx*nlayermx) ) 
      
-     ! DO iq = 1, nqmx
-          ! IF ( trim(noms(iq)) == "o2" ) THEN 
-                    ! g_lbfgsb( (iq-1)*nlayermx + 1 ) = 1.D0 
-                    ! EXIT
-          ! ENDIF 
-     ! ENDDO 
+     ! Reset FIRSTCALL for next L-BFGS-B loop iterations 
+     FIRSTCALL = .True.
      
-     ! g_lbfgsb( 1 : nqmx*nlayermx ) = MATMUL( Adjoint_Transition, g_lbfgsb( 1:nqmx*nlayermx ) )
+     ! Clear P for next L-BFGS-B loop 
+     P(:,:) = 0.D0 
      
-    
-! ENDIF  
+     RETURN 
+     
+ENDIF 
+
+! If we get to here, something's gone askew with the timesteps 
+WRITE(*,*) "TIME-STEP PROBLEMS"
+WRITE(*,*) "i = ", i 
+WRITE(*,*) "t_0 = ", t_0 
+WRITE(*,*) "t_N = ", t_N  
+
+STOP
 
 
 
 
 
-! RETURN 
 
-! END 
-
+END SUBROUTINE lbfgsb_grad

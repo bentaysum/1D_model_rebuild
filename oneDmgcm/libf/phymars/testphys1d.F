@@ -120,6 +120,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $       wa(2*mmax*nmax + 5*nmax + 11*mmax*mmax + 8*mmax) 
      
       LOGICAL, SAVE :: lbfgsb_firstcall_logical = .True.  
+      
+      REAL*8 lbfgsb_cost
 #endif 
       
       
@@ -817,27 +819,24 @@ C     1.1 : First L-BFGS-B loop iteration [ i == 1 ]
 c     ----------------------------------------------
       IF ( lbfgsb_firstcall_logical ) THEN 
           
-C         1.1.1 : Allocate the dimensions of the adjoint transition matrix
-          allocate( Adjoint_Transition(nqmx*nlayer,nqmx*nlayermx) )
-          
-c         1.1.2 : Tell the L-BFGS-B routine we are starting 
+c         1.1.1 : Tell the L-BFGS-B routine we are starting 
           TASK = 'START'
           
-C         1.1.3 : Call the routine that defines the first guess of X,
+C         1.1.2 : Call the routine that defines the first guess of X,
 c                 and the lower and upper bounds of X
           call lbfgsb_firstcall( q, l_bfgs, u_bfgs) 
      
-c         1.1.4 : Initialise the Tangent Linear Model parameters 
+c         1.1.3 : Initialise the Tangent Linear Model parameters 
           call TLM_initialise
           
-c         1.1.5 : Call setulb for the first time; it should request a value 
+c         1.1.4 : Call setulb for the first time; it should request a value 
 c                 of g to be supplied at the next call, occuring -after- the 
 c                 1-D forward model 
           call setulb(n,m,x,l_bfgs,u_bfgs,nbd,f,g_lbfgsb
      +            ,factr,pgtol,wa,iwa,task,iprint,
      +            csave,lsave,isave,dsave)
           
-c         1.1.6 : Close this segment 
+c         1.1.5 : Close this segment 
           lbfgsb_firstcall_logical = .False.
           
 
@@ -1011,30 +1010,39 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
       ENDIF 
       
 
-#IFDEF lbfgsb
+#ifdef lbfgsb      
 C C      ******************************
 C C      L-BFGS-B AT FORECAST TIME-STEP 
 C C      ******************************
       IF ( idt == t_N ) THEN
 
 C      2.1 : Calculate the value of the Cost Function     
+          F = lbfgsb_cost(q)
 
 C      2.2 : Calculate the value of the Gradient 
-
-C      2.3 : Call the L-BFGS-B procedure with X, f, and g 
-C            from 2.1 and 2.2
+          CALL lbfgsb_grad(idt) 
+          
+C C      2.3 : Call the L-BFGS-B procedure with X, f, and g 
+C C            from 2.1 and 2.2
+C           call setulb(n,m,x,l_bfgs,u_bfgs,nbd,f,g_lbfgsb
+C      +            ,factr,pgtol,wa,iwa,task,iprint,
+C      +            csave,lsave,isave,dsave)
  
-c     2.4 : Revert to 456, and set PQ to values of x at 
-c           time-step idt == t_0 [ i.e. 1.3 ] 
+ 
+C     2.4 : Revert to 456, and set PQ to values of x at 
+C           time-step idt == t_0 [ i.e. 1.3 ] 
      
      
      
+      ELSE 
+      
+      CALL lbfgsb_grad(idt)
      
      
      
-     
-     
-     
+      ENDIF
+#endif 
+
      
      
      
@@ -1068,7 +1076,6 @@ C       ENDIF
 
 C       IF ( idt > t_0 ) CALL LBFGSB_GRAD( idt )
 
-#ENDIF 
 C ***************************************************
       
            

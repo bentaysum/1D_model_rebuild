@@ -19,6 +19,10 @@ non-navigatable, and at this point all I can see is: I don't frankly care anymor
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
 
+## 15/06/2020
+
+COst and gradient calculations hooked up ; get the loop working properly now...
+
 ## 11/06/2020 
 
 Loop established, compiles fine; code looks nicer; need to complete:
