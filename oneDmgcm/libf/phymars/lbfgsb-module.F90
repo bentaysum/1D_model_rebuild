@@ -18,7 +18,7 @@ REAL*8 g_lbfgsb(nmax) ! Gradient of the cost function
 INTEGER, PARAMETER :: iprint = 1
 
 ! ************ Stopping Criteria *************** !
-REAL*8, PARAMETER :: factr=1.0d+7
+REAL*8, PARAMETER :: factr=1.0d+1
 REAL*8, PARAMETER :: pgtol=1.0d-5
 ! ********************************************* !
 INTEGER nbd(nmax)

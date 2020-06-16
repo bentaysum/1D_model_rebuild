@@ -572,8 +572,26 @@ C forecast time-step, t_N , such that 1 <= t_0 < t_N
        ! temporal domain.
        ! ===============================================
        call_tlm = .False.
-       ENDIF 
 C ================================================================
+
+C ================================================================
+C L-BFGS-B Loop Starts here 
+c ---------------------------------------------------------------
+      ELSE 
+200       call setulb(n,m,x,l_bfgs,u_bfgs,nbd,f,g_lbfgsb,factr,
+     +                pgtol,wa,iwa,task,iprint,
+     +                csave,lsave,isave,dsave)
+          IF ( task(1:5) == "NEW_X" ) GOTO 200 
+     
+          IF ( task(1:2) == "FG" ) GOTO 300 
+          
+          WRITE(*,*) "L-BFGS-B DONE?" 
+          
+          STOP
+          
+      ENDIF
+
+300      CONTINUE 
 #endif
 
 
@@ -780,7 +798,7 @@ c ***********************************************************************
 #ifdef lbfgsb
 c         L-BFGS-B will shoot back to here upon each new iteration and 
 c         new solution vector x. 
-456       tlm_on = .False.
+          tlm_on = .False.
 
           mcd_profiles = .True.
           
@@ -808,79 +826,72 @@ c
 C ******************************
 c L-BFGS-B Optimization Routines
 C ****************************** 
-#ifdef lbfgsb      
+#ifdef lbfgsb
 
+c BACKTRACE TIME-STEP t_0 
+C =======================
       IF ( idt == t_0 ) THEN 
-c ----------------------------------------------------------------------
-c 1 : idt = BACKTRACE TIME-STEP 
-C ----------------------------------------------------------------------
 
-C     1.1 : First L-BFGS-B loop iteration [ i == 1 ]
-c     ----------------------------------------------
-      IF ( lbfgsb_firstcall_logical ) THEN 
+          tlm_on = .True.
+
+          mcd_profiles = .False.
           
-c         1.1.1 : Tell the L-BFGS-B routine we are starting 
-          TASK = 'START'
+          calladj = .False. 
+                                                    
+          callcond = .False.
+
+
+C         1.0 : Very first L-BFGS-B iteration (i=1)
+C         -----------------------------------------
+          IF ( lbfgsb_firstcall_logical ) THEN 
           
-C         1.1.2 : Call the routine that defines the first guess of X,
-c                 and the lower and upper bounds of X
-          call lbfgsb_firstcall( q, l_bfgs, u_bfgs) 
+c              1.1 : Set the first guess of X, and prescribe 
+c                    upper+lower bounds (u_bfgs+l_bfgs) 
+c              ---------------------------------------------
+               CALL lbfgsb_firstcall( q , l_bfgs, u_bfgs) 
+c              1.2 : First use of the setulb call 
+c              ----------------------------------
+               TASK = 'START'
+               call setulb(n,m,x,l_bfgs,u_bfgs,nbd,f,g_lbfgsb,factr,
+     +                     pgtol,wa,iwa,task,iprint,
+     +                     csave,lsave,isave,dsave)
      
-c         1.1.3 : Initialise the Tangent Linear Model parameters 
-          call TLM_initialise
-          
-c         1.1.4 : Call setulb for the first time; it should request a value 
-c                 of g to be supplied at the next call, occuring -after- the 
-c                 1-D forward model 
-          call setulb(n,m,x,l_bfgs,u_bfgs,nbd,f,g_lbfgsb
-     +            ,factr,pgtol,wa,iwa,task,iprint,
-     +            csave,lsave,isave,dsave)
-          
-c         1.1.5 : Close this segment 
-          lbfgsb_firstcall_logical = .False.
-          
-      GOTO 789 
-      ENDIF 
+C              1.3 : Initialise the Tangent Linear Model 
+C              -----------------------------------------
+               call TLM_initialise
 
-          call setulb(n,m,x,l_bfgs,u_bfgs,nbd,f,g_lbfgsb
-     +            ,factr,pgtol,wa,iwa,task,iprint,
-     +            csave,lsave,isave,dsave)
-      
-      IF ( TASK(1:5) .EQ. 'NEW_X' ) GOTO 456
-      
-C    1.2 : Every L-BFGS-B loop iteration [ 1 <= i <= t_N - t_0 ]
-c    -----------------------------------------------------------
-789   call_tlm = .False.     ! Prevents multiple initialisations.
+C              1.4 : Routine will ask for values of F and G, 
+C                    so proceed with the forward model 
+c              ---------------------------------------------
+               IF ( task(1:2) == 'FG' ) GOTO 100 
 
-      tlm_on = .True.        ! Routines will now engage.
-
-      mcd_profiles = .False. 
-
-      calladj = .False. ! Convective adjustments require a 
-                          ! conditional that the TLM will not
-                          ! be capable of performing.
-      callcond = .False. ! Again, conditionals activate this 
-                          ! module.
-      
-
-      
-c   1.3 : Every L-BFGS-B bar the very first [ 1 < i <= t_N - t_0 ] 
-c   --------------------------------------------------------------
-      IF ( .not. lbfgsb_firstcall_logical ) THEN 
- 
-C         1.3.1 : Set the 1-D model mixing ratio vector with the
-C                 values of X
-          DO iq = 1, nqmx 
+          ELSE
+C        3.0 : Start of consequent L-BFGS-B iterations ( i > 1)
+c        ------------------------------------------------------
+               DO iq = 1, nqmx
+                    Q(:,iq) = 
+     $          REAL(X( (iq-1)*nlayermx + 1 : iq*nlayermx) ) 
+                    DO ilayer = 1, nlayermx
+                       IF ( q(ilayer,iq) < 0. ) THEN 
+                         q(ilayer,iq) = 0.
+                       ENDIF 
+                    ENDDO 
+               ENDDO 
           
-               q(:,iq) = REAL( x( (iq-1)*nlayermx + 1 : iq*nlayermx) )
+          ENDIF 
           
-          ENDDO 
-      
-      ENDIF 
-     
-      ENDIF ! BACKTRACE TIME-STEP 
+
+100   CONTINUE 
+       
+       
+               
+      lbfgsb_firstcall_logical = .False. 
+
+      ENDIF ! of idt == t_0 
+       
       
 #endif 
+
 ******************************
 
 c        IF (idt.eq.ndt) lastcall=.true.
@@ -1016,52 +1027,38 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
       ENDIF 
       
 
-#ifdef lbfgsb      
-C C      ******************************
-C C      L-BFGS-B AT FORECAST TIME-STEP 
-C C      ******************************
-      IF ( idt == t_N ) THEN
+C ******************************
+c L-BFGS-B Optimization Routines
+C ****************************** 
+#ifdef lbfgsb
+c 2.0 : Between backtrace and forecast ( t_0 <= idt < t_N ) 
+c       ---------------------------------------------------
+      IF ( (idt .ge. t_0) .and. (idt .lt. t_N ) ) THEN 
+          write(*,"(F6.2,A1)") 100.*(idt-t_0)/(t_N-t_0), "%"
+          call lbfgsb_grad(idt) ! Builds up the transition matrix from TLM values each time-step
+C 
+C 2.0 : Calculations at forecast time 
+c       -----------------------------
+      ELSEIF ( idt == t_N ) THEN 
+          call lbfgsb_grad(idt) ! Produces gradient 
 
-      IF ( task == 'FG' ) THEN 
-C      2.1 : Calculate the value of the Cost Function     
-          F = lbfgsb_cost(q)
+          F =  lbfgsb_cost( q ) ! Produces cost function value 
 
-C      2.2 : Calculate the value of the Gradient 
-          CALL lbfgsb_grad(idt) 
-          
-C      2.3 : Call the L-BFGS-B procedure with X, f, and g 
-C            from 2.1 and 2.2
-          GOTO 456 
- 
-      ELSEIF ( task == 'NEW_X' ) THEN 
-              GOTO 456
-      ELSE 
-          write(*,*) "L-BFGS-B COMPLETE?"
-          STOP 
+          GOTO 200
       
-      ENDIF 
-C     2.4 : Revert to 456, and set PQ to values of x at 
-C           time-step idt == t_0 [ i.e. 1.3 ] 
-     
-     
-     
-      ELSEIF ( idt .ge. t_0 ) THEN
-      
-      CALL lbfgsb_grad(idt)
-     
-     
-     
-      ENDIF
+      ENDIF ! of  t_0 <= idt < t_N  .or. idt == t_N 
 #endif 
-C ***************************************************
-      
-           
 
 
 
 
-        
-        
+
+
+
+
+
+
+
       ENDDO   ! of idt=1,ndt ! end of time stepping loop
 
 c    ========================================================

@@ -19,6 +19,11 @@ non-navigatable, and at this point all I can see is: I don't frankly care anymor
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
 
+## 16/06/2020
+
+Optimization loop operational and does reduce the value of the cost function. 
+Analyse results and ensure the optimized input profiles are reliable.
+
 ## 15/06/2020
 
 COst and gradient calculations hooked up ; get the loop working properly now...

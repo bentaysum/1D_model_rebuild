@@ -25,7 +25,7 @@ REAL, intent(in) :: PQi(nlayermx,nqmx)
 ! Local 
 ! =====
 INTEGER iq ! Loop iterator
-
+INTEGER, SAVE :: call_number = 1
 ! Output 
 ! ======
 REAL*8 COST 
@@ -36,14 +36,49 @@ DO iq = 1, nqmx
 
      IF ( trim(noms(iq)) == "o2" ) THEN 
           vmr_mmr = (1.D0*mmol(iq))/(1.0D0*mmean(1,iq)) 
-          COST = ABS( (1.D0*PQi(1,iq)) - (J_o2*vmr_mmr) ) 
+          COST =  SQRT( ( 1.D0*PQi(1,iq) - J_o2*vmr_mmr)**2 )  
+          COST = ABS(COST/(J_o2*vmr_mmr)  - 1.D0)
           exit
      ENDIF 
 
 ENDDO 
 
-
 lbfgsb_cost = COST 
+
+! ------------------------------------------------------------------- ! 
+!                       COST.dat 
+! ------------------------------------------------------------------- ! 
+IF ( call_number == 1 ) THEN ! On first call, wipe out existing file if there is one 
+     OPEN( 12, FILE = "COST.dat", ACTION = "WRITE", STATUS = "REPLACE")
+     
+     ! WRITE THE HEADER 
+     WRITE( 12 , "(A15,3A23,27A23)" ) "Iteration" , "COST", "MAX GRAD", "MIN GRAD", (TRIM(NOMS(IQ)), iq = 1,nqmx)
+     WRITE( 12 , "(I15, 3E23.14, 27E23.7)" ) call_number, lbfgsb_cost, MAXVAL(g_lbfgsb(:nqmx*nlayermx)), &
+                                   MINVAL(g_lbfgsb(:nqmx*nlayermx)), &
+                                   ( MAXVAL( X( (iq-1)*nlayermx + 1 : iq*nlayermx  ) &
+                                    - LBFGSB_FIRSTGUESS( (iq-1)*nlayermx + 1 : iq*nlayermx  )), iq = 1, nqmx)
+     
+     CLOSE(12) 
+     
+     call_number = call_number + 1 
+     RETURN 
+
+ELSE ! Consequent calls, insert data 
+     OPEN( 12, FILE = "COST.dat", ACTION = "write", STATUS = "old", POSITION = "append")
+     WRITE( 12 , "(I15, 3E23.14, 27E23.7)" ) call_number, lbfgsb_cost, MAXVAL(g_lbfgsb(:nqmx*nlayermx)), &
+                                   MINVAL(g_lbfgsb(:nqmx*nlayermx)), &
+                                   ( MAXVAL( X( (iq-1)*nlayermx + 1 : iq*nlayermx  ) &
+                                   - LBFGSB_FIRSTGUESS( (iq-1)*nlayermx + 1 : iq*nlayermx  )), iq = 1, nqmx)
+     
+     CLOSE(12)
+     call_number = call_number + 1      
+     RETURN 
+
+ENDIF   
+
+
+
+
 
 RETURN 
 
@@ -68,80 +103,86 @@ IMPLICIT NONE
 ! forecast element at the forecast time-step t_N to the previously defined
 ! backtrace time-step t_0. 
 
-! INPUT VARIABLES 
-! ---------------
-INTEGER, INTENT(IN) :: i ! 1-D model time-step 
+! Input Vars 
+! ----------
+INTEGER i ! 1-D model time-step 
 
-! LOCAL VARIABLES 
-! ---------------
-REAL*8, SAVE :: P(nqmx*nlayermx,nqmx*nlayermx) 
-LOGICAL, SAVE :: FIRSTCALL = .TRUE. 
-INTEGER iq ! Loop iterator 
+! Local Vars 
+! ----------
+REAL*8, ALLOCATABLE, SAVE :: TLM_stash(:,:,:) ! Store for the TLM matrices produced  
+LOGICAL, SAVE :: FIRSTCALL = .TRUE. ! Prevents the re-allocation of TLM_stash
+INTEGER iter, iq, t ! Loop iterators 
+REAL*8 hatJ(nqmx*nlayermx) ! Sensitivity vector
+REAL*8 adj(nqmx*nlayermx,nqmx*nlayermx) ! Adjoint matrix
+REAL*8 vmr_mmr ! VMR -> MMR conversion factor 
 
-! ---------------------------------------------------------------------
 
-! On first entry ( i == t_0 ) we initialise the transition matrix P 
-! as the 1st TLM and return ( gradient only calculated at forecast 
-! time-step t_N 
+
+
+! On the first call to the gradient routine, allocate the size of TLM_stash 
 IF ( FIRSTCALL ) THEN 
-     FIRSTCALL = .False. 
+     ALLOCATE( TLM_stash( nqmx*nlayermx, nqmx*nlayermx, t_N - t_0 ) ) 
      
-     P = TLM 
-   
+     FIRSTCALL = .FALSE. 
+     
+     TLM_stash( : , : , 1) = TLM 
+     
      RETURN 
 ENDIF 
 
-! On following entries, we calculate this time-step's (i) transition 
-! matrix P^i via the formula:
-!         P^i = TLM^i x P^{i-1} 
-IF ( i < t_N ) THEN 
+! When i == t_0 after the firstcall here occurs 
+IF ( i == t_0 ) THEN 
      
-     P = MATMUL( TLM, P ) 
-
+     ! Clear the stash from the previous iteration 
+     TLM_stash(:,:,:) = 0.D0
+     
+     ! Prescribe first values 
+     TLM_stash(:,:,1) = TLM 
+     
      RETURN
-! On the forecast time-step we calculate the  gradient of the cost 
-! function, i.e. the sensitivity vector from the adjoint model. 
-ELSEIF ( i == t_N ) THEN
-
-     P = MATMUL( TLM, P ) 
-
-     ! Initialise the gradient vector 
-     g_lbfgsb( : nqmx*nlayermx ) = 0.D0 
-     ! At the forecast time-step the sensitivity vector is trivial
-     DO iq = 1, nqmx
-          IF ( trim(noms(iq)) == "o2" ) THEN
-               g_lbfgsb( (iq-1)*nlayermx + 1 ) = 1.D0 
-               EXIT 
-          ENDIF 
-     ENDDO 
      
-     ! Transpose the transition matrix 
-     P = Transpose(P) 
+! When we are between the backtrace and the forecast timesteps 
+ELSEIF ( i < t_N ) THEN
      
-     ! Calculation of the gradient vector
-     g_lbfgsb(:nqmx*nlayermx) = MATMUL( P , g_lbfgsb(:nqmx*nlayermx) ) 
+     iter = ( i + 1 - t_0)
      
-     ! Reset FIRSTCALL for next L-BFGS-B loop iterations 
-     FIRSTCALL = .True.
-     
-     ! Clear P for next L-BFGS-B loop 
-     P(:,:) = 0.D0 
+     TLM_stash(:,:,iter) = TLM 
      
      RETURN 
-     
 ENDIF 
 
-! If we get to here, something's gone askew with the timesteps 
-WRITE(*,*) "TIME-STEP PROBLEMS"
-WRITE(*,*) "i = ", i 
-WRITE(*,*) "t_0 = ", t_0 
-WRITE(*,*) "t_N = ", t_N  
+! ==================
+! Forecast Time-step 
+! ==================
 
-STOP
+! Error if we reach this point and it is not the forecast timestep 
+! ----------------------------------------------------------------
+IF ( i .ne. t_N ) THEN
+     WRITE(*,*) "TIMESTEP MISMANEGEMENT IN lbfgsb_forecast.F90"
+     STOP 
+ENDIF 
+
+! Initialise the sensitivity vector 
+! ---------------------------------
+hatJ(:) = 0.D0 
+! Trivial at forecast time 
+! ------------------------
+DO iq = 1, nqmx 
+     IF ( trim(noms(iq)) == "o2" ) THEN 
+          vmr_mmr = (1.D0*mmol(iq))/(1.0D0*mmean(1,iq)) 
+          hatJ( (iq-1)*nlayermx + 1 ) = 1.D0 
+          GOTO 100 
+     ENDIF 
+ENDDO 
+
+100 DO t = (t_N-t_0) - 1 , 1, - 1
+     ADJ = Transpose( TLM_stash(:,:,t) )
+     hatJ = MATMUL( ADJ, hatJ )
+ENDDO 
+
+g_lbfgsb(:nqmx*nlayermx) = hatJ/(J_o2*vmr_mmr)
 
 
-
-
-
+RETURN
 
 END SUBROUTINE lbfgsb_grad

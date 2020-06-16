@@ -134,7 +134,7 @@ write(*,"(A54)") "--------------------------------------------------------"
 ! 		Model should always begin at LT = 00:00 hrs. The model will exit spin-up,
 ! 		run for day_step time-steps (1 sol), then continue to the temporal location
 !		(lt index) of the Curiosity data point.
-t_N = (spin_up + 1)*day_step + INT( day_step*(J_lt/24. ) ) 
+t_N = (spin_up + 2)*day_step + INT( day_step*(J_lt/24. ) ) 
 
 ! 3.2 : Ask for number of sols after spin-up and local time to backtrace model to 
 444 write(*,*) "Sols (INT) and LT (FLOAT) after spin-up to backtrace model towards:" 
@@ -154,7 +154,7 @@ t_N = (spin_up + 1)*day_step + INT( day_step*(J_lt/24. ) )
 write(*,"(A63)") "--------------------------------------------------------"
 WRITE(*,"(A30, A3, A30)")  "BACKTRACE", " | ", "FORECAST"
 WRITE(*,"(2A15, A3, 2A15)") "SOL", "LT" , " | ", "SOL", "LT"
-WRITE(*,"(I15, F15.2, A3, I15, F15.2)") 1, J_lt , " | ", sol_backtrace, lt_backtrace 
+WRITE(*,"(I15, F15.2, A3, I15, F15.2)") 2, J_lt , " | ", sol_backtrace, lt_backtrace 
 write(*,*) "Correct [y/n] ? : "
 READ(*,*) confirm 
 IF ( confirm == "y" .or. confirm == "Y" ) GOTO 555
@@ -212,13 +212,18 @@ DO iq = 1, nqmx
           idx = ( iq - 1 )*nlayermx + lyr 
 
           ! L-BFGS-B works in Double Precision ergo the 1.D0 
-          LBFGSB_FIRSTGUESS(idx) = MAX(pq(lyr,iq)*1.D0,1.E-31)  
+          LBFGSB_FIRSTGUESS(idx) = MAX(pq(lyr,iq)*1.D0,1.D-31)  
           ! Establish this in the input array for the L-BFGS-B routine 
           x(idx) = LBFGSB_FIRSTGUESS(idx)
           
           
-          u(idx) = MIN( x(idx)*1.5D0, 0.99D0 )
-          l(idx) =  MIN( x(idx)*0.5D0, u(idx) )
+          IF ( iq > 15 ) THEN 
+               u(idx) = MIN( x(idx)*10.D0, 0.99D0 )
+               l(idx) =  MIN( x(idx)*0.1D0, u(idx) )
+          ELSE 
+               u(idx) = MIN( x(idx)*1.5D0, 0.99D0 )
+               l(idx) =  MIN( x(idx)*0.5D0, u(idx) )
+          ENDIF 
           
           IF ( u(idx) < l(idx) ) THEN 
           
