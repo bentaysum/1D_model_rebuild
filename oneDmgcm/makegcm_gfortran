@@ -14,7 +14,7 @@ set filtre=filtrez
 set grille=reg
 set dyntype="dyn"
 set scatterers="1"
-
+set lbfgsb=""
 ########################################################################
 # path a changer contenant les sources et les objets du modele
 ########################################################################
@@ -138,7 +138,7 @@ endif
 if ( ! -d $libo )  then
    mkdir $libo
 endif
-
+    
 if $VPP then
 set netcdf=netcdf_v
 else 
@@ -380,7 +380,14 @@ exit
 
      case -link
         set opt_link="$opt_link $2" ; shift ; shift ; goto top
-
+	 
+########################################################################
+# Compile the L-BFGS-B files in the symbolic linked directory for optim-
+# ization routines [BMT 09/06/2020]
+########################################################################
+	 case -lbfgsb
+		set include="$include -Dlbfgsb=.True." ; set lbfgsb="lbfgsb" ; shift ; goto top
+	 
      case -debug
         if $HP then
            set optim90=" -g "
@@ -408,6 +415,8 @@ exit
 endif
 
 echo "apres les opts dim $dim"
+
+
 
 ########################################################################
 # cas special sans physique
@@ -491,6 +500,11 @@ if ( $NEC || $XNEC ) then
     set nomlib=F90_${dim_}_t${ntrac}
 endif
 
+# BMT 10/06/2020 
+# L-BFGS-B case 
+if ( $lbfgsb == "lbfgsb" ) then 
+    set nomlib=${nomlib}_$lbfgsb
+endif 
 
 
 echo "calcul de la dimension"
@@ -620,6 +634,7 @@ echo "MACRO FILTRE $filtre"
 
 echo "dimc $dimc"
 
+
 ########################################################################
 #  Avant de lancer le make, on recree le makefile si necessaire
 ########################################################################
@@ -631,10 +646,13 @@ echo "dimc $dimc"
 # 3. Si le makefile n'existe pas.
 ########################################################################
 
+
 cd $model
 find libf -name '*.[Fh]' -print | sort >! tmp77
 #find libf -name '*.[Fh]' -exec egrep -i " *use *ioipsl" {} \; -print >! tmp90
 find libf -name '*.[Fh]90' -print | sort >> tmp90
+
+
 
 if (    `diff tmp77 liste_des_sources_f77 | wc -w` \
      || `diff tmp90 liste_des_sources_f90 | wc -w` \
@@ -739,6 +757,8 @@ else if $LINUX then
 # Ehouarn: remove set mod_loc_dir def below; mod_loc_dir=$localdir (set above)
 # set mod_loc_dir=$libo
 endif
+
+
 
 set link="$f90 $optim90"
 

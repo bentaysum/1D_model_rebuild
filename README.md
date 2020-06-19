@@ -19,6 +19,11 @@ non-navigatable, and at this point all I can see is: I don't frankly care anymor
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
 
+## 19/06/2020
+
+Routine finds t_0, t_N, and asks user for a manually inputed day0 to correspond with te
+seleceted curisoity rover data point.
+
 ## 03/06/2020
 
 Routine has been working and producing valid output for 1 month. Paper in production.

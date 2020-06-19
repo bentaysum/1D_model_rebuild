@@ -30,7 +30,8 @@ calleofdump = .false.
 mcd_profiles = .true. 
 
 # Longitudinal mean values of all MCD v5.3 variables?
-long_mean = .true.
+long_mean=.false.
+longitude=137.4
 
 ## Tracer interpolation shutdown parameters 
 mcd_dayfin = 10000 
@@ -41,6 +42,11 @@ mcd_ltfin = 0.
 call_tlm=.true.
 tlm_day=10
 tlm_lt=0
+
+## L-BFGS-B Routines 
+## ~~~~~~~~~~~~~~~~~
+t_backtrace=504
+
 
 ## Handled by bash script
 ## perturbation_cycle.sh 

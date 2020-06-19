@@ -19,11 +19,11 @@ timer=timer.f
 cd $oneDmgcm
 
 ## Compile the 1-D model
-./makegcm_gfortran -d 1x1x25 -p mars t -16 testphys1d 
+./makegcm_gfortran -d 1x1x25 -p mars t -16 -lbfgsb testphys1d 
 
 ## Back to L-BFGS-B directory
 cd - 
 
 ## Compile the L-BFGS-B scripts 
 gfortran -c lbfgsb_mod.f90 
-gfortran OPTIMIZE/$lbfgsb OPTIMIZE/$linpack OPTIMIZE/$blas OPTIMIZE/$timer lbfgsb_mod.o lbfgsb_init.f90 run.f -o run.e
+gfortran OPTIMIZE/$lbfgsb OPTIMIZE/$linpack OPTIMIZE/$blas OPTIMIZE/$timer lbfgsb_mod.o makeinput.f90 lbfgsb_init.f90 run.f -o run.e

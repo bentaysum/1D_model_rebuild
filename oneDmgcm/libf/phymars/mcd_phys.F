@@ -2,6 +2,10 @@
      & 			      temp, ps, zonwind, merwind,
      &                    q2)
 
+      ! To acquire longitude...
+      USE ioipsl_getincom 
+
+
       IMPLICIT NONE
 
 
@@ -28,6 +32,8 @@
       real q2(nlayermx)
 
 ! 	  LOCAL VARIABLES
+!     === Longitude ===
+      real, save :: mcd_longitude 
 !     === netCDF parameters ===
       integer N_LT, N_ALT, N_ZLS, N_LAT, N_LONG
       integer x, y, z, t ! loop iterators     
@@ -129,6 +135,10 @@
       
            
       else 
+          ! Read longitude for MCD parameters
+           mcd_longitude=0. ! default value for ndt
+           call getin("longitude",mcd_longitude)
+      
           ! ID's
            retval = nf_inq_varid(ncid, 'ps', psid)
            if (retval .ne. nf_noerr) call handle_err(retval)
@@ -210,23 +220,23 @@
                    do t = 1, N_LAT
 
                   call interp_line(v5mcd_long,v5mcd_q2(x,y,z,t,:),N_LONG
-     &                             ,long(1)*180./pi,int_long_q2(x,y,z,t)
+     &                             ,mcd_longitude,int_long_q2(x,y,z,t)
      &                             ,1)
 
                    call interp_line(v5mcd_long,v5mcd_T(x,y,z,t,:),N_LONG
-     &                             ,long(1)*180./pi,int_long_T(x,y,z,t)
+     &                             ,mcd_longitude,int_long_T(x,y,z,t)
      &                             ,1)
 
                    call interp_line(v5mcd_long,v5mcd_u(x,y,z,t,:),N_LONG
-     &                             ,long(1)*180./pi,int_long_u(x,y,z,t)
+     &                             ,mcd_longitude,int_long_u(x,y,z,t)
      &                             ,1)
      
                    call interp_line(v5mcd_long,v5mcd_v(x,y,z,t,:),N_LONG
-     &                             ,long(1)*180./pi,int_long_v(x,y,z,t)
+     &                             ,mcd_longitude,int_long_v(x,y,z,t)
      &                             ,1)
                 
                    call interp_line(v5mcd_long,v5mcd_ps(x,z,t,:),N_LONG
-     &                             ,long(1)*180./pi,int_long_ps(x,z,t)
+     &                             ,mcd_longitude,int_long_ps(x,z,t)
      &                             ,1)
                
                   end do ! of N_LAT

@@ -39,16 +39,6 @@ c   =================================================================
 c                   Optimization Routine Variables 
 c   =================================================================
 
-      INTEGER, PARAMETER :: bash_unit = 10 ! Unit for the bash script  
-      CHARACTER(len=10) day0 ! Read at run time 
-      INTEGER ndt ! Number of time-steps for the 1-D model to run for 
-      INTEGER, PARAMETER :: spinup_sols = 10 ! Number of sols for the 1-D model to spin
-      INTEGER, PARAMETER :: day_step = 48 ! Time-steps per sol 
-      INTEGER sol_run ! Number of sols to run for -after- forecast time-step 
-      CHARACTER(len=100) ONED_HOME 
-
-
-      ONED_HOME = "/home/s1215319/mgcm/oneDmgcm/"
 
 
 c     ----------------------------------------------------------------
@@ -61,31 +51,14 @@ c     ndt  - number of sols to run for (INCLUDING the 10 sol spin-up)
 c     -----------------------------------------------------------------
       call lbfgsb_init
       
+      call makeinput 
 
-c     Open the new bash file 
-      OPEN( bash_unit , FILE = "APPEND_INPUT", ACTION = "WRITE",
-     $                  STATUS = "REPLACE") 
-      
-C    Choose day0 
-C    -----------
-      WRITE(*,"(A42,F6.2)") "SOLAR LONGITUDE OF CURIOSITY DATA POINT = "
-     $ , J_ls
-      WRITE(*,*) "CORRESPONDING DAY0 [CHECK USERMANUAL.PDF] : "
-      READ(*,*) day0
-
-C     Write overwrite commands
-      WRITE(bash_unit,*) "#!/bin/bash"
-      WRITE(bash_unit,"(A21,A3,A2,A29,A7)") 
-     $  "sed -i '/day0/c\day0=", TRIM(day0), "' ", TRIM(ONED_HOME), 
-     $  "run.def"
-      WRITE(bash_unit,"(A19,I3,A2,A29,A7)") 
-     $  "sed -i '/ndt/c\ndt=", t_N, "' ", TRIM(ONED_HOME), 
-     $  "run.def"
-      CLOSE(bash_unit)
-c     Execute the bash script 
-      CALL execute_command_line("chmod a+x APPEND_INPUT &&" 
-     $ // "./APPEND_INPUT") 
+      write(*,*) t_0, t_N
     
+
+
+
+
 
 
 

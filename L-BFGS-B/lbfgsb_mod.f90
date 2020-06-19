@@ -23,5 +23,8 @@ REAL*8, PARAMETER :: pgtol=1.0d-5
 ! ********************************************* !
 INTEGER nbd(nmax)
 
+! *********** oneDmgcm parameters ************* !
+CHARACTER(len=*), PARAMETER :: ONED_HOME = "/home/s1215319/mgcm/oneDmgcm/"
+
 
 END 

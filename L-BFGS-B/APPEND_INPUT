@@ -1,3 +1,7 @@
  #!/bin/bash
-sed -i '/day0/c\day0=124' /home/s1215319/mgcm/oneDmgcm/run.def
-sed -i '/ndt/c\ndt=621' /home/s1215319/mgcm/oneDmgcm/run.def
+sed -i '/day0/c\day0=102' /home/s1215319/mgcm/oneDmgcm/run.def
+sed -i '/ndt/c\ndt=576' /home/s1215319/mgcm/oneDmgcm/run.def
+sed -i '/latitude/c\latitude=-4.5' /home/s1215319/mgcm/oneDmgcm/run.def
+sed -i '/long_mean/c\long_mean=.false.' /home/s1215319/mgcm/oneDmgcm/callphys.def
+sed -i '/longitude/c\longitude=137.4' /home/s1215319/mgcm/oneDmgcm/callphys.def
+sed -i '/t_backtrace/c\t_backtrace=504' /home/s1215319/mgcm/oneDmgcm/callphys.def
