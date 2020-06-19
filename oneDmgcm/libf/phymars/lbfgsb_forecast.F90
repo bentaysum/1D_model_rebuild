@@ -26,6 +26,7 @@ REAL, intent(in) :: PQi(nlayermx,nqmx)
 ! =====
 INTEGER iq ! Loop iterator
 INTEGER, SAVE :: call_number = 1
+REAL*8 frac 
 ! Output 
 ! ======
 REAL*8 COST 
@@ -36,8 +37,8 @@ DO iq = 1, nqmx
 
      IF ( trim(noms(iq)) == "o2" ) THEN 
           vmr_mmr = (1.D0*mmol(iq))/(1.0D0*mmean(1,iq)) 
-          COST =  SQRT( ( 1.D0*PQi(1,iq) - J_o2*vmr_mmr)**2 )  
-          COST = ABS(COST/(J_o2*vmr_mmr)  - 1.D0)
+          COST =  ABS(1.D0*PQi(1,iq) - J_o2*vmr_mmr)*1.D6
+          FRAC = 1.D0*PQi(1,iq)/(J_o2*vmr_mmr)
           exit
      ENDIF 
 
@@ -52,8 +53,8 @@ IF ( call_number == 1 ) THEN ! On first call, wipe out existing file if there is
      OPEN( 12, FILE = "COST.dat", ACTION = "WRITE", STATUS = "REPLACE")
      
      ! WRITE THE HEADER 
-     WRITE( 12 , "(A15,3A23,27A23)" ) "Iteration" , "COST", "MAX GRAD", "MIN GRAD", (TRIM(NOMS(IQ)), iq = 1,nqmx)
-     WRITE( 12 , "(I15, 3E23.14, 27E23.7)" ) call_number, lbfgsb_cost, MAXVAL(g_lbfgsb(:nqmx*nlayermx)), &
+     WRITE( 12 , "(A15,4A23,27A23)" ) "Iteration" , "COST", "1D/Cur.","MAX GRAD", "MIN GRAD", (TRIM(NOMS(IQ)), iq = 1,nqmx)
+     WRITE( 12 , "(I15, 4E23.14, 27E23.14)" ) call_number, lbfgsb_cost, frac, MAXVAL(g_lbfgsb(:nqmx*nlayermx)), &
                                    MINVAL(g_lbfgsb(:nqmx*nlayermx)), &
                                    ( MAXVAL( X( (iq-1)*nlayermx + 1 : iq*nlayermx  ) &
                                     - LBFGSB_FIRSTGUESS( (iq-1)*nlayermx + 1 : iq*nlayermx  )), iq = 1, nqmx)
@@ -65,7 +66,7 @@ IF ( call_number == 1 ) THEN ! On first call, wipe out existing file if there is
 
 ELSE ! Consequent calls, insert data 
      OPEN( 12, FILE = "COST.dat", ACTION = "write", STATUS = "old", POSITION = "append")
-     WRITE( 12 , "(I15, 3E23.14, 27E23.7)" ) call_number, lbfgsb_cost, MAXVAL(g_lbfgsb(:nqmx*nlayermx)), &
+     WRITE( 12 , "(I15, 4E23.14, 27E23.7)" ) call_number, lbfgsb_cost, frac, MAXVAL(g_lbfgsb(:nqmx*nlayermx)), &
                                    MINVAL(g_lbfgsb(:nqmx*nlayermx)), &
                                    ( MAXVAL( X( (iq-1)*nlayermx + 1 : iq*nlayermx  ) &
                                    - LBFGSB_FIRSTGUESS( (iq-1)*nlayermx + 1 : iq*nlayermx  )), iq = 1, nqmx)
@@ -162,6 +163,8 @@ IF ( i .ne. t_N ) THEN
      STOP 
 ENDIF 
 
+TLM_stash(:,:, SIZE(TLM_stash(1,1,:)) ) = TLM 
+
 ! Initialise the sensitivity vector 
 ! ---------------------------------
 hatJ(:) = 0.D0 
@@ -180,7 +183,7 @@ ENDDO
      hatJ = MATMUL( ADJ, hatJ )
 ENDDO 
 
-g_lbfgsb(:nqmx*nlayermx) = hatJ/(J_o2*vmr_mmr)
+g_lbfgsb(:nqmx*nlayermx) = hatJ*1.D6
 
 
 RETURN
