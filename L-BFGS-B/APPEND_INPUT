@@ -1,0 +1,3 @@
+ #!/bin/bash
+sed -i '/day0/c\day0=124' /home/s1215319/mgcm/oneDmgcm/run.def
+sed -i '/ndt/c\ndt=621' /home/s1215319/mgcm/oneDmgcm/run.def
