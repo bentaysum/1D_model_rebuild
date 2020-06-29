@@ -335,6 +335,7 @@ $(LIBF)/phymars/dimphys.h \
 $(LIBF)/aeronomars/chimiedata.h \
 $(LIBF)/phymars/callkeys.h \
 $(LIBF)/phymars/tracer.h \
+$(LIBF)/aeronomars/conc.h \
 $(LIBF)/grid/dimensions.h \
 $(LIBF)/phymars/dimphys.h \
 $(LIBF)/aeronomars/chimiedata.h \
@@ -2595,6 +2596,8 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(geticecover.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(iniwritesoil.o)
 
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lbfgsb_calls.o)
+
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(mkstat.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(param_slope.o)
@@ -3133,17 +3136,19 @@ $(LIBF)/phymars/callkeys.h
 	$(AR) r $(LIBO)/libphymars.a lwxn.o ; $(RM) lwxn.o ; \
 	cd $(GCM)
 
-$(LIBO)/libphymars.a(mcd_phys.o) : $(LIBF)/phymars/mcd_phys.F
+$(LIBO)/libphymars.a(mcd_phys.o) : $(LIBF)/phymars/mcd_phys.F \
+$(LIBO)/libbibio.a(ioipsl_getincom.o)
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libphymars.a mcd_phys.o ; \
-	$(COMPILE) $(LIBF)/phymars/mcd_phys.F ; \
+	$(COMPILE90) $(LIBF)/phymars/mcd_phys.F ; \
 	$(AR) r $(LIBO)/libphymars.a mcd_phys.o ; $(RM) mcd_phys.o ; \
 	cd $(GCM)
 
-$(LIBO)/libphymars.a(mcd_trac.o) : $(LIBF)/phymars/mcd_trac.F
+$(LIBO)/libphymars.a(mcd_trac.o) : $(LIBF)/phymars/mcd_trac.F \
+$(LIBO)/libbibio.a(ioipsl_getincom.o)
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libphymars.a mcd_trac.o ; \
-	$(COMPILE) $(LIBF)/phymars/mcd_trac.F ; \
+	$(COMPILE90) $(LIBF)/phymars/mcd_trac.F ; \
 	$(AR) r $(LIBO)/libphymars.a mcd_trac.o ; $(RM) mcd_trac.o ; \
 	cd $(GCM)
 
@@ -3802,6 +3807,14 @@ $(LIBF)/phymars/comsoil.h
 	$(AR) r $(LIBO)/libphymars.a iniwritesoil.o ; $(RM) iniwritesoil.o ; \
 	cd $(GCM)
 
+$(LIBO)/libphymars.a(lbfgsb_calls.o) : $(LIBF)/phymars/lbfgsb_calls.F90 \
+$(LIBF)/phymars/callkeys.h
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a lbfgsb_calls.o ; \
+	$(COMPILE) $(LIBF)/phymars/lbfgsb_calls.F90 ; \
+	$(AR) r $(LIBO)/libphymars.a lbfgsb_calls.o ; $(RM) lbfgsb_calls.o ; \
+	cd $(GCM)
+
 $(LIBO)/libphymars.a(mkstat.o) : $(LIBF)/phymars/mkstat.F90 \
 $(LIBF)/grid/dimensions.h \
 $(LIBF)/phymars/statto.h
@@ -3830,10 +3843,11 @@ $(LIBF)/phymars/callkeys.h
 	$(AR) r $(LIBO)/libphymars.a read_dust_scenario.o ; $(RM) read_dust_scenario.o ; \
 	cd $(GCM)
 
-$(LIBO)/libphymars.a(scalar_perturbation.o) : $(LIBF)/phymars/scalar_perturbation.F90
+$(LIBO)/libphymars.a(scalar_perturbation.o) : $(LIBF)/phymars/scalar_perturbation.F90 \
+$(LIBO)/libbibio.a(ioipsl_getincom.o)
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libphymars.a scalar_perturbation.o ; \
-	$(COMPILE) $(LIBF)/phymars/scalar_perturbation.F90 ; \
+	$(COMPTRU90) $(LIBF)/phymars/scalar_perturbation.F90 ; \
 	$(AR) r $(LIBO)/libphymars.a scalar_perturbation.o ; $(RM) scalar_perturbation.o ; \
 	cd $(GCM)
 

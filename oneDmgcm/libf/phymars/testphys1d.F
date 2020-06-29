@@ -697,6 +697,25 @@ c  It is needed to transfert physics variables to "physiq"...
      
       ndt_plume =  (plume_day*day_step) + NINT((plume_lt/24.)*day_step)
 
+
+c =====================================================================
+c L-BFGS-B Optimization Routines [BMT]
+c =====================================================================
+#ifdef lbfgsb
+      call lbfgsb_timesteps(ndt)
+      lbfgsb_output = .False. ! Ensures that all output in netCDF form
+                              ! is skipped prior to the backtrace time
+                              ! step being reached [improves computat-
+                              ! ional efficiency].
+#endif 
+c =====================================================================
+
+
+
+
+
+
+
 c=======================================================================
 c  1D MODEL TIME STEPPING LOOP
 c=======================================================================
@@ -744,6 +763,29 @@ c     ~~~~~~~~~~~~~~~~~~~~~
 
       ENDDO
 
+c    L-BFGS-B opertations
+c    ~~~~~~~~~~~~~~~~~~~~
+#ifdef lbfgsb 
+      if (idt .eq. t_backtrace ) then 
+      
+          lbfgsb_output = .True.
+          
+          
+          tlm_on = .True.        ! Routines will now engage.
+           
+          mcd_profiles = .False. ! Interpolation routines will 
+                                   ! invalidate TLM results.
+            
+          calladj = .False. ! Convective adjustments require a 
+                            ! conditional that the TLM will not
+                            ! be capable of performing.
+          callcond = .False. ! Again, conditionals activate this 
+                             ! module.
+ 
+          call TLM_initialise          
+         
+      endif
+#endif 
 
       
 c       call physics
@@ -849,6 +891,14 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
       ENDIF 
       
       
+
+c    L-BFGS-B Optimization 
+c    ~~~~~~~~~~~~~~~~~~~~~~
+#ifdef lbfgsb
+      IF ( idt .ge. t_backtrace ) THEN 
+          call lbfgsb_gradient(idt)
+      ENDIF 
+#endif 
         
         
       ENDDO   ! of idt=1,ndt ! end of time stepping loop

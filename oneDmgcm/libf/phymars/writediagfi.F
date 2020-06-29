@@ -109,6 +109,11 @@
 !     irythme = periodav*day_step ! sortie au rythme des fichiers histmoy
 
 !***************************************************************
+#ifdef lbfgsb
+      ! Output suppression during L-BFGS-B routines 
+      if ( .not. lbfgsb_output ) RETURN
+#endif 
+
 
 !     Tangent Linear Model Runs 
 !     =========================

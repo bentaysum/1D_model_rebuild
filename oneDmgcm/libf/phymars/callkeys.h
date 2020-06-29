@@ -13,11 +13,11 @@
      &   ,lifting,callddevil,scavenging,sedimentation,activice,water    &
      &   ,tifeedback,microphys,caps,photochem,calltherm,outptherm       &
      &   ,callrichsl,callslope,tituscap,long_mean,mcd_profiles,plume    &
-     &   ,call_tlm,pertloop
+     &   ,call_tlm,pertloop,lbfgsb_output
      
       COMMON/callkeys_i/iradia,iaervar,iddist,ilwd,ilwb,ilwn,ncouche    &
      &   ,dustbin,nltemodel,nircorr,solvarmod,solvaryear,plume_day      &
-     &   ,p_low,p_high,tlm_day
+     &   ,p_low,p_high,tlm_day,t_backtrace,t_forecast 
      
       COMMON/callkeys_r/topdustref,solarcondate,semi,alphan,euveff,     &
      &   tke_heat_flux,mcd_dayfin,mcd_ltfin,plume_lt,tlm_lt 
@@ -39,6 +39,8 @@
       logical plume
       logical call_tlm 
       logical pertloop 
+      
+      logical lbfgsb_output 
       
       real topdustref
       real semi
@@ -66,7 +68,10 @@
       integer p_low 
       integer p_high 
       integer tlm_day
-	  
+
+      integer t_backtrace ! Optimization routine [OPTIONAL] backtrace timestep
+      integer t_forecast ! Optimization routine [OPTIONAL] forecast timestep
+
       logical rayleigh
       logical tracer
       integer dustbin

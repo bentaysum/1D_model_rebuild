@@ -19,6 +19,15 @@ non-navigatable, and at this point all I can see is: I don't frankly care anymor
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
 
+## 29/06/2020
+
+1-D model takes t_N as ndt, and tlm + netcdf output is activated when the 1-D model 
+spins-up past the 10 sol period and reaches the backtrace timestep t_0.
+
+L-BFGS-B routines within the 1-d model now successfully calculate the gradient 
+vector and stash it in an output file within the oneDmgcm directory dubbed
+grad.dat that is easily readable ( TRACER NAME | MODEL LAYER | GRADIENT OF O2 )
+
 ## 19/06/2020
 
 Routine finds t_0, t_N, and asks user for a manually inputed day0 to correspond with te

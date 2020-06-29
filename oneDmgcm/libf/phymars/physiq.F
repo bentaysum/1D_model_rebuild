@@ -1382,7 +1382,9 @@ c 10.0: Construct the 1-D model Jacobian [TLM] and advance perturbation
 c       vector [PERTS] to next time-step then call the netCDF save routine
 c ======================================================================
 
-          IF (tlm_on) THEN
+c COMMENTED OUT 29/06/2020 TO MAKE WAY FOR L-BFGS-B OPTIMIZATION ROUTINES
+
+c          IF (tlm_on) THEN
 
 C                TLM = TLM_trans + TLM_photo
 C                TLM = tlm_ident + TLM*ptimestep
@@ -1391,10 +1393,10 @@ C                TLM( (t_co2-1)*nlayermx + 1 :
 C      $              t_co2*nlayermx, : ) = 0.D0
 
 
-              call TLM_ADJ_out(idt,ptime*24.)
+c              call TLM_ADJ_out(idt,ptime*24.)
               
 
-          ENDIF
+c          ENDIF
           
 
 c 10.1: Conditional activation of TLM routines
