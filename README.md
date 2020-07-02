@@ -19,6 +19,12 @@ non-navigatable, and at this point all I can see is: I don't frankly care anymor
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
 
+## 02/07/2020
+
+Results do get better but not as good as I believe possible. 
+
+g(i) FOR ALL INITIAL O2 MMRs IS SET TO 0
+
 ## 29/06/2020
 
 1-D model takes t_N as ndt, and tlm + netcdf output is activated when the 1-D model 

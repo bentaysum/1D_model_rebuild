@@ -85,10 +85,19 @@ IF ( idt == t_backtrace ) THEN
      RETURN 
 ENDIF 
 
+
 ! Backtrace Timestep < idt < Forecast Timestep
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 TLM = TRANSPOSE(TLM)
 TRANS_MATRIX = MATMUL( TRANS_MATRIX, TLM )
+
+DO iq = 1, nlayermx*nqmx
+     DO l = 1, nlayermx*nqmx 
+          IF ( TLM( iq, l ) .NE. TLM( iq, l ) ) call tlm_error 
+          IF ( TRANS_MATRIX( iq, l ) .NE. TRANS_MATRIX( iq, l ) ) call trans_error( TRANS_MATRIX )
+     ENDDO 
+ENDDO 
+
 
 WRITE(*,"(A46)") '**********************************************'
 WRITE(*,"(2E23.15)") MAXVAL(TLM), MAXVAL(TRANS_MATRIX)
@@ -120,12 +129,6 @@ DO iq = 1, nqmx
      DO l = 1,nlayermx
           WRITE(20,"(A15,I10, E23.15)") TRIM(NOMS(IQ)), l, &
                     grad( (iq-1)*nlayermx + l ) 
-     
-     IF ( grad( (iq-1)*nlayermx + l ) .ne.  grad( (iq-1)*nlayermx + l )  ) THEN 
-          WRITE(*,*) "ERROR IN GRADIENT" 
-          STOP
-     ENDIF 
-
      ENDDO 
 ENDDO
 
@@ -234,3 +237,78 @@ return
 
 
 END SUBROUTINE lbfgsb_stateinput
+
+
+SUBROUTINE trans_error(trans)
+
+USE TLMvars 
+
+IMPLICIT NONE 
+
+#include "dimensions.h"
+#include "dimphys.h"
+#include "tracer.h" 
+
+INTEGER iq, l 
+CHARACTER(len=20) nlayermx_string, nqmx_string, nq_nl_string 
+CHARACTER(len=100) FMT_HEADER, FMT_MATRIX 
+REAL*8 trans(nqmx*nlayermx,nqmx*nlayermx)
+
+WRITE( nlayermx_string, * ) nlayermx
+WRITE( nqmx_string, * ) nqmx
+WRITE( nq_nl_string, * ) nqmx*nlayermx
+
+FMT_HEADER = "(A23," // ADJUSTL(nqmx_string) // "A" // ADJUSTL(nq_nl_string) // ")"
+FMT_MATRIX = "(A23," // ADJUSTL(nq_nl_string) // "E23.15)" 
+
+OPEN( UNIT = 100, FILE = "TRANSITION_ERROR.dat", ACTION = "WRITE", STATUS = "REPLACE") 
+
+WRITE(100,ADJUSTL(FMT_HEADER)) (TRIM(noms(iq)), iq = 1, nqmx )
+
+DO iq = 1, nqmx
+     DO l = 1, nlayermx 
+          WRITE(100,ADJUSTL(FMT_MATRIX)) TRIM(NOMS(IQ)), trans( (iq-1)*nlayermx + l , : ) 
+     ENDDO 
+ENDDO 
+
+CLOSE(100)
+WRITE(*,*) "ERROR IN TRANSITION MATRIX" 
+STOP
+END SUBROUTINE trans_error
+
+
+SUBROUTINE tlm_error 
+
+USE TLMvars 
+
+IMPLICIT NONE 
+
+#include "dimensions.h"
+#include "dimphys.h"
+#include "tracer.h" 
+
+INTEGER iq, l 
+CHARACTER(len=20) nlayermx_string, nqmx_string, nq_nl_string 
+CHARACTER(len=100) FMT_HEADER, FMT_MATRIX 
+
+WRITE( nlayermx_string, * ) nlayermx
+WRITE( nqmx_string, * ) nqmx
+WRITE( nq_nl_string, * ) nqmx*nlayermx
+
+FMT_HEADER = "(A23," // ADJUSTL(nqmx_string) // "A" // ADJUSTL(nq_nl_string) // ")"
+FMT_MATRIX = "(A23," // ADJUSTL(nq_nl_string) // "E23.15)" 
+
+OPEN( UNIT = 100, FILE = "TLM_ERROR.dat", ACTION = "WRITE", STATUS = "REPLACE") 
+
+WRITE(100,ADJUSTL(FMT_HEADER)) (TRIM(noms(iq)), iq = 1, nqmx )
+
+DO iq = 1, nqmx
+     DO l = 1, nlayermx 
+          WRITE(100,ADJUSTL(FMT_MATRIX)) TRIM(NOMS(IQ)), TLM( (iq-1)*nlayermx + l , : ) 
+     ENDDO 
+ENDDO 
+
+CLOSE(100)
+WRITE(*,*) "ERROR IN TLM" 
+STOP
+END SUBROUTINE tlm_error

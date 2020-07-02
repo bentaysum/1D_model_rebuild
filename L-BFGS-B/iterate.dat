@@ -15,18 +15,19 @@ f     = function value
            * * *
 
 Machine precision = 2.220D-16
- N =          400     M =            7
+ N =          400     M =           15
 
    it   nf  nseg  nact  sub  itls  stepl    tstep     projg        f
-    0    1     -     -   -     -     -        -     4.860D-04  3.297D-04
-    1    2    20    30  ---    0  1.0D+00  8.4D-04  2.385D-07  1.563D-04
-    2   16     1    30  ---   13  2.4D-04  5.6D-11  2.385D-07  1.563D-04
+    0    1     -     -   -     -     -        -     1.006D-03  3.203D-04
+    1   11    88   101  ---    9  3.5D-01  1.1D-03  6.538D-04  3.232D-05
+    2   51    90   103  x€í   19  5.1D-15  1.0D-17      -          -
 
-CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH             
+ABNORMAL_TERMINATION_IN_LNSRCH                              
 
- Warning:  more than 10 function and gradient
-   evaluations in the last line search.  Termination
-   may possibly be caused by a bad search direction.
+ Line search cannot locate an adequate point after 20 function
+  and gradient evaluations.  Previous x, f and g restored.
+ Possible causes: 1 error in function or gradient evaluation;
+                  2 rounding error dominate computation.
 
- Total User time 3.879E-02 seconds.
+ Total User time 1.508E-01 seconds.
 

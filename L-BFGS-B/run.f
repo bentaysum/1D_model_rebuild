@@ -65,8 +65,16 @@ c     day0 - Establishes the solar longitude
 c     ndt  - number of sols to run for (INCLUDING the 10 sol spin-up)
 c     -----------------------------------------------------------------
 
-      lbfgsb_firstcall = .TRUE.
 
+c     Acquisition of tracer names from traceur.def 
+      OPEN(200,FILE = ONED_HOME // "traceur.def", ACTION = "READ") 
+      READ(200,*) 
+      DO iq = 1, nqmx 
+          READ(200,*) noms(iq) 
+          write(*,*) TRIM(NOMS(IQ)), " | ", iq 
+      ENDDO 
+      
+      lbfgsb_firstcall = .TRUE.
 
 c     Purge the 1-D model directory of temporarily stored .dat files:
 c     - grad.dat 
@@ -118,7 +126,7 @@ c     =====================
 c     Define the dimensions
 c     =====================
       n = nqmx*nlayermx
-      m = 7
+      m = 15
 
 c     =========================
 c     Extract the first X state
@@ -134,22 +142,14 @@ c     / tracer name / model layer / mmr at t_0 / mmr at t_N /
           READ(50,"(A15,A10,2E15.7)") DUMMY_1, DUMMY_2, 
      $            initialstate(line), finalstate(line)
      
-c     ------------------
-c     Store tracer names
-c     ------------------
-      if ( ADJUSTL(dummy_2) == "1" ) then 
-          noms(iq) = ADJUSTL(dummy_1) 
-          iq = iq + 1
-      endif 
-      
 c     =============================
 c     Assign upper and lower bounds  
 c     =============================
           X(line) = MAX(1.e-31,DBLE(initialstate(line))) ! Double conversion for L-BFGS-B
-          
-               l(line) = MAX(X(line) - X(line)*0.5D0,1.D-31) 
-               u(line) = MIN(X(line) + X(line)*10.D0,0.99) 
           nbd(line) = 2
+
+          l(line) = MAX(X(line) - X(line)*0.9D0,1.D-31) 
+          u(line) = MIN(X(line) + X(line)*10.D0,0.99) 
           
       ENDDO 
       CLOSE(50)
@@ -461,8 +461,7 @@ c     --------------------------------------------------------------
           
           IF ( layer == 1 ) THEN 
                
-               f = ABS(final-J_o2)
-               
+               f = ABS(final*1.D0-J_o2)
                close(20)
                RETURN 
                
@@ -498,8 +497,14 @@ c     --------------------------------------------------------------
       READ(20,*) dummy
       DO i = 1 ,nqmx*nlayermx
           READ(20,"(A15,A10,E23.15)") dummy_1, dummy_2, g(i)
-          IF ( ABS(g(i)) < 1.e-20 ) g(i) = 0.D0
-          g(i) = g(i)
+          IF ( ABS(g(i)) < 1.e-6 ) g(i) = 0.D0
+          
+          IF ( adjustl(dummy_1) == "o2" ) THEN
+               g(i) = 0.D0
+          ELSE  
+               g(i) = g(i)
+          ENDIF 
+          
       ENDDO 
       
       RETURN 
