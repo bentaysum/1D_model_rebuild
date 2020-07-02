@@ -14,17 +14,19 @@ REAL J_ls
 ! Variables for the call to the setulb() subroutine
 ! *************************************************
 REAL*8 X(nmax) ! Solution vector
-REAL*8 g_lbfgsb(nmax) ! Gradient of the cost function
+REAL*8 g(nmax) ! Gradient of the cost function
 INTEGER, PARAMETER :: iprint = 1
 
 ! ************ Stopping Criteria *************** !
 REAL*8, PARAMETER :: factr=1.0d+1
-REAL*8, PARAMETER :: pgtol=1.0d-5
+REAL*8, PARAMETER :: pgtol=0.!1.0d-5
 ! ********************************************* !
 INTEGER nbd(nmax)
 
 ! *********** oneDmgcm parameters ************* !
 CHARACTER(len=*), PARAMETER :: ONED_HOME = "/home/s1215319/mgcm/oneDmgcm/"
-
+INTEGER, PARAMETER :: nqmx =16
+INTEGER, PARAMETER :: nlayermx = 25 
+CHARACTER(len=20) noms(nqmx)
 
 END 

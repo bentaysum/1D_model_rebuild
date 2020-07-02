@@ -219,7 +219,7 @@ c     Declare a few additional variables for this sample problem.
 
       double precision t1, t2
       integer          i
- 
+      integer          active 
 c     We wish to have output at every iteration.
 
       iprint = 1
@@ -233,7 +233,7 @@ c     We specify the dimension n of the sample problem and the number
 c        m of limited memory corrections stored.  (n and m should not
 c        exceed the limits nmax and mmax respectively.)
  
-      n=25
+      n=400
       m=5
  
 c     We now provide nbd which defines the bounds on the variables:
@@ -271,14 +271,17 @@ c
       task = 'START'
 
 c        ------- the beginning of the loop ----------
- 
+      active = 0
+      iprint = 0
  111  continue
       
 c     This is the call to the L-BFGS-B code.
- 
+      active = active + 1 
       call setulb(n,m,x,l,u,nbd,f,g,factr,pgtol,wa,iwa,task,iprint,
      +            csave,lsave,isave,dsave)
- 
+      
+      write(*,"(I5, E23.15, A12, 25E23.15)") active, f, task, x(1:25)
+      
       if (task(1:2) .eq. 'FG') then
 c        the minimization routine has returned to request the
 c        function f and gradient g values at the current x.

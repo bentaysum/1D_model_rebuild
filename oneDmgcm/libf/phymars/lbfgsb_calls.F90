@@ -78,16 +78,24 @@ CHARACTER(len=*), PARAMETER :: FILENAME = "grad.dat"
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 IF ( idt == t_backtrace ) THEN 
      TRANS_MATRIX = TRANSPOSE(TLM)
+     WRITE(*,"(A46)") '**********************************************'
+     WRITE(*,"(2E23.15)") MAXVAL(TLM), MAXVAL(TRANS_MATRIX)
+     WRITE(*,"(2E23.15)") MINVAL(TLM), MINVAL(TRANS_MATRIX) 
+     WRITE(*,"(A46)") '**********************************************'
      RETURN 
 ENDIF 
 
 ! Backtrace Timestep < idt < Forecast Timestep
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-IF ( idt .ne. t_forecast ) THEN 
-     TLM = TRANSPOSE(TLM)
-     TRANS_MATRIX = MATMUL( TRANS_MATRIX, TLM )
-     RETURN 
-ENDIF 
+TLM = TRANSPOSE(TLM)
+TRANS_MATRIX = MATMUL( TRANS_MATRIX, TLM )
+
+WRITE(*,"(A46)") '**********************************************'
+WRITE(*,"(2E23.15)") MAXVAL(TLM), MAXVAL(TRANS_MATRIX)
+WRITE(*,"(2E23.15)") MINVAL(TLM), MINVAL(TRANS_MATRIX) 
+WRITE(*,"(A46)") '**********************************************'
+IF ( idt .ne. t_forecast) RETURN 
+
 
 ! idt == Forecast Timestep
 ! ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -112,10 +120,16 @@ DO iq = 1, nqmx
      DO l = 1,nlayermx
           WRITE(20,"(A15,I10, E23.15)") TRIM(NOMS(IQ)), l, &
                     grad( (iq-1)*nlayermx + l ) 
+     
+     IF ( grad( (iq-1)*nlayermx + l ) .ne.  grad( (iq-1)*nlayermx + l )  ) THEN 
+          WRITE(*,*) "ERROR IN GRADIENT" 
+          STOP
+     ENDIF 
+
      ENDDO 
 ENDDO
 
-
+CLOSE(20)
 RETURN 
 
 ENDIF 
@@ -124,3 +138,99 @@ ENDIF
 END SUBROUTINE lbfgsb_gradient 
 
 
+! ---------------------------------------------------------------
+! Final mixing ratio state from 1-D model saved to a .dat
+! ---------------------------------------------------------------
+SUBROUTINE lbfgsb_stateoutput(q)
+
+IMPLICIT NONE 
+
+#include "dimensions.h"
+#include "dimphys.h"
+#include "tracer.h" 
+
+! Input Variables
+! ---------------
+REAL q(nlayermx,nqmx)
+
+! Local Variables 
+! ---------------
+REAL, SAVE :: q_initial(nlayermx,nqmx) ! Initial state 
+CHARACTER(LEN=*), PARAMETER :: FILENAME = "finalstate.dat"
+INTEGER iq, l ! Loop iterators 
+CHARACTER(LEN=20) tracer
+LOGICAL, SAVE :: FIRSTCALL = .True.
+
+
+IF ( firstcall ) THEN 
+     q_initial = q 
+     firstcall = .FALSE. 
+     RETURN 
+ENDIF 
+
+OPEN(unit = 30, file = FILENAME, status = "REPLACE", action = "WRITE")
+WRITE(30,"(A15,A10,2A15)") "TRACER", "LAYER", "INITIAL MMR", "FINAL MMR"  
+
+DO iq = 1, nqmx     
+     DO l = 1, nlayermx
+          WRITE(30,"(A15,I10, 2E15.7)") TRIM(NOMS(IQ)), l, &
+                      q_initial(l,iq), q(l,iq)
+     ENDDO 
+ENDDO 
+
+RETURN
+
+END SUBROUTINE
+
+
+SUBROUTINE lbfgsb_stateinput( q ) 
+
+IMPLICIT NONE 
+
+#include "dimensions.h"
+#include "dimphys.h"
+#include "tracer.h" 
+
+! Input Variables
+! ===============
+REAL, INTENT(INOUT) :: q(nlayermx,nqmx)
+! Local Variables 
+! ===============
+CHARACTER(len=*), PARAMETER :: filename = "inputstate.dat" 
+INTEGER iq, lyr ! Tracer and layer loop iterators 
+LOGICAL exists
+CHARACTER(len=15) tracer 
+INTEGER layer 
+
+INQUIRE( FILE = FILENAME, EXIST = EXISTS) 
+
+IF ( .NOT. EXISTS ) THEN 
+     WRITE(*,*) FILENAME , " DOES NOT EXIST."
+     STOP
+ENDIF 
+
+OPEN( UNIT = 70 , FILE = FILENAME, ACTION = "READ" )
+
+DO iq = 1, nqmx
+     DO lyr = 1, nlayermx
+          READ(70,"(A15,I10,E15.7)") tracer, layer, q(lyr,iq)
+          
+          IF ( ( TRIM(TRACER) .NE. TRIM(NOMS(IQ)) ) .OR. &
+               ( layer .NE. lyr ) ) THEN 
+               WRITE(*,*) "ERROR IN INPUTSTATE.DAT FORMAT" 
+               WRITE(*,*) "¦",TRIM(TRACER), "¦", " ¦",TRIM(NOMS(IQ)), "¦"
+               WRITE(*,*) "¦",LAYER, "¦", " ¦",lyr, "¦"
+               STOP
+          ENDIF 
+          
+          q(lyr,iq) = MAX( q(lyr,iq), 1.E-31)
+          
+     ENDDO 
+ENDDO
+
+CLOSE(70)
+
+return
+
+
+END SUBROUTINE lbfgsb_stateinput

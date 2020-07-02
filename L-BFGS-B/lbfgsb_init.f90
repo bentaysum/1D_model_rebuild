@@ -92,7 +92,7 @@ GOTO 222
 ! 1.1.3 : Set these values as the forecast values 
 333 J_co = curiosity_co_array(data_point)
     J_co2 = curiosity_co2_array(data_point)
-    J_o2 = curiosity_o2_array(data_point)*1.D0
+    J_o2 = curiosity_o2_array(data_point)*1.D0*16./43.34
 	J_lt = curiosity_lt_array(data_point)
 	J_ls = curiosity_zls_array(data_point)
 

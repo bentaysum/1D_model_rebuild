@@ -13,7 +13,7 @@ c
 c    which is the sensitivity vector that the Adjoint to the 1-D
 c    model code calculates. 
 
-      PROGRAM main_optimze
+      PROGRAM main_optimize
       
       USE lbfgsb_mod 
       
@@ -38,9 +38,24 @@ c       the driver.
 c   =================================================================
 c                   Optimization Routine Variables 
 c   =================================================================
-
-
-
+      character(len=30) dummy_1, dummy_2 ! Dummy variables for file parsing 
+      integer line ! Loop iterator 
+      real finalstate(nqmx*nlayermx) ! Final state from 1-D model run with X as input 
+      real initialstate(nqmx*nlayermx) ! Initial state in REAL*4 format
+      
+      logical lbfgsb_firstcall
+      logical Existance
+      character(len=100) filecheck
+      
+      integer iq ! Iterator 
+      integer lyr ! Iterator
+      integer iql ! Iterator
+      
+      CHARACTER(LEN=*), PARAMETER :: BENSOUTPUT = "bensoutput.txt"
+      INTEGER activate
+      INTEGER errorstat
+      INTEGER filenumber 
+      CHARACTER(len=3) filenumber_string
 c     ----------------------------------------------------------------
 c     Acquire time-steps t_0 (the backtrace timestep) and t_N (the 
 c     forecast timestep), and proceed to generate a bash file that 
@@ -49,24 +64,223 @@ c     required variables :
 c     day0 - Establishes the solar longitude 
 c     ndt  - number of sols to run for (INCLUDING the 10 sol spin-up)
 c     -----------------------------------------------------------------
+
+      lbfgsb_firstcall = .TRUE.
+
+
+c     Purge the 1-D model directory of temporarily stored .dat files:
+c     - grad.dat 
+c     - finalstate.dat 
+c     - inputstate.dat 
+c     prior to routine starting. These files are searched in the 1-D 
+c     model to activate certain conditionals and must not be present
+c     on the very first call. 
+      filecheck = "/home/s1215319/mgcm/oneDmgcm/finalstate.dat"
+      INQUIRE(file = filecheck, EXIST = existance) 
+      IF ( existance ) call system("rm " // filecheck)
+
+      filecheck = "/home/s1215319/mgcm/oneDmgcm/grad.dat"
+      INQUIRE(file = filecheck, EXIST = existance) 
+      IF ( existance ) call system("rm " // filecheck)
+      
+      filecheck = "/home/s1215319/mgcm/oneDmgcm/inputstate.dat"
+      INQUIRE(file = filecheck, EXIST = existance) 
+      IF ( existance ) call system("rm " // filecheck)
+
       call lbfgsb_init
       
       call makeinput 
+      
+C     ===============
+C     Very First Call 
+C     ===============
+C     Need to extract the 1-D atmospheric state at the specified backtrace 
+c     time-step to pose as the first guess of X for the L-BFGS-B routines. 
+      call system("cd /home/s1215319/mgcm/oneDmgcm && "
+     $ // "./testphys1d.e ", errorstat)
+      IF ( errorstat .ne. 0 ) CALL testphys1d_error
+      
+      filenumber = 0
+      write(filenumber_string,"(I1)") filenumber
+      call system("mv /scratch/local/s1215319/organics/diagfi.nc " 
+     $ // "/exports/csce/datastore/geos/users/s1215319/L-BFGS-B/"
+     $ // "temphold/diagfi_" // TRIM(filenumber_string) // ".nc"
+     $ ,errorstat)
+      IF ( errorstat .ne. 0 ) CALL testphys1d_error
+     
+      call system("cp /home/s1215319/mgcm/oneDmgcm/finalstate.dat " 
+     $ // "/exports/csce/datastore/geos/users/s1215319/L-BFGS-B/"
+     $ // "temphold/final_" // TRIM(filenumber_string) // ".dat"
+     $ ,errorstat)
+      IF ( errorstat .ne. 0 ) CALL testphys1d_error
+      
+c     =====================
+c     Define the dimensions
+c     =====================
+      n = nqmx*nlayermx
+      m = 7
 
-    
-
-
-
-
-
-
-
-
+c     =========================
+c     Extract the first X state
+c     =========================
+c     File Layout:
+c     / tracer name / model layer / mmr at t_0 / mmr at t_N /  
+      OPEN(unit = 50, 
+     $     file = "/home/s1215319/mgcm/oneDmgcm/finalstate.dat",
+     $     action = "READ")
+      READ(50,*) dummy_1 ! First line = Header 
+      iq = 1 
+      DO line = 1, nqmx*nlayermx 
+          READ(50,"(A15,A10,2E15.7)") DUMMY_1, DUMMY_2, 
+     $            initialstate(line), finalstate(line)
+     
+c     ------------------
+c     Store tracer names
+c     ------------------
+      if ( ADJUSTL(dummy_2) == "1" ) then 
+          noms(iq) = ADJUSTL(dummy_1) 
+          iq = iq + 1
+      endif 
+      
+c     =============================
+c     Assign upper and lower bounds  
+c     =============================
+          X(line) = MAX(1.e-31,DBLE(initialstate(line))) ! Double conversion for L-BFGS-B
+          
+               l(line) = MAX(X(line) - X(line)*0.5D0,1.D-31) 
+               u(line) = MIN(X(line) + X(line)*10.D0,0.99) 
+          nbd(line) = 2
+          
+      ENDDO 
+      CLOSE(50)
+      
+c     =========================
+c     Optimization routine loop 
+c     =========================
+      task = 'START' 
+      f = 0.d0 
+      OPEN( UNIT = 222, FILE = BENSOUTPUT, ACTION = "WRITE",
+     $      STATUS = "REPLACE" )
+      activate = 0 
+      
+      write( 222 , "(A9,2A23, 16A23)" ) "TASK",
+     $     "f", "MAX[g]",  ( noms(iq) , iq = 1, nqmx ) 
+      write( 222,"(A368)") 
+     $            "----------------------------------------------------"
+     $          //"----------------------------------------------------"
+     $          //"----------------------------------------------------"
+     $          //"----------------------------------------------------"
+     $          //"----------------------------------------------------"
+     $          //"----------------------------------------------------"
+     $          //"----------------------------------------------------"
+     $          //"----"
 
       
+111   CONTINUE 
       
+      call setulb(n,m,x,l,u,nbd,f,g,factr,pgtol,wa,iwa,task,iprint,
+     +            csave,lsave,isave,dsave)
+     
+              activate = activate + 1
+              WRITE(222,"(A9,2E23.15,16E23.15)") TASK(1:7),f, maxval(g),
+     $       (X( (iq-1)*nlayermx + 1 ) , iq = 1,nqmx )
+     
+Cccccccccccccccccc
+cc Incomplete
+cccccccccccccccccc     
+
+      if ( task(1:2) .eq. 'FG' ) then
+              
+          ! On the first ask for F and G values, all we need to do is
+          ! read files made by the call to the 1-D model above. 
+          if ( lbfgsb_firstcall ) then 
+          
+               lbfgsb_firstcall = .FALSE. 
+             
+               call COST(f)
+               call GRAD 
+               
+
+               
+               
+               goto 111 
+               
+          else 
+          
+          OPEN( UNIT = 50, 
+     $          FILE = "/home/s1215319/mgcm/oneDmgcm/inputstate.dat",
+     $          ACTION = "WRITE",
+     $          STATUS = "REPLACE")
+          
+          DO iq = 1, nqmx 
+          
+               DO lyr = 1, nlayermx
+               
+               write(50,"(A15,I10,E15.7)" ) adjustl(noms(iq)), 
+     $                     lyr,
+     $                     real(X((iq-1)*nlayermx + lyr))
+               ENDDO 
+               
+          ENDDO 
+          
+          close(50)
+          
+          call system("cd /home/s1215319/mgcm/oneDmgcm &&"
+     $                // " ./testphys1d.e ", errorstat)
+          
+          if ( errorstat .ne. 0 ) call testphys1d_error
+          
+      filenumber = filenumber + 1
+      write(filenumber_string,"(I3)") filenumber
+      write(*,*) "mv /scratch/local/s1215319/organics/diagfi.nc " 
+     $ // "/exports/csce/datastore/geos/users/s1215319/L-BFGS-B/"
+     $ // "temphold/diagfi_" // TRIM(ADJUSTL(filenumber_string))//".nc"
+      call system("mv /scratch/local/s1215319/organics/diagfi.nc " 
+     $ // "/exports/csce/datastore/geos/users/s1215319/L-BFGS-B/"
+     $ // "temphold/diagfi_" // TRIM(ADJUSTL(filenumber_string)) //".nc"
+     $ ,errorstat)
+     
+      IF ( errorstat .ne. 0 ) CALL testphys1d_error          
       
-      END PROGRAM main_optimze
+          call COST(f)
+          call GRAD 
+          
+               
+          
+          goto 111 
+                   
+          endif 
+         
+      endif 
+      
+ccccccccccccccccccc
+cc Incomplete
+ccccccccccccccccccc
+      if ( task(1:5) .eq. 'NEW_X' ) then 
+          OPEN( UNIT = 50, 
+     $          FILE = "/home/s1215319/mgcm/oneDmgcm/inputstate.dat",
+     $          ACTION = "WRITE",
+     $          STATUS = "REPLACE")
+          
+          DO iq = 1, nqmx 
+          
+               DO lyr = 1, nlayermx
+               
+               write(50,"(A15,I10,E15.7)" ) adjustl(noms(iq)), 
+     $                     lyr,
+     $                     real(X((iq-1)*nlayermx + lyr))
+               ENDDO 
+               
+          ENDDO 
+          
+          close(50)
+          
+          GOTO 111
+          
+      endif 
+
+     
+      END PROGRAM main_optimize
 
 
 
@@ -217,3 +431,93 @@ c
 c     --------------------------------------------------------------
 c           END OF THE DESCRIPTION OF THE VARIABLES IN L-BFGS-B
 c     --------------------------------------------------------------
+
+      SUBROUTINE COST(f)
+      
+      USE lbfgsb_mod
+      
+      IMPLICIT NONE 
+      
+      ! INPUT 
+      ! =====
+      REAL*8, INTENT(OUT) :: f 
+      
+      ! LOCAL 
+      ! =====
+      INTEGER i ! loop iterator 
+      CHARACTER(len = 100) dummy_1
+      CHARACTER(len=15) tracer 
+      INTEGER layer 
+      REAL*4 initial, final 
+      
+      ! ------------------------------------------------------------
+      OPEN(UNIT=20,FILE="/home/s1215319/mgcm/oneDmgcm/finalstate.dat"
+     $    ,ACTION="READ")
+      READ(20,*) dummy_1 
+      DO i = 1, nqmx*nlayermx
+         READ(20,"(A15,I10,2E15.7)") tracer, layer, initial, final
+      
+      IF ( ADJUSTL(tracer) == "o2" ) THEN 
+          
+          IF ( layer == 1 ) THEN 
+               
+               f = ABS(final-J_o2)
+               
+               close(20)
+               RETURN 
+               
+          ENDIF 
+      
+      ENDIF 
+          
+      ENDDO 
+      
+      WRITE(*,*) "ERROR IN COST FUNCTION : SHOULDN'T REACH HERE" 
+      
+      STOP 
+       
+      END SUBROUTINE COST 
+      
+      
+      SUBROUTINE GRAD
+      
+      USE lbfgsb_mod
+      
+      IMPLICIT NONE 
+
+      ! Variables
+      ! ---------
+      CHARACTER(len=100) dummy 
+      CHARACTER(len=15) dummy_1
+      CHARACTER(len=10) dummy_2
+      INTEGER i ! Loop iterator 
+      
+      OPEN(UNIT=20,FILE="/home/s1215319/mgcm/oneDmgcm/grad.dat")
+      
+      READ(20,*) dummy 
+      READ(20,*) dummy
+      DO i = 1 ,nqmx*nlayermx
+          READ(20,"(A15,A10,E23.15)") dummy_1, dummy_2, g(i)
+          IF ( ABS(g(i)) < 1.e-20 ) g(i) = 0.D0
+          g(i) = g(i)
+      ENDDO 
+      
+      RETURN 
+      
+      END SUBROUTINE GRAD 
+      
+      
+      
+      
+      
+      
+      
+      SUBROUTINE testphys1d_error 
+      
+      IMPLICIT NONE 
+
+      WRITE(*,*) " ERROR IN TESTPHYS1D " 
+      STOP
+
+      END SUBROUTINE testphys1d_error
+     

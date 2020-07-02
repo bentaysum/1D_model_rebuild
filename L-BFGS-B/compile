@@ -18,11 +18,25 @@ timer=timer.f
 ## Enter 1-D model directory
 cd $oneDmgcm
 
+## Select number of tracers
+echo "Number of TRACER (16 or 27)?"
+read nqmx 
+
 ## Compile the 1-D model
-./makegcm_gfortran -d 1x1x25 -p mars t -16 -lbfgsb testphys1d 
+./makegcm_gfortran -d 1x1x25 -p mars -t $nqmx -lbfgsb testphys1d 
+
+## Update the traceur.def file 
+sed -i "1s/.*/$nqmx/" traceur.def
+
 
 ## Back to L-BFGS-B directory
 cd - 
+
+
+# Edit the module file
+sed -i '/INTEGER, PARAMETER :: nqmx =/c\INTEGER, PARAMETER :: nqmx ='$nqmx lbfgsb_mod.f90 
+
+
 
 ## Compile the L-BFGS-B scripts 
 gfortran -c lbfgsb_mod.f90 

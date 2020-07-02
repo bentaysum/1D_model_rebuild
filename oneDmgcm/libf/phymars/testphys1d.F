@@ -104,6 +104,10 @@ c   Various intermediate variables
       ! TLM Parameters
       integer ndt_tlm ! Time-step for tlm activation
       
+#ifdef lbfgsb
+      logical lbfgsb_exists
+#endif 
+
 c=======================================================================
 
 c=======================================================================
@@ -767,9 +771,7 @@ c    L-BFGS-B opertations
 c    ~~~~~~~~~~~~~~~~~~~~
 #ifdef lbfgsb 
       if (idt .eq. t_backtrace ) then 
-      
           lbfgsb_output = .True.
-          
           
           tlm_on = .True.        ! Routines will now engage.
            
@@ -783,7 +785,25 @@ c    ~~~~~~~~~~~~~~~~~~~~
                              ! module.
  
           call TLM_initialise          
-         
+          
+          call lbfgsb_stateoutput(q)
+          
+          ! We check to see if there are input files in the main
+          ! directory created by the L-BFGS-B external routine. 
+          ! If they are there, the routine places the MMR's in
+          ! inputstate.dat into the MMR vector q(nlayermx,nqmx)
+          ! and if not, then the routine is on the 1st iteration
+          ! of said external routines. 
+          INQUIRE( FILE = "/home/s1215319/mgcm/oneDmgcm/" //
+     $    "inputstate.dat", EXIST = lbfgsb_exists)
+          
+          write(*,*) lbfgsb_exists
+          
+          
+          IF ( lbfgsb_exists ) THEN 
+               call lbfgsb_stateinput(q)
+          ENDIF 
+          
       endif
 #endif 
 
@@ -896,12 +916,17 @@ c    L-BFGS-B Optimization
 c    ~~~~~~~~~~~~~~~~~~~~~~
 #ifdef lbfgsb
       IF ( idt .ge. t_backtrace ) THEN 
+          write(*,*) t_backtrace, idt, t_forecast
           call lbfgsb_gradient(idt)
       ENDIF 
+      
+c     Save the final state to another .dat file
+c    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      IF ( idt == ndt ) call lbfgsb_stateoutput(q)
 #endif 
         
-        
       ENDDO   ! of idt=1,ndt ! end of time stepping loop
+
 
 c    ========================================================
 c    OUTPUTS
