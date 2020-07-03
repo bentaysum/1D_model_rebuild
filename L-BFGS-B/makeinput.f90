@@ -48,7 +48,7 @@ READ(*,*) day0
      WRITE(bash_unit,"(A35,I3,A2,A29,A12)") "sed -i '/t_backtrace/c\t_backtrace=", t_0,"' ", &
                          TRIM(ONED_HOME), "callphys.def"
      ! 1.2.7) Define forecast time in callphys.def 
-     WRITE(bash_unit,"(A35,I3,A2,A29,A12)") "sed -i '/t_forecast/c\t_forecast=", t_N,"' ", &
+     WRITE(bash_unit,"(A35,I6,A2,A29,A12)") "sed -i '/t_forecast/c\t_forecast=", t_N,"' ", &
                          TRIM(ONED_HOME), "callphys.def"
                          
 CLOSE(bash_unit)

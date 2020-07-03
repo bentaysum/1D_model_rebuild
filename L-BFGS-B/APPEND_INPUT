@@ -5,4 +5,4 @@ sed -i '/latitude/c\latitude=-4.5' /home/s1215319/mgcm/oneDmgcm/run.def
 sed -i '/long_mean/c\long_mean=.false.' /home/s1215319/mgcm/oneDmgcm/callphys.def
 sed -i '/longitude/c\longitude=137.4' /home/s1215319/mgcm/oneDmgcm/callphys.def
 sed -i '/t_backtrace/c\t_backtrace=480' /home/s1215319/mgcm/oneDmgcm/callphys.def
-  sed -i '/t_forecast/c\t_forecast=608' /home/s1215319/mgcm/oneDmgcm/callphys.def
+  sed -i '/t_forecast/c\t_forecast=  2912' /home/s1215319/mgcm/oneDmgcm/callphys.def

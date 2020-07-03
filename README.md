@@ -19,6 +19,11 @@ non-navigatable, and at this point all I can see is: I don't frankly care anymor
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
 
+## 03/07/2020
+
+Studies with o2 may be difficult to accurately perform; o2 lifetime ~ 30 years, so instant
+changes of magnitude 10^-1 will be very difficult to create with static o2.
+
 ## 02/07/2020
 
 Results do get better but not as good as I believe possible. 

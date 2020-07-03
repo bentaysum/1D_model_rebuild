@@ -148,8 +148,8 @@ c     =============================
           X(line) = MAX(1.e-31,DBLE(initialstate(line))) ! Double conversion for L-BFGS-B
           nbd(line) = 2
 
-          l(line) = MAX(X(line) - X(line)*0.9D0,1.D-31) 
-          u(line) = MIN(X(line) + X(line)*10.D0,0.99) 
+          l(line) = MAX(X(line) - X(line)*0.995D0,1.D-31) 
+          u(line) = MIN(X(line) + X(line)*100.D0,0.99) 
           
       ENDDO 
       CLOSE(50)
@@ -497,13 +497,15 @@ c     --------------------------------------------------------------
       READ(20,*) dummy
       DO i = 1 ,nqmx*nlayermx
           READ(20,"(A15,A10,E23.15)") dummy_1, dummy_2, g(i)
-          IF ( ABS(g(i)) < 1.e-6 ) g(i) = 0.D0
           
-          IF ( adjustl(dummy_1) == "o2" ) THEN
-               g(i) = 0.D0
-          ELSE  
-               g(i) = g(i)
-          ENDIF 
+          ! Conditionals 
+          ! =============
+          IF ( ABS( g(i) ) < 1.D-7 ) g(i) = 0.D0 
+          IF ( ADJUSTl( dummy_1 ) == "h" ) g(i) = 0.D0 
+          IF ( ADJUSTl( dummy_1 ) == "oh" ) g(i) = 0.D0 
+          IF ( ADJUSTl( dummy_1 ) == "ho2" ) g(i) = 0.D0 
+          IF ( ADJUSTl( dummy_1 ) == "o2" ) g(i) = 0.D0 
+
           
       ENDDO 
       
