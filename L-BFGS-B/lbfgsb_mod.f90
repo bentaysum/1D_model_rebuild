@@ -25,7 +25,7 @@ INTEGER nbd(nmax)
 
 ! *********** oneDmgcm parameters ************* !
 CHARACTER(len=*), PARAMETER :: ONED_HOME = "/home/s1215319/mgcm/oneDmgcm/"
-INTEGER, PARAMETER :: nqmx =16
+INTEGER, PARAMETER :: nqmx =27
 INTEGER, PARAMETER :: nlayermx = 25 
 CHARACTER(len=20) noms(nqmx)
 

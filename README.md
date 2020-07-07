@@ -19,6 +19,12 @@ non-navigatable, and at this point all I can see is: I don't frankly care anymor
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
 
+## 07/07/2020
+
+O2 too photochemically stable; only use sensitivity analysis on Curiosity data.
+
+Began conversion from O2 -> O3 assimilation routine
+
 ## 03/07/2020
 
 Studies with o2 may be difficult to accurately perform; o2 lifetime ~ 30 years, so instant

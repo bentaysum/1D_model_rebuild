@@ -395,6 +395,16 @@ c =================================================================
 
                TLM = TLM_trans + TLM_photo
                TLM = tlm_ident + TLM*ptimestep
+               
+        do iq = 1, nqmx*nlayermx 
+          do l = 1, nlayermx*nqmx
+               IF ( TLM(iq,l) .ne. TLM(iq,l) ) THEN 
+                    WRITE(*,*) "NAN AT ", iq, l 
+                    STOP 
+               ENDIF 
+          enddo 
+        enddo 
+               
 
       endif 
 

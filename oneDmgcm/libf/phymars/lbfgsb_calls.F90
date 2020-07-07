@@ -82,6 +82,12 @@ IF ( idt == t_backtrace ) THEN
      WRITE(*,"(2E23.15)") MAXVAL(TLM), MAXVAL(TRANS_MATRIX)
      WRITE(*,"(2E23.15)") MINVAL(TLM), MINVAL(TRANS_MATRIX) 
      WRITE(*,"(A46)") '**********************************************'
+     
+     IF ( ABS(MAXVAL(TLM)) .GE. 1D11 ) THEN 
+          WRITE(*,*) "ALARMINGLY BIG TLM VALUE"
+          CALL tlm_error
+     ENDIF 
+     
      RETURN 
 ENDIF 
 
@@ -91,6 +97,19 @@ ENDIF
 TLM = TRANSPOSE(TLM)
 TRANS_MATRIX = MATMUL( TRANS_MATRIX, TLM )
 
+WRITE(*,"(A46)") '**********************************************'
+WRITE(*,"(2E23.15)") MAXVAL(TLM), MAXVAL(TRANS_MATRIX)
+WRITE(*,"(2E23.15)") MINVAL(TLM), MINVAL(TRANS_MATRIX) 
+WRITE(*,"(A46)") '**********************************************'
+
+IF ( ABS(MAXVAL(TLM)) .GE. 1D11 ) THEN 
+     WRITE(*,*) "ALARMINGLY BIG TLM VALUE"
+     CALL tlm_error
+ELSEIF ( ABS(MAXVAL(TRANS_MATRIX)) .GE. 1D11 ) THEN 
+     WRITE(*,*) "ALARMINGLY BIG TRANSITION MATRIX"
+     CALL trans_error(TRANS_MATRIX)
+ENDIF 
+
 DO iq = 1, nlayermx*nqmx
      DO l = 1, nlayermx*nqmx 
           IF ( TLM( iq, l ) .NE. TLM( iq, l ) ) call tlm_error 
@@ -99,10 +118,7 @@ DO iq = 1, nlayermx*nqmx
 ENDDO 
 
 
-WRITE(*,"(A46)") '**********************************************'
-WRITE(*,"(2E23.15)") MAXVAL(TLM), MAXVAL(TRANS_MATRIX)
-WRITE(*,"(2E23.15)") MINVAL(TLM), MINVAL(TRANS_MATRIX) 
-WRITE(*,"(A46)") '**********************************************'
+
 IF ( idt .ne. t_forecast) RETURN 
 
 
@@ -113,13 +129,22 @@ IF ( idt == t_forecast ) THEN
      grad(:) = 0.D0 
      
      ! STUDYING CURIOSITY SURFACE O2 FOR NOW : MAKE INTERACTIVE AT LATER DATE 
+     ! DO iq = 1, nqmx
+          ! IF ( trim(noms(iq)) == "o2" ) THEN 
+               ! grad( (iq-1)*nlayermx + 1 ) = 1.D0
+               ! grad = MATMUL( TRANS_MATRIX, GRAD )
+               ! GOTO 100 
+          ! ENDIF 
+     ! ENDDO 
+     
      DO iq = 1, nqmx
           IF ( trim(noms(iq)) == "o2" ) THEN 
                grad( (iq-1)*nlayermx + 1 ) = 1.D0
                grad = MATMUL( TRANS_MATRIX, GRAD )
                GOTO 100 
           ENDIF 
-     ENDDO 
+     ENDDO      
+     
 
 ! 2. Write the gradient vector to a .dat file in the oneDmgcm directory
 100 OPEN( unit = 20, file = FILENAME, action = "WRITE", status = "REPLACE")

@@ -56,6 +56,9 @@ c   =================================================================
       INTEGER errorstat
       INTEGER filenumber 
       CHARACTER(len=3) filenumber_string
+      
+      REAL*8, PARAMETER :: low_default = 1.D-3 
+      REAL*8, PARAMETER :: high_default = 1.D2
 c     ----------------------------------------------------------------
 c     Acquire time-steps t_0 (the backtrace timestep) and t_N (the 
 c     forecast timestep), and proceed to generate a bash file that 
@@ -95,6 +98,15 @@ c     on the very first call.
       INQUIRE(file = filecheck, EXIST = existance) 
       IF ( existance ) call system("rm " // filecheck)
 
+      filecheck = "/home/s1215319/mgcm/oneDmgcm/TLM_ERROR.dat"
+      INQUIRE(file = filecheck, EXIST = existance) 
+      IF ( existance ) call system("rm " // filecheck)
+
+      filecheck = "/home/s1215319/mgcm/oneDmgcm/TRANS_ERROR.dat"
+      INQUIRE(file = filecheck, EXIST = existance) 
+      IF ( existance ) call system("rm " // filecheck)
+
+
       call lbfgsb_init
       
       call makeinput 
@@ -126,7 +138,7 @@ c     =====================
 c     Define the dimensions
 c     =====================
       n = nqmx*nlayermx
-      m = 15
+      m = 7
 
 c     =========================
 c     Extract the first X state
@@ -148,9 +160,67 @@ c     =============================
           X(line) = MAX(1.e-31,DBLE(initialstate(line))) ! Double conversion for L-BFGS-B
           nbd(line) = 2
 
-          l(line) = MAX(X(line) - X(line)*0.995D0,1.D-31) 
-          u(line) = MIN(X(line) + X(line)*100.D0,0.99) 
+          l(line) = MAX(low_default*X(line),1.D-31) 
+          u(line) = MIN(high_default*X(line),0.99) 
+         
+         
+c         Odd-Hydrogen 
+c         cccccccccccc 
+          IF ( 
+     $         (adjustl(DUMMY_1) == "h") .or. 
+     $         (adjustl(DUMMY_1) == "oh") .or. 
+     $         (adjustl(DUMMY_1) == "ho2")
+     $       ) THEN 
+               l(line) = MAX(X(line)*1.D-4,1.D-31)
+               u(line) = MIN(X(line)*1.D4,1.D-7) 
+         
+C        Non-Methyl Radicals 
+c        ccccccccccccccc 
+         ELSEIF (
+     $            (adjustl(DUMMY_1) == "ch3o2") .or.
+     $            (adjustl(DUMMY_1) == "ch3o") .or.
+     $            (adjustl(DUMMY_1) == "hoch2o2") .or. 
+     $            (adjustl(DUMMY_1) == "hco") ) THEN 
+               l(line) = MAX(X(line)*1.D-4,1.D-31)
+               u(line) = MIN(X(line)*1.D4,1.D-9)  
           
+c         Methyl Radical 
+c         cccccccccccccc 
+          ELSEIF(
+     $            (adjustl(DUMMY_1) == "ch3") ) THEN 
+          
+               l(line) = MAX( x(line)*1.D-5,1.D-31) 
+               u(line) = 1.D-9
+
+C         Methane 
+c         ccccccccccccccc 
+         ELSEIF( adjustl(DUMMY_1) == "ch4" ) THEN 
+               l(line) = MIN( X(line)*1.D-5, 1.D-31) 
+               u(line) = MAX( X(line)*10.D0, 1.D-7)
+         
+C         Long Lived Organics 
+c         ccccccccccccccccccc 
+         ELSEIF( 
+     $           (adjustl(DUMMY_1) == "ch3ooh") .or. 
+     $           (adjustl(DUMMY_1) == "ch3oh") .or. 
+     $           (adjustl(DUMMY_1) == "hcho") .or. 
+     $           (adjustl(DUMMY_1) == "hcooh") .or. 
+     $           (adjustl(DUMMY_1) == "hoch2oh") .or.
+     $           (adjustl(DUMMY_1) == "hoch2ooh") 
+     $         ) THEN 
+               
+               l(line) = MIN(X(LINE)*1.D-6,1.D-31) 
+               u(line) = MAX(X(LINE)*1.D4,1.D-7) 
+             
+C         O2 
+C         ccccccccccccccccccc 
+          ELSEIF ( adjustl(DUMMY_1) == "o2" ) THEN 
+          
+               l(line) =  x(line)*0.94D0
+               u(line) = x(line)*1.04D0
+               
+          ENDIF
+         
       ENDDO 
       CLOSE(50)
       
@@ -158,12 +228,12 @@ c     =========================
 c     Optimization routine loop 
 c     =========================
       task = 'START' 
-      f = 0.d0 
+      
       OPEN( UNIT = 222, FILE = BENSOUTPUT, ACTION = "WRITE",
      $      STATUS = "REPLACE" )
       activate = 0 
       
-      write( 222 , "(A9,2A23, 16A23)" ) "TASK",
+      write( 222 , "(A9,2A23, 27A23)" ) "TASK",
      $     "f", "MAX[g]",  ( noms(iq) , iq = 1, nqmx ) 
       write( 222,"(A368)") 
      $            "----------------------------------------------------"
@@ -182,7 +252,7 @@ c     =========================
      +            csave,lsave,isave,dsave)
      
               activate = activate + 1
-              WRITE(222,"(A9,2E23.15,16E23.15)") TASK(1:7),f, maxval(g),
+              WRITE(222,"(A9,2E23.15,27E23.15)") TASK(1:7),f, maxval(g),
      $       (X( (iq-1)*nlayermx + 1 ) , iq = 1,nqmx )
      
 Cccccccccccccccccc
@@ -229,6 +299,17 @@ cccccccccccccccccc
      $                // " ./testphys1d.e ", errorstat)
           
           if ( errorstat .ne. 0 ) call testphys1d_error
+          
+          
+      filecheck = "/home/s1215319/mgcm/oneDmgcm/TLM_ERROR.dat"
+      INQUIRE(file = filecheck, EXIST = existance) 
+      IF ( existance ) call testphys1d_error
+
+      filecheck = "/home/s1215319/mgcm/oneDmgcm/TRANS_ERROR.dat"
+      INQUIRE(file = filecheck, EXIST = existance) 
+      IF ( existance ) call testphys1d_error
+          
+          
           
       filenumber = filenumber + 1
       write(filenumber_string,"(I3)") filenumber
@@ -456,6 +537,7 @@ c     --------------------------------------------------------------
       READ(20,*) dummy_1 
       DO i = 1, nqmx*nlayermx
          READ(20,"(A15,I10,2E15.7)") tracer, layer, initial, final
+     
       
       IF ( ADJUSTL(tracer) == "o2" ) THEN 
           
@@ -501,10 +583,11 @@ c     --------------------------------------------------------------
           ! Conditionals 
           ! =============
           IF ( ABS( g(i) ) < 1.D-7 ) g(i) = 0.D0 
-          IF ( ADJUSTl( dummy_1 ) == "h" ) g(i) = 0.D0 
-          IF ( ADJUSTl( dummy_1 ) == "oh" ) g(i) = 0.D0 
-          IF ( ADJUSTl( dummy_1 ) == "ho2" ) g(i) = 0.D0 
-          IF ( ADJUSTl( dummy_1 ) == "o2" ) g(i) = 0.D0 
+          
+          ! IF ( ADJUSTl( dummy_1 ) == "h" ) g(i) = 0.D0 
+          ! IF ( ADJUSTl( dummy_1 ) == "oh" ) g(i) = 0.D0 
+          ! IF ( ADJUSTl( dummy_1 ) == "ho2" ) g(i) = 0.D0 
+
 
           
       ENDDO 

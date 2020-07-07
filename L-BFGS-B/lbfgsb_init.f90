@@ -47,6 +47,7 @@ REAL day0s(668) ! Grid of day0 values to get zls values from
 REAL zls_grid(668) ! Arrays to interpolate our day0 from 
 INTEGER fortran_is_a_fussy_diva(1) ! Because FORTRAN is difficult 
 
+INTEGER, PARAMETER :: SOL_SPIN = 10
 
 ! =============================================================
 ! Stage 1: Reading the Curiosity Data Table 
@@ -106,7 +107,7 @@ GOTO 222
 ! 		Model should always begin at LT = 00:00 hrs. The model will exit spin-up,
 ! 		run for day_step time-steps (1 sol), then continue to the temporal location
 !		(lt index) of the Curiosity data point.
-t_N = (spin_up + 50)*day_step + INT( day_step*(J_lt/24. ) ) 
+t_N = (spin_up + SOL_SPIN)*day_step + INT( day_step*(J_lt/24. ) ) 
 
 ! 2.2 : Ask for number of sols after spin-up and local time to backtrace model to 
 444 write(*,*) "Sols (INT) and LT (FLOAT) after spin-up to backtrace model towards:" 
@@ -126,7 +127,7 @@ t_N = (spin_up + 50)*day_step + INT( day_step*(J_lt/24. ) )
 write(*,"(A63)") "--------------------------------------------------------"
 WRITE(*,"(A30, A3, A30)")  "BACKTRACE", " | ", "FORECAST"
 WRITE(*,"(2A15, A3, 2A15)") "SOL", "LT" , " | ", "SOL", "LT"
-WRITE(*,"(I15, F15.2, A3, I15, F15.2)") 2, J_lt , " | ", sol_backtrace, lt_backtrace 
+WRITE(*,"(I15, F15.2, A3, I15, F15.2)") SOL_SPIN, J_lt , " | ", sol_backtrace, lt_backtrace 
 write(*,*) "Correct [y/n] ? : "
 READ(*,*) confirm 
 IF ( confirm == "y" .or. confirm == "Y" ) GOTO 555
