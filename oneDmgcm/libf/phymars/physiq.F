@@ -377,11 +377,56 @@ c Variables for PBL
 
 c=======================================================================
 
+c 0.0: Conditional activation of TLM routines
+c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       IF ( idt == ndt_tlm
+     $      .and. call_tlm ) THEN 
+            
+            call_tlm = .False.     ! Prevents multiple initialisations.
+            
+            tlm_on = .True.        ! Routines will now engage.
+            
+            mcd_profiles = .False. ! Interpolation routines will 
+                                   ! invalidate TLM results.
+            
+            calladj = .False. ! Convective adjustments require a 
+                               ! conditional that the TLM will not
+                               ! be capable of performing.
+            callcond = .False. ! Again, conditionals activate this 
+                               ! module.
+            call TLM_initialise
+
+C        ELSEIF ( idt == ndt_tlm 
+C      $      .and. pertloop ) THEN 
+
+C            CALL scalar_perturbation(pq(1,:,:))
+
+C             mcd_profiles = .False. ! Interpolation routines will 
+C                                    ! invalidate TLM results.
+            
+C             calladj = .False. ! Convective adjustments require a 
+C                                ! conditional that the TLM will not
+C                                ! be capable of performing.
+C             callcond = .False. ! Again, conditionals activate this 
+C                                ! module.
+C             pertloop = .False.
+
+       ENDIF 
+
+
        IF ( tlm_on ) THEN 
           TLM_photo(:,:) = 0.D0
           TLM_trans(:,:) = 0.D0
           TLM(:,:) = 0.D0
        ENDIF 
+
+
+
+
+
+
+
+
 c 1. Initialisation:
 c -----------------
 c  1.1   Initialisation only at first call
@@ -1398,47 +1443,6 @@ c              call TLM_ADJ_out(idt,ptime*24.)
 
 c          ENDIF
           
-
-c 10.1: Conditional activation of TLM routines
-c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-       IF ( idt == ndt_tlm
-     $      .and. call_tlm ) THEN 
-            
-            call_tlm = .False.     ! Prevents multiple initialisations.
-            
-            tlm_on = .True.        ! Routines will now engage.
-            
-            mcd_profiles = .False. ! Interpolation routines will 
-                                   ! invalidate TLM results.
-            
-            calladj = .False. ! Convective adjustments require a 
-                               ! conditional that the TLM will not
-                               ! be capable of performing.
-            callcond = .False. ! Again, conditionals activate this 
-                               ! module.
-            call TLM_initialise
-
-       
-
-       ELSEIF ( idt == ndt_tlm 
-     $      .and. pertloop ) THEN 
-
-           CALL scalar_perturbation(pq(1,:,:))
-
-            mcd_profiles = .False. ! Interpolation routines will 
-                                   ! invalidate TLM results.
-            
-            calladj = .False. ! Convective adjustments require a 
-                               ! conditional that the TLM will not
-                               ! be capable of performing.
-            callcond = .False. ! Again, conditionals activate this 
-                               ! module.
-            pertloop = .False.
-
-       ENDIF 
-
-
-
 
 
 

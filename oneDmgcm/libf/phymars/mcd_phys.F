@@ -34,6 +34,9 @@
 ! 	  LOCAL VARIABLES
 !     === Longitude ===
       real, save :: mcd_longitude 
+!     === Local Time ===
+      real local_time
+      
 !     === netCDF parameters ===
       integer N_LT, N_ALT, N_ZLS, N_LAT, N_LONG
       integer x, y, z, t ! loop iterators     
@@ -77,8 +80,9 @@
       logical, save :: first_call = .True.
       logical, save :: secondcall = .False.
 
+      local_time = lt
 !     0: IF THE MODEL IS NOT OPERATING VIA DIURNAL CHEMISTRY, LT = 12:00
-      if ( .not. diurnal ) lt = 12.
+      if ( .not. diurnal ) local_time = 12.
 
 
 !=======================================================================
@@ -285,7 +289,7 @@
       enddo
           
       call interp_line(v5mcd_lt, zps(:), N_LT,
-     &                     lt, ps, 1)
+     &                     local_time, ps, 1)
 
        secondcall = .True. 
            
@@ -360,20 +364,21 @@ C !=======================================================================
       
 
       call interp_line(v5mcd_lt, zps(:), N_LT,
-     &                     lt, ps, 1)
+     &                     local_time, ps, 1)
 
       do y = 1, nlayermx
 		 
-          call interp_line(v5mcd_lt, zT(:,y), N_LT, lt, temp(y), 1)
+          call interp_line(v5mcd_lt, zT(:,y), N_LT, 
+     &                     local_time, temp(y), 1)
           
           call interp_line(v5mcd_lt, zq2(:,y), N_LT,
-     &                     lt, q2(y), 1)
+     &                     local_time, q2(y), 1)
           
           call interp_line(v5mcd_lt, zu(:,y), N_LT,
-     &                     lt, zonwind(y), 1)
+     &                     local_time, zonwind(y), 1)
           
           call interp_line(v5mcd_lt, zv(:,y), N_LT,
-     &                     lt, merwind(y), 1)
+     &                     local_time, merwind(y), 1)
 
       end do
       

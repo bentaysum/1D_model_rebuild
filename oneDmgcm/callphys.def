@@ -8,7 +8,7 @@ tracer=.true.
 datadir=/exports/csce/datastore/geos/users/s1215319/cleaning_gcm/mgcm-datafile
 
 #Diurnal cycle ?  if diurnal=False, diurnal averaged solar heating
-diurnal=.true.
+diurnal=.false.
 
 #Seasonal cycle ? if season=False, Ls stays constant, to value set in "start"
 season = .false.   
@@ -34,12 +34,12 @@ long_mean=.false.
 longitude=137.4
 
 ## Tracer interpolation shutdown parameters 
-mcd_dayfin = 10000 
+mcd_dayfin = 1000000
 mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call_tlm=.false.
+call_tlm=.true.
 tlm_day=10
 tlm_lt=0
 

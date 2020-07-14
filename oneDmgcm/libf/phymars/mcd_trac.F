@@ -31,6 +31,9 @@
 ! 	  LOCAL VARIABLES
 !     === longitude ===
       real, save :: mcd_longitude 
+!     === Local Time ===
+      real :: local_time
+!     
 !     === netCDF parameters ===
       integer N_LT, N_ALT, N_ZLS, N_LAT, N_LONG
       parameter (N_LT =4, N_ALT = 30, N_ZLS = 37, 
@@ -78,10 +81,10 @@
 !     OTHER
       logical, save :: first_call = .True.
 
-
+      local_time = lt*24.
 !     0: IF THE MODEL IS NOT OPERATING VIA DIURNAL CHEMISTRY, LT = 12:00
-      if ( .not. diurnal ) lt = 12.
-
+      if ( .not. diurnal ) local_time = 12.
+     
 
 !=======================================================================
 !     STAGE 1
@@ -342,19 +345,20 @@ C !=======================================================================
       
       do y = 1, nlayermx
       
-          call interp_line(mcdv5_lt, zco2(:,y), N_LT, lt*24., co2(y), 1)
+          call interp_line(mcdv5_lt, zco2(:,y), N_LT, 
+     &                     local_time, co2(y), 1)
 
           call interp_line(mcdv5_lt, zco(:,y), N_LT,
-     &                     lt*24., co(y), 1)
+     &                     local_time, co(y), 1)
           
           call interp_line(mcdv5_lt, zo2(:,y), N_LT,
-     &                     lt*24., o2(y), 1)
+     &                     local_time, o2(y), 1)
           
           call interp_line(mcdv5_lt, zh2(:,y), N_LT,
-     &                     lt*24., h2(y), 1)
+     &                     local_time, h2(y), 1)
           
           call interp_line(mcdv5_lt, zh2o(:,y), N_LT,
-     &                     lt*24., h2o(y), 1)
+     &                     local_time, h2o(y), 1)
      
 
           co2(y) = co2(y)*mmol(1)/43.34!mmean(1,y)

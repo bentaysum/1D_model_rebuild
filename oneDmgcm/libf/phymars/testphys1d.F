@@ -911,6 +911,16 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
       ENDIF 
       
       
+      
+      
+c     Tangent Linear Matrix 
+c    ~~~~~~~~~~~~~~~~~~~~~~
+      IF ( tlm_on ) THEN 
+          CALL TLM_ADJ_out(idt,time*24.)
+      ENDIF 
+      
+      
+      
 
 c    L-BFGS-B Optimization 
 c    ~~~~~~~~~~~~~~~~~~~~~~
@@ -925,13 +935,18 @@ c    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       IF ( idt == ndt ) call lbfgsb_stateoutput(q)
 #endif 
         
+        
+        
+        
+        
+        
       ENDDO   ! of idt=1,ndt ! end of time stepping loop
 
 
 c    ========================================================
 c    OUTPUTS
 c    ========================================================
-
+         
 c    finalize and close grads files "g1d.dat" and "g1d.ctl"
 
 c        CALL endg1d(1,nlayer,zphi/(g*1000.),ndt)
