@@ -103,7 +103,7 @@ c   Various intermediate variables
 
       ! TLM Parameters
       integer ndt_tlm ! Time-step for tlm activation
-      
+      integer ndt_mcd ! Time-step for mcd profile interpolation shutdown
 #ifdef lbfgsb
       logical lbfgsb_exists
 #endif 
@@ -729,13 +729,27 @@ c
 
       if ( call_tlm .or. pertloop ) then
 c     Plume release activates after this many model steps 
-      ndt_plume =  (plume_day*day_step) + NINT((plume_lt/24.)*day_step)
+          ndt_plume =  (plume_day*day_step) 
+     $              +  NINT((plume_lt/24.)*day_step)
 c     TLM activates after this many model steps 
 c     -1 ensures the model saves the perturbed initial 
 c     state, as opposed to saving it -after- it enters
 c     the chemistry routine.
-      ndt_tlm = (tlm_day*day_step) + NINT((tlm_lt/24.)*day_step) - 1
+          ndt_tlm = (tlm_day*day_step) 
+     $            + NINT((tlm_lt/24.)*day_step) - 1
       endif 
+
+
+!     Check if the MCD v5.3 tracer interpolation routine has reached
+!     the desired shutdown point 
+      IF ( mcd_profiles ) THEN 
+          ndt_mcd = (mcd_dayfin*day_step)
+     $            + NINT((mcd_ltfin/24.)*day_step)
+      ENDIF 
+      
+
+
+
 
       DO idt=1,ndt
 c        IF (idt.eq.ndt) lastcall=.true.
@@ -899,19 +913,6 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
              q(ilayer,iq)=q(ilayer,iq)+dtphys*dq(ilayer,iq)
           ENDDO
         ENDDO
-
-!     Check if the MCD v5.3 tracer interpolation routine has reached
-!     the desired shutdown point 
-      IF ( mcd_profiles ) THEN 
-          
-          IF (  ( date >= mcd_dayfin ) .and. 
-     &      ( ABS(time*24. - mcd_ltfin) < 1.e-1 ) )
-     &    mcd_profiles = .False.
-         
-      ENDIF 
-      
-      
-      
       
 c     Tangent Linear Matrix 
 c    ~~~~~~~~~~~~~~~~~~~~~~

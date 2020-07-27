@@ -55,6 +55,8 @@ integer :: length
 integer :: l
 integer :: iostat
 character(len=15) :: HEADER_FMT
+character(len=3), SAVE :: day0_string
+integer :: day0 
 
 ! WRITING TO TERMINAL 
 integer :: loc_max(2)
@@ -69,6 +71,10 @@ IF ( firstcall ) THEN
 	
 	firstcall = .False.
 	
+     call getin("day0",day0)
+     
+     write(day0_string,"(I3)") day0 
+     
 	call getin("ndt",ndt)
 	
 	ndt = ndt*day_step
@@ -78,7 +84,7 @@ IF ( firstcall ) THEN
 ! Save the initial model state (in VMR units)
 	length = nlayermx*wl
 	
-	open (unit = 15, file = directory // "tracer_index.txt")
+	open (unit = 15, file = directory // ADJUSTL(trim(day0_string)) // "_tracer_index.txt")
 	
 	! Save idt, so we can jump directly to relevant time index for control and perturbed files
 	! in post-analysis.
@@ -129,11 +135,14 @@ write(*,*) "===================================="
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 IF ( idt == ndt ) THEN 
 				
-		filename = "tlm.bin"
+     filename = "tlm.bin"
 			
 	length = nx*ny*wl
-		
-	open (unit=11, file= directory // filename, access='direct', recl=length, iostat=iostat)
+
+     
+	open (unit=11, file= directory // ADJUSTL(day0_string) &
+     // "_" // TRIM(filename), access='direct', recl=length, &
+     STATUS = "REPLACE", iostat=iostat)
 	
 	! DO k = 1, nt 
 		! WRITE(11,rec=k) ( (tangent_matrix(x,y,k),x=1,nx ), y=1,ny)

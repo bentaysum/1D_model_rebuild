@@ -1444,14 +1444,7 @@ c              call TLM_ADJ_out(idt,ptime*24.)
 c          ENDIF
           
 
-
-
-
-
-
-
-
-
+       
 c-----------------------------------------------------------------------
 c  10. Write output files
 c  ----------------------
@@ -1467,6 +1460,7 @@ c    -------------------------------
 c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
       ! temperature, zonal and meridional wind
       DO l=1,nlayer
+          
         DO ig=1,ngrid
           zt(ig,l)=pt(ig,l)  + pdt(ig,l)*ptimestep
           zu(ig,l)=pu(ig,l)  + pdu(ig,l)*ptimestep
@@ -2323,7 +2317,11 @@ c        ==========================================================
         CALL WRITEDIAGFI(ngridmx, "zls", 
      &                   "Solar Longitude", 'degs', 
      &                   0, zls*180./pi)
-
+     
+        CALL WRITEDIAGFI(ngridmx, "tauref", 
+     &                   "tauref", 'unitless', 
+     &                   0, tauref)
+     
         CALL WRITEDIAGFI(ngridmx, "sza", 
      &                   "Solar Zenith Angle", 'degs', 
      &                   0, acos(mu0(1))*180./pi )

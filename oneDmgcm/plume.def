@@ -6,4 +6,4 @@
 ## 		Gas name as in tracer.def - Gas concentration - unit
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-c2h6 = 100. ppt
+o3 = 0. ppm
