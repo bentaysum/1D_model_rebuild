@@ -2478,6 +2478,8 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lwxd.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(lwxn.o)
 
+$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(mcd_dust.o)
+
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(mcd_phys.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(mcd_trac.o)
@@ -3134,6 +3136,14 @@ $(LIBF)/phymars/callkeys.h
 	$(AR) d $(LIBO)/libphymars.a lwxn.o ; \
 	$(COMPILE) $(LIBF)/phymars/lwxn.F ; \
 	$(AR) r $(LIBO)/libphymars.a lwxn.o ; $(RM) lwxn.o ; \
+	cd $(GCM)
+
+$(LIBO)/libphymars.a(mcd_dust.o) : $(LIBF)/phymars/mcd_dust.F \
+$(LIBO)/libbibio.a(ioipsl_getincom.o)
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libphymars.a mcd_dust.o ; \
+	$(COMPILE90) $(LIBF)/phymars/mcd_dust.F ; \
+	$(AR) r $(LIBO)/libphymars.a mcd_dust.o ; $(RM) mcd_dust.o ; \
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(mcd_phys.o) : $(LIBF)/phymars/mcd_phys.F \
@@ -3808,10 +3818,27 @@ $(LIBF)/phymars/comsoil.h
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(lbfgsb_calls.o) : $(LIBF)/phymars/lbfgsb_calls.F90 \
-$(LIBF)/phymars/callkeys.h
+$(LIBF)/phymars/callkeys.h \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h \
+$(LIBF)/phymars/tracer.h \
+$(LIBF)/phymars/callkeys.h \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h \
+$(LIBF)/phymars/tracer.h \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h \
+$(LIBF)/phymars/tracer.h \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h \
+$(LIBF)/phymars/tracer.h \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h \
+$(LIBF)/phymars/tracer.h \
+$(LIBO)/libbibio.a(ioipsl_getincom.o)
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libphymars.a lbfgsb_calls.o ; \
-	$(COMPILE) $(LIBF)/phymars/lbfgsb_calls.F90 ; \
+	$(COMPTRU90) $(LIBF)/phymars/lbfgsb_calls.F90 ; \
 	$(AR) r $(LIBO)/libphymars.a lbfgsb_calls.o ; $(RM) lbfgsb_calls.o ; \
 	cd $(GCM)
 

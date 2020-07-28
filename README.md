@@ -6,7 +6,7 @@ CH4 and C2H6.
 
 ## Complaints
 
-Git is arguably the worst software I've ever encountered. This is not the README that
+Git is arguably the worst software I've ever encountered. This is not the README that 
 all logical thought processes dictate should be here, but git doesn't work logically,
 it operates in some indecipherable way that's either mentally 1000's of years more
 advanced than current human thought, or 10000's of years backwards in time in the days
@@ -19,11 +19,12 @@ non-navigatable, and at this point all I can see is: I don't frankly care anymor
 you github, for showing me how inept I truly am at the should-be-easy process of version
 control. I'm earnestly trying my best here.
 
-## 07/07/2020
 
-O2 too photochemically stable; only use sensitivity analysis on Curiosity data.
-
-Began conversion from O2 -> O3 assimilation routine
+## 28/07/2020
+Dust operates as a radiatively active tracer, with MASS MIXING RATIO profiles interpolated
+from an MCDv5.3 produced dataset as a function of [local time, altitude, solar longitude,
+latitude, longitude]. Ready for use as a source of species in photochemistry.F. Values 
+validated by comparison with webtool.
 
 ## 03/07/2020
 

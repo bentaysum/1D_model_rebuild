@@ -8,7 +8,7 @@ tracer=.true.
 datadir=/exports/csce/datastore/geos/users/s1215319/cleaning_gcm/mgcm-datafile
 
 #Diurnal cycle ?  if diurnal=False, diurnal averaged solar heating
-diurnal=.false.
+diurnal=.true.
 
 #Seasonal cycle ? if season=False, Ls stays constant, to value set in "start"
 season = .false.   
@@ -39,7 +39,7 @@ mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call_tlm=.true.
+call_tlm=.False.
 tlm_day=10
 tlm_lt=0.
 
@@ -82,7 +82,7 @@ p_high = 1
 #  =6 "cold" (low dust) scenario ; =7 "warm" (high dust) scenario
 #  =24 Mars Year 24  ; =25 Mars Year 25 (year with a global dust storm) ; ...
 #  =30 Mars Year 30 
-iaervar = 1
+iaervar = 24
 # Dust opacity at 610 Pa (when constant, i.e. for the iaervar=1 case)
 tauvis=0.4
 # Dust vertical distribution: 
@@ -104,7 +104,7 @@ callnlte = .false.
 # 2-> New scheme
 nltemodel = 1
 # call CO2 NIR absorption ?   matters only if callrad=T
-callnirco2 = .false.
+callnirco2 = .true.
 # NIR NLTE correction ? matters only if callnirco2=T
 nircorr=1
 # call turbulent vertical diffusion ?
@@ -138,11 +138,11 @@ callslope = .false.
 ## Tracer (dust water, ice and/or chemical species) options (used if tracer=T):
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # DUST: Transported dust ? (if >0, use 'dustbin' dust bins)
-dustbin    = 0
+dustbin    = 2
 # DUST: Radiatively active dust ? (matters if dustbin>0)
-active  = .false.
+active  = .true.
 # DUST: use mass and number mixing ratios to predict dust size ?
-doubleq   = .false.
+doubleq   = .True.
 # DUST: lifted by GCM surface winds ?
 lifting = .false.
 # DUST: lifted by dust devils ?
