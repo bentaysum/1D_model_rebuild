@@ -26,6 +26,8 @@ from an MCDv5.3 produced dataset as a function of [local time, altitude, solar l
 latitude, longitude]. Ready for use as a source of species in photochemistry.F. Values 
 validated by comparison with webtool.
 
+Included in photochemistry.F, with a number density calculated via molar weight of 100.
+
 ## 03/07/2020
 
 Studies with o2 may be difficult to accurately perform; o2 lifetime ~ 30 years, so instant

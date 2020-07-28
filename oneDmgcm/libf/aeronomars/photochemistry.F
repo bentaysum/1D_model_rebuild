@@ -61,7 +61,7 @@ c
       integer lswitch
 c
       integer l, iq
-      parameter (nesp = 58)      ! number of species in the chemistry (+1 for RO2)
+      parameter (nesp = 59)      ! number of species in the chemistry (+2 for RO2 and dust)
 c
       real stimestep             ! standard timestep for the chemistry (s)
       real ctimestep             ! real timestep for the chemistry (s) 
@@ -667,7 +667,7 @@ c
        integer, parameter :: i_hox  = 56
        integer, parameter :: i_ox   = 57
        integer, parameter :: i_RO2  = 58
-
+       integer, parameter :: i_dust = 59
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     numbering of photolysis rates
@@ -2994,7 +2994,7 @@ c
        integer, parameter :: i_hox  = 56
        integer, parameter :: i_ox   = 57
        integer, parameter :: i_RO2  = 58
-
+       integer, parameter :: i_dust = 59 
       
 
        
@@ -3397,6 +3397,16 @@ c
          end do
       end if
 
+      if (igcm_dust_mass .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_dust) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_dust) = max(zycol(l,igcm_dust_mass), 1.e-30)
+         end do
+      end if
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     initialise chemical families                     c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -3543,6 +3553,7 @@ c
        integer, parameter :: i_hox  = 56
        integer, parameter :: i_ox   = 57
        integer, parameter :: i_RO2  = 58
+       integer, parameter :: i_dust = 59 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     save mixing ratios for the gcm
@@ -3772,6 +3783,12 @@ c
       if (igcm_ch2choh .ne. 0) then
          do l = 1,lswitch-1
             zycol(l,igcm_ch2choh) = rm(l,i_ch2choh)
+         end do
+      end if
+      
+      if (igcm_dust_mass .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_dust_mass) = rm(l,i_dust)
          end do
       end if
       
