@@ -26,7 +26,11 @@ from an MCDv5.3 produced dataset as a function of [local time, altitude, solar l
 latitude, longitude]. Ready for use as a source of species in photochemistry.F. Values 
 validated by comparison with webtool.
 
-Included in photochemistry.F, with a number density calculated via molar weight of 100.
+Included in photochemistry.F, with a number density calculated via molar weight of 66.5 
+which is derived from Gale Crater measurements of Dust compositions in doi:10.1002/2015GL066675.
+
+
+
 
 ## 03/07/2020
 

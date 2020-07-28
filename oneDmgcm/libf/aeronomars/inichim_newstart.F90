@@ -200,7 +200,6 @@
             end if
          end do
       end if ! of if (doubleq)
-
       if (scavenging) then
          do iq = 1,nqmx
             if (noms(iq) == "ccn_mass") then

@@ -173,7 +173,9 @@
 	  integer,save :: i_hcoco3h     = 0
 	  integer,save :: i_hcoco3 	   = 0 
 	  integer,save :: i_hoch2co3h   = 0
-
+       ! Dust 
+       integer,save :: i_dust = 0 
+       
       integer :: ig_vl1
 
       real    :: latvl1, lonvl1
@@ -308,6 +310,14 @@
             niq(nbq) = i_h2o2
          end if
 		 
+         i_dust = igcm_dust_mass
+         if (i_dust == 0) then
+            write(*,*) "calchim: Error; no dust as tracer !!!"
+            else
+            nbq = nbq + 1
+            niq(nbq) = i_dust
+         end if
+           
          i_ch4 = igcm_ch4
          if (i_ch4 == 0) then
             write(*,*) "calchim: Error; no CH4 tracer !!!"
@@ -660,6 +670,11 @@
             nbq = nbq + 1
             niq(nbq) = i_h2o
          end if
+         
+         
+         
+         
+         
          !Check tracers needed for thermospheric chemistry
          if(thermochem) then
             chemthermod=0  !Default: C/O/H chemistry
@@ -953,6 +968,12 @@
 !     loop over grid
 !=======================================================================
 
+!     Re-define the molar mass of mars dust as that derived from
+!     doi:10.1002/2015GL066675 [ BMT 28/07/2020]
+      IF (igcm_dust_mass .ne. 0 ) THEN 
+          mmol(igcm_dust_mass) = 66.5
+      ENDIF
+      
       do ig = 1,ngridmx
          
          foundswitch = 0
