@@ -978,18 +978,29 @@
          
          foundswitch = 0
          do l = 1,nlayermx
-            do i = 1,nbq
-               iq = niq(i) ! get tracer index
-               zq(ig,l,iq) = pq(ig,l,iq) + pdq(ig,l,iq)*ptimestep
-               zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
-            end do
-            zt(ig,l)  = pt(ig,l) + pdt(ig,l)*ptimestep
-            zu(ig,l)  = pu(ig,l) + pdu(ig,l)*ptimestep
-            zv(ig,l)  = pv(ig,l) + pdv(ig,l)*ptimestep
+         
             zpress(l) = pplay(ig,l)/100.
             ztemp(l)  = zt(ig,l)
             zdens(l)  = zpress(l)/(kb*1.e4*ztemp(l))
             zlocal(l) = zzlay(ig,l)/1000.
+         
+            do i = 1,nbq
+               iq = niq(i) ! get tracer index
+               ! ---------------------------------------
+               ! Electron number density is read in from 
+               ! the MCDv5.3 [BMT 30/07/2020]
+               ! ---------------------------------------
+               IF ( trim(noms(iq)) == "elec" ) THEN
+                    pq(ig,l,iq) = pq(ig,l,iq)*mmol(iq) &
+                                /(zdens(l)*mmean(ig,l)) 
+               ENDIF 
+               zq(ig,l,iq) = pq(ig,l,iq) + pdq(ig,l,iq)*ptimestep
+               zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
+            end do
+            
+            zt(ig,l)  = pt(ig,l) + pdt(ig,l)*ptimestep
+            zu(ig,l)  = pu(ig,l) + pdu(ig,l)*ptimestep
+            zv(ig,l)  = pv(ig,l) + pdv(ig,l)*ptimestep
 
 !           surfdust1d and surfice1d: conversion from m2/m3 to cm2/cm3
 
