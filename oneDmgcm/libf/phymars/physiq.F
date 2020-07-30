@@ -1450,7 +1450,7 @@ c              call TLM_ADJ_out(idt,ptime*24.)
 c          ENDIF
           
 
-       
+
 c-----------------------------------------------------------------------
 c  10. Write output files
 c  ----------------------
@@ -2421,7 +2421,6 @@ c              CALL writeg1d(ngrid,nlayer,zq(1,1,iq),noms(iq),'kg/kg')
      $                                 *6.022e22/(mmol(iq)*g)       
                end do                                        
           end do       
-               
 
 
                call WRITEDIAGFI(ngridmx,trim(noms(iq)) // "_col",

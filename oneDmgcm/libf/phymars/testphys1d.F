@@ -747,7 +747,7 @@ c     the chemistry routine.
      $            + NINT((mcd_ltfin/24.)*day_step)
       ENDIF 
       
-
+  
 
 
 
@@ -910,6 +910,8 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
 !       increment tracers
         DO iq = 1, nqmx
           DO ilayer=1,nlayer
+             IF (  TRIM(NOMS(IQ)) == "ch4" )
+     $              CYCLE
              q(ilayer,iq)=q(ilayer,iq)+dtphys*dq(ilayer,iq)
           ENDDO
         ENDDO
@@ -938,8 +940,8 @@ c    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
         
         
-        
-        
+      if ( .not. mcd_profiles ) stop  
+       
         
       ENDDO   ! of idt=1,ndt ! end of time stepping loop
 

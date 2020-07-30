@@ -135,6 +135,8 @@ c     Tangent Linear Model variables
       REAL*8 dOX_dPQ(nlayermx,nlayermx*nqmx)
       REAL*8 dOX0_dPQ(nlayermx,nlayermx*nqmx)
 
+      REAL lifetime(nlayermx,nesp)
+
       integer h_j, oh_j, ho2_j
       integer o_j, o3_j 
       integer x_j 
@@ -327,6 +329,7 @@ c =================================================================
      $               e001, e002, e003,
      $               h001, h002, h003, h004, h005,
      $               t001, t002, t003,
+     $               lifetime,
      $               cab001, cab002, cab003, cab004, cab005,
      $               cab006, cab007, cab008, cab009, cab010,
      $               cab011, cab012, cab013, cab014, cab015,
@@ -417,6 +420,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       call chimtogcm(zycol, lswitch, nesp, rm) 
 c      
 
+cc Output of selected photochemical lifetimes
+       call WRITEDIAGFI(1,"o2_tau","o2_tau","s",1,lifetime(:,5))
+       call WRITEDIAGFI(1,"ch4_tau","ch4_tau","s",1,lifetime(:,12))
+
 
       return
       end
@@ -435,6 +442,7 @@ c
      $                  e001, e002, e003,
      $                  h001, h002, h003, h004, h005,
      $                  t001, t002, t003,
+     $                   lifetime,
      $               cab001, cab002, cab003, cab004, cab005,
      $               cab006, cab007, cab008, cab009, cab010,
      $               cab011, cab012, cab013, cab014, cab015,
@@ -558,6 +566,8 @@ c     Tangent Linear Model
       REAL*8 dOX_dPQ(nlayermx,nqmx*nlayermx)
       REAL*8 dOX0_dPQ(nlayermx,nqmx*nlayermx)
 
+      REAL lifetime(nlayermx,nesp)
+      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     local:
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -601,6 +611,9 @@ c
 
       real cc_ox_next    ! Next timestep cc(i_ox) value for TLM 
       real cc_hox_next   ! " " cc(i_hox) " "
+      
+      real dust_photo_fac
+      parameter(dust_photo_fac=100.)
       
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     tracer numbering in the chemistry
@@ -751,7 +764,6 @@ c
          end do
       end do
 c
-
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     co2 and nox number densities (cm-3)    
@@ -1114,7 +1126,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
             cc(l,i_o1d) = (j(l,j_co2_o1d)*cc(l,i_co2)
      $                   + j(l,j_o2_o1d)*cc(l,i_o2)
-     $                   + j(l,j_o3_o1d)*cc(l,i_o3))
+     $                   + j(l,j_o3_o1d)*cc(l,i_o3)
+     $                   + j(l,j_so3)*cc(l,i_dust)*dust_photo_fac)
      $                   /(b001(l)*cc(l,i_co2)
      $                   + b002(l)*cc(l,i_h2o)
      $                   + b003(l)*cc(l,i_h2)
@@ -2504,6 +2517,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       end do
       
+      lifetime = 1./loss
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     density -> volume mixing ratio conversion
