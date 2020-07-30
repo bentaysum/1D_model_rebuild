@@ -1,5 +1,5 @@
       SUBROUTINE mcd_dust(lt,alt,zls,
-     & 			      dust)
+     & 			      q)
 
       ! To acquire longitude...
       USE ioipsl_getincom 
@@ -23,10 +23,12 @@
       real lt            ! 1D Model local time
       real alt(nlayermx) ! 1D Model altitude layers (km)
       real zls           ! 1D Model zls
+      real q(nlayermx,nqmx)
 !     1D Longitude 
       real longitude
 !     VALUES FOR THE 1D SUBMODULE
-      real dust(nlayermx)
+      real dust(nlayermx) ! Mixing ratio (kg/kg)
+      real elec(nlayermx) ! Number density (e-/cm^-3)
       real localtime 
 
 ! 	  LOCAL VARIABLES
@@ -43,20 +45,26 @@
       ! Static: lat, long and altitudes are invariant with time
       REAL LAT_mcd(N_LAT), LONG_mcd(N_LONG), ALT_mcd(N_ALT)
      
-     
-     
       ! Straight from MCD dataset
       REAL DUST_MCD(N_LT, N_ALT, N_ZLS, 
      $              N_LAT, N_LONG) 
+      REAL ELEC_MCD(N_LT, N_ALT, N_ZLS, 
+     $              N_LAT, N_LONG) 
+
       ! Interpolated with longitude/zonal mean taken 
       REAL DUST_long(N_LT, N_ALT, N_ZLS, N_LAT)
+      REAL ELEC_long(N_LT, N_ALT, N_ZLS, N_LAT)
       ! Interpolated with latitude 
       REAL DUST_lat(N_LT, N_ALT, N_ZLS)
+      REAL ELEC_lat(N_LT, N_ALT, N_ZLS)
       ! Interpolated with altitude 
       REAL,SAVE :: DUST_alt(N_LT, NLAYERMX, N_ZLS)
+      REAL,SAVE :: ELEC_alt(N_LT, NLAYERMX, N_ZLS)
+
       ! Interpolated with solar longitude 
       REAL DUST_zls(N_LT,NLAYERMX)
-    
+      REAL ELEC_zls(N_LT,NLAYERMX)
+
       
       ! Loop iterators
       INTEGER w, x, y, z, t
@@ -67,7 +75,7 @@
      $                   "/home/s1215319/mgcm/mcd-datafile/"
      $                 //"dustprofiles_MY24.nc"
       INTEGER NCID ! File ID 
-      INTEGER VARID(6) ! Variable ID's 
+      INTEGER VARID(7) ! Variable ID's 
 
 
 
@@ -91,7 +99,7 @@
           if (retval .ne. nf_noerr) call handle_err(retval)
 
           ! Variable ID Extractions 
-           retval = nf_inq_varid(ncid, 'dust_mmr', varid(1))
+           retval = nf_inq_varid(ncid, 'Dust MMR', varid(1))
            if (retval .ne. nf_noerr) call handle_err(retval)
            retval = nf_inq_varid(ncid, 'Local Time', varid(2))
            if (retval .ne. nf_noerr) call handle_err(retval)
@@ -103,7 +111,9 @@
            if (retval .ne. nf_noerr) call handle_err(retval)
            retval = nf_inq_varid(ncid, 'Longitude', varid(6))
            if (retval .ne. nf_noerr) call handle_err(retval)
-           
+           retval = nf_inq_varid(ncid, 'Electron Number Density'
+     $                               , varid(7))
+           if (retval .ne. nf_noerr) call handle_err(retval)
           ! Variable Value Extractions 
            retval = nf_get_var_real(ncid, varid(1), DUST_MCD)
            if (retval .ne. nf_noerr) call handle_err(retval)
@@ -116,6 +126,10 @@
            retval = nf_get_var_real(ncid, varid(5), LAT_mcd)
            if (retval .ne. nf_noerr) call handle_err(retval)
            retval = nf_get_var_real(ncid, varid(6), LONG_mcd)
+           if (retval .ne. nf_noerr) call handle_err(retval)
+           
+           ! Optional electron densities
+           retval = nf_get_var_real(ncid, varid(7), ELEC_mcd)
            if (retval .ne. nf_noerr) call handle_err(retval)
            
            retval = nf_close(ncid)
@@ -139,6 +153,9 @@
                call interp_line(LONG_mcd,DUST_MCD(x,y,z,t,:),N_LONG
      &                             ,longitude, DUST_long(x,y,z,t)
      &                             ,1)                              
+               call interp_line(LONG_mcd,ELEC_MCD(x,y,z,t,:),N_LONG
+     &                             ,longitude, ELEC_long(x,y,z,t)
+     &                             ,1)       
                               ENDDO
                          ENDDO 
                     ENDDO
@@ -150,7 +167,8 @@
                     DO y = 1, N_ALT
                          DO z = 1, N_ZLS 
                               DO t = 1, N_LAT 
-               DUST_long(x,y,z,t) = SUM(DUST_MCD(x,y,z,t,:))/N_LONG                             
+               DUST_long(x,y,z,t) = SUM(DUST_MCD(x,y,z,t,:))/N_LONG        
+               ELEC_long(x,y,z,t) = SUM(ELEC_MCD(x,y,z,t,:))/N_LONG        
                               ENDDO
                          ENDDO 
                     ENDDO
@@ -164,7 +182,11 @@
                     DO z = 1, N_ZLS 
                call interp_line(LAT_mcd,DUST_long(x,y,z,:),N_lat
      &                             ,lati(1)*180./pi, DUST_lat(x,y,z)
-     &                             ,1)                      
+     &                             ,1)             
+               IF (igcm_elec .ne. 0 ) 
+     &         call interp_line(LAT_mcd,ELEC_long(x,y,z,:),N_lat
+     &                             ,lati(1)*180./pi, ELEC_lat(x,y,z)
+     &                             ,1)           
                     ENDDO 
                ENDDO
           ENDDO        
@@ -175,7 +197,11 @@
                     DO z = 1, N_ZLS 
                call interp_line(ALT_mcd,DUST_lat(x,:,z),N_alt
      &                             ,alt(:), DUST_alt(x,:,z)
-     &                             ,nlayermx)                      
+     &                             ,nlayermx)   
+               IF ( igcm_elec .ne. 0 ) 
+     &         call interp_line(ALT_mcd,ELEC_lat(x,:,z),N_alt
+     &                             ,alt(:), ELEC_alt(x,:,z)
+     &                             ,nlayermx)    
                     ENDDO 
           ENDDO           
       ENDIF 
@@ -189,6 +215,12 @@
                call interp_line(LS_mcd,DUST_alt(x,y,:),N_zls
      &                             ,zls, DUST_zls(x,y)
      &                             ,1)    
+               IF ( igcm_elec .ne. 0 ) 
+     &         call interp_line(LS_mcd,ELEC_alt(x,y,:),N_zls
+     &                             ,zls, ELEC_zls(x,y)
+     &                             ,1)    
+     
+     
           ENDDO 
       ENDDO 
 
@@ -199,8 +231,16 @@
                call interp_line(LT_mcd,DUST_zls(:,y),N_lt
      &                             ,localtime, dust(y)
      &                             ,1)    
+               IF ( igcm_elec .ne. 0 )
+     &         call interp_line(LT_mcd,ELEC_zls(:,y),N_lt
+     &                             ,localtime, elec(y)
+     &                             ,1)    
+     
       ENDDO 
 
+      q(:,igcm_dust_mass) = dust
+      IF ( igcm_elec .ne. 0 ) q(:,igcm_elec) = elec
+      
       RETURN 
 
       END

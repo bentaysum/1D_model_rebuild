@@ -1731,8 +1731,7 @@
          !check that all required ions are in traceur.def
          if (igcm_o2plus == 0 .or. igcm_oplus == 0 .or. igcm_coplus == 0          &
               .or. igcm_cplus == 0 .or. igcm_nplus == 0 .or. igcm_noplus == 0    & 
-              .or. igcm_n2plus == 0 .or. igcm_hplus == 0 .or. igcm_hco2plus == 0 &
-              .or. igcm_elec == 0) then
+              .or. igcm_n2plus == 0 .or. igcm_hplus == 0 .or. igcm_hco2plus == 0) then 
             write(*,*)'inichim_newstart error:'
             write(*,*)'if co2plus is in traceur.def, all other ions must also be'
             write(*,*)'o2plus, oplus, coplus, cplus, nplus, noplus, n2plus'
@@ -1778,8 +1777,7 @@
 
          if (igcm_o2plus /= 0 .or. igcm_oplus /= 0 .or. igcm_coplus /= 0          &
               .or. igcm_cplus /= 0 .or. igcm_nplus /= 0 .or. igcm_noplus /= 0    & 
-              .or. igcm_n2plus /= 0 .or. igcm_hplus /= 0 .or. igcm_hco2plus /= 0 &
-              .or. igcm_elec /= 0) then
+              .or. igcm_n2plus /= 0 .or. igcm_hplus /= 0 .or. igcm_hco2plus /= 0) then 
             write(*,*)'inichim_newstart error:'
             write(*,*)'some ions are in traceur.def, but not co2plus'
             write(*,*)'stop'
