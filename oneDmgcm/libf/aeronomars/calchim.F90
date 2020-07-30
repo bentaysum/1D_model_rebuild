@@ -671,8 +671,14 @@
             niq(nbq) = i_h2o
          end if
          
-         
-         
+!      Electrons introduced into chemistry [ BMT 30/07/2020 ]
+         i_elec = igcm_elec
+         if (i_elec == 0) then
+            write(*,*) "calchim: WARNING: NO ELECTRONS IN CHEMISTRY"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_elec
+         end if
          
          
          !Check tracers needed for thermospheric chemistry
@@ -930,7 +936,7 @@
                endif
             endif    !Of if(chemthermod == 3)
             !e-
-            i_elec = igcm_elec
+            ! i_elec = igcm_elec [ COMMENTED BMT [ 30/07//2020 ]
             if(chemthermod == 3) then
                if (i_elec == 0) then
                   write(*,*) "calchim: Error; no e- tracer !!!"
@@ -985,6 +991,8 @@
                zq(ig,l,iq) = pq(ig,l,iq) + pdq(ig,l,iq)*ptimestep
                zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
             end do
+            
+            
             
             zt(ig,l)  = pt(ig,l) + pdt(ig,l)*ptimestep
             zu(ig,l)  = pu(ig,l) + pdu(ig,l)*ptimestep

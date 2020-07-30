@@ -61,7 +61,7 @@ c
       integer lswitch
 c
       integer l, iq
-      parameter (nesp = 59)      ! number of species in the chemistry (+2 for RO2 and dust)
+      parameter (nesp = 60)      ! number of species in the chemistry (+3 for RO2, e-, and dust)
 c
       real stimestep             ! standard timestep for the chemistry (s)
       real ctimestep             ! real timestep for the chemistry (s) 
@@ -613,7 +613,9 @@ c
       real cc_hox_next   ! " " cc(i_hox) " "
       
       real dust_photo_fac
-      parameter(dust_photo_fac=100.)
+      parameter(dust_photo_fac=0.)!100.)
+      real elec_dust_rate 
+      parameter(elec_dust_rate=1.E-8)
       
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     tracer numbering in the chemistry
@@ -681,7 +683,7 @@ c
        integer, parameter :: i_ox   = 57
        integer, parameter :: i_RO2  = 58
        integer, parameter :: i_dust = 59
-
+       integer, parameter :: i_elec = 60 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     numbering of photolysis rates
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -763,8 +765,7 @@ c
             cc(l,iesp)  = cc0(l,iesp)
          end do
       end do
-c
-
+c      
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     co2 and nox number densities (cm-3)    
 c      
@@ -1127,7 +1128,8 @@ c
             cc(l,i_o1d) = (j(l,j_co2_o1d)*cc(l,i_co2)
      $                   + j(l,j_o2_o1d)*cc(l,i_o2)
      $                   + j(l,j_o3_o1d)*cc(l,i_o3)
-     $                   + j(l,j_so3)*cc(l,i_dust)*dust_photo_fac)
+     $                   + j(l,j_so3)*cc(l,i_dust)*dust_photo_fac
+     $                   + elec_dust_rate*cc(l,i_dust)*cc(l,i_elec))
      $                   /(b001(l)*cc(l,i_co2)
      $                   + b002(l)*cc(l,i_h2o)
      $                   + b003(l)*cc(l,i_h2)
@@ -1292,8 +1294,40 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o(1d)
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
-            cc(l,i_o1d) = 0.
-c
+C             cc(l,i_o1d) = 0.
+
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c    NEW NOCTURNAL O1D 
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+
+       IF ( igcm_elec .ne. 0 ) THEN 
+       
+          cc(l,i_o1d) =(elec_dust_rate*cc(l,i_dust)*cc(l,i_elec))
+     $                   /(b001(l)*cc(l,i_co2)
+     $                   + b002(l)*cc(l,i_h2o)
+     $                   + b003(l)*cc(l,i_h2)
+     $                   + b004(l)*cc(l,i_o2)
+     $                   + b005(l)*cc(l,i_o3)
+     $                   + b006(l)*cc(l,i_o3)
+     $                   + b007(l)*cc(l,i_ch4)
+     $                   + b008(l)*cc(l,i_ch4)
+     $                   + b009(l)*cc(l,i_ch4))
+       
+       ELSE 
+       
+          cc(l,i_o1d) = 0.
+       
+       ENDIF 
+
+
+
+
+
+
+
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o3
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -3011,7 +3045,8 @@ c
        integer, parameter :: i_ox   = 57
        integer, parameter :: i_RO2  = 58
        integer, parameter :: i_dust = 59 
-      
+       integer, parameter :: i_elec = 60 
+
 
        
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -3423,6 +3458,18 @@ c
          end do
       end if
 
+
+     
+      if (igcm_elec .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_elec) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_elec) = max(zycol(l,igcm_elec), 1.e-30)
+         end do
+      end if
+      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     initialise chemical families                     c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -3570,6 +3617,7 @@ c
        integer, parameter :: i_ox   = 57
        integer, parameter :: i_RO2  = 58
        integer, parameter :: i_dust = 59 
+       integer, parameter :: i_elec = 60 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     save mixing ratios for the gcm
@@ -3807,6 +3855,13 @@ c
             zycol(l,igcm_dust_mass) = rm(l,i_dust)
          end do
       end if
+      
+      if (igcm_elec .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_elec) = rm(l,i_elec)
+         end do
+      end if
+      
       
       return
       
