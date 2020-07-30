@@ -654,7 +654,7 @@ c  table for tracers CO2, CO, H2, H2O vapour, and O2.
 c    Dust profiles in kg/kg supplied by MCD dataset 
          IF ( doubleq ) THEN 
                call mcd_dust(ptime*24.,zzlay(1,:),zls*180./pi,
-     &                       pplay(1,:)/100., pt(1,:),
+  !   &                       pplay(1,:)/100., pt(1,:),
      &                       pq(1,:,:) )
          ENDIF 
 
@@ -1105,6 +1105,7 @@ c   -------------------------------------------
             zdtsurf(ig) = zdtsurf(ig) + zdtsurfc(ig)
          ENDDO
 
+
          IF (tracer) THEN
            DO iq=1, nq
             DO l=1,nlayer
@@ -1116,7 +1117,7 @@ c   -------------------------------------------
          ENDIF ! of IF (tracer)
 
       ENDIF  ! of IF (callcond)
-      
+
 c-----------------------------------------------------------------------
 c   7. Specific parameterizations for tracers 
 c:   -----------------------------------------
@@ -1483,7 +1484,11 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
           ENDDO
         ENDDO
       ENDDO
-
+      
+         DO l = 1, nlayermx
+         WRITE(*,*) L, zq(1,l,igcm_o2), zq(1,l,igcm_co2),
+     $            zq(1,l,igcm_dust_mass)
+         ENDDO 
       ! surface pressure
       DO ig=1,ngrid
           ps(ig)=pplev(ig,1) + pdpsrf(ig)*ptimestep

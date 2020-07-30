@@ -979,11 +979,7 @@
          foundswitch = 0
          do l = 1,nlayermx
          
-            zpress(l) = pplay(ig,l)/100.
-            ztemp(l)  = zt(ig,l)
-            zdens(l)  = zpress(l)/(kb*1.e4*ztemp(l))
-            zlocal(l) = zzlay(ig,l)/1000.
-         
+
             do i = 1,nbq
                iq = niq(i) ! get tracer index
                zq(ig,l,iq) = pq(ig,l,iq) + pdq(ig,l,iq)*ptimestep
@@ -994,6 +990,11 @@
             zu(ig,l)  = pu(ig,l) + pdu(ig,l)*ptimestep
             zv(ig,l)  = pv(ig,l) + pdv(ig,l)*ptimestep
 
+            zpress(l) = pplay(ig,l)/100.
+            ztemp(l)  = zt(ig,l)
+            zdens(l)  = zpress(l)/(kb*1.e4*ztemp(l))
+            zlocal(l) = zzlay(ig,l)/1000.
+         
 !           surfdust1d and surfice1d: conversion from m2/m3 to cm2/cm3
 
             surfdust1d(l) = surfdust(ig,l)*1.e-2

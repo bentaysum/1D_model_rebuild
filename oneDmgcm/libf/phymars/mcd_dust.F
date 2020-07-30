@@ -1,4 +1,4 @@
-      SUBROUTINE mcd_dust(lt,alt,zls,p,temp,
+      SUBROUTINE mcd_dust(lt,alt,zls,!p,temp,
      & 			      q)
 
       ! To acquire longitude...
@@ -241,7 +241,7 @@
       ENDDO 
 
       q(:,igcm_dust_mass) = dust
-
+      
 ! ====================================================================================
 ! Electron Number Density -> Electron mmr (for ease of insertion into photochemistry.F 
 ! ====================================================================================
