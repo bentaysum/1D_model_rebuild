@@ -986,14 +986,6 @@
          
             do i = 1,nbq
                iq = niq(i) ! get tracer index
-               ! ---------------------------------------
-               ! Electron number density is read in from 
-               ! the MCDv5.3 [BMT 30/07/2020]
-               ! ---------------------------------------
-               IF ( trim(noms(iq)) == "elec" ) THEN
-                    pq(ig,l,iq) = pq(ig,l,iq)*mmol(iq) &
-                                /(zdens(l)*mmean(ig,l)) 
-               ENDIF 
                zq(ig,l,iq) = pq(ig,l,iq) + pdq(ig,l,iq)*ptimestep
                zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
             end do

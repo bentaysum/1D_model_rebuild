@@ -654,6 +654,7 @@ c  table for tracers CO2, CO, H2, H2O vapour, and O2.
 c    Dust profiles in kg/kg supplied by MCD dataset 
          IF ( doubleq ) THEN 
                call mcd_dust(ptime*24.,zzlay(1,:),zls*180./pi,
+     &                       pplay(1,:)/100., pt(1,:),
      &                       pq(1,:,:) )
          ENDIF 
 

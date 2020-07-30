@@ -1,4 +1,4 @@
-      SUBROUTINE mcd_dust(lt,alt,zls,
+      SUBROUTINE mcd_dust(lt,alt,zls,p,temp,
      & 			      q)
 
       ! To acquire longitude...
@@ -23,6 +23,8 @@
       real lt            ! 1D Model local time
       real alt(nlayermx) ! 1D Model altitude layers (km)
       real zls           ! 1D Model zls
+      real p(nlayermx) ! Pressure (Pa)
+      real temp(nlayermx) ! Temperature (K)
       real q(nlayermx,nqmx)
 !     1D Longitude 
       real longitude
@@ -30,7 +32,7 @@
       real dust(nlayermx) ! Mixing ratio (kg/kg)
       real elec(nlayermx) ! Number density (e-/cm^-3)
       real localtime 
-
+      real zdens(nlayermx) ! Atmospheric number density
 ! 	  LOCAL VARIABLES
 !      ---------------
       LOGICAL, save :: firscall = .TRUE.
@@ -239,7 +241,19 @@
       ENDDO 
 
       q(:,igcm_dust_mass) = dust
-      IF ( igcm_elec .ne. 0 ) q(:,igcm_elec) = elec
+
+! ====================================================================================
+! Electron Number Density -> Electron mmr (for ease of insertion into photochemistry.F 
+! ====================================================================================
+      IF ( igcm_elec .ne. 0 ) THEN 
+          DO y = 1, nlayermx
+               zdens(y) = p(y)/(kb*1.e4*temp(y))
+               q(y,igcm_elec) = elec(y)*mmol(igcm_elec)
+     &                        /(zdens(y)*mmean(1,y))
+          ENDDO 
+      ENDIF 
+      
+
       
       RETURN 
 
