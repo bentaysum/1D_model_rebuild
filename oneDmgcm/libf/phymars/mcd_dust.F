@@ -1,5 +1,6 @@
-      SUBROUTINE mcd_dust(lt,alt,zls,!p,temp,
-     & 			      q)
+      SUBROUTINE mcd_dust(lt,alt,zls,
+     & 			      q,
+     &                    p,temperature)
 
       ! To acquire longitude...
       USE ioipsl_getincom 
@@ -24,7 +25,7 @@
       real alt(nlayermx) ! 1D Model altitude layers (km)
       real zls           ! 1D Model zls
       real p(nlayermx) ! Pressure (Pa)
-      real temp(nlayermx) ! Temperature (K)
+      real temperature(nlayermx) ! Temperature (K)
       real q(nlayermx,nqmx)
 !     1D Longitude 
       real longitude
@@ -247,7 +248,7 @@
 ! ====================================================================================
       IF ( igcm_elec .ne. 0 ) THEN 
           DO y = 1, nlayermx
-               zdens(y) = p(y)/(kb*1.e4*temp(y))
+               zdens(y) = p(y)/(kb*1.e6*temperature(y))
                q(y,igcm_elec) = elec(y)*mmol(igcm_elec)
      &                        /(zdens(y)*mmean(1,y))
           ENDDO 

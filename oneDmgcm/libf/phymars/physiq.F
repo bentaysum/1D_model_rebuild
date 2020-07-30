@@ -651,19 +651,18 @@ c  table for tracers CO2, CO, H2, H2O vapour, and O2.
                WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]"
           ENDIF 
 
-c    Dust profiles in kg/kg supplied by MCD dataset 
-         IF ( doubleq ) THEN 
-               call mcd_dust(ptime*24.,zzlay(1,:),zls*180./pi,
-  !   &                       pplay(1,:)/100., pt(1,:),
-     &                       pq(1,:,:) )
-         ENDIF 
-
 c     Interpolate physical variables (temperature, wind,
 c     q2 and surface pressure) 
       call mcd_phys(ptime*24.,zzlay,zls*180./pi,
      &              pt(1,:), ps(1), pu(1,:), pv(1,:), 
      &              q2(1,:))
-
+     
+c    Dust profiles in kg/kg supplied by MCD dataset 
+         IF ( doubleq ) THEN 
+               call mcd_dust(ptime*24.,zzlay(1,:),zls*180./pi,
+     &                       pq(1,:,:), 
+     &                       pplay(1,:), zt(1,:) )
+         ENDIF 
 
 
 c----------------------------------------------------------------------
@@ -1485,10 +1484,6 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
         ENDDO
       ENDDO
       
-         DO l = 1, nlayermx
-         WRITE(*,*) L, zq(1,l,igcm_o2), zq(1,l,igcm_co2),
-     $            zq(1,l,igcm_dust_mass)
-         ENDDO 
       ! surface pressure
       DO ig=1,ngrid
           ps(ig)=pplev(ig,1) + pdpsrf(ig)*ptimestep
