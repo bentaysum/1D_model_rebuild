@@ -615,7 +615,7 @@ c
       real dust_photo_fac
       parameter(dust_photo_fac=0.)!100.)
       real elec_dust_rate 
-      parameter(elec_dust_rate=1.E-8)
+      parameter(elec_dust_rate=1.E-4)
       
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     tracer numbering in the chemistry
