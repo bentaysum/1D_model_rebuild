@@ -84,8 +84,9 @@ IF ( firstcall ) THEN
 ! Save the initial model state (in VMR units)
 	length = nlayermx*wl
 	
-	open (unit = 15, file = directory // ADJUSTL(trim(day0_string)) // "_tracer_index.txt")
-	
+	! open (unit = 15, file = directory // ADJUSTL(trim(day0_string)) // "_tracer_index.txt")
+	open (unit = 15, file = directory // "tracer_index.txt")
+
 	! Save idt, so we can jump directly to relevant time index for control and perturbed files
 	! in post-analysis.
 	HEADER_FMT = "(A12,A3,I4)"
@@ -140,10 +141,13 @@ IF ( idt == ndt ) THEN
 	length = nx*ny*wl
 
      
-	open (unit=11, file= directory // ADJUSTL(day0_string) &
-     // "_" // TRIM(filename), access='direct', recl=length, &
-     STATUS = "REPLACE", iostat=iostat)
+	! open (unit=11, file= directory // ADJUSTL(day0_string) &
+     ! // "_" // TRIM(filename), access='direct', recl=length, &
+     ! STATUS = "REPLACE", iostat=iostat)
 	
+	open (unit=11, file= directory // "tlm.bin", access='direct', recl=length, &
+     STATUS = "REPLACE", iostat=iostat)
+     
 	! DO k = 1, nt 
 		! WRITE(11,rec=k) ( (tangent_matrix(x,y,k),x=1,nx ), y=1,ny)
 	! ENDDO 

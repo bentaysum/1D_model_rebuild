@@ -39,8 +39,8 @@ mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call_tlm=.true.
-tlm_day=130
+call_tlm=.False.
+tlm_day=10
 tlm_lt=0.
 
 ## L-BFGS-B Routines 
@@ -51,9 +51,9 @@ t_forecast=   992
 
 ## Handled by bash script
 ## perturbation_cycle.sh 
-pertloop=.false.
+pertloop= .true.
 PERTGAS=h2o2
-SCALAR=1.E2
+SCALAR=1.E-2
 L_1=1
 L_2=8
 
@@ -84,13 +84,13 @@ p_high = 1
 #  =30 Mars Year 30 
 iaervar = 1
 # Dust opacity at 610 Pa (when constant, i.e. for the iaervar=1 case)
-tauvis=1.0075
+tauvis=0.6522
 # Dust vertical distribution: 
 # (=0: old distrib. (Pollack90), =1: top set by "topdustref",
 #  =2: Viking scenario; =3 MGS scenario)
 iddist  = 1
 # Dust top altitude (km). (Matters only if iddist=1)
-topdustref=40.
+topdustref=32.
 
 ## Physical Parameterizations :
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~

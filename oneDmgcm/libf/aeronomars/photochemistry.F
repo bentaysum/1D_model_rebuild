@@ -318,7 +318,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c =================================================================
 
          call chimie(lswitch,nesp, rm, j, dens, ctimestep, ptimestep,
-     $               press, temp, sza, dist_sol, 
+     $               press, temp, sza, dist_sol, surfdust1d,
      $               a001, a002, a003,
      $               b001, b002, b003, b004, b005, b006,
      $               b007, b008, b009,
@@ -422,6 +422,7 @@ c
 
 cc Output of selected photochemical lifetimes
        call WRITEDIAGFI(1,"o2_tau","o2_tau","s",1,lifetime(:,5))
+       call WRITEDIAGFI(1,"h2o2_tau","h2o2_tau","s",1,lifetime(:,11))
        call WRITEDIAGFI(1,"ch4_tau","ch4_tau","s",1,lifetime(:,12))
 
 
@@ -431,7 +432,7 @@ c
 c*****************************************************************
 c
       subroutine chimie(lswitch, nesp, rm, j, dens, dt, ptimestep,
-     $                  press, t, sza, dist_sol, 
+     $                  press, t, sza, dist_sol, surfdust,
      $                  a001, a002, a003,
      $                  b001, b002, b003, b004, b005, b006,
      $                  b007, b008, b009,
@@ -502,6 +503,7 @@ c
       real t(nlayermx)        ! temperature (k)
       real sza                ! solar zenith angle (deg)
       real dist_sol           ! sun distance (au) 
+      real surfdust(nlayermx) ! Dust surface area cm2 / cm3 of air
       real pq(nlayermx,nqmx)  ! mixing ratios (mmr)
       real pdq(nlayermx,nqmx) ! tracer tendency prior to photochem routine
 c     reaction rates
@@ -612,10 +614,27 @@ c
       real cc_ox_next    ! Next timestep cc(i_ox) value for TLM 
       real cc_hox_next   ! " " cc(i_hox) " "
       
+c     ---------------------------
+c     Photochemically active dust
+c     ---------------------------      
+
+c     O(1D) production via [Dust] x J_SO3 x dust_photo_fac
+c     =====================================================
       real dust_photo_fac
       parameter(dust_photo_fac=0.)!100.)
+c     O(1D) production via [Dust] x [e-] x elec_dust_rate
+c     =====================================================
       real elec_dust_rate 
-      parameter(elec_dust_rate=1.E-4)
+      parameter(elec_dust_rate=0.)!1.E-4)
+      
+c     Rate for CH4 + X -> CH3 + ... proposed reaction 
+c     ===============================================
+      real methane_enhancement
+      parameter(methane_enhancement=1.E1) 
+      real k_pseudo 
+    
+      
+      
       
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     tracer numbering in the chemistry
@@ -777,15 +796,12 @@ c
         
       end do 
 c
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     loop over iterations in the chemical scheme
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
 
-C c     Initialise the photochemistry Jacobian to 0 if the 
-C c     TLM routine is ongoing.
-C       if (tlm_on) tlm_photo(:,:) = 0.
-C       if (tlm_on) dccn_dpq(:,:) = 0.
 
       do iter = 1,niter
        
@@ -1285,6 +1301,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
        
        
          end do
+     
        
       else
 c
@@ -1319,14 +1336,6 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
           cc(l,i_o1d) = 0.
        
        ENDIF 
-
-
-
-
-
-
-
-
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o3
@@ -1368,18 +1377,12 @@ c
      $                   + cab037(l)*cc(l,i_c2h6)
 
        end do 
-     
 
       end if
-c
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     CHx radicals
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
-c     [CHx] = [CH3] + [1CH2] + [3CH2] + [CH]
-C
-C     Daytime : All species in photochemical equilibrium
-c     Night-time : No more production via light (photo. eq.?)
+
+
+
+
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     other species
@@ -1738,7 +1741,10 @@ c
      $                 + j(l,j_ch4_3ch2_h_h)
      $                 + j(l,j_ch4_ch_h2_h)
      
-     
+c       Loss Rate Adjustment [ BMT 21/08/2020]
+        k_pseudo = (methane_enhancement - 1.)*loss(l,i_ch4) 
+        loss(l,i_ch4) = loss(l,i_ch4) + k_pseudo
+    
 C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C c        ch3
 C C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1761,6 +1767,9 @@ C C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                        + j(l,j_ch3coooh)*cc(l,i_ch3coooh)
      $                        + 0.75*cab017(l)*cc(l,i_o)*cc(l,i_ch3o)
      
+c     Production Rate Adjustment [ BMT 21/08/2020 ] 
+         production(l,i_ch3) = production(l,i_ch3) 
+     $                       + cc(l,i_ch4)*k_pseudo
  
 
           loss(l,i_ch3) = cab003(l)*cc(l,i_o2)
@@ -2552,6 +2561,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       end do
       
       lifetime = 1./loss
+      
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     density -> volume mixing ratio conversion

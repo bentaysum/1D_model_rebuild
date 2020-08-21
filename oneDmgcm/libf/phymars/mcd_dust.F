@@ -242,7 +242,7 @@
       ENDDO 
 
       q(:,igcm_dust_mass) = dust
-      
+
 ! ====================================================================================
 ! Electron Number Density -> Electron mmr (for ease of insertion into photochemistry.F 
 ! ====================================================================================

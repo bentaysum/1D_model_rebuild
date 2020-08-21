@@ -396,20 +396,21 @@ c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                ! module.
             call TLM_initialise
 
-C        ELSEIF ( idt == ndt_tlm 
-C      $      .and. pertloop ) THEN 
+       ELSEIF ( idt == ndt_tlm 
+     $      .and. pertloop ) THEN 
 
-C            CALL scalar_perturbation(pq(1,:,:))
+           CALL scalar_perturbation(pq(1,:,:))
 
-C             mcd_profiles = .False. ! Interpolation routines will 
-C                                    ! invalidate TLM results.
+            mcd_profiles = .False. ! Interpolation routines will 
+                                   ! invalidate TLM results.
             
-C             calladj = .False. ! Convective adjustments require a 
-C                                ! conditional that the TLM will not
-C                                ! be capable of performing.
-C             callcond = .False. ! Again, conditionals activate this 
-C                                ! module.
-C             pertloop = .False.
+            calladj = .False. ! Convective adjustments require a 
+                               ! conditional that the TLM will not
+                               ! be capable of performing.
+            callcond = .False. ! Again, conditionals activate this 
+                               ! module.
+            pertloop = .False.
+           
 
        ENDIF 
 

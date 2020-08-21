@@ -747,11 +747,9 @@ c     the chemistry routine.
      $            + NINT((mcd_ltfin/24.)*day_step)
       ENDIF 
       
-  
-
-
-
+ 
       DO idt=1,ndt
+      
 c        IF (idt.eq.ndt) lastcall=.true.
         IF (idt.eq.ndt-day_step-1) then       !test
          lastcall=.true.
@@ -821,6 +819,12 @@ c    ~~~~~~~~~~~~~~~~~~~~
       endif
 #endif 
 
+c       MCD interpolation shutdown 
+c       --------------------------
+        if ( mcd_profiles ) then 
+          if ( idt == ndt_mcd ) mcd_profiles = .False.
+        endif 
+      
       
 c       call physics
 c       --------------------
@@ -910,8 +914,6 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
 !       increment tracers
         DO iq = 1, nqmx
           DO ilayer=1,nlayer
-             IF (  TRIM(NOMS(IQ)) == "ch4" )
-     $              CYCLE
              q(ilayer,iq)=q(ilayer,iq)+dtphys*dq(ilayer,iq)
           ENDDO
         ENDDO
@@ -939,9 +941,7 @@ c    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif 
         
         
-        
-      if ( .not. mcd_profiles ) stop  
-       
+               
         
       ENDDO   ! of idt=1,ndt ! end of time stepping loop
 
