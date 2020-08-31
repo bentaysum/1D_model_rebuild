@@ -424,6 +424,10 @@ cc Output of selected photochemical lifetimes
        call WRITEDIAGFI(1,"o2_tau","o2_tau","s",1,lifetime(:,5))
        call WRITEDIAGFI(1,"h2o2_tau","h2o2_tau","s",1,lifetime(:,11))
        call WRITEDIAGFI(1,"ch4_tau","ch4_tau","s",1,lifetime(:,12))
+cc Output of o2 production and loss rates 
+       call WRITEDIAGFI(1,"o2_prod","o2_prod","molec. cm-3 s"
+     $                 ,1,lifetime(:,59))
+       call WRITEDIAGFI(1,"o2_loss","o2_loss","cm-3 s",1,lifetime(:,60))
 
 
       return
@@ -630,7 +634,7 @@ c     =====================================================
 c     Rate for CH4 + X -> CH3 + ... proposed reaction 
 c     ===============================================
       real methane_enhancement
-      parameter(methane_enhancement=1.E1) 
+      parameter( methane_enhancement = 1.E4)
       real k_pseudo 
     
       
@@ -1741,10 +1745,44 @@ c
      $                 + j(l,j_ch4_3ch2_h_h)
      $                 + j(l,j_ch4_ch_h2_h)
      
-c       Loss Rate Adjustment [ BMT 21/08/2020]
-        k_pseudo = (methane_enhancement - 1.)*loss(l,i_ch4) 
+C       Loss Rate Adjustment [ BMT 21/08/2020]
+        k_pseudo = (methane_enhancement - 1.)
+     $             *(b007(l)*cc(l,i_o1d)
+     $                 + b008(l)*cc(l,i_o1d)
+     $                 + b009(l)*cc(l,i_o1d)
+     $                 + cab001(l)*cc(l,i_oh)
+     $                 + cab002(l)*cc(l,i_o))
+      
+C c       Lifetime of CH4 close to surface == 1 hour 
+C         if ( l == 1 ) then 
+C           k_pseudo = (1./methane_enhancement) - loss(l,i_ch4)
+C         else 
+C           k_pseudo = 0. 
+C         endif 
+
+C         if ( sza < 95. ) then 
+        
+C           k_pseudo = methane_enhancement*(b007(l)*cc(l,i_o1d)
+C      $                 + b008(l)*cc(l,i_o1d)
+C      $                 + b009(l)*cc(l,i_o1d)
+C      $                 + cab001(l)*cc(l,i_oh)
+C      $                 + cab002(l)*cc(l,i_o))
+     
+C           k_pseudo = (1./k_pseudo) - (b007(l)*cc(l,i_o1d)
+C      $                 + b008(l)*cc(l,i_o1d)
+C      $                 + b009(l)*cc(l,i_o1d)
+C      $                 + cab001(l)*cc(l,i_oh)
+C      $                 + cab002(l)*cc(l,i_o))
+     
+C         else 
+        
+C           k_pseudo = 0.
+          
+C         endif 
+
         loss(l,i_ch4) = loss(l,i_ch4) + k_pseudo
-    
+
+      
 C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C c        ch3
 C C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2562,7 +2600,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       
       lifetime = 1./loss
       
-
+c O2 production and loss 
+      lifetime(:,59) = production(:,i_o2) 
+      lifetime(:,60) = loss(:,i_o2) 
+      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     density -> volume mixing ratio conversion
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc

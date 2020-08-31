@@ -913,9 +913,16 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
         
 !       increment tracers
         DO iq = 1, nqmx
+        
+            IF (  (trim(noms(iq)) == "ch4") ) CYCLE 
+
           DO ilayer=1,nlayer
+     
              q(ilayer,iq)=q(ilayer,iq)+dtphys*dq(ilayer,iq)
+             
           ENDDO
+          
+          
         ENDDO
       
 c     Tangent Linear Matrix 

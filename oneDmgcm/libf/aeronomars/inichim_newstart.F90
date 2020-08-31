@@ -925,6 +925,7 @@
             do j = 1,jjp1
                do l = 1,llm
                   pq(i,j,l,igcm_ch4) = vmr*mmol(igcm_ch4)/mmean(i,j,l)
+                  ! if ( l .le. 7 ) pq(i,j,l,igcm_ch4) = 10.e-9*mmol(igcm_ch4)/mmean(i,j,l)
                end do
             end do
          end do

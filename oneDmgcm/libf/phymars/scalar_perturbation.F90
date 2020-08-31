@@ -7,6 +7,7 @@ IMPLICIT NONE
 #include "dimensions.h"
 #include "dimphys.h"
 #include "tracer.h"
+#include "conc.h"
 ! Input 
 ! -----
 REAL q(nlayermx,nqmx)
@@ -56,9 +57,8 @@ DO iq = 1,nqmx
     
 
         DO l = l_1, l_2 
-            q(l,iq) = q(l,iq) + q(l,iq)*scalar
+            q(l,iq) = q(l,iq) + q(l,iq)*scalar            
         ENDDO 
-
     RETURN     
     ENDIF 
 

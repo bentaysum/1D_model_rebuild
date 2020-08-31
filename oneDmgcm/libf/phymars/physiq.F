@@ -399,7 +399,9 @@ c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
        ELSEIF ( idt == ndt_tlm 
      $      .and. pertloop ) THEN 
 
+
            CALL scalar_perturbation(pq(1,:,:))
+
 
             mcd_profiles = .False. ! Interpolation routines will 
                                    ! invalidate TLM results.
