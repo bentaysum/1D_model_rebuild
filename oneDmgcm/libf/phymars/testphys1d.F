@@ -740,6 +740,8 @@ c     the chemistry routine.
       endif 
 
 
+
+
 !     Check if the MCD v5.3 tracer interpolation routine has reached
 !     the desired shutdown point 
       IF ( mcd_profiles ) THEN 
@@ -913,8 +915,9 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
         
 !       increment tracers
         DO iq = 1, nqmx
-        
-            IF (  (trim(noms(iq)) == "ch4") ) CYCLE 
+            
+          IF (  (trim(noms(iq)) == "ch4") .and.
+     $          (idt < ndt_plume)       ) CYCLE 
 
           DO ilayer=1,nlayer
      

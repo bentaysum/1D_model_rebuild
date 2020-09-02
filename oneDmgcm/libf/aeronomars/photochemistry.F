@@ -634,7 +634,7 @@ c     =====================================================
 c     Rate for CH4 + X -> CH3 + ... proposed reaction 
 c     ===============================================
       real methane_enhancement
-      parameter( methane_enhancement = 1.E4)
+      parameter( methane_enhancement = 60.*60.) ! Forced lifetime (in seconds)
       real k_pseudo 
     
       
@@ -1746,39 +1746,24 @@ c
      $                 + j(l,j_ch4_ch_h2_h)
      
 C       Loss Rate Adjustment [ BMT 21/08/2020]
-        k_pseudo = (methane_enhancement - 1.)
-     $             *(b007(l)*cc(l,i_o1d)
+C         k_pseudo = (methane_enhancement - 1.)
+C      $             *(b007(l)*cc(l,i_o1d)
+C      $                 + b008(l)*cc(l,i_o1d)
+C      $                 + b009(l)*cc(l,i_o1d)
+C      $                 + cab001(l)*cc(l,i_oh)
+C      $                 + cab002(l)*cc(l,i_o))
+      
+        IF ( (sza < 95. ) .AND. (l == 1) ) THEN 
+          k_pseudo = (1./methane_enhancement) 
+     $             - (b007(l)*cc(l,i_o1d)
      $                 + b008(l)*cc(l,i_o1d)
      $                 + b009(l)*cc(l,i_o1d)
      $                 + cab001(l)*cc(l,i_oh)
-     $                 + cab002(l)*cc(l,i_o))
+     $                 + cab002(l)*cc(l,i_o)) 
+        ELSE 
+          k_pseudo = 0. 
+        ENDIF 
       
-C c       Lifetime of CH4 close to surface == 1 hour 
-C         if ( l == 1 ) then 
-C           k_pseudo = (1./methane_enhancement) - loss(l,i_ch4)
-C         else 
-C           k_pseudo = 0. 
-C         endif 
-
-C         if ( sza < 95. ) then 
-        
-C           k_pseudo = methane_enhancement*(b007(l)*cc(l,i_o1d)
-C      $                 + b008(l)*cc(l,i_o1d)
-C      $                 + b009(l)*cc(l,i_o1d)
-C      $                 + cab001(l)*cc(l,i_oh)
-C      $                 + cab002(l)*cc(l,i_o))
-     
-C           k_pseudo = (1./k_pseudo) - (b007(l)*cc(l,i_o1d)
-C      $                 + b008(l)*cc(l,i_o1d)
-C      $                 + b009(l)*cc(l,i_o1d)
-C      $                 + cab001(l)*cc(l,i_oh)
-C      $                 + cab002(l)*cc(l,i_o))
-     
-C         else 
-        
-C           k_pseudo = 0.
-          
-C         endif 
 
         loss(l,i_ch4) = loss(l,i_ch4) + k_pseudo
 

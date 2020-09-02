@@ -60,7 +60,7 @@ L_2=10
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Introducing an instantaneous plume?
-plume=.false.
+plume=.true.
 
 #Days after day0 to release plume?
 plume_day=130
@@ -72,7 +72,7 @@ plume_lt=0.
 p_low = 1
 
 #Plume upper altitude (model layer index)
-p_high = 1 
+p_high = 7
 
 
 ## Dust scenario. Used if the dust is prescribed (i.e. if tracer=F or active=F)
