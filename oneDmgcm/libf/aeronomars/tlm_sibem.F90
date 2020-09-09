@@ -2,6 +2,7 @@ SUBROUTINE tlm_sibem(iter, niter, lyr_m, dens, sza, &
 					dt_c, dt_p, &
 					nesp, cc, cc0, cc_hox_next, &
 					j, production, loss, &
+                         methane_enhancement, &
 					a001, a002, a003, &
 					b001, b002, b003, b004, b005, b006, &
 					b007, b008, b009, &
@@ -62,6 +63,7 @@ real*8, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 real*8 dHOX_dPQ(nlayermx,nqmx*nlayermx), dHOX0_dPQ(nlayermx,nlayermx*nqmx)
 
 real j(nd), production(nesp), loss(nesp) ! photolysis, production and loss values 
+real methane_enhancement ! Methane enhancement factor 
 ! Oxygen Reaction Rates 
 real a001, a002, a003
 ! O(1D) Reaction Rates 
@@ -510,6 +512,60 @@ IF ( sza > 95. ) THEN
 	dP_coeff(t_o,t_oh) = 2.*c013*cc(i_oh)
 ENDIF 
 
+
+
+! ===============================================================
+! ADDITIONAL CHEMISTRY 
+! ===============================================================
+!
+! 1 - Atmospheric lifetime of CH4 600x faster than standard chem.
+! 2 - Surface lifetime of CH4 forced to 1 hour
+!
+! ===============================================================
+
+! -------------------------------------------------------
+! 1 ) new P[CH3] = P[CH3] + [CH4]( (tau_ch4 - 1)*L[CH4] )  
+! -------------------------------------------------------
+! IF ( sza < 95. ) THEN 
+     ! dP_coeff(t_ch3,t_ch4) = dP_coeff(t_ch3,t_ch4) + (methane_enhancement-1) &
+                                                    ! *(loss(i_ch4) - j(j_ch4_1ch2_h2) &
+                                                    ! - j(j_ch4_3ch2_h_h) - j(j_ch4_ch_h2_h) &
+                                                    ! - j(j_ch4_ch3_h))
+     ! dP_coeff(t_ch3,t_o1d) = dP_coeff(t_ch3,t_o1d) &
+                           ! + cc(i_ch4)*( (methane_enhancement-1)*(b007 + b008 + b009) )   
+                           
+     ! dP_coeff(t_ch3,t_o) = dP_coeff(t_ch3,t_o) &
+                           ! + cc(i_ch4)*( (methane_enhancement-1)*(cab002) ) 
+     ! dP_coeff(t_ch3,t_oh) = dP_coeff(t_ch3,t_oh) &
+                           ! + cc(i_ch4)*( (methane_enhancement-1)*(cab001) )
+                           
+! ENDIF 
+
+! ! -------------------------------------------------------
+! ! 2 ) new P[CH3] = P[CH3] + [CH4]( (1/tau_ch4) - L[CH4] ) 
+! ! -------------------------------------------------------
+IF ( (lyr_m == 1 ) .and. (sza .le. 95.) ) THEN 
+     ! IF ( sza .le. 95. ) THEN 
+          dP_coeff(t_ch3,t_ch4) = dP_coeff(t_ch3,t_ch4) + &
+                                 (1./methane_enhancement) - &
+                                 ( (b007 + b008 + b009)*cc(i_o1d) &
+                                  +(cab001)*cc(i_oh) &
+                                  +(cab002)*cc(i_o) ) 
+                                                    
+          dP_coeff(t_ch3,t_o1d) = dP_coeff(t_ch3,t_o1d) - &
+                                 cc(i_ch4)*( b007 + b008 + b009 )
+                                       
+          dP_coeff(t_ch3,t_o) = dP_coeff(t_ch3,t_o) - &
+                                cc(i_ch4)*( cab002 ) 
+                                
+          dP_coeff(t_ch3,t_oh) = dP_coeff(t_ch3,t_oh) - &
+                                cc(i_ch4)*( cab001 ) 
+     ! ENDIF     
+ENDIF 
+
+
+
+
 dP_dPQ(:,:) = 0.
 DO iq_j = 1, nqmx
 	
@@ -661,6 +717,43 @@ IF ( sza > 95. ) THEN
 	IF ( igcm_ch3o .ne. 0 ) dL_coeff(t_o3,t_ch3o) = cab016
 ENDIF
 
+
+! ===============================================================
+! ADDITIONAL CHEMISTRY 
+! ===============================================================
+!
+! 1 - Atmospheric lifetime of CH4 600x faster than standard chem.
+! 2 - Surface lifetime of CH4 forced to 1 hour
+!
+! ===============================================================
+
+! ----------------------------------------------------
+! 1 ) new L[CH4] = SUM( J(l,j_ch4_XXX) ) + Tau_ch4*L[CH4] 
+! -------------------------------------------------
+! IF ( sza < 95. ) THEN 
+          ! ! CH4 Loss 
+          ! ! --------
+          ! dL_coeff(t_ch4,t_oh) = dL_coeff(t_ch4,t_oh)*methane_enhancement
+          ! dL_coeff(t_ch4,t_o) = dL_coeff(t_ch4,t_o)*methane_enhancement
+          ! dL_coeff(t_ch4,t_o1d) = dL_coeff(t_ch4,t_o1d)*methane_enhancement
+! ENDIF 
+
+! ----------------------------------------------------
+! 2 ) new L[CH4] = SUM( J(l,j_ch4_XXX) ) + (1/Tau_ch4)
+! ----------------------------------------------------
+IF ( (lyr_m == 1) .and. (sza .le. 95.) ) THEN 
+     ! IF ( sza < 95. ) THEN 
+          dL_coeff(t_ch4,:) = 0. 
+     ! ENDIF     
+ENDIF 
+
+
+
+
+
+
+
+
 dL_dPQ(:,:) = 0. 
 DO iq_j = 1,nqmx
 
@@ -671,13 +764,6 @@ DO iq_j = 1,nqmx
 	ENDDO 
 
 ENDDO 
-
-
-! IF ( lyr_m == 12) THEN 
-
-! WRITE(*,*) dL_dPQ(t_h2, 87), dP_dPQ(t_h2,87), dcc0_dpq( (t_h2-1)*nlayermx + 12, 87 )
-
-! ENDIF 
 
 
 

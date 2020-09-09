@@ -406,11 +406,12 @@ c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             mcd_profiles = .False. ! Interpolation routines will 
                                    ! invalidate TLM results.
             
-            calladj = .False. ! Convective adjustments require a 
-                               ! conditional that the TLM will not
-                               ! be capable of performing.
-            callcond = .False. ! Again, conditionals activate this 
-                               ! module.
+            ! calladj = .False. ! Convective adjustments require a 
+                               ! ! conditional that the TLM will not
+                               ! ! be capable of performing.
+            ! callcond = .False. ! Again, conditionals activate this 
+                               ! ! module.
+                               
             pertloop = .False.
            
 

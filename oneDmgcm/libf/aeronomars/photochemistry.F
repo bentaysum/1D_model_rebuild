@@ -1746,6 +1746,7 @@ c
      $                 + j(l,j_ch4_ch_h2_h)
      
 C       Loss Rate Adjustment [ BMT 21/08/2020]
+C        IF ( sza < 95. ) THEN  
 C         k_pseudo = (methane_enhancement - 1.)
 C      $             *(b007(l)*cc(l,i_o1d)
 C      $                 + b008(l)*cc(l,i_o1d)
@@ -1753,13 +1754,9 @@ C      $                 + b009(l)*cc(l,i_o1d)
 C      $                 + cab001(l)*cc(l,i_oh)
 C      $                 + cab002(l)*cc(l,i_o))
       
-        IF ( (sza < 95. ) .AND. (l == 1) ) THEN 
+        IF ( (l == 1) .and. (sza .le. 95.) ) THEN 
           k_pseudo = (1./methane_enhancement) 
-     $             - (b007(l)*cc(l,i_o1d)
-     $                 + b008(l)*cc(l,i_o1d)
-     $                 + b009(l)*cc(l,i_o1d)
-     $                 + cab001(l)*cc(l,i_oh)
-     $                 + cab002(l)*cc(l,i_o)) 
+     $             -  loss(l,i_ch4)
         ELSE 
           k_pseudo = 0. 
         ENDIF 
@@ -2319,6 +2316,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $         dt, ptimestep,  
      $         nesp, cc(l,:), cc0(l,:), cc_hox_next,
      $         j(l,:), production(l,:), loss(l,:),  
+     $         methane_enhancement,
      $         a001(l), a002(l), a003(l),  
      $         b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),  
      $         b007(l), b008(l), b009(l),  

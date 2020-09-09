@@ -73,7 +73,7 @@
       character(len=20)          :: txt           ! to store some text
       logical                    :: flagnitro     ! checks if N species present
 
-
+      real :: ch4vmr
 
   
 ! 1. identify tracers by their names: (and set corresponding values of mmol)
@@ -919,12 +919,12 @@
           ! -   2.9426485E-04*zls**2 &
           ! +   4.6374896E-03*zls &
           ! +   2.8769755E-01)*1.e-9
-		  vmr = 50.e-12
+ch4vmr=0.2088e-9
 
           do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
-                  pq(i,j,l,igcm_ch4) = vmr*mmol(igcm_ch4)/mmean(i,j,l)
+                  pq(i,j,l,igcm_ch4) = ch4vmr*mmol(igcm_ch4)/mmean(i,j,l)
                   ! if ( l .le. 7 ) pq(i,j,l,igcm_ch4) = 10.e-9*mmol(igcm_ch4)/mmean(i,j,l)
                end do
             end do
