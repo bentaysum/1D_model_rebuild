@@ -981,6 +981,8 @@ c_
      $           + cab079(l)*cc(l,i_hcoch2o2)
      $           + cab096(l)*cc(l,i_hoch2co3)
      $           + cab097(l)*cc(l,i_hoch2co3)
+     $           + cl009(l)*cc(l,i_cl)
+     $            + cl013(l)*cc(l,i_clo)
      $           + (cab002(l)*cc(l,i_o)*cc(l,i_ch4)*0.49
      $                + cab005(l)*cc(l,i_ch3)*cc(l,i_o3)*0.956
      $                + cab006(l)*cc(l,i_ch3)*cc(l,i_o)
@@ -997,6 +999,8 @@ c_
      $            /max(cc(l,i_h),dens(l)*1.e-30)   ! ajout 20090401
      $           + cab027(l)*cc(l,i_hco)
      $           + cab042(l)*cc(l,i_c2h5)
+     $           + cl037(l)*cc(l,i_cl2)
+     $           + cl042(l)*cc(l,i_hcl) 
      $           +    (cab011(l)*cc(l,i_ch3o2)*cc(l,i_oh)
      $                + cab013(l)*cc(l,i_ch3oh)*cc(l,i_oh)
      $                + cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
@@ -1063,6 +1067,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $            + cab096(l)*cc(l,i_hoch2co3)
      $            + cab097(l)*cc(l,i_hoch2co3)
      $            + cab106(l)*cc(l,i_hcoco3)
+     $            + cl009(l)*cc(l,i_cl)
+     $            + 2.*cl010(l)*cc(l,i_cl)
+     $            + cl013(l)*cc(l,i_clo)
      $            + (cab002(l)*cc(l,i_o)*cc(l,i_ch4)*0.51
      $                 + cab017(l)*cc(l,i_ch3o)*cc(l,i_o)*0.25
      $                 + cab020(l)*cc(l,i_hcho)*cc(l,i_o)
@@ -1121,6 +1128,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $            + cab101(l)*cc(l,i_hoch2co3h)*2.
      $            + cab102(l)*cc(l,i_hcoco3h)
      $            + cab107(l)*cc(l,i_ch3)
+     $            + 1.94*cl012(l)*cc(l,i_clo)
+     $            + cl032(l)*cc(l,i_ch3ocl)
+     $            + cl036(l)*cc(l,i_cl2)
+     $            + cl041(l)*cc(l,i_hcl)
      $            + (cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
      $                 + cab026(l)*cc(l,i_hco)*cc(l,i_o2)
      $                 + cab028(l)*cc(l,i_hoch2o2)
@@ -1297,13 +1308,7 @@ c
 
       endif ! of cl 
        
-       
-       
-       
-       
-       
-       
-       
+      
        
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ox species
@@ -1340,7 +1345,10 @@ c
      $                   + b006(l)*cc(l,i_o3)
      $                   + b007(l)*cc(l,i_ch4)
      $                   + b008(l)*cc(l,i_ch4)
-     $                   + b009(l)*cc(l,i_ch4))
+     $                   + b009(l)*cc(l,i_ch4)
+     $                   + cl034(l)*cc(l,i_cl2)
+     $                   + cl035(l)*cc(l,i_cl2)
+     $                   + cl036(l)*cc(l,i_hcl))
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1356,6 +1364,7 @@ cccc Original Routine
      $              + cab004(l)*cc(l,i_ch3)
      $              + cab010(l)*cc(l,i_ch3o2)
      $              + cab016(l)*cc(l,i_ch3o)
+     $              + cl001(l)*cc(l,i_cl)
      $              )
      $              /(a001(l)*cc(l,i_o2)
      $              + cab002(l)*cc(l,i_ch4)
@@ -1365,6 +1374,9 @@ cccc Original Routine
      $              + cab020(l)*cc(l,i_hcho)
      $              + cab021(l)*cc(l,i_hco)
      $              + cab037(l)*cc(l,i_c2h6)
+     $              + cl002(l)*cc(l,i_clo)
+     $              + cl027(l)*cc(l,i_oclo)
+     $              + cl040(l)*cc(l,i_hcl)
      $              + (cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
      $               + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
      $                 )/MAX(cc(l,i_o),dens(l)*1.e-30)
@@ -1397,7 +1409,11 @@ c
      $                   + d003(l)*cc(l,i_ho2)*no(l)
      $                   + cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
      $                   + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
+     $                   + cl034(l)*cc(l,i_cl2)*cc(l,i_o1d) 
+     $                   + cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)*0.12 
+     $                   + j(l,j_oclo)*cc(l,i_oclo)
 c
+
             loss(l,i_ox) = 2.*a002(l)*cc(l,i_o)*cc(l,i_o)
      $                   + 2.*a003(l)*cc(l,i_o)*cc(l,i_o3)
      $                   + c001(l)*cc(l,i_ho2)*cc(l,i_o)
@@ -1417,7 +1433,10 @@ c
      $                   + cab020(l)*cc(l,i_o)*cc(l,i_hcho)
      $                   + cab021(l)*cc(l,i_hco)*cc(l,i_o)
      $                   + cab037(l)*cc(l,i_c2h6)*cc(l,i_o)
-
+     $                   + cl001(l)*cc(l,i_cl)*cc(l,I_o3)
+     $                   + cl002(l)*cc(l,i_clo)*cc(l,i_o)
+     $                   + cl027(l)*cc(l,i_oclo)*cc(l,i_o) 
+     $                 + cl040(l)*cc(l,i_hcl)*cc(l,i_o)
 
             loss(l,i_ox) = loss(l,i_ox)/cc(l,i_ox)
 
@@ -1539,7 +1558,8 @@ c
      $                   + cab004(l)*cc(l,i_ch3)
      $                   + cab010(l)*cc(l,i_ch3o2)
      $                   + cab016(l)*cc(l,i_ch3o)
-           
+     $                   + cl001(l)*cc(l,i_cl)
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1561,7 +1581,11 @@ c
      $                   + cab017(l)*Cc(L,i_ch3o)
      $                   + cab021(l)*cc(l,i_hco)
      $                   + cab037(l)*cc(l,i_c2h6)
-
+     $                   + cl002(l)*cc(l,i_clo)
+     $                   + cl027(l)*cc(l,i_oclo)
+     $                   + cl040(l)*cc(l,i_hcl)
+     $                   + cl043(l)*cc(l,i_hocl) 
+     
        end do 
 
       end if
@@ -1647,9 +1671,11 @@ c
      $                 + j(l,j_hoch2cho_co)
      $                 + j(l,j_hoch2cho_hco)
      $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
+     $                 + cl033(l)*cc(l,i_clco) 
      
          loss(l,i_co) = e001(l)*cc(l,i_oh)
      $                + e002(l)*cc(l,i_o)
+     $                + cl023(l)*cc(l,i_cl)
 c
 
 
@@ -1690,6 +1716,17 @@ c
      $                + cab044(l)*cc(l,i_c2h5o2)*cc(l,i_ro2)
      $                + cab065(l)*cc(l,i_ch3choho2)*cc(L,i_ho2)
      $                + cab105(l)*cc(l,i_hcoco3)*cc(l,i_ro2)*0.1
+     $                + cl001(l)*cc(l,i_cl)*cc(l,I_o3)
+     $                + cl002(l)*cc(l,i_clo)*cc(l,i_o)
+     $                + cl003(l)*cc(l,i_clo)*cc(l,i_clo)
+     $                + cl004(l)*cc(l,i_clo)*cc(l,i_clo)
+     $                + cl009(l)*cc(l,i_ho2)*cc(l,i_cl)
+     $                + 0.06*cl012(l)*cc(l,i_clo)*cc(l,i_oh) 
+     $                + cl013(l)*cc(l,i_clo)*cc(l,i_ho2)
+     $                + cl021(l)*cc(l,i_clo)*cc(l,i_ch3o2)
+     $                + cl025(l)*cc(l,i_cloo)*cc(l,i_cl)
+     $                + cl026(l)*cc(l,i_cloo)
+
 
          loss(l,i_o2) = j(l,j_o2_o)
      $                + j(l,j_o2_o1d)
@@ -1707,7 +1744,8 @@ c
      $                + cab091(l)*cc(l,i_hoch2co)
      $                + cab092(l)*cc(l,i_hoch2co)
      $                + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)*3.5e-14 ! Factor from Veyret, B. et al. [1982]
-
+     $                + cl028(l)*cc(l,i_cl) 
+     
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        h2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1721,9 +1759,11 @@ c
      $                   + j(l,j_ch2o_co)*cc(l,i_hcho)
      $                   + cab027(l)*cc(l,i_hco)*cc(l,i_h)
      $                   + j(l,j_glyox_h2)*cc(l,i_glyox)
-
+     $                   + cl042(l)*Cc(l,i_hcl)*cc(l,i_h) 
+     
          loss(l,i_h2) = b003(l)*cc(l,i_o1d)
      $                + c010(l)*cc(l,i_oh)
+     $                + cl008(l)*cc(l,i_cl)
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        h2o
@@ -1767,6 +1807,9 @@ c
      $                 + cab100(l)*cc(l,i_oh)*Cc(l,i_hoch2co3h)
      $                 + cab102(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
      $                 + cab103(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
+     $                 + cl014(l)*cc(l,i_oh)*cc(l,i_hcl) 
+     $                 + cl015(l)*cc(l,i_oh)*cc(l,i_hocl) 
+     $                 + cl041(l)*cc(l,i_oh)*cc(l,i_hcl)
 
          loss(l,i_h2o) = j(l,j_h2o)
      $                 + b002(l)*cc(l,i_o1d)
@@ -1789,6 +1832,8 @@ c
      $                  + c012(l)*cc(l,i_o)
      $                  + h004(l)*hetero_ice
      $                  + h005(l)*hetero_dust
+     $                  + cl011(l)*cc(l,i_cl)
+     
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        hox = h + oh + ho2
@@ -1853,8 +1898,13 @@ c
      $                 + j(l,j_hoch2cho_co)
      $                 + j(l,j_hoch2cho_hco)
      $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
-     
-     
+     $                 + cl008(l)*cc(l,i_cl)*cc(l,i_h2)
+     $                 + cl011(l)*cc(l,i_cl)*cc(l,i_h2o2)
+     $                 + cl018(l)*cc(l,i_cl)*cc(l,i_ch3ooh)
+     $                 + 0.88*cl039(l)*cc(l,i_hcl)*cc(l,i_o1d) 
+     $                 + cl040(l)*cc(l,i_hcl)*cc(l,i_o)
+     $                 + cl043(l)*cc(l,i_hocl)*cc(l,i_o)
+
           loss(l,i_hox) = 2.*c005(l)*cc(l,i_h)*cc(l,i_ho2)
      $                 + 2.*c006(l)*cc(l,i_h)*cc(l,i_ho2)
      $                 + 2.*c007(l)*cc(l,i_oh)*cc(l,i_ho2)
@@ -1904,7 +1954,15 @@ c
      $                 + cab100(l)*cc(l,i_oh)*Cc(l,i_hoch2co3h)
      $                 + cab102(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
      $                 + cab107(l)*cc(l,i_oh)*cc(l,i_ch3)
-     
+     $                 + cl009(l)*cc(l,i_ho2)*cc(l,i_cl)
+     $                 + cl013(l)*cc(l,i_clo)*cc(l,i_ho2) 
+     $                 + cl014(l)*cc(l,i_oh)*cc(l,i_hcl) 
+     $                 + cl015(l)*cc(l,i_oh)*cc(l,i_hocl) 
+     $                 + cl032(l)*cc(l,i_oh)*cc(l,i_ch3ocl) 
+     $                 + cl036(l)*cc(l,i_oh)*cc(l,i_cl2)
+     $                 + cl037(l)*cc(l,i_h)*cc(l,i_cl2)
+     $                 + cl041(l)*cc(l,i_oh)*cc(l,i_hcl)
+
       loss(l,i_hox) = loss(l,i_hox)/cc(l,i_hox)
 c
 
@@ -1925,6 +1983,7 @@ c
      $                 + j(l,j_ch4_ch3_h)
      $                 + j(l,j_ch4_3ch2_h_h)
      $                 + j(l,j_ch4_ch_h2_h)
+     $                 + cl016(l)*cc(l,i_cl) 
      
 C       Loss Rate Adjustment [ BMT 21/08/2020]
        IF ( sza .le. 95. ) THEN
@@ -1968,6 +2027,7 @@ C C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                        + j(l,j_ch3cooh)*cc(l,i_ch3cooh)
      $                        + j(l,j_ch3coooh)*cc(l,i_ch3coooh)
      $                        + 0.75*cab017(l)*cc(l,i_o)*cc(l,i_ch3o)
+     $                        + cl016(l)*cc(l,i_cl)*cc(l,i_ch4)
      
 c     Production Rate Adjustment [ BMT 21/08/2020 ] 
          production(l,i_ch3) = production(l,i_ch3) 
@@ -1981,6 +2041,8 @@ c     Production Rate Adjustment [ BMT 21/08/2020 ]
      $                  + cab023(L)*cc(l,i_hco)
      $                  + cab038(l)*cc(l,i_ch3)
      $                  + cab107(l)*cc(l,i_oh)
+     $                  + cl038(l)*cc(l,i_cl2)
+     
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ch3o2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1998,7 +2060,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                    + cab010(l)*cc(l,i_o3)
      $                    + cab011(l)*cc(l,i_oh)
      $                    + cab012(l)*cc(l,i_o)
-
+     $                    + cl019(l)*cc(l,i_clo) 
+     $                    + cl020(l)*cc(l,i_clo)
+     $                    + cl021(l)*cc(l,i_clo)
+     $                    + cl022(l)*cc(l,i_cl)
+     
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ch3ooh
 Ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2007,6 +2073,7 @@ Ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
           loss(l,i_ch3ooh) = cab014(l)*cc(l,i_oh)
      $                     + j(l,j_ch3o2h) 
+     $                     + cl018(l)*cc(l,i_cl)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ch3oh
@@ -2034,7 +2101,12 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                         + j(l,j_ch3o2h)*cc(l,i_ch3ooh)
      $                         + j(l,j_ch3oh)*cc(l,i_ch3oh)
      $                         + j(l,j_hoch2cho_hco)*cc(l,i_hoch2cho)
-        
+     $                         + cl019(l)*cc(l,i_ch3o2)*cc(l,i_clo) 
+     $                         + cl021(l)*cc(l,i_clo)*cc(l,i_ch3o2)
+     $                         + 0.5*cl022(l)*cc(l,i_cl)*cc(l,i_ch3o2)
+     $                         + cl029(l)*cc(l,i_cl)*cc(l,i_ch3ocl) 
+     $                         + cl032(l)*cc(l,i_oh)*cc(l,i_ch3ocl)
+
          loss(l,i_ch3o) = cab015(l)*cc(l,i_o2)
      $                  + cab016(l)*cc(l,i_o3)
      $                  + cab017(l)*cc(l,i_o)
@@ -2071,14 +2143,16 @@ C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                   + j(l,j_hoch2cho_co)
      $                   + j(l,j_hoch2cho_hco)
      $                   + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
-     
+     $                   + cl018(l)*cc(l,i_cl)*cc(l,i_ch3ooh)
+
      
           loss(l,i_hcho) = cab018(l)*cc(l,i_oh)
      $                   + cab019(l)*cc(l,i_ho2)
      $                   + cab020(l)*cc(l,i_o)
      $                   + j(l,j_ch2o_co)
      $                   + j(l,j_ch2o_hco)
-
+     $                   + cl017(l)*cc(l,i_cl) 
+     
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        hco 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2089,7 +2163,8 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                      + j(l,j_ch3cho_ch3)*cc(l,i_ch3cho)
      $                      + j(l,j_hoch2cho_hco)*cc(l,i_hoch2cho)
      $                      + 2.*j(l,j_glyox_hco)*cc(l,i_glyox)
-     
+     $                   + cl017(l)*cc(l,i_cl)*cc(l,i_hcho)
+
         loss(l,i_hco) = cab021(l)*cc(l,i_o)
      $                + cab022(l)*cc(l,i_ch3)
      $                + cab023(l)*cc(l,i_ch3)
@@ -5843,7 +5918,7 @@ c     cl031 : cl + ch3ocl -> hcl + ch2ocl
 c     Summary of Evaluated Kinetic and Photochemical Data for Atmospheric Chemistry
       cl031(l) = 9.15E-12
 
-c     cl032 : oh + ch3ocl -> products  
+c     cl032 : oh + ch3ocl -> ch3o + hocl
 c     Summary of Evaluated Kinetic and Photochemical Data for Atmospheric Chemistry
       cl032(l) = 2.4E-12*EXP(-360./T(L))
 
@@ -5890,14 +5965,6 @@ c     Kinetic studies of reactions of hydrogen atoms with HCl, Cl2 and NOCl, and
 c     cl043 : hocl + o -> clo + oh
 c     Evaluated kinetic and photochemical data for atmospheric chemistry: Volume III - gas phase reactions of inorganic halogens
       cl043(l) = 1.7e-13
-
-
-
-
-
-
-
-
 
 
       end do
