@@ -905,7 +905,7 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
            IF ( idt == ndt_plume ) THEN
 
            
-           ! call tracer_release(dq)
+           call tracer_release(dq)
            
            plume = .False.
            mcd_profiles = .False. 
@@ -916,7 +916,7 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
 !       increment tracers
         DO iq = 1, nqmx
             
-          IF (  (trim(noms(iq)) == "ch4")    ) CYCLE 
+          IF (  (trim(noms(iq)) == "ch4") .and. (plume) ) CYCLE 
 
           DO ilayer=1,nlayer
      

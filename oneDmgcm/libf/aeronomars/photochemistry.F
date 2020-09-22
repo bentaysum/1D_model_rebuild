@@ -428,6 +428,8 @@ cc Output of o2 production and loss rates
        call WRITEDIAGFI(1,"o2_prod","o2_prod","molec. cm-3 s"
      $                 ,1,lifetime(:,59))
        call WRITEDIAGFI(1,"o2_loss","o2_loss","cm-3 s",1,lifetime(:,60))
+cc 
+       call WRITEDIAGFI(1,"h2o2_tau","h2o2_tau","s-1",1,lifetime(:,11))
 
 
       return
@@ -634,7 +636,7 @@ c     =====================================================
 c     Rate for CH4 + X -> CH3 + ... proposed reaction 
 c     ===============================================
       real methane_enhancement
-      parameter( methane_enhancement = 60.*60.) ! Forced lifetime (in seconds)
+      parameter( methane_enhancement = 600.) ! Forced lifetime (in seconds)
       real k_pseudo 
     
       
@@ -1526,7 +1528,6 @@ c
      $                + cab092(l)*cc(l,i_hoch2co)
      $                + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)*3.5e-14 ! Factor from Veyret, B. et al. [1982]
 
-     
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        h2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1746,17 +1747,18 @@ c
      $                 + j(l,j_ch4_ch_h2_h)
      
 C       Loss Rate Adjustment [ BMT 21/08/2020]
-C        IF ( sza < 95. ) THEN  
-C         k_pseudo = (methane_enhancement - 1.)
-C      $             *(b007(l)*cc(l,i_o1d)
-C      $                 + b008(l)*cc(l,i_o1d)
-C      $                 + b009(l)*cc(l,i_o1d)
-C      $                 + cab001(l)*cc(l,i_oh)
-C      $                 + cab002(l)*cc(l,i_o))
+       IF ( sza .le. 95. ) THEN
+       
+        k_pseudo = (methane_enhancement - 1.)
+     $             *(b007(l)*cc(l,i_o1d)
+     $                 + b008(l)*cc(l,i_o1d)
+     $                 + b009(l)*cc(l,i_o1d)
+     $                 + cab001(l)*cc(l,i_oh)
+     $                 + cab002(l)*cc(l,i_o))
       
-        IF ( (l == 1) .and. (sza .le. 95.) ) THEN 
-          k_pseudo = (1./methane_enhancement) 
-     $             -  loss(l,i_ch4)
+C         IF ( (l == 1 ) .and. (sza .le. 95. ) ) THEN 
+C           k_pseudo = (1./methane_enhancement) 
+C      $             -  loss(l,i_ch4)
         ELSE 
           k_pseudo = 0. 
         ENDIF 

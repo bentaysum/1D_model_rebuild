@@ -6,4 +6,4 @@
 ## 		Gas name as in tracer.def - Gas concentration - unit
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-ch4 = 100. ppb
+ch4 = 0. ppb

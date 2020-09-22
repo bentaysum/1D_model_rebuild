@@ -541,27 +541,27 @@ ENDIF
                            
 ! ENDIF 
 
-! ! -------------------------------------------------------
-! ! 2 ) new P[CH3] = P[CH3] + [CH4]( (1/tau_ch4) - L[CH4] ) 
-! ! -------------------------------------------------------
-IF ( (lyr_m == 1 ) .and. (sza .le. 95.) ) THEN 
-     ! IF ( sza .le. 95. ) THEN 
-          dP_coeff(t_ch3,t_ch4) = dP_coeff(t_ch3,t_ch4) + &
-                                 (1./methane_enhancement) - &
-                                 ( (b007 + b008 + b009)*cc(i_o1d) &
-                                  +(cab001)*cc(i_oh) &
-                                  +(cab002)*cc(i_o) ) 
+! ! ! -------------------------------------------------------
+! ! ! 2 ) new P[CH3] = P[CH3] + [CH4]( (1/tau_ch4) - L[CH4] ) 
+! ! ! -------------------------------------------------------
+! IF ( (lyr_m == 1 ) .and. (sza .le. 95.) ) THEN 
+     ! ! IF ( sza .le. 95. ) THEN 
+          ! dP_coeff(t_ch3,t_ch4) = dP_coeff(t_ch3,t_ch4) + &
+                                 ! (1./methane_enhancement) - &
+                                 ! ( (b007 + b008 + b009)*cc(i_o1d) &
+                                  ! +(cab001)*cc(i_oh) &
+                                  ! +(cab002)*cc(i_o) ) 
                                                     
-          dP_coeff(t_ch3,t_o1d) = dP_coeff(t_ch3,t_o1d) - &
-                                 cc(i_ch4)*( b007 + b008 + b009 )
+          ! dP_coeff(t_ch3,t_o1d) = dP_coeff(t_ch3,t_o1d) - &
+                                 ! cc(i_ch4)*( b007 + b008 + b009 )
                                        
-          dP_coeff(t_ch3,t_o) = dP_coeff(t_ch3,t_o) - &
-                                cc(i_ch4)*( cab002 ) 
+          ! dP_coeff(t_ch3,t_o) = dP_coeff(t_ch3,t_o) - &
+                                ! cc(i_ch4)*( cab002 ) 
                                 
-          dP_coeff(t_ch3,t_oh) = dP_coeff(t_ch3,t_oh) - &
-                                cc(i_ch4)*( cab001 ) 
-     ! ENDIF     
-ENDIF 
+          ! dP_coeff(t_ch3,t_oh) = dP_coeff(t_ch3,t_oh) - &
+                                ! cc(i_ch4)*( cab001 ) 
+     ! ! ENDIF     
+! ENDIF 
 
 
 
@@ -741,11 +741,11 @@ ENDIF
 ! ----------------------------------------------------
 ! 2 ) new L[CH4] = SUM( J(l,j_ch4_XXX) ) + (1/Tau_ch4)
 ! ----------------------------------------------------
-IF ( (lyr_m == 1) .and. (sza .le. 95.) ) THEN 
-     ! IF ( sza < 95. ) THEN 
-          dL_coeff(t_ch4,:) = 0. 
-     ! ENDIF     
-ENDIF 
+! IF ( (lyr_m == 1) .and. (sza .le. 95.) ) THEN 
+     ! ! IF ( sza < 95. ) THEN 
+          ! dL_coeff(t_ch4,:) = 0. 
+     ! ! ENDIF     
+! ENDIF 
 
 
 

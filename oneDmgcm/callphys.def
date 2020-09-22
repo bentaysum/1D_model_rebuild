@@ -39,7 +39,7 @@ mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call_tlm=.false.
+call_tlm=.true.
 tlm_day=130
 tlm_lt=0.
 
@@ -63,7 +63,7 @@ L_2=10
 plume=.True.
 
 #Days after day0 to release plume?
-plume_day=130
+plume_day=20
 
 #Local time to release plume?
 plume_lt=0.
@@ -72,7 +72,7 @@ plume_lt=0.
 p_low = 1
 
 #Plume upper altitude (model layer index)
-p_high = 7
+p_high = 5
 
 
 ## Dust scenario. Used if the dust is prescribed (i.e. if tracer=F or active=F)
@@ -84,7 +84,7 @@ p_high = 7
 #  =30 Mars Year 30 
 iaervar = 1
 # Dust opacity at 610 Pa (when constant, i.0e. for the iaervar=1 case)
-tauvis=0.5446
+tauvis=1.0075
 # Dust vertical distribution: 
 # (=0: old distrib. (Pollack90), =1: top set by "topdustref",
 #  =2: Viking scenario; =3 MGS scenario)
