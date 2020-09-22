@@ -55,6 +55,7 @@ ccc Chlorine compounds inside organic netCDF
       character(len=30) chlor_reactions(numchlor)
 
       integer i 
+c
       
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
@@ -96,8 +97,8 @@ c
 c                    print*, colairtab(iz), xsza, table_ozo(iozo)
                      read(fic,'(7e11.4)')
      $               (jphot(itemp,isza,iz,iozo,itau,ij),
-     $                                       ij= 1, nd-numorgs)
-                     do ij = 1,nd-numorgs
+     $                                       ij= 1, nd-numorgs-numchlor)
+                     do ij = 1,nd-numorgs-numchlor
                         if (jphot(itemp,isza,iz,iozo,itau,ij)
      $                     .eq. 1.e-30) then
                            jphot(itemp,isza,iz,iozo,itau,ij) = 0.
@@ -190,7 +191,6 @@ c     Chlorine species
        
        retval = nf_close(ncid)
        if (retval .ne. nf_noerr) call net_err(retval)       
-
 
 
       return

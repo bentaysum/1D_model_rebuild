@@ -5,7 +5,10 @@ tracer=.true.
 
 #Where are the external files (dust, topography; chemistry,...)
 #datadir=/u/forget/WWW/datagcm/datafile
-datadir=/exports/csce/datastore/geos/users/s1215319/cleaning_gcm/mgcm-datafile
+#datadir=/exports/csce/datastore/geos/users/s1215319/cleaning_gcm/mgcm-datafile
+datadir=/home/s1215319/mgcm/mgcm-datafile/
+
+
 
 #Diurnal cycle ?  if diurnal=False, diurnal averaged solar heating
 diurnal=.true.
@@ -138,11 +141,11 @@ callslope = .false.
 ## Tracer (dust water, ice and/or chemical species) options (used if tracer=T):
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # DUST: Transported dust ? (if >0, use 'dustbin' dust bins)
-dustbin    = 0
+dustbin    = 2
 # DUST: Radiatively active dust ? (matters if dustbin>0)
 active  = .False.
 # DUST: use mass and number mixing ratios to predict dust size ?
-doubleq   = .False.
+doubleq   = .True.
 # DUST: lifted by GCM surface winds ?
 lifting = .false.
 # DUST: lifted by dust devils ?

@@ -890,10 +890,16 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       do iesp = 1,nesp
          do l = 1,lswitch-1
+            if ( iesp == i_dust ) then 
+            cc0(l,iesp) = rm(l,iesp)*(1.66e-24*43.34*dens(l)/0.3)*(0.75)
+     $                  /(1.5e-4*1.26e-8)
+            else 
             cc0(l,iesp) = rm(l,iesp)*dens(l)
             cc(l,iesp)  = cc0(l,iesp)
+            endif 
          end do
       end do
+      
 c      
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     co2 and nox number densities (cm-3)    

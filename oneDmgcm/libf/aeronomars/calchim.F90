@@ -1074,12 +1074,6 @@
 !=======================================================================
 !     loop over grid
 !=======================================================================
-
-!     Re-define the molar mass of mars dust as that derived from
-!     doi:10.1002/2015GL066675 [ BMT 28/07/2020]
-      IF (igcm_dust_mass .ne. 0 ) THEN 
-          mmol(igcm_dust_mass) = 66.5
-      ENDIF
       
       do ig = 1,ngridmx
          
@@ -1089,7 +1083,10 @@
 
             do i = 1,nbq
                iq = niq(i) ! get tracer index
-               zq(ig,l,iq) = pq(ig,l,iq) + pdq(ig,l,iq)*ptimestep
+               if ( trim(noms(iq)) == "dust_mass" ) then 
+                    mmol(iq) = 1.
+               endif
+               zq(ig,l,iq) = pq(ig,l,iq)! + pdq(ig,l,iq)*ptimestep
                zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
             end do
             
