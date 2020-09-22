@@ -175,6 +175,19 @@ c------------------------------------------------------------
       igcm_hoch2oh=0
       igcm_c2h5o=0
 
+!     Chlorine Scheme 22/04/2020
+      igcm_cl=0
+      igcm_cl2=0
+      igcm_clo=0
+      igcm_oclo=0
+      igcm_cl2o2=0
+      igcm_hcl=0
+      igcm_hocl=0
+      igcm_cloo=0
+      igcm_ch3ocl=0
+      igcm_clco=0
+
+
       igcm_n2=0
       igcm_ar=0
       igcm_ar_n2=0
@@ -513,6 +526,59 @@ c------------------------------------------------------------
           mmol(igcm_hoch2co3h)=92.
           count=count+1
         endif        
+
+c     Chlorine Scheme 22/04/2020 
+        if (noms(iq).eq."cl") then
+          igcm_cl=iq
+          mmol(igcm_cl)=35.45
+          count=count+1
+        endif
+        if (noms(iq).eq."clo") then
+          igcm_clo=iq
+          mmol(igcm_clo)=51.54
+          count=count+1
+        endif
+        if (noms(iq).eq."cl2") then
+          igcm_cl2=iq
+          mmol(igcm_cl2)=70.9
+          count=count+1
+        endif
+        if (noms(iq).eq."oclo") then
+          igcm_oclo=iq
+          mmol(igcm_oclo)=67.45
+          count=count+1
+        endif
+        if (noms(iq).eq."cl2o2") then
+          igcm_cl2o2=iq
+          mmol(igcm_cl2o2)=102.9
+          count=count+1
+        endif
+        if (noms(iq).eq."hcl") then
+          igcm_hcl=iq
+          mmol(igcm_hcl)=36.46
+          count=count+1
+        endif
+        if (noms(iq).eq."hocl") then
+          igcm_hocl=iq
+          mmol(igcm_hocl)=52.46
+          count=count+1
+        endif
+        if (noms(iq).eq."cloo") then
+          igcm_cloo=iq
+          mmol(igcm_cloo)=67.45
+          count=count+1
+        endif
+        if (noms(iq).eq."ch3ocl") then
+          igcm_ch3ocl=iq
+          mmol(igcm_ch3ocl)=66.49
+          count=count+1
+        endif
+        if (noms(iq).eq."clco") then
+          igcm_clco=iq
+          mmol(igcm_clco)=63.46
+          count=count+1
+        endif
+
 
         if (noms(iq).eq."ar") then
           igcm_ar=iq

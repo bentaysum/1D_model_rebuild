@@ -172,6 +172,19 @@
       igcm_hco2plus    = 0
       igcm_elec        = 0
 
+!   Chlorine species 
+     igcm_cl = 0
+     igcm_clo = 0
+     igcm_cl2 = 0
+     igcm_oclo = 0
+     igcm_cl2o2 = 0
+     igcm_hcl = 0
+     igcm_hocl = 0
+     igcm_cloo = 0
+     igcm_ch3ocl = 0
+     igcm_clco = 0
+
+
 ! 1.2 find dust tracers
 
       count = 0
@@ -598,6 +611,74 @@
            nbqchem = nbqchem + 1
         end if
 
+
+!     Chlorine Scheme 22/04/2020 
+        if (noms(iq).eq."cl") then
+          igcm_cl=iq
+          mmol(igcm_cl)=35.45
+          count=count+1
+          nbqchem = nbqchem + 1
+        endif
+        if (noms(iq).eq."clo") then
+          igcm_clo=iq
+          mmol(igcm_clo)=51.54
+          count=count+1
+          nbqchem = nbqchem + 1
+        endif
+        if (noms(iq).eq."cl2") then
+          igcm_cl2=iq
+          mmol(igcm_cl2)=70.9
+          count=count+1
+          nbqchem = nbqchem + 1
+        endif
+        if (noms(iq).eq."oclo") then
+          igcm_oclo=iq
+          mmol(igcm_oclo)=67.45
+          count=count+1
+          nbqchem = nbqchem + 1
+        endif
+        if (noms(iq).eq."cl2o2") then
+          igcm_cl2o2=iq
+          mmol(igcm_cl2o2)=102.9
+          count=count+1
+          nbqchem = nbqchem + 1
+        endif
+        if (noms(iq).eq."hcl") then
+          igcm_hcl=iq
+          mmol(igcm_hcl)=36.46
+          count=count+1
+          nbqchem = nbqchem + 1
+        endif
+        if (noms(iq).eq."hocl") then
+          igcm_hocl=iq
+          mmol(igcm_hocl)=52.46
+          count=count+1
+          nbqchem = nbqchem + 1
+        endif
+        if (noms(iq).eq."cloo") then
+          igcm_cloo=iq
+          mmol(igcm_cloo)=67.45
+          count=count+1
+          nbqchem = nbqchem + 1
+        endif
+        if (noms(iq).eq."ch3ocl") then
+          igcm_ch3ocl=iq
+          mmol(igcm_ch3ocl)=66.49
+          count=count+1
+          nbqchem = nbqchem + 1
+        endif
+        if (noms(iq).eq."clco") then
+          igcm_clco=iq
+          mmol(igcm_clco)=63.46
+          count=count+1
+          nbqchem = nbqchem + 1
+        endif
+        
+        
+        
+        
+        
+        
         
 ! 1.4 find ions
 
@@ -1630,6 +1711,144 @@ ch4vmr=410.e-12
          qsurf(1:ngridmx,igcm_hcoco3) = 0.
       end if 
 	 
+! Chlrorine species 22/04/2020
+      ! Cl
+      if (igcm_cl /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_cl) = vmr*mmol(igcm_cl)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_cl) = 0.
+      end if 
+      ! ClO
+      if (igcm_clo /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_clo) = vmr*mmol(igcm_clo)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_clo) = 0.
+      end if 
+      ! OClO
+      if (igcm_oclo /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_oclo) = vmr*mmol(igcm_oclo)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_oclo) = 0.
+      end if 
+      ! Cl2
+      if (igcm_cl2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_cl2) = vmr*mmol(igcm_cl2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_cl2) = 0.
+      end if 
+      ! ClO2
+      if (igcm_cl2o2 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_cl2o2) = vmr*mmol(igcm_cl2o2)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_cl2o2) = 0.
+      end if 
+      ! HCl
+      if (igcm_hcl /= 0) then
+         vmr = 0.
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hcl) = vmr*mmol(igcm_hcl)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hcl) = 0.
+      end if 
+      ! HOCl
+      if (igcm_hocl /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_hocl) = vmr*mmol(igcm_hocl)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_hocl) = 0.
+      end if 
+      ! ClOO
+      if (igcm_cloo /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_cloo) = vmr*mmol(igcm_cloo)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_cloo) = 0.
+      end if 
+      ! CH3COCl
+      if (igcm_ch3ocl /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_ch3ocl) = vmr*mmol(igcm_ch3ocl)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_ch3ocl) = 0.
+      end if 
+      ! ClCO
+      if (igcm_clco /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_clco) = vmr*mmol(igcm_clco)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_clco) = 0.
+      end if 
+      
+      
+      
+      
+      
+      
+      
 	  
 ! CH2OO*
       if (igcm_ch2oo_e /= 0) then

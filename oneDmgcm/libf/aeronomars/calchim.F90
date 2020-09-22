@@ -176,6 +176,21 @@
        ! Dust 
        integer,save :: i_dust = 0 
        
+       
+!  Chlorine Compounds
+     integer,save :: i_cl = 0
+     integer,save :: i_clo = 0
+     integer,save :: i_cl2 = 0
+     integer,save :: i_oclo = 0
+     integer,save :: i_cl2o2 = 0
+     integer,save :: i_hcl = 0
+     integer,save :: i_hocl = 0
+     integer,save :: i_cloo = 0
+     integer,save :: i_ch3ocl = 0
+     integer,save :: i_clco = 0
+       
+       
+       
       integer :: ig_vl1
 
       real    :: latvl1, lonvl1
@@ -679,6 +694,92 @@
             nbq = nbq + 1
             niq(nbq) = i_elec
          end if
+
+!        Chlorine Compounds 
+           i_cl = igcm_cl
+         if (i_cl == 0) then
+            write(*,*) "calchim: Error; no cl tracer !!!"
+            write(*,*) "cl will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_cl
+         end if
+           i_cl2 = igcm_cl2
+         if (i_cl2 == 0) then
+            write(*,*) "calchim: Error; no cl2 tracer !!!"
+            write(*,*) "cl2 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_cl2
+         end if
+           i_clo = igcm_clo
+         if (i_clo == 0) then
+            write(*,*) "calchim: Error; no clo tracer !!!"
+            write(*,*) "clo will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_clo
+         end if
+           i_oclo = igcm_oclo
+         if (i_oclo == 0) then
+            write(*,*) "calchim: Error; no oclo tracer !!!"
+            write(*,*) "oclo will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_oclo
+         end if
+           i_cl2o2 = igcm_cl2o2
+         if (i_cl2o2 == 0) then
+            write(*,*) "calchim: Error; no cl2o2 tracer !!!"
+            write(*,*) "cl2o2 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_cl2o2
+         end if
+           i_hcl = igcm_hcl
+         if (i_hcl == 0) then
+            write(*,*) "calchim: Error; no hcl tracer !!!"
+            write(*,*) "hcl will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hcl
+         end if
+           i_hocl = igcm_hocl
+         if (i_hocl == 0) then
+            write(*,*) "calchim: Error; no hocl tracer !!!"
+            write(*,*) "hocl will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hocl
+         end if
+           i_cloo = igcm_cloo
+         if (i_cloo == 0) then
+            write(*,*) "calchim: Error; no cloo tracer !!!"
+            write(*,*) "cloo will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_cloo
+         end if
+           i_ch3ocl = igcm_ch3ocl
+         if (i_ch3ocl== 0) then
+            write(*,*) "calchim: Error; no ch3ocl tracer !!!"
+            write(*,*) "ch3ocl will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3ocl
+         end if
+           i_clco = igcm_clco
+         if (i_clco== 0) then
+            write(*,*) "calchim: Error; no clco tracer !!!"
+            write(*,*) "clco will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_clco
+         end if
+         
+         
+         
+         
          
          
          !Check tracers needed for thermospheric chemistry
