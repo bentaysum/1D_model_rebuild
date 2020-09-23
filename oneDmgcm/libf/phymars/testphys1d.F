@@ -916,7 +916,6 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
 !       increment tracers
         DO iq = 1, nqmx
             
-          IF (  (trim(noms(iq)) == "ch4") .and. (plume) ) CYCLE 
 
           DO ilayer=1,nlayer
      

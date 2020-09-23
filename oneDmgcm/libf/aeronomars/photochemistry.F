@@ -700,7 +700,9 @@ c
       real cc_hox_next   ! " " cc(i_hox) " "
       
 c     ClOx Handling
-      real rcl_cloo, rclo_cloo 
+      real rcl_cloo, rclo_cloo
+      real rclo_cl, rcloo_cl 
+      
       real, parameter :: NCl = 2.E19
       real, parameter :: QYCl = 1.E-3
       
@@ -720,7 +722,7 @@ c     =====================================================
 c     Rate for CH4 + X -> CH3 + ... proposed reaction 
 c     ===============================================
       real methane_enhancement
-      parameter( methane_enhancement = 600.) ! Forced lifetime (in seconds)
+      parameter( methane_enhancement = 1.) ! Forced lifetime (in seconds)
       real k_pseudo 
     
       
@@ -891,16 +893,35 @@ c
       do iesp = 1,nesp
          do l = 1,lswitch-1
             if ( iesp == i_dust ) then 
-            cc0(l,iesp) = rm(l,iesp)*(1.66e-24*43.34*dens(l)/0.3)*(0.75)
-     $                  /(1.5e-4*1.26e-8)
+               cc0(l,iesp) = 3.*rm(l,iesp)/(4.*3.15*(1.5e-4)**3.)  
             else 
-            cc0(l,iesp) = rm(l,iesp)*dens(l)
-            cc(l,iesp)  = cc0(l,iesp)
-            endif 
+               cc0(l,iesp) = rm(l,iesp)*dens(l)
+            endif    
+               cc(l,iesp)  = cc0(l,iesp)
          end do
       end do
       
-c      
+      
+c     
+c DUST NOTES: 
+C ===========
+C @article{doi:10.1029/2010JE003691,
+C author = {Heavens, N. G. and Richardson, M. I. and Kleinböhl, A. and Kass, D. M. and McCleese, D. J. and Abdou, W. and Benson, J. L. and Schofield, J. T. and Shirley, J. H. and Wolkenberg, P. M.},
+C title = {The vertical distribution of dust in the Martian atmosphere during northern spring and summer: Observations by the Mars Climate Sounder and analysis of zonal average vertical dust profiles},
+C journal = {Journal of Geophysical Research: Planets},
+C volume = {116},
+C number = {E4},
+C pages = {},
+C keywords = {Mars, dust, atmosphere, circulation},
+C doi = {10.1029/2010JE003691},
+C url = {https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/2010JE003691},
+C eprint = {https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2010JE003691},
+C abstract = {The vertical distribution of dust in Mars's atmosphere is a critical and poorly known input in atmospheric physical and chemical models and a source of insight into the lifting and transport of dust and general vertical mixing in the atmosphere. We investigate vertical profiles of dust opacity retrieved from limb observations by Mars Climate Sounder during the relatively dust-clear Martian northern summer of 2006–2007 (Ls = 111°–177°of Mars year (MY) 28) and Martian northern spring and summer of 2007–2008 (Ls = 0°–180° of MY 29). To represent local maxima in inferred mass mixing ratio in these profiles, we develop an empirical alternative to the classic “Conrath profile” for representing the vertical distribution of dust in the Martian atmosphere. We then assess the magnitude and variability of atmospheric dust loading, the depth of dust penetration during these seasons, and the impact of the observed vertical dust distribution on the radiative forcing of the circulation. During most of northern spring and summer, the dust mass mixing ratio in the tropics has a maximum at 15–25 km above the local surface (the high-altitude tropical dust maximum (HATDM)). The HATDM appears to have increased significantly in magnitude and altitude during middle to late northern summer of MY 29. The HATDM gradually decayed during late summer of MY 28. Interannual variability in the dust distribution during middle to late northern summer may be connected with known interannual variability in tropical dust storm activity.},
+C year = {2011}
+C }
+
+
+
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     co2 and nox number densities (cm-3)    
 c      
@@ -1252,63 +1273,51 @@ c     ClOx Species
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       DO l = 1, lswitch-1
 
-      rcl_cloo = (cl001(l)*cc(l,i_o3)
-     $           + cl008(l)*cc(l,i_h2)
-     $           + cl009(l)*cc(l,i_ho2)
-     $           + cl010(l)*cc(l,i_ho2)
-     $           + cl011(l)*cc(l,i_h2o2)
-     $           + cl016(l)*cc(l,i_ch4)
-     $           + cl017(l)*cc(l,i_hcho)
-     $           + cl018(l)*cc(l,i_ch3ooh)
-     $           + cl022(l)*cc(l,i_ch3o2)
-     $           + cl023(l)*cc(l,i_co)
-     $           + cl024(l)*cc(l,i_cloo)
-     $           + cl025(l)*cc(l,i_cloo)
-     $           + cl028(l)*cc(l,i_o2)
-     $           + cl029(l)*cc(l,i_ch3ocl)
-     $           + cl030(l)*cc(l,i_cl2o2)
-     $           + cl031(l)*cc(l,i_ch3ocl)
-     $           + j(l,j_cloo))
-     $           /
-     $           ( cl024(l)*cc(l,i_cl)
-     $           + cl025(l)*cc(l,i_cl)
-     $           + cl026(l))
 
-      rclo_cloo = (cl002(l)*cc(l,i_o)
-     $           + cl003(l)*cc(l,i_clo)
-     $           + cl004(l)*cc(l,i_clo)
-     $           + cl005(l)*cc(l,i_clo)
-     $           + cl012(l)*cc(l,i_oh)
-     $           + cl013(l)*cc(l,i_ho2)
-     $           + cl019(l)*cc(l,i_ch3o2)
-     $           + cl020(l)*cc(l,i_ch3o2)
-     $           + cl021(l)*cc(l,i_ch3o2)
-     $           + j(l,j_cloo))
-     $           /
-     $           ( cl024(l)*cc(l,i_cl)
-     $           + cl025(l)*cc(l,i_cl)
-     $           + cl026(l))
+      rclo_cl = (cl001(l)*cc(l,i_o3) 
+     $        +  cl010(l)*cc(l,i_ho2)
+     $        +  cl022(l)*cc(l,i_ch3o2)*0.5
+     $        +  cl024(l)*cc(l,i_cloo)*2.)
+     $        /
+     $          (cl002(l)*cc(l,i_o) 
+     $        +  cl003(l)*cc(l,i_clo)
+     $        +  cl004(l)*cc(l,i_clo)
+     $        +  cl005(l)*cc(l,i_clo)
+     $        +  cl006(l)*cc(l,i_clo)
+     $        +  cl012(l)*cc(l,i_oh)
+     $        +  cl013(l)*cc(l,i_ho2)
+     $        +  cl019(l)*cc(l,i_ch3o2)
+     $        +  cl020(l)*cc(l,i_ch3o2)
+     $        +  cl021(l)*cc(l,i_ch3o2))
 
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c        cl
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
+      rcloo_cl = (cl028(l)*cc(l,i_o2) 
+     $         +  cl030(l)*cc(l,i_cl2o2))
+     $         /
+     $           (cl024(l)*cc(l,i_cl)
+     $         +  cl025(l)*cc(l,i_cl)
+     $         +  cl026(l))
+
+
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c       cl
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+         if ( cc(l,i_clox) > 5.e-30*dens(l) ) then ! instability suppression
          cc(l,i_cl) = cc(l,i_clox)
-     $                 /(1. + (1. + rclo_cloo)/rcl_cloo ) 
+     $                 /(1. + rclo_cl + rcloo_cl )
 c
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        cloo
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
-         cc(l,i_cloo) = cc(l,i_cl)/rcl_cloo
+         cc(l,i_cloo) = 0.!cc(l,i_cl)*rcloo_cl
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        clo
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
-         cc(l,i_clo) = cc(l,i_cloo)*rclo_cloo
-
+         cc(l,i_clo) = cc(l,i_cl)*rclo_cl
+         endif 
 
       ENDDO 
 
@@ -1992,21 +2001,21 @@ c
      $                 + cl016(l)*cc(l,i_cl) 
      
 C       Loss Rate Adjustment [ BMT 21/08/2020]
-       IF ( sza .le. 95. ) THEN
+C        IF ( sza .le. 95. ) THEN
        
-        k_pseudo = (methane_enhancement - 1.)
-     $             *(b007(l)*cc(l,i_o1d)
-     $                 + b008(l)*cc(l,i_o1d)
-     $                 + b009(l)*cc(l,i_o1d)
-     $                 + cab001(l)*cc(l,i_oh)
-     $                 + cab002(l)*cc(l,i_o))
+C         k_pseudo = (methane_enhancement - 1.)
+C      $             *(b007(l)*cc(l,i_o1d)
+C      $                 + b008(l)*cc(l,i_o1d)
+C      $                 + b009(l)*cc(l,i_o1d)
+C      $                 + cab001(l)*cc(l,i_oh)
+C      $                 + cab002(l)*cc(l,i_o))
       
-C         IF ( (l == 1 ) .and. (sza .le. 95. ) ) THEN 
-C           k_pseudo = (1./methane_enhancement) 
-C      $             -  loss(l,i_ch4)
-        ELSE 
+C C         IF ( (l == 1 ) .and. (sza .le. 95. ) ) THEN 
+C C           k_pseudo = (1./methane_enhancement) 
+C C      $             -  loss(l,i_ch4)
+C         ELSE 
           k_pseudo = 0. 
-        ENDIF 
+C         ENDIF 
       
 
         loss(l,i_ch4) = loss(l,i_ch4) + k_pseudo
@@ -2607,12 +2616,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                      + j(l,j_hcl)*cc(l,i_hcl)
      $                      + j(l,j_hocl)*cc(l,i_hocl)
 
-      IF ( l == 1) THEN 
-
-       production(l,i_clox) = production(l,i_clox)
-     $                      + j(l,j_hcl)*NCl*QYCl
-
-      ENDIF 
 
        loss(l,i_clox) = cl001(l)*cc(l,i_o3)*cc(l,i_cl)
      $                 + cl008(l)*cc(l,i_h2)*cc(l,i_cl)
@@ -2645,7 +2648,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                + cl031(l)*cc(l,i_cl)*cc(l,i_ch3ocl)
      $                + j(l,j_cloo)*cc(l,i_cloo)
 
-      loss(l,i_clox) = loss(l,i_clox)/cc(l,i_clox)
+      loss(l,i_clox) = loss(l,i_clox)
+     $               /cc(l,i_clox)
+
+
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c       Cl2 
@@ -2787,8 +2793,13 @@ c -----------------------------------------------
 
        DO l = 1, lswitch-1
 
+        IF ( 1./loss(l,i_clox) > dt ) THEN 
         cc(l,i_clox) = (cc0(l,i_clox) + production(l,i_clox)*dt)
      $                /(1. + loss(l,i_clox)*dt )
+        ELSE 
+        cc(l,i_clox) = production(l,i_clox)/loss(l,i_clox)
+        ENDIF 
+
 
         IF ( 1./loss(l,i_cl2) > dt ) THEN 
           cc(l,i_cl2) = (cc0(l,i_cl2) + production(l,i_cl2)*dt)
@@ -3081,6 +3092,7 @@ c     density -> volume mixing ratio conversion
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       do iesp = 1,nesp
+         if ( iesp == i_dust ) cycle 
          do l = 1,lswitch-1
             rm(l,iesp) = max(cc(l,iesp)/dens(l), 1.e-30)
          end do
@@ -4139,12 +4151,17 @@ c
         rm(l,i_ro2) = max(rm(l,i_ro2),1.e-30)
         
 c     ClOx
-         if ( rm(l,i_cl) .gt. 1.e-30 ) 
-     $        rm(l,i_clox) = rm(l,i_clox) + rm(l,i_cl)
-         if ( rm(l,i_clo) .gt. 1.e-30 ) 
-     $        rm(l,i_clox) = rm(l,i_clox) + rm(l,i_clo)
-         if ( rm(l,i_cloo) .gt. 1.e-30 ) 
-     $        rm(l,i_clox) = rm(l,i_clox) + rm(l,i_cloo)
+        rm(l,i_clox) = max( rm(l,i_cl) + rm(l,i_clo) + rm(l,i_cloo),
+     $                      5.e-30 )
+        if ( rm(l,i_clox) == 5.E-30 ) rm(l,i_clox) = 1.e-30 
+        
+C         rm(l,i_clox) = 1.e-30
+C          if ( rm(l,i_cl) .gt. 1.e-30 ) 
+C      $        rm(l,i_clox) = rm(l,i_clox) + rm(l,i_cl)
+C          if ( rm(l,i_clo) .gt. 1.e-30 ) 
+C      $        rm(l,i_clox) = rm(l,i_clox) + rm(l,i_clo)
+C          if ( rm(l,i_cloo) .gt. 1.e-30 ) 
+C      $        rm(l,i_clox) = rm(l,i_clox) + rm(l,i_cloo)
         
         
       end do

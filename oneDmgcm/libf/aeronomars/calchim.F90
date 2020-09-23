@@ -1080,21 +1080,28 @@
          foundswitch = 0
          do l = 1,nlayermx
          
+            zt(ig,l)  = pt(ig,l) + pdt(ig,l)*ptimestep
+            zu(ig,l)  = pu(ig,l) + pdu(ig,l)*ptimestep
+            zv(ig,l)  = pv(ig,l) + pdv(ig,l)*ptimestep
 
             do i = 1,nbq
                iq = niq(i) ! get tracer index
+               zq(ig,l,iq) = pq(ig,l,iq) + pdq(ig,l,iq)*ptimestep
+
+               ! Special case for Dust (mass concentration)
+               ! Assumption of particle density @ 1.52 g/cm3 
                if ( trim(noms(iq)) == "dust_mass" ) then 
-                    mmol(iq) = 1.
-               endif
-               zq(ig,l,iq) = pq(ig,l,iq)! + pdq(ig,l,iq)*ptimestep
-               zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
+                    zycol(l,iq) = 1.e-3*zq(ig,l,iq)*pplay(ig,l)/(188.92*zt(ig,l))
+                    zycol(l,iq) = zycol(l,iq)/1.52
+               else 
+                    zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
+               endif 
+               
             end do
             
             
             
-            zt(ig,l)  = pt(ig,l) + pdt(ig,l)*ptimestep
-            zu(ig,l)  = pu(ig,l) + pdu(ig,l)*ptimestep
-            zv(ig,l)  = pv(ig,l) + pdv(ig,l)*ptimestep
+
 
             zpress(l) = pplay(ig,l)/100.
             ztemp(l)  = zt(ig,l)
@@ -1176,6 +1183,7 @@
             iqmax=iloc(1)
             do i = 1,nbq
                iq = niq(i) ! get tracer index
+               if ( trim(noms(iq)) == "dust_mass" ) cycle
                if (iq /= iqmax) then
                   dqchim(ig,l,iq) = (zycol(l,iq)*mmol(iq)/mmean(ig,l)  &
                                    - zq(ig,l,iq))/ptimestep
