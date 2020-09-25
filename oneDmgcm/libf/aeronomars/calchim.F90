@@ -1091,8 +1091,13 @@
                ! Special case for Dust (mass concentration)
                ! Assumption of particle density @ 1.52 g/cm3 
                if ( trim(noms(iq)) == "dust_mass" ) then 
-                    zycol(l,iq) = 1.e-3*zq(ig,l,iq)*pplay(ig,l)/(188.92*zt(ig,l))
-                    zycol(l,iq) = zycol(l,iq)/1.52
+                    ! zycol(l,iq) = 1.e-3*zq(ig,l,iq)*pplay(ig,l)/(188.92*zt(ig,l))
+                    ! zycol(l,iq) = zycol(l,iq)/1.52
+                    
+                    ! Number particles = (4/3 pi)^-1 (dust density * reff^3 ) (P/RT) x Mass Mixing Ratio
+                    zycol(l,iq) = 1./(2.5*((1.5E-4)**3.))
+                    zycol(l,iq) = zycol(l,iq)/(1.333*3.14)
+                    zycol(l,iq) = zq(IG,l,iq)*zycol(l,iq)*pplay(ig,l)/(188.92*zt(ig,l)*1.e3)
                else 
                     zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
                endif 

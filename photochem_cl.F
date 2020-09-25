@@ -61,7 +61,8 @@ c
       integer lswitch
 c
       integer l, iq
-      parameter (nesp = 71)      ! number of species in the chemistry (+3 for RO2, e-, and dust)
+      parameter (nesp = 69)      ! number of species in the chemistry (+1 for RO2)
+
 c
       real stimestep             ! standard timestep for the chemistry (s)
       real ctimestep             ! real timestep for the chemistry (s) 
@@ -140,7 +141,7 @@ cc    reaction rates from CAABA/MECCA
      $ ,cl034(nlayermx), cl035(nlayermx), cl036(nlayermx)
      $ ,cl037(nlayermx), cl038(nlayermx), cl039(nlayermx)
      $ ,cl040(nlayermx), cl041(nlayermx), cl042(nlayermx)
-     $ ,cl043(nlayermx), cl044(nlayermx)
+     $ ,cl043(nlayermx)
 
 c     Tangent Linear Model variables
       REAL*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
@@ -151,17 +152,25 @@ c     Tangent Linear Model variables
       REAL*8 dOX_dPQ(nlayermx,nlayermx*nqmx)
       REAL*8 dOX0_dPQ(nlayermx,nlayermx*nqmx)
 
-      REAL lifetime(nlayermx,nesp)
-
       integer h_j, oh_j, ho2_j
       integer o_j, o3_j 
       integer x_j 
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     stimestep  : standard timestep for the chemistry (s)       c
 c     ctimestep  : real timestep for the chemistry (s)           c
 c     phychemrat : ratio physical/chemical timestep              c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
+
+#ifdef ethane
+      write(*,*) "Works!"
+      stop
+#endif
+      write(*,*) "Is not on!"
+      stop
+
+
 
       stimestep = 600.
 
@@ -234,7 +243,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $               cl034, cl035, cl036,
      $               cl037, cl038, cl039,
      $               cl040, cl041, cl042,
-     $               cl043, cl044)
+     $               cl043)
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     interpolation of photolysis rates in the lookup table      c
@@ -340,16 +349,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     loop over time within the physical timestep                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       
-
-
-
-
       do istep = 1,phychemrat
 
 c =================================================================
 
          call chimie(lswitch,nesp, rm, j, dens, ctimestep, ptimestep,
-     $               press, temp, sza, dist_sol, surfdust1d,
+     $               press, temp, sza, dist_sol, 
+     $               istep, phychemrat,
      $               a001, a002, a003,
      $               b001, b002, b003, b004, b005, b006,
      $               b007, b008, b009,
@@ -360,7 +366,6 @@ c =================================================================
      $               e001, e002, e003,
      $               h001, h002, h003, h004, h005,
      $               t001, t002, t003,
-     $               lifetime,
      $               cab001, cab002, cab003, cab004, cab005,
      $               cab006, cab007, cab008, cab009, cab010,
      $               cab011, cab012, cab013, cab014, cab015,
@@ -397,7 +402,7 @@ c =================================================================
      $               cl034, cl035, cl036,
      $               cl037, cl038, cl039,
      $               cl040, cl041, cl042,
-     $               cl043, cl044,
+     $               cl043,
      $               dccn_dpq, dcc0_dpq,
      $               dHOX_dPQ, dHOX0_dPQ,
      $               dOX_dPQ, dOX0_dPQ)
@@ -419,7 +424,7 @@ c =================================================================
       end do
 
 
-
+      
 
 
 
@@ -444,20 +449,10 @@ c =================================================================
 
                TLM = TLM_trans + TLM_photo
                TLM = tlm_ident + TLM*ptimestep
-               
-        do iq = 1, nqmx*nlayermx 
-          do l = 1, nlayermx*nqmx
-               IF ( TLM(iq,l) .ne. TLM(iq,l) ) THEN 
-                    WRITE(*,*) "NAN AT ", iq, l 
-                    STOP 
-               ENDIF 
-          enddo 
-        enddo 
-               
 
       endif 
 
-
+      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     save chemical species for the gcm                          c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -466,17 +461,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       call chimtogcm(zycol, lswitch, nesp, rm) 
 c      
 
-cc Output of selected photochemical lifetimes
-       call WRITEDIAGFI(1,"o2_tau","o2_tau","s",1,lifetime(:,5))
-       call WRITEDIAGFI(1,"h2o2_tau","h2o2_tau","s",1,lifetime(:,11))
-       call WRITEDIAGFI(1,"ch4_tau","ch4_tau","s",1,lifetime(:,12))
-cc Output of o2 production and loss rates 
-       call WRITEDIAGFI(1,"o2_prod","o2_prod","molec. cm-3 s"
-     $                 ,1,lifetime(:,59))
-       call WRITEDIAGFI(1,"o2_loss","o2_loss","cm-3 s",1,lifetime(:,60))
-cc 
-       call WRITEDIAGFI(1,"h2o2_tau","h2o2_tau","s-1",1,lifetime(:,11))
-
 
       return
       end
@@ -484,7 +468,8 @@ c
 c*****************************************************************
 c
       subroutine chimie(lswitch, nesp, rm, j, dens, dt, ptimestep,
-     $                  press, t, sza, dist_sol, surfdust,
+     $                  press, t, sza, dist_sol, 
+     $                  istep, phychemrat,
      $                  a001, a002, a003,
      $                  b001, b002, b003, b004, b005, b006,
      $                  b007, b008, b009,
@@ -495,7 +480,6 @@ c
      $                  e001, e002, e003,
      $                  h001, h002, h003, h004, h005,
      $                  t001, t002, t003,
-     $                   lifetime,
      $               cab001, cab002, cab003, cab004, cab005,
      $               cab006, cab007, cab008, cab009, cab010,
      $               cab011, cab012, cab013, cab014, cab015,
@@ -532,7 +516,7 @@ c
      $               cl034, cl035, cl036,
      $               cl037, cl038, cl039,
      $               cl040, cl041, cl042,
-     $               cl043, cl044,
+     $               cl043,
      $               dccn_dpq, dcc0_dpq,
      $               dHOX_dPQ, dHOX0_dPQ,
      $               dOX_dPQ, dOX0_dPQ)
@@ -570,9 +554,9 @@ c
       real t(nlayermx)        ! temperature (k)
       real sza                ! solar zenith angle (deg)
       real dist_sol           ! sun distance (au) 
-      real surfdust(nlayermx) ! Dust surface area cm2 / cm3 of air
       real pq(nlayermx,nqmx)  ! mixing ratios (mmr)
       real pdq(nlayermx,nqmx) ! tracer tendency prior to photochem routine
+      integer istep, phychemrat ! current and final iteration number
 c     reaction rates
 c
       real a001(nlayermx), a002(nlayermx), a003(nlayermx)
@@ -641,8 +625,7 @@ c
      $ ,cl034(nlayermx), cl035(nlayermx), cl036(nlayermx)
      $ ,cl037(nlayermx), cl038(nlayermx), cl039(nlayermx)
      $ ,cl040(nlayermx), cl041(nlayermx), cl042(nlayermx)
-     $ ,cl043(nlayermx), cl044(nlayermx)
-
+     $ ,cl043(nlayermx)
 
 c     Tangent Linear Model 
       REAL*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
@@ -652,8 +635,6 @@ c     Tangent Linear Model
       REAL*8 dOX_dPQ(nlayermx,nqmx*nlayermx)
       REAL*8 dOX0_dPQ(nlayermx,nqmx*nlayermx)
 
-      REAL lifetime(nlayermx,nesp)
-      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     local:
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -700,41 +681,11 @@ c
       real cc_hox_next   ! " " cc(i_hox) " "
       
 c     ClOx Handling
-      real rcl_cloo, rclo_cloo
-      real rclo_cl, rcloo_cl 
-      
-      real, parameter :: NCl = 2.E19
-      real, parameter :: QYCl = 1.E-3
-      
-C     Chlorine Production via Dust Photolysis
-c     ---------------------------------------
-      real, parameter :: r_eff = 1.5E-4 ! Dust effective radius (cm) 
-      real, parameter :: dust_dens = 2.5 ! Dust particle density (g cm-3)
-      real, parameter :: cl_percent = 0.5 ! Cl mass percentage
-      
-c     ---------------------------
-c     Photochemically active dust
-c     ---------------------------      
+      real rcl_cloo, rclo_cloo 
 
-c     O(1D) production via [Dust] x J_SO3 x dust_photo_fac
-c     =====================================================
-      real dust_photo_fac
-      parameter(dust_photo_fac=0.)!100.)
-      
-c     O(1D) production via [Dust] x [e-] x elec_dust_rate
-c     =====================================================
-      real elec_dust_rate 
-      parameter(elec_dust_rate=0.)!1.E-4)
-      
-c     Rate for CH4 + X -> CH3 + ... proposed reaction 
-c     ===============================================
-      real methane_enhancement
-      parameter( methane_enhancement = 1.) ! Forced lifetime (in seconds)
-      real k_pseudo 
-    
-      
-      
-      
+c     Atmospheric Lifetimes 
+      real tau_atmos(nlayermx,nesp)
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     tracer numbering in the chemistry
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -800,24 +751,19 @@ c
        integer, parameter :: i_hox  = 56
        integer, parameter :: i_ox   = 57
        integer, parameter :: i_RO2  = 58
-       integer, parameter :: i_dust = 59
-       integer, parameter :: i_elec = 60 
 !      Chlorine Compounds 
-       integer, parameter :: i_cl = 61
-       integer, parameter :: i_clo = 62
-       integer, parameter :: i_cl2 = 63
-       integer, parameter :: i_oclo = 64
-       integer, parameter :: i_cl2o2 = 65
-       integer, parameter :: i_hcl = 66
-       integer, parameter :: i_hocl = 67 
-       integer, parameter :: i_cloo = 68 
-       integer, parameter :: i_ch3ocl = 69
-       integer, parameter :: i_clco = 70
-       integer, parameter :: i_clox = 71
-       
-       
-       
-       
+       integer, parameter :: i_cl = 59
+       integer, parameter :: i_clo = 60
+       integer, parameter :: i_cl2 = 61
+       integer, parameter :: i_oclo = 62
+       integer, parameter :: i_cl2o2 = 63
+       integer, parameter :: i_hcl = 64
+       integer, parameter :: i_hocl = 65 
+       integer, parameter :: i_cloo = 66 
+       integer, parameter :: i_ch3ocl = 67
+       integer, parameter :: i_clco = 68
+       integer, parameter :: i_clox = 69
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     numbering of photolysis rates
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -876,6 +822,9 @@ c
       j_oclo         = 45      ! oclo + hv -> clo + o
       j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo 
 
+
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c New rates : Tropospheric Photochemistry of Ozone, its
 c  			  Precursors and the Hydroxyl Radical: A 3D
@@ -899,47 +848,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       do iesp = 1,nesp
          do l = 1,lswitch-1
-            if ( iesp == i_dust ) then 
-               cc0(l,iesp) = rm(l,iesp)
-            else
-               cc0(l,iesp) = rm(l,iesp)*dens(l)
-            endif 
-               cc(l,iesp)  = cc0(l,iesp)
-
+            cc0(l,iesp) = rm(l,iesp)*dens(l)
+            cc(l,iesp)  = cc0(l,iesp)
          end do
       end do
-      
-c      -------------------------
-c      Number of Chlorine atoms 
-c      available to photolyse
-c      -------------------------
-      do l = 1, lswitch-1
-          cc0(l,i_dust) = (cc0(l,i_dust)*dust_dens*(4./3.)
-     $                  *3.14*(r_eff**3.)*cl_percent/100.) 
-     $                *6.023e23/35.453
-          cc(l,i_dust) = cc0(l,i_dust)
-      enddo 
-c     
-c DUST NOTES: 
-c DUST NOTES: 
-C ===========
-C @article{doi:10.1029/2010JE003691,
-C author = {Heavens, N. G. and Richardson, M. I. and Kleinböhl, A. and Kass, D. M. and McCleese, D. J. and Abdou, W. and Benson, J. L. and Schofield, J. T. and Shirley, J. H. and Wolkenberg, P. M.},
-C title = {The vertical distribution of dust in the Martian atmosphere during northern spring and summer: Observations by the Mars Climate Sounder and analysis of zonal average vertical dust profiles},
-C journal = {Journal of Geophysical Research: Planets},
-C volume = {116},
-C number = {E4},
-C pages = {},
-C keywords = {Mars, dust, atmosphere, circulation},
-C doi = {10.1029/2010JE003691},
-C url = {https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/2010JE003691},
-C eprint = {https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2010JE003691},
-C abstract = {The vertical distribution of dust in Mars's atmosphere is a critical and poorly known input in atmospheric physical and chemical models and a source of insight into the lifting and transport of dust and general vertical mixing in the atmosphere. We investigate vertical profiles of dust opacity retrieved from limb observations by Mars Climate Sounder during the relatively dust-clear Martian northern summer of 2006–2007 (Ls = 111°–177°of Mars year (MY) 28) and Martian northern spring and summer of 2007–2008 (Ls = 0°–180° of MY 29). To represent local maxima in inferred mass mixing ratio in these profiles, we develop an empirical alternative to the classic “Conrath profile” for representing the vertical distribution of dust in the Martian atmosphere. We then assess the magnitude and variability of atmospheric dust loading, the depth of dust penetration during these seasons, and the impact of the observed vertical dust distribution on the radiative forcing of the circulation. During most of northern spring and summer, the dust mass mixing ratio in the tropics has a maximum at 15–25 km above the local surface (the high-altitude tropical dust maximum (HATDM)). The HATDM appears to have increased significantly in magnitude and altitude during middle to late northern summer of MY 29. The HATDM gradually decayed during late summer of MY 28. Interannual variability in the dust distribution during middle to late northern summer may be connected with known interannual variability in tropical dust storm activity.},
-C year = {2011}
-C }
-
-
-
+c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     co2 and nox number densities (cm-3)    
 c      
@@ -951,8 +864,6 @@ c
         
       end do 
 c
-
-
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     loop over iterations in the chemical scheme
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1027,7 +938,7 @@ c_
      $           + cab096(l)*cc(l,i_hoch2co3)
      $           + cab097(l)*cc(l,i_hoch2co3)
      $           + cl009(l)*cc(l,i_cl)
-     $            + cl013(l)*cc(l,i_clo)
+     $           + cl010(l)*cc(l,i_cl)
      $           + (cab002(l)*cc(l,i_o)*cc(l,i_ch4)*0.49
      $                + cab005(l)*cc(l,i_ch3)*cc(l,i_o3)*0.956
      $                + cab006(l)*cc(l,i_ch3)*cc(l,i_o)
@@ -1036,7 +947,8 @@ c_
      $                + j(l,j_ch4_ch_h2_h)*cc(l,i_ch4)
      $                + j(l,j_ch2o_hco)*cc(l,i_hcho)
      $                + j(l,j_ch3oh)*cc(l,i_ch3oh)
-     $                + j(l,j_ch3cho_h)*cc(l,i_ch3cho))
+     $                + j(l,j_ch3cho_h)*cc(l,i_ch3cho)
+     $                + j(l,j_hcl)*cc(l,i_hcl))
      $                /MAX(cc(l,i_ho2),dens(l)*1.e-30)
      $           ) 
      $          /( c011(l)*cc(l,i_o2)
@@ -1044,8 +956,8 @@ c_
      $            /max(cc(l,i_h),dens(l)*1.e-30)   ! ajout 20090401
      $           + cab027(l)*cc(l,i_hco)
      $           + cab042(l)*cc(l,i_c2h5)
-     $           + cl037(l)*cc(l,i_cl2)
-     $           + cl042(l)*cc(l,i_hcl) 
+     $           + cl037(l)*Cc(l,i_cl2)
+     $           + cl042(l)*cc(l,i_hcl)    
      $           +    (cab011(l)*cc(l,i_ch3o2)*cc(l,i_oh)
      $                + cab013(l)*cc(l,i_ch3oh)*cc(l,i_oh)
      $                + cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
@@ -1113,7 +1025,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $            + cab097(l)*cc(l,i_hoch2co3)
      $            + cab106(l)*cc(l,i_hcoco3)
      $            + cl009(l)*cc(l,i_cl)
-     $            + 2.*cl010(l)*cc(l,i_cl)
+     $            + cl010(l)*cc(l,i_cl)*2.
      $            + cl013(l)*cc(l,i_clo)
      $            + (cab002(l)*cc(l,i_o)*cc(l,i_ch4)*0.51
      $                 + cab017(l)*cc(l,i_ch3o)*cc(l,i_o)*0.25
@@ -1132,7 +1044,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                + 2.*b002(l)*cc(l,i_o1d)*cc(l,i_h2o)         ! ajout 20101210
      $            	  + b003(l)*cc(l,i_o1d)*cc(l,i_h2)             ! ajout 20101210
      $            	  + j(l,j_h2o)*cc(l,i_h2o)
-     $               + b007(l)*cc(l,i_ch4)*cc(l,i_o1d))
+     $               + b007(l)*cc(l,i_ch4)*cc(l,i_o1d)
+     $               + j(l,j_hocl)*cc(l,i_hocl))
      $                /MAX(cc(l,i_ho2),1.e-30*dens(l))
      $               )
      $            /(c002(l)*cc(l,i_o)
@@ -1174,9 +1087,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $            + cab102(l)*cc(l,i_hcoco3h)
      $            + cab107(l)*cc(l,i_ch3)
      $            + 1.94*cl012(l)*cc(l,i_clo)
-     $            + cl032(l)*cc(l,i_ch3ocl)
-     $            + cl036(l)*cc(l,i_cl2)
-     $            + cl041(l)*cc(l,i_hcl)
+     $            + cl035(l)*cc(l,i_cl2)
+     $            + cl041(l)*cc(l,i_hcl)  
+     $            + cl015(l)*cc(l,i_hocl)
+     $            + cl032(l)*Cc(l,i_ch3ocl)
      $            + (cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
      $                 + cab026(l)*cc(l,i_hco)*cc(l,i_o2)
      $                 + cab028(l)*cc(l,i_hoch2o2)
@@ -1283,16 +1197,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
        ENDIF
 
       end do
-      
-       
-      if ( igcm_cl .ne. 0 ) then 
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     ClOx Species
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       DO l = 1, lswitch-1
-
-
-      if ( cc(l,i_clox) > 5.e-30*dens(l) ) then ! instability suppression
 
       rcl_cloo = (cl001(l)*cc(l,i_o3)
      $           + cl008(l)*cc(l,i_h2)
@@ -1313,14 +1222,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $           + j(l,j_cloo)
      $           + (2.*j(l,j_cl2)*cc(l,i_cl2) 
      $              + j(l,j_hcl)*cc(l,i_hcl)
-     $              + j(l,j_hocl)*cc(l,i_hocl)
-     $              + j(l,j_hcl)*cc(l,i_dust))
+     $              + j(l,j_hocl)*cc(l,i_hocl))
      $            /MAX(cc(l,i_cloo),1.e-30*dens(l)) )
      $           /
      $           ( cl024(l)*cc(l,i_cl)
      $           + cl025(l)*cc(l,i_cl)
-     $           + cl026(l)
-     $           + cl044(l)*cc(l,i_hcooh))
+     $           + cl026(l))
 
       rclo_cloo = (cl002(l)*cc(l,i_o)
      $           + cl003(l)*cc(l,i_clo)
@@ -1345,7 +1252,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
          cc(l,i_cl) = cc(l,i_clox)
      $                 /(1. + (1. + rclo_cloo)/rcl_cloo ) 
-
+c
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        cloo
@@ -1360,12 +1267,14 @@ c
          cc(l,i_clo) = cc(l,i_cloo)*rclo_cloo
 
 
-         endif 
-
       ENDDO 
 
-      endif ! of cl 
-       
+
+
+
+
+
+
       
        
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1392,9 +1301,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
             cc(l,i_o1d) = (j(l,j_co2_o1d)*cc(l,i_co2)
      $                   + j(l,j_o2_o1d)*cc(l,i_o2)
-     $                   + j(l,j_o3_o1d)*cc(l,i_o3)
-     $                   + j(l,j_so3)*cc(l,i_dust)*dust_photo_fac
-     $                   + elec_dust_rate*cc(l,i_dust)*cc(l,i_elec))
+     $                   + j(l,j_o3_o1d)*cc(l,i_o3))
      $                   /(b001(l)*cc(l,i_co2)
      $                   + b002(l)*cc(l,i_h2o)
      $                   + b003(l)*cc(l,i_h2)
@@ -1406,7 +1313,7 @@ c
      $                   + b009(l)*cc(l,i_ch4)
      $                   + cl034(l)*cc(l,i_cl2)
      $                   + cl035(l)*cc(l,i_cl2)
-     $                   + cl036(l)*cc(l,i_hcl))
+     $                   + cl039(l)*cc(l,i_hcl))
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1423,6 +1330,8 @@ cccc Original Routine
      $              + cab010(l)*cc(l,i_ch3o2)
      $              + cab016(l)*cc(l,i_ch3o)
      $              + cl001(l)*cc(l,i_cl)
+     $              + j(l,j_clo)*cc(l,i_clo)
+     $                /MAX(cc(l,i_o3),dens(l)*1.e-30)
      $              )
      $              /(a001(l)*cc(l,i_o2)
      $              + cab002(l)*cc(l,i_ch4)
@@ -1435,6 +1344,7 @@ cccc Original Routine
      $              + cl002(l)*cc(l,i_clo)
      $              + cl027(l)*cc(l,i_oclo)
      $              + cl040(l)*cc(l,i_hcl)
+     $              + cl043(l)*cc(l,i_hocl)
      $              + (cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
      $               + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
      $                 )/MAX(cc(l,i_o),dens(l)*1.e-30)
@@ -1467,11 +1377,10 @@ c
      $                   + d003(l)*cc(l,i_ho2)*no(l)
      $                   + cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
      $                   + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
-     $                   + cl034(l)*cc(l,i_cl2)*cc(l,i_o1d) 
-     $                   + cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)*0.12 
+     $                   + cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)*0.12
      $                   + j(l,j_oclo)*cc(l,i_oclo)
+     $                   + j(l,j_clo)*cc(l,i_clo)
 c
-
             loss(l,i_ox) = 2.*a002(l)*cc(l,i_o)*cc(l,i_o)
      $                   + 2.*a003(l)*cc(l,i_o)*cc(l,i_o3)
      $                   + c001(l)*cc(l,i_ho2)*cc(l,i_o)
@@ -1491,10 +1400,11 @@ c
      $                   + cab020(l)*cc(l,i_o)*cc(l,i_hcho)
      $                   + cab021(l)*cc(l,i_hco)*cc(l,i_o)
      $                   + cab037(l)*cc(l,i_c2h6)*cc(l,i_o)
-     $                   + cl001(l)*cc(l,i_cl)*cc(l,I_o3)
-     $                   + cl002(l)*cc(l,i_clo)*cc(l,i_o)
-     $                   + cl027(l)*cc(l,i_oclo)*cc(l,i_o) 
-     $                 + cl040(l)*cc(l,i_hcl)*cc(l,i_o)
+     $                   + cl001(l)*cc(l,i_cl)*cc(l,i_o3)
+     $                   + cl027(l)*cc(l,i_oclo)*cc(l,i_o)
+     $                   + cl040(l)*cc(l,i_hcl)*cc(l,i_o)
+     $                   + cl043(l)*cc(l,i_hocl)*cc(l,i_o)
+
 
             loss(l,i_ox) = loss(l,i_ox)/cc(l,i_ox)
 
@@ -1564,7 +1474,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
        
        
          end do
-     
        
       else
 c
@@ -1574,32 +1483,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o(1d)
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
-C             cc(l,i_o1d) = 0.
-
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c    NEW NOCTURNAL O1D 
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-
-       IF ( igcm_elec .ne. 0 ) THEN 
-       
-          cc(l,i_o1d) =(elec_dust_rate*cc(l,i_dust)*cc(l,i_elec))
-     $                   /(b001(l)*cc(l,i_co2)
-     $                   + b002(l)*cc(l,i_h2o)
-     $                   + b003(l)*cc(l,i_h2)
-     $                   + b004(l)*cc(l,i_o2)
-     $                   + b005(l)*cc(l,i_o3)
-     $                   + b006(l)*cc(l,i_o3)
-     $                   + b007(l)*cc(l,i_ch4)
-     $                   + b008(l)*cc(l,i_ch4)
-     $                   + b009(l)*cc(l,i_ch4))
-       
-       ELSE 
-       
-          cc(l,i_o1d) = 0.
-       
-       ENDIF 
-
+            cc(l,i_o1d) = 0.
+c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o3
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1617,7 +1502,6 @@ c
      $                   + cab010(l)*cc(l,i_ch3o2)
      $                   + cab016(l)*cc(l,i_ch3o)
      $                   + cl001(l)*cc(l,i_cl)
-
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1642,15 +1526,21 @@ c
      $                   + cl002(l)*cc(l,i_clo)
      $                   + cl027(l)*cc(l,i_oclo)
      $                   + cl040(l)*cc(l,i_hcl)
-     $                   + cl043(l)*cc(l,i_hocl) 
-     
+     $                   + cl043(l)*cc(l,i_hocl)
+
        end do 
+     
 
       end if
-
-
-
-
+c
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     CHx radicals
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c
+c     [CHx] = [CH3] + [1CH2] + [3CH2] + [CH]
+C
+C     Daytime : All species in photochemical equilibrium
+c     Night-time : No more production via light (photo. eq.?)
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     other species
@@ -1729,8 +1619,8 @@ c
      $                 + j(l,j_hoch2cho_co)
      $                 + j(l,j_hoch2cho_hco)
      $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
-     $                 + cl033(l)*cc(l,i_clco) 
-     
+     $                 + cl033(l)*cc(l,i_clco)
+
          loss(l,i_co) = e001(l)*cc(l,i_oh)
      $                + e002(l)*cc(l,i_o)
      $                + cl023(l)*cc(l,i_cl)
@@ -1774,17 +1664,17 @@ c
      $                + cab044(l)*cc(l,i_c2h5o2)*cc(l,i_ro2)
      $                + cab065(l)*cc(l,i_ch3choho2)*cc(L,i_ho2)
      $                + cab105(l)*cc(l,i_hcoco3)*cc(l,i_ro2)*0.1
-     $                + cl001(l)*cc(l,i_cl)*cc(l,I_o3)
+     $                + cl001(l)*cc(L,i_cl)*cc(l,i_o3)
+     $                + cl009(l)*cc(l,i_cl)*cc(l,i_ho2)
+     $                + cl024(l)*cc(l,i_cl)*cc(l,i_cloo)
      $                + cl002(l)*cc(l,i_clo)*cc(l,i_o)
      $                + cl003(l)*cc(l,i_clo)*cc(l,i_clo)
      $                + cl004(l)*cc(l,i_clo)*cc(l,i_clo)
-     $                + cl009(l)*cc(l,i_ho2)*cc(l,i_cl)
-     $                + 0.06*cl012(l)*cc(l,i_clo)*cc(l,i_oh) 
+     $                + cl012(l)*cc(l,i_clo)*cc(l,i_oh)*0.06
      $                + cl013(l)*cc(l,i_clo)*cc(l,i_ho2)
-     $                + cl021(l)*cc(l,i_clo)*cc(l,i_ch3o2)
-     $                + cl025(l)*cc(l,i_cloo)*cc(l,i_cl)
+     $                + cl019(l)*cc(l,i_clo)*cc(l,i_ch3o2)
+     $                + cl025(l)*cc(l,i_cl)*cc(l,i_cloo)
      $                + cl026(l)*cc(l,i_cloo)
-
 
          loss(l,i_o2) = j(l,j_o2_o)
      $                + j(l,j_o2_o1d)
@@ -1802,7 +1692,7 @@ c
      $                + cab091(l)*cc(l,i_hoch2co)
      $                + cab092(l)*cc(l,i_hoch2co)
      $                + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)*3.5e-14 ! Factor from Veyret, B. et al. [1982]
-     $                + cl028(l)*cc(l,i_cl) 
+     $                + cl028(l)*cc(l,i_cl)
      
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        h2
@@ -1817,8 +1707,8 @@ c
      $                   + j(l,j_ch2o_co)*cc(l,i_hcho)
      $                   + cab027(l)*cc(l,i_hco)*cc(l,i_h)
      $                   + j(l,j_glyox_h2)*cc(l,i_glyox)
-     $                   + cl042(l)*Cc(l,i_hcl)*cc(l,i_h) 
-     
+     $                   + cl042(l)*cc(l,i_hcl)*cc(l,i_h)
+
          loss(l,i_h2) = b003(l)*cc(l,i_o1d)
      $                + c010(l)*cc(l,i_oh)
      $                + cl008(l)*cc(l,i_cl)
@@ -1865,9 +1755,9 @@ c
      $                 + cab100(l)*cc(l,i_oh)*Cc(l,i_hoch2co3h)
      $                 + cab102(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
      $                 + cab103(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
-     $                 + cl014(l)*cc(l,i_oh)*cc(l,i_hcl) 
-     $                 + cl015(l)*cc(l,i_oh)*cc(l,i_hocl) 
-     $                 + cl041(l)*cc(l,i_oh)*cc(l,i_hcl)
+     $                 + cl014(l)*cc(l,i_oh)*cc(l,i_hcl)
+     $                 + cl041(l)*cc(l,i_hcl)*cc(l,i_oh)
+     $                 + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
 
          loss(l,i_h2o) = j(l,j_h2o)
      $                 + b002(l)*cc(l,i_o1d)
@@ -1891,7 +1781,6 @@ c
      $                  + h004(l)*hetero_ice
      $                  + h005(l)*hetero_dust
      $                  + cl011(l)*cc(l,i_cl)
-     
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        hox = h + oh + ho2
@@ -1959,9 +1848,11 @@ c
      $                 + cl008(l)*cc(l,i_cl)*cc(l,i_h2)
      $                 + cl011(l)*cc(l,i_cl)*cc(l,i_h2o2)
      $                 + cl018(l)*cc(l,i_cl)*cc(l,i_ch3ooh)
-     $                 + 0.88*cl039(l)*cc(l,i_hcl)*cc(l,i_o1d) 
+     $                 + cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)*0.88
      $                 + cl040(l)*cc(l,i_hcl)*cc(l,i_o)
      $                 + cl043(l)*cc(l,i_hocl)*cc(l,i_o)
+     $                 + j(l,j_hcl)*cc(l,i_hcl)
+     $                 + j(l,j_hocl)*cc(l,i_hocl)
 
           loss(l,i_hox) = 2.*c005(l)*cc(l,i_h)*cc(l,i_ho2)
      $                 + 2.*c006(l)*cc(l,i_h)*cc(l,i_ho2)
@@ -2013,13 +1904,12 @@ c
      $                 + cab102(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
      $                 + cab107(l)*cc(l,i_oh)*cc(l,i_ch3)
      $                 + cl009(l)*cc(l,i_ho2)*cc(l,i_cl)
-     $                 + cl013(l)*cc(l,i_clo)*cc(l,i_ho2) 
-     $                 + cl014(l)*cc(l,i_oh)*cc(l,i_hcl) 
-     $                 + cl015(l)*cc(l,i_oh)*cc(l,i_hocl) 
-     $                 + cl032(l)*cc(l,i_oh)*cc(l,i_ch3ocl) 
+     $                 + 0.06*cl012(l)*cc(l,i_clo)*cc(l,i_oh)
+     $                 + cl013(l)*cc(l,i_clo)*cc(l,i_ho2)
      $                 + cl036(l)*cc(l,i_oh)*cc(l,i_cl2)
-     $                 + cl037(l)*cc(l,i_h)*cc(l,i_cl2)
-     $                 + cl041(l)*cc(l,i_oh)*cc(l,i_hcl)
+     $                 + cl041(l)*cc(l,i_hcl)*cc(l,i_oh)
+     $                 + cl042(l)*cc(l,i_hcl)*cc(l,i_h)
+     $                 + cl032(l)*cc(l,i_oh)*Cc(l,i_ch3ocl)
 
       loss(l,i_hox) = loss(l,i_hox)/cc(l,i_hox)
 c
@@ -2041,29 +1931,8 @@ c
      $                 + j(l,j_ch4_ch3_h)
      $                 + j(l,j_ch4_3ch2_h_h)
      $                 + j(l,j_ch4_ch_h2_h)
-     $                 + cl016(l)*cc(l,i_cl) 
+     $                 + cl016(l)*cc(l,i_ch4)
      
-C       Loss Rate Adjustment [ BMT 21/08/2020]
-C        IF ( sza .le. 95. ) THEN
-       
-C         k_pseudo = (methane_enhancement - 1.)
-C      $             *(b007(l)*cc(l,i_o1d)
-C      $                 + b008(l)*cc(l,i_o1d)
-C      $                 + b009(l)*cc(l,i_o1d)
-C      $                 + cab001(l)*cc(l,i_oh)
-C      $                 + cab002(l)*cc(l,i_o))
-      
-C C         IF ( (l == 1 ) .and. (sza .le. 95. ) ) THEN 
-C C           k_pseudo = (1./methane_enhancement) 
-C C      $             -  loss(l,i_ch4)
-C         ELSE 
-          k_pseudo = 0. 
-C         ENDIF 
-      
-
-        loss(l,i_ch4) = loss(l,i_ch4) + k_pseudo
-
-      
 C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C c        ch3
 C C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2085,11 +1954,7 @@ C C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                        + j(l,j_ch3cooh)*cc(l,i_ch3cooh)
      $                        + j(l,j_ch3coooh)*cc(l,i_ch3coooh)
      $                        + 0.75*cab017(l)*cc(l,i_o)*cc(l,i_ch3o)
-     $                        + cl016(l)*cc(l,i_cl)*cc(l,i_ch4)
-     
-c     Production Rate Adjustment [ BMT 21/08/2020 ] 
-         production(l,i_ch3) = production(l,i_ch3) 
-     $                       + cc(l,i_ch4)*k_pseudo
+     $                        + cl016(l)*cc(l,i_cl)*cc(l,i_ch4)      
  
 
           loss(l,i_ch3) = cab003(l)*cc(l,i_o2)
@@ -2100,7 +1965,6 @@ c     Production Rate Adjustment [ BMT 21/08/2020 ]
      $                  + cab038(l)*cc(l,i_ch3)
      $                  + cab107(l)*cc(l,i_oh)
      $                  + cl038(l)*cc(l,i_cl2)
-     
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ch3o2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2118,11 +1982,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                    + cab010(l)*cc(l,i_o3)
      $                    + cab011(l)*cc(l,i_oh)
      $                    + cab012(l)*cc(l,i_o)
-     $                    + cl019(l)*cc(l,i_clo) 
+     $                    + cl022(l)*cc(l,i_cl)
+     $                    + cl019(l)*cc(l,i_clo)
      $                    + cl020(l)*cc(l,i_clo)
      $                    + cl021(l)*cc(l,i_clo)
-     $                    + cl022(l)*cc(l,i_cl)
-     
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ch3ooh
 Ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2132,7 +1996,6 @@ Ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
           loss(l,i_ch3ooh) = cab014(l)*cc(l,i_oh)
      $                     + j(l,j_ch3o2h) 
      $                     + cl018(l)*cc(l,i_cl)
-
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ch3oh
 C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2159,11 +2022,10 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                         + j(l,j_ch3o2h)*cc(l,i_ch3ooh)
      $                         + j(l,j_ch3oh)*cc(l,i_ch3oh)
      $                         + j(l,j_hoch2cho_hco)*cc(l,i_hoch2cho)
-     $                         + cl019(l)*cc(l,i_ch3o2)*cc(l,i_clo) 
+     $                         + cl022(l)*cc(l,i_cl)*cc(l,i_ch3o2)
+     $                         + cl019(l)*cc(l,i_clo)*cc(l,i_ch3o2)
      $                         + cl021(l)*cc(l,i_clo)*cc(l,i_ch3o2)
-     $                         + 0.5*cl022(l)*cc(l,i_cl)*cc(l,i_ch3o2)
-     $                         + cl029(l)*cc(l,i_cl)*cc(l,i_ch3ocl) 
-     $                         + cl032(l)*cc(l,i_oh)*cc(l,i_ch3ocl)
+     $                         + cl029(l)*cc(l,i_cl)*cc(l,i_ch3ocl)
 
          loss(l,i_ch3o) = cab015(l)*cc(l,i_o2)
      $                  + cab016(l)*cc(l,i_o3)
@@ -2202,15 +2064,14 @@ C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                   + j(l,j_hoch2cho_hco)
      $                   + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
      $                   + cl018(l)*cc(l,i_cl)*cc(l,i_ch3ooh)
-
      
           loss(l,i_hcho) = cab018(l)*cc(l,i_oh)
      $                   + cab019(l)*cc(l,i_ho2)
      $                   + cab020(l)*cc(l,i_o)
      $                   + j(l,j_ch2o_co)
      $                   + j(l,j_ch2o_hco)
-     $                   + cl017(l)*cc(l,i_cl) 
-     
+     $                   + cl017(l)*cc(l,i_cl)
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        hco 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2221,7 +2082,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                      + j(l,j_ch3cho_ch3)*cc(l,i_ch3cho)
      $                      + j(l,j_hoch2cho_hco)*cc(l,i_hoch2cho)
      $                      + 2.*j(l,j_glyox_hco)*cc(l,i_glyox)
-     $                   + cl017(l)*cc(l,i_cl)*cc(l,i_hcho)
+     $                      + cl017(l)*cc(l,i_cl)*cc(l,i_hcho)
 
         loss(l,i_hco) = cab021(l)*cc(l,i_o)
      $                + cab022(l)*cc(l,i_ch3)
@@ -2259,7 +2120,6 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                             *cc(l,i_o2)*3.5e-14 ! ADDED [06/09/2019]
 
           loss(l,i_hcooh) = cab032(l)*cc(l,i_oh)
-     $                    + cl044(l)*cc(l,i_cl)
           
 
 
@@ -2296,7 +2156,7 @@ C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                    + cab037(l)*cc(l,i_o)
          
           
-
+#ifdef ethane
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        c2h5
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2617,13 +2477,14 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
           loss(l,i_hcoco3) = cab104(L)*cc(l,i_ro2)
      $                     + cab105(l)*cc(l,i_ro2)
      $                     + cab106(l)*cc(l,i_ho2)
-     
-  
+    
+#endif
+
 cccccccccccccccccccccc
 c       Chlorine
 cccccccccccccccccccccc
 
-      if ( igcm_cl .ne. 0 ) then
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c      ClOx 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2659,16 +2520,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                      + j(l,j_cl2o2)*cc(l,i_cl2o2)*2.
      $                      + j(l,j_hcl)*cc(l,i_hcl)
      $                      + j(l,j_hocl)*cc(l,i_hocl)
-     $                      + j(l,j_hcl)*cc(l,i_dust)
-     
-c     Surface Photolysis 
-c     ------------------
-       if ( l == 1 ) then 
-          production(l,i_clox) = production(l,i_clox) 
-     $                         + (0.5e-2) ! Cl wt% in soil
-     $                         *(1.69E19) ! Cl atoms per cm-3 
-     $                         *J(l,j_hcl)
-       endif 
 
        loss(l,i_clox) = cl001(l)*cc(l,i_o3)*cc(l,i_cl)
      $                 + cl008(l)*cc(l,i_h2)*cc(l,i_cl)
@@ -2700,12 +2551,8 @@ c     ------------------
      $                + cl029(l)*cc(l,i_cl)*cc(l,i_ch3ocl)
      $                + cl031(l)*cc(l,i_cl)*cc(l,i_ch3ocl)
      $                + j(l,j_cloo)*cc(l,i_cloo)
-     $                + cl044(l)*cc(l,i_cl)*cc(l,i_hcooh)
 
-      loss(l,i_clox) = loss(l,i_clox)
-     $               /cc(l,i_clox)
-
-
+      loss(l,i_clox) = loss(l,i_clox)/cc(l,i_clox)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c       Cl2 
@@ -2754,8 +2601,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                        + 0.5*cl022(l)*cc(l,i_ch3o2)*cc(l,i_cl)
      $                        + cl031(l)*cc(l,i_cl)*Cc(l,i_ch3ocl)
      $                        + cl037(l)*cc(l,i_cl2)*cc(l,i_h)
-     $                        + cl044(l)*cc(l,i_cl)*cc(l,i_hcooh)
-     
+
           loss(l,i_hcl) = cl014(l)*cc(l,i_oh)
      $                  + cl039(l)*cc(l,i_o1d)*0.88
      $                  + cl040(l)*cc(l,i_o)
@@ -2787,10 +2633,58 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          production(l,i_clco) = cl023(l)*cc(l,i_cl)*cc(l,i_co)
 
          loss(l,i_clco) = cl033(l)
-  
-      ENDIF ! of chlorine 
-  
-  
+
+
+
+cccccccccccccccccccccccccc
+c For lifetime output only
+cccccccccccccccccccccccccc
+       IF (istep == phychemrat) THEN 
+
+        loss(l,i_cl)   = cl001(l)*cc(l,i_o3) 
+     $                 + cl008(l)*cc(l,i_h2) 
+     $                 + cl009(l)*cc(l,i_ho2) 
+     $                 + cl010(l)*cc(l,i_ho2) 
+     $                 + cl011(l)*cc(l,i_h2o2) 
+     $                 + cl016(l)*cc(l,i_ch4) 
+     $                 + cl017(l)*cc(l,i_hcho) 
+     $                 + cl018(l)*cc(l,i_ch3ooh) 
+     $                 + cl022(l)*cc(l,i_ch3o2) 
+     $                 + cl023(l)*cc(l,i_co) 
+     $                 + cl024(l)*cc(l,i_cloo) 
+     $                 + cl025(l)*cc(l,i_cloo) 
+     $                 + cl029(l)*cc(l,i_ch3ocl) 
+     $                 + cl030(l)*cc(l,i_cl2o2) 
+     $                 + cl031(l)*cc(l,i_ch3ocl) 
+
+        loss(l,i_clo) = cl002(l)*cc(l,i_o) 
+     $                + cl003(l)*cc(l,i_clo)
+     $                + cl004(l)*cc(l,i_clo)
+     $                + cl005(l)*cc(l,i_clo)
+     $                + cl012(l)*cc(l,i_oh) 
+     $                + cl013(l)*cc(l,i_ho2) 
+     $                + cl019(l)*cc(l,i_ch3o2) 
+     $                + cl020(l)*cc(l,i_ch3o2) 
+     $                + cl021(l)*cc(l,i_ch3o2) 
+
+        loss(l,i_cloo) = cl024(l)*cc(l,i_cl)
+     $                 + cl025(l)*cc(l,i_cl)
+     $                 + cl026(l)
+     $                 + cl029(l)*cc(l,i_cl)
+     $                 + cl031(l)*cc(l,i_cl)
+     $                 + j(l,j_cloo)
+
+
+       ENDIF 
+
+
+
+
+
+
+
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  
 c      Tangent Linear Model - Inorganic/Long-lived species
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
@@ -2804,7 +2698,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $         dt, ptimestep,  
      $         nesp, cc(l,:), cc0(l,:), cc_hox_next,
      $         j(l,:), production(l,:), loss(l,:),  
-     $         methane_enhancement,
      $         a001(l), a002(l), a003(l),  
      $         b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),  
      $         b007(l), b008(l), b009(l),  
@@ -2841,20 +2734,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
   
       end do
                 
-      if ( igcm_cl .ne. 0 ) then 
+
 c -----------------------------------------------
 c     Temporary Cl routines
 c -----------------------------------------------
 
        DO l = 1, lswitch-1
 
-        IF ( 1./loss(l,i_clox) > dt ) THEN 
         cc(l,i_clox) = (cc0(l,i_clox) + production(l,i_clox)*dt)
      $                /(1. + loss(l,i_clox)*dt )
-        ELSE 
-        cc(l,i_clox) = production(l,i_clox)/loss(l,i_clox)
-        ENDIF 
-
 
         IF ( 1./loss(l,i_cl2) > dt ) THEN 
           cc(l,i_cl2) = (cc0(l,i_cl2) + production(l,i_cl2)*dt)
@@ -2902,18 +2790,21 @@ c -----------------------------------------------
           cc(l,i_clco) = production(l,i_clco)/loss(l,i_clco)
         ENDIF 
 
+
+
+
+
+
        ENDDO  
 
-      endif ! of cl 
-                
-                
-                
+
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     update number densities
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
 c     long-lived species
-c
       do l = 1,lswitch-1
                   
          cc(l,i_co2) = (cc0(l,i_co2) + production(l,i_co2)*dt)
@@ -2978,11 +2869,12 @@ C !      Methane Oxidation
      $              /(1. + loss(l,i_hoch2ooh)*dt)
      
 
+#ifdef ethane
 C !     Alkane Oxidation
          cc(l,i_c2h6) = (cc0(l,i_c2h6) + production(l,i_c2h6)*dt)
      $              /(1. + loss(l,i_c2h6)*dt)
 
-         cc(l,i_c2h5) = production(l,i_c2h5)/loss(l,i_c2h5)   
+         cc(l,i_c2h5) = production(l,i_c2h5)/loss(l,i_c2h5)    
 
          cc(l,i_c2h5ooh) = (cc0(l,i_c2h5ooh) 
      $                   + production(l,i_c2h5ooh)*dt)
@@ -2994,10 +2886,8 @@ C !     Alkane Oxidation
          cc(l,i_c2h5o2) = (cc0(l,i_c2h5o2) + production(l,i_c2h5o2)*dt)
      $              /(1. + loss(l,i_c2h5o2)*dt)
      
-C          cc(l,i_c2h5o2) = production(l,i_c2h5o2)/loss(l,i_c2h5o2)
-
-         cc(l,i_hoch2ch2o)=production(l,i_hoch2ch2o)/loss(l,i_hoch2ch2o)
-         
+        cc(l,i_hoch2ch2o)=production(l,i_hoch2ch2o)/loss(l,i_hoch2ch2o)
+      
          cc(l,i_hoch2ch2o2)=production(l,i_hoch2ch2o2)/
      $                     loss(l,i_hoch2ch2o2)
 
@@ -3014,8 +2904,8 @@ C          cc(l,i_c2h5o2) = production(l,i_c2h5o2)/loss(l,i_c2h5o2)
      
         cc(l,i_ch2choh) =(cc0(l,i_ch2choh) + production(l,i_ch2choh)*dt)
      $              /(1. + loss(l,i_ch2choh)*dt)
-     
-         cc(l,i_ch3choho2)=production(l,i_ch3choho2)/
+
+        cc(l,i_ch3choho2)=production(l,i_ch3choho2)/
      $                     loss(l,i_ch3choho2)     
      
          cc(l,i_ch3cooh) = (cc0(l,i_ch3cooh) 
@@ -3025,7 +2915,7 @@ C          cc(l,i_c2h5o2) = production(l,i_c2h5o2)/loss(l,i_c2h5o2)
          cc(l,i_ch3chohooh) = (cc0(l,i_ch3chohooh) 
      $                      + production(l,i_ch3chohooh)*dt)
      $              /(1. + loss(l,i_ch3chohooh)*dt)
-     
+
          cc(l,i_ch3co)=production(l,i_ch3co)/
      $                     loss(l,i_ch3co)
      
@@ -3035,14 +2925,14 @@ C          cc(l,i_c2h5o2) = production(l,i_c2h5o2)/loss(l,i_c2h5o2)
          cc(l,i_ch3coooh) = (cc0(l,i_ch3coooh) 
      $                    + production(l,i_ch3coooh)*dt)
      $              /(1. + loss(l,i_ch3coooh)*dt)
-     
-         cc(l,i_hcoch2o2)=production(l,i_hcoch2o2)/
+      
+      cc(l,i_hcoch2o2)=production(l,i_hcoch2o2)/
      $                     loss(l,i_hcoch2o2)
      
          cc(l,i_glyox) = (cc0(l,i_glyox) + production(l,i_glyox)*dt)
      $              /(1. + loss(l,i_glyox)*dt)
      
-         cc(l,i_hcoco)=production(l,i_hcoco)/
+          cc(l,i_hcoco)=production(l,i_hcoco)/
      $                     loss(l,i_hcoco)
      
          cc(l,i_hooch2cho) = (cc0(l,i_hooch2cho) 
@@ -3081,6 +2971,8 @@ C          cc(l,i_c2h5o2) = production(l,i_c2h5o2)/loss(l,i_c2h5o2)
          cc(l,i_hcoco3)=production(l,i_hcoco3)/
      $                     loss(l,i_hcoco3)
      
+#endif 
+
 C !    Sum Peroxy Radicals [R-O2]
 
          cc(l,i_ro2) = 1.e-30*dens(l)
@@ -3091,6 +2983,7 @@ C !    Sum Peroxy Radicals [R-O2]
          if ( cc(l,i_hoch2o2) .gt. 1.e-30*dens(l))  
      $          cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hoch2o2)
 
+#ifdef ethane
          if ( cc(l,i_hoch2ch2o2) .gt. 1.e-30*dens(l))  
      $          cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hoch2ch2o2)
 
@@ -3108,7 +3001,7 @@ C !    Sum Peroxy Radicals [R-O2]
 
          if (cc(l,i_hoch2co3) .gt. 1.e-30*dens(l))  
      $          cc(l,i_RO2) = cc(l,i_RO2) + cc(l,i_hoch2co3)
-
+#endif
 
       end do
 
@@ -3136,18 +3029,40 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       end do
       
-      lifetime = 1./loss
-      
-c O2 production and loss 
-      lifetime(:,59) = production(:,i_o2) 
-      lifetime(:,60) = loss(:,i_o2) 
-      
+
+      if ( istep == phychemrat ) then 
+      tau_atmos = 1./loss
+
+
+      call WRITEDIAGFI(1,"ch4_tau","lifetime","s",1,tau_atmos(:,i_ch4))
+      call WRITEDIAGFI(1,"hcho_tau","lifetime","s",
+     $                 1,tau_atmos(:,i_hcho))
+      call WRITEDIAGFI(1,"ch3ooh_tau","lifetime","s",
+     $                 1,tau_atmos(:,i_ch3ooh))
+      call WRITEDIAGFI(1,"cl_tau","lifetime","s",1,tau_atmos(:,i_cl))
+      call WRITEDIAGFI(1,"clo_tau","lifetime","s",1,tau_atmos(:,i_clo))
+      call WRITEDIAGFI(1,"cl2_tau","lifetime","s",1,tau_atmos(:,i_cl2))
+      call WRITEDIAGFI(1,"oclo_tau","lifetime","s",
+     $                 1,tau_atmos(:,i_oclo))
+      call WRITEDIAGFI(1,"cl2o2_tau","lifetime","s",
+     $                 1,tau_atmos(:,i_cl2o2))
+      call WRITEDIAGFI(1,"hcl_tau","lifetime","s",1,tau_atmos(:,i_hcl))
+      call WRITEDIAGFI(1,"hocl_tau","lifetime","s",
+     $                 1,tau_atmos(:,i_hocl))
+      call WRITEDIAGFI(1,"cloo_tau","lifetime","s",
+     $                 1,tau_atmos(:,i_cloo))
+      call WRITEDIAGFI(1,"ch3ocl_tau","lifetime","s",
+     $                 1,tau_atmos(:,i_ch3ocl))
+      call WRITEDIAGFI(1,"clco_tau","lifetime","s",
+     $                 1,tau_atmos(:,i_clco))
+
+      endif 
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     density -> volume mixing ratio conversion
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       do iesp = 1,nesp
-         if ( iesp == i_dust ) cycle 
          do l = 1,lswitch-1
             rm(l,iesp) = max(cc(l,iesp)/dens(l), 1.e-30)
          end do
@@ -3634,20 +3549,21 @@ c
        integer, parameter :: i_hox  = 56
        integer, parameter :: i_ox   = 57
        integer, parameter :: i_RO2  = 58
-       integer, parameter :: i_dust = 59 
-       integer, parameter :: i_elec = 60 
 !      Chlorine Compounds 
-       integer, parameter :: i_cl = 61
-       integer, parameter :: i_clo = 62
-       integer, parameter :: i_cl2 = 63
-       integer, parameter :: i_oclo = 64
-       integer, parameter :: i_cl2o2 = 65
-       integer, parameter :: i_hcl = 66
-       integer, parameter :: i_hocl = 67 
-       integer, parameter :: i_cloo = 68 
-       integer, parameter :: i_ch3ocl = 69
-       integer, parameter :: i_clco = 70
-       integer, parameter :: i_clox = 71
+       integer, parameter :: i_cl = 59
+       integer, parameter :: i_clo = 60
+       integer, parameter :: i_cl2 = 61
+       integer, parameter :: i_oclo = 62
+       integer, parameter :: i_cl2o2 = 63
+       integer, parameter :: i_hcl = 64
+       integer, parameter :: i_hocl = 65 
+       integer, parameter :: i_cloo = 66 
+       integer, parameter :: i_ch3ocl = 67
+       integer, parameter :: i_clco = 68
+       integer, parameter :: i_clox = 69
+
+
+      
 
        
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -4048,30 +3964,6 @@ c
             rm(l,i_hoch2co3h) = max(zycol(l,igcm_hoch2co3h), 1.e-30)
          end do
       end if
-
-      if (igcm_dust_mass .eq. 0) then
-         do l = 1,lswitch-1
-            rm(l,i_dust) = 0.
-         end do
-      else
-         do l = 1,lswitch-1
-            rm(l,i_dust) = max(zycol(l,igcm_dust_mass), 1.e-30)
-         end do
-      end if
-
-
-     
-      if (igcm_elec .eq. 0) then
-         do l = 1,lswitch-1
-            rm(l,i_elec) = 0.
-         end do
-      else
-         do l = 1,lswitch-1
-            rm(l,i_elec) = max(zycol(l,igcm_elec), 1.e-30)
-         end do
-      end if
-      
-      
 !     Chlorine 23/04/2020
       if (igcm_cl .eq. 0) then
          do l = 1,lswitch-1
@@ -4163,8 +4055,9 @@ c
             rm(l,i_clco) = max(zycol(l,igcm_clco), 1.e-30)
          end do
       end if
-      
-      
+
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     initialise chemical families                     c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -4178,6 +4071,8 @@ c
      
          rm(l,i_ro2) = 1.e-30
          
+         rm(l,i_clox) = 1.e-30
+
          if ( rm(l,i_ch3o2) .gt. 1.e-30)  
      $          rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_ch3o2)
                
@@ -4201,24 +4096,15 @@ c
                
          if (rm(l,i_hoch2co3) .gt. 1.e-30)  
      $          rm(l,i_RO2) = rm(l,i_RO2) + rm(l,i_hoch2co3)
-               
-      
-        rm(l,i_ro2) = max(rm(l,i_ro2),1.e-30)
-        
+
 c     ClOx
-        rm(l,i_clox) = max( rm(l,i_cl) + rm(l,i_clo) + rm(l,i_cloo),
-     $                      5.e-30 )
-        if ( rm(l,i_clox) == 5.E-30 ) rm(l,i_clox) = 1.e-30 
-        
-C         rm(l,i_clox) = 1.e-30
-C          if ( rm(l,i_cl) .gt. 1.e-30 ) 
-C      $        rm(l,i_clox) = rm(l,i_clox) + rm(l,i_cl)
-C          if ( rm(l,i_clo) .gt. 1.e-30 ) 
-C      $        rm(l,i_clox) = rm(l,i_clox) + rm(l,i_clo)
-C          if ( rm(l,i_cloo) .gt. 1.e-30 ) 
-C      $        rm(l,i_clox) = rm(l,i_clox) + rm(l,i_cloo)
-        
-        
+         if ( rm(l,i_cl) .gt. 1.e-30 ) 
+     $        rm(l,i_clox) = rm(l,i_clox) + rm(l,i_cl)
+         if ( rm(l,i_clo) .gt. 1.e-30 ) 
+     $        rm(l,i_clox) = rm(l,i_clox) + rm(l,i_clo)
+         if ( rm(l,i_cloo) .gt. 1.e-30 ) 
+     $        rm(l,i_clox) = rm(l,i_clox) + rm(l,i_cloo)
+
       end do
 c
       return
@@ -4325,22 +4211,18 @@ c
        integer, parameter :: i_hox  = 56
        integer, parameter :: i_ox   = 57
        integer, parameter :: i_RO2  = 58
-       integer, parameter :: i_dust = 59 
-       integer, parameter :: i_elec = 60 
 !      Chlorine Compounds 
-       integer, parameter :: i_cl = 61
-       integer, parameter :: i_clo = 62
-       integer, parameter :: i_cl2 = 63
-       integer, parameter :: i_oclo = 64
-       integer, parameter :: i_cl2o2 = 65
-       integer, parameter :: i_hcl = 66
-       integer, parameter :: i_hocl = 67 
-       integer, parameter :: i_cloo = 68 
-       integer, parameter :: i_ch3ocl = 69
-       integer, parameter :: i_clco = 70
-       integer, parameter :: i_clox = 71
-       
-       
+       integer, parameter :: i_cl = 59
+       integer, parameter :: i_clo = 60
+       integer, parameter :: i_cl2 = 61
+       integer, parameter :: i_oclo = 62
+       integer, parameter :: i_cl2o2 = 63
+       integer, parameter :: i_hcl = 64
+       integer, parameter :: i_hocl = 65 
+       integer, parameter :: i_cloo = 66 
+       integer, parameter :: i_ch3ocl = 67
+       integer, parameter :: i_clco = 68
+       integer, parameter :: i_clox = 69
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     save mixing ratios for the gcm
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -4571,20 +4453,7 @@ c
             zycol(l,igcm_ch2choh) = rm(l,i_ch2choh)
          end do
       end if
-      
-      if (igcm_dust_mass .ne. 0) then
-         do l = 1,lswitch-1
-            zycol(l,igcm_dust_mass) = rm(l,i_dust)
-         end do
-      end if
-      
-      if (igcm_elec .ne. 0) then
-         do l = 1,lswitch-1
-            zycol(l,igcm_elec) = rm(l,i_elec)
-         end do
-      end if
-      
-      !     Chlorine 23/04/2020
+!     Chlorine 23/04/2020
       if (igcm_cl .ne. 0) then
          do l = 1,lswitch-1
             zycol(l,igcm_cl) = rm(l,i_cl)
@@ -4635,8 +4504,10 @@ c
             zycol(l,igcm_clco) = rm(l,i_clco)
          end do
       end if
-      
-      
+
+
+
+
       return
       
       end
@@ -4691,7 +4562,7 @@ c
      $               cl034, cl035, cl036,
      $               cl037, cl038, cl039,
      $               cl040, cl041, cl042,
-     $               cl043, cl044)
+     $               cl043)
 c
 c*****************************************************************
 c
@@ -4773,7 +4644,7 @@ c
      $     cab100(nlayermx), cab101(nlayermx), cab102(nlayermx),
      $     cab103(nlayermx), cab104(nlayermx), cab105(nlayermx),
      $     cab106(nlayermx), cab107(nlayermx)
-     
+
       real cl001(nlayermx), cl002(nlayermx), cl003(nlayermx) 
      $ ,cl004(nlayermx), cl005(nlayermx), cl006(nlayermx) 
      $ ,cl007(nlayermx), cl008(nlayermx), cl009(nlayermx) 
@@ -4788,10 +4659,8 @@ c
      $ ,cl034(nlayermx), cl035(nlayermx), cl036(nlayermx)
      $ ,cl037(nlayermx), cl038(nlayermx), cl039(nlayermx)
      $ ,cl040(nlayermx), cl041(nlayermx), cl042(nlayermx)
-     $ ,cl043(nlayermx), cl044(nlayermx)
-     
+     $ ,cl043(nlayermx)
       real k_clo_clo 
-      
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     local:                                                     c
@@ -5996,7 +5865,7 @@ c     cl031 : cl + ch3ocl -> hcl + ch2ocl
 c     Summary of Evaluated Kinetic and Photochemical Data for Atmospheric Chemistry
       cl031(l) = 9.15E-12
 
-c     cl032 : oh + ch3ocl -> ch3o + hocl
+c     cl032 : oh + ch3ocl -> products  
 c     Summary of Evaluated Kinetic and Photochemical Data for Atmospheric Chemistry
       cl032(l) = 2.4E-12*EXP(-360./T(L))
 
@@ -6044,10 +5913,12 @@ c     cl043 : hocl + o -> clo + oh
 c     Evaluated kinetic and photochemical data for atmospheric chemistry: Volume III - gas phase reactions of inorganic halogens
       cl043(l) = 1.7e-13
 
-c     cl044 : hcooh + cl -> hcl + products
-c     Evaluated Kinetic and Photochemical Data for Atmospheric Chemistry. Supplement IV, IUPAC Subcommittee on Gas Kinetic Data Evaluation for Atmospheric Chemistry
-      cl044(l) = 2.01e-13
-      
+
+
+
+
+
+
       end do
      
      
