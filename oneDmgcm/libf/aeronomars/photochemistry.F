@@ -716,10 +716,9 @@ c     ---------------------------
 c     Photochemically active dust
 c     ---------------------------      
 
-c     O(1D) production via [Dust] x J_SO3 x dust_photo_fac
-c     =====================================================
-      real dust_photo_fac
-      parameter(dust_photo_fac=0.)!100.)
+
+      real cl_rate
+      parameter(cl_rate=1.E-6)
       
 c     O(1D) production via [Dust] x [e-] x elec_dust_rate
 c     =====================================================
@@ -1311,11 +1310,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $           + cl030(l)*cc(l,i_cl2o2)
      $           + cl031(l)*cc(l,i_ch3ocl)
      $           + j(l,j_cloo)
-     $           + (2.*j(l,j_cl2)*cc(l,i_cl2) 
-     $              + j(l,j_hcl)*cc(l,i_hcl)
-     $              + j(l,j_hocl)*cc(l,i_hocl)
-     $              + j(l,j_hcl)*cc(l,i_dust))
-     $            /MAX(cc(l,i_cloo),1.e-30*dens(l)) )
+     $           )
      $           /
      $           ( cl024(l)*cc(l,i_cl)
      $           + cl025(l)*cc(l,i_cl)
@@ -1331,9 +1326,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $           + cl019(l)*cc(l,i_ch3o2)
      $           + cl020(l)*cc(l,i_ch3o2)
      $           + cl021(l)*cc(l,i_ch3o2)
-     $           + j(l,j_cloo)
-     $           + (j(l,j_oclo)*cc(l,i_oclo))
-     $             /MAX(cc(l,i_cloo),dens(l)*1.e-30) )
+     $           + j(l,j_cloo))
      $           /
      $           ( cl024(l)*cc(l,i_cl)
      $           + cl025(l)*cc(l,i_cl)
@@ -1392,9 +1385,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
             cc(l,i_o1d) = (j(l,j_co2_o1d)*cc(l,i_co2)
      $                   + j(l,j_o2_o1d)*cc(l,i_o2)
-     $                   + j(l,j_o3_o1d)*cc(l,i_o3)
-     $                   + j(l,j_so3)*cc(l,i_dust)*dust_photo_fac
-     $                   + elec_dust_rate*cc(l,i_dust)*cc(l,i_elec))
+     $                   + j(l,j_o3_o1d)*cc(l,i_o3))
      $                   /(b001(l)*cc(l,i_co2)
      $                   + b002(l)*cc(l,i_h2o)
      $                   + b003(l)*cc(l,i_h2)
@@ -1729,7 +1720,7 @@ c
      $                 + j(l,j_hoch2cho_co)
      $                 + j(l,j_hoch2cho_hco)
      $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
-     $                 + cl033(l)*cc(l,i_clco) 
+     $                 + cl033(l)*cc(l,i_clco)*cc(l,i_clco)
      
          loss(l,i_co) = e001(l)*cc(l,i_oh)
      $                + e002(l)*cc(l,i_o)
@@ -2627,83 +2618,49 @@ cccccccccccccccccccccc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c      ClOx 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-       production(l,i_clox) = cl002(l)*cc(l,i_o)*cc(l,i_clo)
-     $                       + cl004(l)*cc(l,i_clo)*cc(l,i_clo)*2.
-     $                       + cl005(l)*cc(l,i_clo)*cc(l,i_clo)  
-     $                       + cl014(l)*cc(l,i_oh)*cc(l,i_hcl)
-     $                       + cl026(l)*cc(l,i_cloo)
-     $                       + cl033(l)*cc(l,i_clco) 
-     $                       + cl012(l)*cc(l,i_clo)*cc(l,i_oh)*0.94
-     $                       + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
-     $                       + cl036(l)*cc(l,i_cl2)*cc(l,i_oh)
-     $                       + cl037(l)*cc(l,i_cl2)*cc(l,i_h)
-     $                       + cl038(l)*cc(l,i_cl2)*cc(l,i_ch3)
-     $                       + cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)*0.66
-     $                       + cl040(l)*cc(l,i_hcl)*cc(l,i_o)
-     $                       + cl041(l)*cc(l,i_hcl)*cc(l,i_oh)
-     $                       + cl042(l)*cc(l,i_hcl)*cc(l,i_h)
-     $                       + cl001(l)*cc(l,i_cl)*cc(l,i_o3) 
-     $                      + 2.*cl007(l)*cc(l,i_cl2o2)
-     $                      + cl010(l)*cc(l,i_cl)*cc(l,i_ho2)
+       production(l,i_clox) = cl007(l)*cc(l,i_cl2o2)
+     $                      + cl014(l)*cc(l,i_oh)*cc(l,i_hcl)
      $                      + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
-     $                       + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
-     $                      + 0.5*cl022(l)*cc(l,i_ch3o2)*cc(l,i_cl)
-     $                      + cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)*0.22
+     $                      + cl033(l)*cc(l,i_clco)*cc(l,i_clco)
+     $                      + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
+     $                      + cl036(l)*cc(l,i_cl2)*cc(l,i_oh)
+     $                      + cl037(l)*cc(l,i_cl2)*cc(l,i_h)
+     $                      + cl038(l)*cc(l,i_cl2)*cc(l,i_ch3)
+     $                      + cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)*0.88
+     $                      + cl040(l)*cc(l,i_o)*cc(l,i_hcl)
+     $                      + cl041(l)*cc(l,i_hcl)*cc(l,i_oh)
+     $                      + cl042(l)*cc(l,i_hcl)*cc(l,i_h)
      $                      + cl043(l)*cc(l,i_hocl)*cc(l,i_o)
-     $                      + 2.*cl024(l)*cc(l,i_cloo)*cc(l,i_cL)
-     $                      + cl019(l)*cc(l,i_clo)*cc(l,i_ch3o2)
-     $                      + cl030(l)*cc(l,i_cl)*cc(l,i_cl2o2)
-     $                      + cl033(l)*cc(l,i_clco)
-     $                      + 2.*j(l,j_cl2)*cc(l,i_cl2)
-     $                      + j(l,j_oclo)*cc(l,i_oclo)
-     $                      + j(l,j_cl2o2)*cc(l,i_cl2o2)*2.
      $                      + j(l,j_hcl)*cc(l,i_hcl)
      $                      + j(l,j_hocl)*cc(l,i_hocl)
-     $                      + j(l,j_hcl)*cc(l,i_dust)
-     
-c     Surface Photolysis 
-c     ------------------
-       if ( l == 1 ) then 
-          production(l,i_clox) = production(l,i_clox) 
-     $                         + (0.5e-2) ! Cl wt% in soil
-     $                         *(1.69E19) ! Cl atoms per cm-3 
-     $                         *J(l,j_hcl)
-       endif 
+     $                      + j(l,j_cl2)*cc(l,i_cl2)*2.
+     $                      + j(l,j_oclo)*cc(l,i_oclo)
+     $                      + j(l,j_cl2o2)*cc(l,i_cl2o2)*2.
+     $                      + cc(l,i_dust)*cl_rate
 
-       loss(l,i_clox) = cl001(l)*cc(l,i_o3)*cc(l,i_cl)
-     $                 + cl008(l)*cc(l,i_h2)*cc(l,i_cl)
-     $                 + cl009(l)*cc(l,i_ho2)*cc(l,i_cl)
-     $                 + cl010(l)*cc(l,i_ho2)*cc(l,i_cl)
-     $                 + cl011(l)*cc(l,i_h2o2)*cc(l,i_cl)
-     $                 + cl016(l)*cc(l,i_ch4)*cc(l,i_cl)
-     $                 + cl017(l)*cc(l,i_hcho)*cc(l,i_cl)
-     $                 + cl018(l)*cc(l,i_ch3ooh)*cc(l,i_cl)
-     $                 + cl022(l)*cc(l,i_ch3o2)*cc(l,i_cl)
-     $                 + cl023(l)*cc(l,i_co)*cc(l,i_cl)
-     $                 + cl024(l)*cc(l,i_cloo)*cc(l,i_cl)
-     $                 + cl025(l)*cc(l,i_cloo)*cc(l,i_cl)
-     $                 + cl029(l)*cc(l,i_ch3ocl)*cc(l,i_cl)
-     $                 + cl030(l)*cc(l,i_cl2o2)*cc(l,i_cl)
-     $                 + cl031(l)*cc(l,i_ch3ocl)*cc(l,i_cl)
-     $                 + cl002(l)*cc(l,i_o)*cc(l,i_clo)
-     $                + cl003(l)*cc(l,i_clo)*cc(l,i_clo)
-     $                + cl004(l)*cc(l,i_clo)*cc(l,i_clo)
+       loss(l,i_clox) = cl003(l)*cc(l,i_clo)*cc(l,i_clo)*2.
      $                + cl005(l)*cc(l,i_clo)*cc(l,i_clo)
-     $                + cl012(l)*cc(l,i_oh)*cc(l,i_clo)
-     $                + cl013(l)*cc(l,i_ho2)*cc(l,i_clo)
-     $                + cl019(l)*cc(l,i_ch3o2)*cc(l,i_clo)
-     $                + cl020(l)*cc(l,i_ch3o2)*cc(l,i_clo)
-     $                + cl021(l)*cc(l,i_ch3o2)*cc(l,i_clo)
-     $                + cl024(l)*cc(l,i_cl)*cc(l,i_cloo)
-     $                + cl025(l)*cc(l,i_cl)*cc(l,i_cloo)
-     $                + cl026(l)*cc(l,i_cloo)
+     $                + cl006(l)*cc(l,i_clo)*cc(l,i_clo)*2.
+     $                + cl008(l)*cc(l,i_h2)*cc(l,i_cl)
+     $                + cl009(l)*cc(l,i_ho2)*cc(l,i_cl)
+     $                + cl011(l)*cc(l,i_h2o2)*cc(l,i_cl)
+     $                + cl012(l)*cc(l,i_clo)*cc(l,i_oh)*0.06
+     $                + cl013(l)*cc(l,i_clo)*cc(l,i_ho2)
+     $                + cl016(l)*cc(l,i_ch4)*cc(l,i_cl)
+     $                + cl017(l)*cc(l,i_cl)*cc(L,i_hcho)
+     $                + cl018(l)*cc(l,i_cl)*cc(l,i_ch3ooh)
+     $                + cl020(l)*cc(l,i_clo)*cc(l,i_ch3o2)
+     $                + cl021(l)*cc(l,i_clo)*cc(l,i_ch3o2)
+     $                + cl022(l)*cc(l,i_clo)*cc(l,i_ch3o2)*0.5
+     $                + cl023(l)*cc(l,i_cl)*Cc(l,i_co)
+     $                + 2.*cl025(l)*cc(l,i_cloo)*cc(l,i_cl)
      $                + cl029(l)*cc(l,i_cl)*cc(l,i_ch3ocl)
      $                + cl031(l)*cc(l,i_cl)*cc(l,i_ch3ocl)
-     $                + j(l,j_cloo)*cc(l,i_cloo)
-     $                + cl044(l)*cc(l,i_cl)*cc(l,i_hcooh)
+     $                + cl044(l)*cc(l,i_hcooh)*cc(l,i_cl)
+     $                + j(l,j_cloo)*cc(l,j_cloo)
 
       loss(l,i_clox) = loss(l,i_clox)
-     $               /cc(l,i_clox)
+     $               /MAX(cc(l,i_clox),1.E-30*dens(l))
 
 
 
@@ -2779,6 +2736,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
           production(l,i_ch3ocl) = cl020(l)*cc(l,i_clo)*cc(l,i_ch3o2)
 
           loss(l,i_ch3ocl) = cl029(l)*cc(l,i_cl)
+     $                     + cl031(l)*cc(l,i_cl)
      $                     + cl032(l)*cc(l,i_oh)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2786,7 +2744,7 @@ c       ClCO
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          production(l,i_clco) = cl023(l)*cc(l,i_cl)*cc(l,i_co)
 
-         loss(l,i_clco) = cl033(l)
+         loss(l,i_clco) = cl033(l)*cc(l,i_clco)
   
       ENDIF ! of chlorine 
   
@@ -5973,7 +5931,7 @@ c     Chemical kinetics and photochemical data for use in stratospheric modeling
 
 c     cl026 : cloo -> o2 + cl 
 c     Evaluated kinetic and photochemical data for atmospheric chemistry: Volume III - gas phase reactions of inorganic halogens
-      cl026(l) = 2.8E-10*EXP(-1820./T(L))*dens(l)*2.5
+      cl026(l) = 2.8E-10*EXP(-1820./T(L))
 
 c     cl027 : o + oclo + M -> ClO3 + M  
 c     Summary of Evaluated Kinetic and Photochemical Data for Atmospheric Chemistry
@@ -6002,7 +5960,7 @@ c     Summary of Evaluated Kinetic and Photochemical Data for Atmospheric Chemis
 
 c     cl033 : clco -> co + cl 
 c     Evaluated kinetic and photochemical data for atmospheric chemistry: Volume III - gas phase reactions of inorganic halogens
-      cl033(l) = 4.1E-10*EXP(-2960./T(L))*dens(l)*2.5
+      cl033(l) = 4.1E-10*EXP(-2960./T(L))
 
 c     cl034 : cl2 + o1d -> o + cl2
 c     JPL 2015

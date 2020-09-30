@@ -1714,7 +1714,7 @@ ch4vmr=410.e-12
 ! Chlrorine species 22/04/2020
       ! Cl
       if (igcm_cl /= 0) then
-         vmr = 0.       
+         vmr = 1.e-18  
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
@@ -1727,7 +1727,7 @@ ch4vmr=410.e-12
       end if 
       ! ClO
       if (igcm_clo /= 0) then
-         vmr = 0.       
+         vmr =  1.e-18       
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
@@ -1764,7 +1764,7 @@ ch4vmr=410.e-12
          ! set surface value to zero
          qsurf(1:ngridmx,igcm_cl2) = 0.
       end if 
-      ! ClO2
+      ! Cl2O2
       if (igcm_cl2o2 /= 0) then
          vmr = 0.       
          do i = 1,iip1
@@ -1805,7 +1805,7 @@ ch4vmr=410.e-12
       end if 
       ! ClOO
       if (igcm_cloo /= 0) then
-         vmr = 0.       
+         vmr =  1.e-18  
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
