@@ -699,18 +699,17 @@ c
       real cc_ox_next    ! Next timestep cc(i_ox) value for TLM 
       real cc_hox_next   ! " " cc(i_hox) " "
       
+      
+      
 c     ClOx Handling
       real rcl_cloo, rclo_cloo
       real rclo_cl, rcloo_cl 
-      
-      real, parameter :: NCl = 2.E19
-      real, parameter :: QYCl = 1.E-3
       
 C     Chlorine Production via Dust Photolysis
 c     ---------------------------------------
       real, parameter :: r_eff = 1.5E-4 ! Dust effective radius (cm) 
       real, parameter :: dust_dens = 2.5 ! Dust particle density (g cm-3)
-      real, parameter :: cl_percent = 0.5 ! Cl mass percentage
+      real, parameter :: cl_percent = 0.5 ! Cl mass percentage in soil
       
 c     ---------------------------
 c     Photochemically active dust
@@ -917,8 +916,10 @@ c      -------------------------
      $                  *3.14*(r_eff**3.)*cl_percent/100.) 
      $                *6.023e23/35.453
           cc(l,i_dust) = cc0(l,i_dust)
+          write(*,*) cc(l,i_dust)
       enddo 
-c     
+      stop
+c    
 c DUST NOTES: 
 c DUST NOTES: 
 C ===========
