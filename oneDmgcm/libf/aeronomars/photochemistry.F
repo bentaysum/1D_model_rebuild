@@ -2588,7 +2588,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c      ClOx 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      cl_rate=1.E-8
+      cl_rate=0.!1.E-8
     
        production(l,i_clox) = cl007(l)*cc(l,i_cl2o2)
      $                      + cl014(l)*cc(l,i_oh)*cc(l,i_hcl)

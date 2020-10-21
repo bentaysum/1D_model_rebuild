@@ -9,7 +9,7 @@ tracer=.true.
 datadir=/home/s1215319/mgcm/mgcm-datafile/
 
 #Diurnal cycle ?  if diurnal=False, diurnal averaged solar heating
-diurnal=.FALSE.
+diurnal=.true.
 
 #Seasonal cycle ? if season=False, Ls stays constant, to value set in "start"
 season = .FALSE.   
