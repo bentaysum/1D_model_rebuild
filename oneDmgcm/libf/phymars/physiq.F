@@ -629,7 +629,7 @@ C         IF ( idt == ndt_tlm ) THEN
 C         zls = zls*180./pi
 C         DO iq = 1,nqmx
 C           IF (TRIM(noms(iq)) == "ch4" ) THEN
-C             pq(1,1:7,iq) =  
+C             pq(1,:,iq) =  
 C      $        (-8.1565118E-14*zls**6
 C      $     +   8.3522676E-11*zls**5
 C      $     -   3.0856216E-08*zls**4
@@ -637,7 +637,7 @@ C      $     +   4.8741198E-06*zls**3
 C      $     -   2.9426485E-04*zls**2
 C      $     +   4.6374896E-03*zls
 C      $     +   2.8769755E-01)*1.e-9
-C      $     *mmol(iq)/mmean(1,1:7)
+C      $     *mmol(iq)/mmean(1,:)
 C           ENDIF 
 C         ENDDO
 C         zls = zls*pi/180.
@@ -667,7 +667,7 @@ c  table for tracers CO2, CO, H2, H2O vapour, and O2.
      &                          pq(1,:,1), pq(1,:,2), 
      &                          pq(1,:,5), pq(1,:,8),
      &                          pq(1,:,15))
-               WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]"
+                WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]"
           ENDIF 
 
 c     Interpolate physical variables (temperature, wind,
@@ -2428,6 +2428,13 @@ C      &                                   ,"kg.m-2",0,co2ice)
      &                       'K',1,zt)
      
          colden(:,:) = 0.
+         
+         
+        write(*,"(A15)") "***************"
+        write(*,"(E15.7)") zq(1,1,16)
+        write(*,"(A15)") "***************"
+
+         
          if(tracer) then
          
 c           CALL writeg1d(ngrid,1,tau,'tau','SI')

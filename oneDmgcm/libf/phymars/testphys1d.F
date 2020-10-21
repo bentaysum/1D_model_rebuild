@@ -823,7 +823,7 @@ c    ~~~~~~~~~~~~~~~~~~~~
 
 c       MCD interpolation shutdown 
 c       --------------------------
-        if ( mcd_profiles ) then 
+        if ( mcd_profiles ) then           
           if ( idt == ndt_mcd ) mcd_profiles = .False.
         endif 
       
@@ -901,32 +901,37 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
 
 !      Plume/perturbation scenarios engaged here
         IF ( plume ) THEN 
-           
+
            IF ( idt == ndt_plume ) THEN
 
            
-           call tracer_release(dq)
+C            call tracer_release(dq)
            
            plume = .False.
-           mcd_profiles = .False. 
+C            mcd_profiles = .False. 
            
            ENDIF
         ENDIF 
-        
+
+
+
 !       increment tracers
         DO iq = 1, nqmx
-            
-          IF (  (trim(noms(iq)) == "ch4") .and. (plume) ) CYCLE 
-
+          
           DO ilayer=1,nlayer
      
+               if ( (trim(noms(iq)) == "ch4" ) .and. 
+     $              (ilayer .le. 6) ) cycle 
+
              q(ilayer,iq)=q(ilayer,iq)+dtphys*dq(ilayer,iq)
-             
+         
+
           ENDDO
           
           
         ENDDO
-      
+        
+        
 c     Tangent Linear Matrix 
 c    ~~~~~~~~~~~~~~~~~~~~~~
       IF ( tlm_on ) THEN 

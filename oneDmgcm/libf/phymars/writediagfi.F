@@ -119,20 +119,20 @@
 !     =========================
 !     If we have called the TLM of the 1-D model, we bypass all output
 !     during the initial spin-up period.
-      IF (call_tlm .and. .not. tlm_on) THEN 
-          return
-      ENDIF 
+      ! IF (call_tlm .and. .not. tlm_on) THEN 
+          ! return
+      ! ENDIF 
       
 !     Perturbation loops 
 !     ==================
 !     Used to access TLM model validity by perturbing a select compound
 !     by a scalar.
-      IF (pertloop) THEN 
-        RETURN
-      ENDIF
+      ! IF (pertloop) THEN 
+        ! RETURN
+      ! ENDIF
 
 !     Uninterested in spin-up period 
-      IF (mcd_profiles) RETURN
+      IF (plume) RETURN
 
 ! At very first call, check if there is a "diagfi.def" to use and read it
 ! -----------------------------------------------------------------------
