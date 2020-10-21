@@ -132,7 +132,7 @@
       ! ENDIF
 
 ! !     Uninterested in spin-up period 
-      ! IF (plume) RETURN
+       IF (plume) RETURN
 
 ! At very first call, check if there is a "diagfi.def" to use and read it
 ! -----------------------------------------------------------------------

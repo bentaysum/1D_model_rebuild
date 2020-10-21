@@ -342,8 +342,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       
 
 
-
-
       do istep = 1,phychemrat
 
 c =================================================================
@@ -401,8 +399,6 @@ c =================================================================
      $               dccn_dpq, dcc0_dpq,
      $               dHOX_dPQ, dHOX0_dPQ,
      $               dOX_dPQ, dOX0_dPQ)
-
-
 
       IF ( tlm_on ) THEN
 
@@ -468,14 +464,12 @@ c
 
 cc Output of selected photochemical lifetimes
        call WRITEDIAGFI(1,"o2_tau","o2_tau","s",1,lifetime(:,5))
-       call WRITEDIAGFI(1,"h2o2_tau","h2o2_tau","s",1,lifetime(:,11))
+C        call WRITEDIAGFI(1,"h2o2_tau","h2o2_tau","s",1,lifetime(:,11))
        call WRITEDIAGFI(1,"ch4_tau","ch4_tau","s",1,lifetime(:,12))
-cc Output of o2 production and loss rates 
+C cc Output of o2 production and loss rates 
        call WRITEDIAGFI(1,"o2_prod","o2_prod","molec. cm-3 s"
      $                 ,1,lifetime(:,59))
        call WRITEDIAGFI(1,"o2_loss","o2_loss","cm-3 s",1,lifetime(:,60))
-cc 
-       call WRITEDIAGFI(1,"h2o2_tau","h2o2_tau","s-1",1,lifetime(:,11))
 
 
       return
@@ -717,7 +711,6 @@ c     ---------------------------
 
 
       real cl_rate
-      parameter(cl_rate=1.E-6)
       
 c     O(1D) production via [Dust] x [e-] x elec_dust_rate
 c     =====================================================
@@ -916,9 +909,7 @@ c      -------------------------
      $                  *3.14*(r_eff**3.)*cl_percent/100.) 
      $                *6.023e23/35.453
           cc(l,i_dust) = cc0(l,i_dust)
-          write(*,*) cc(l,i_dust)
       enddo 
-      stop
 c    
 c DUST NOTES: 
 c DUST NOTES: 
@@ -1565,33 +1556,10 @@ c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o(1d)
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
-C             cc(l,i_o1d) = 0.
 
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c    NEW NOCTURNAL O1D 
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-
-       IF ( igcm_elec .ne. 0 ) THEN 
-       
-          cc(l,i_o1d) =(elec_dust_rate*cc(l,i_dust)*cc(l,i_elec))
-     $                   /(b001(l)*cc(l,i_co2)
-     $                   + b002(l)*cc(l,i_h2o)
-     $                   + b003(l)*cc(l,i_h2)
-     $                   + b004(l)*cc(l,i_o2)
-     $                   + b005(l)*cc(l,i_o3)
-     $                   + b006(l)*cc(l,i_o3)
-     $                   + b007(l)*cc(l,i_ch4)
-     $                   + b008(l)*cc(l,i_ch4)
-     $                   + b009(l)*cc(l,i_ch4))
-       
-       ELSE 
        
           cc(l,i_o1d) = 0.
        
-       ENDIF 
-
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o3
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2619,6 +2587,9 @@ cccccccccccccccccccccc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c      ClOx 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      cl_rate=1.E-8
+    
        production(l,i_clox) = cl007(l)*cc(l,i_cl2o2)
      $                      + cl014(l)*cc(l,i_oh)*cc(l,i_hcl)
      $                      + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
