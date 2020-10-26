@@ -83,7 +83,7 @@ p_high = 5
 #  =6 "cold" (low dust) scenario ; =7 "warm" (high dust) scenario
 #  =24 Mars Year 24  ; =25 Mars Year 25 (year with a global dust storm) ; ...
 #  =30 Mars Year 30 
-iaervar = 24
+iaervar = 1
 # Dust opacity at 610 Pa (when constant, i.0e. for the iaervar=1 case)
 tauvis=0.8080
 # Dust vertical distribution: 

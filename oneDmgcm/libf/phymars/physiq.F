@@ -1503,6 +1503,14 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
         ENDDO
       ENDDO
       
+      write(*,*) "-----------------------------------"
+      write(*,"(10E15.7)") zq(1,1,1:10)
+      write(*,"(10E15.7)") zq(1,1,28:37)
+      write(*,*) "-----------------------------------"
+      
+      if ( zq(1,1,1) .ne. zq(1,1,1) ) stop
+      
+      
       ! surface pressure
       DO ig=1,ngrid
           ps(ig)=pplev(ig,1) + pdpsrf(ig)*ptimestep

@@ -900,6 +900,7 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
           date = idt*(dtphys/daysec) 
 
 !      Plume/perturbation scenarios engaged here
+
         IF ( plume ) THEN 
            
            IF ( idt == ndt_plume ) THEN

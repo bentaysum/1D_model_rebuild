@@ -1187,7 +1187,8 @@
                !        mixing ratio 
                ! --------------------------------------
                if ( trim(noms(iq)) == "dust_mass" ) then 
-                   zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
+                   ! zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
+                   cycle
                endif 
                
                if (iq /= iqmax) then
