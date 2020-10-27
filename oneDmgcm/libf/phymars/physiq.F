@@ -1301,6 +1301,7 @@ c        --------------
      $                       pt, pq, pdq, nq, 
      $                       rdust, rice, tau, tauscaling, 
      $                       surfdust, surfice)
+          
 !           call photochemistry
             call calchim(ptimestep,pplay,pplev,pt,pdt,dist_sol,mu0,
      $                   zzlev,zzlay,zday,pq,pdq,zdqchim,zdqschim,
@@ -1509,7 +1510,8 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
       write(*,*) "-----------------------------------"
       
       if ( zq(1,1,1) .ne. zq(1,1,1) ) stop
-      
+      if ( zq(1,1,1) < 0.90 ) stop
+
       
       ! surface pressure
       DO ig=1,ngrid

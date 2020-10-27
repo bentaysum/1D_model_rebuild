@@ -5,7 +5,7 @@
 
 #### Time integration parameters
 # Initial date (in martian sols ; =0 at Ls=0)
-day0=669
+day0=486
 
 # Initial local time (in hours, between 0 and 24)
 time=0.

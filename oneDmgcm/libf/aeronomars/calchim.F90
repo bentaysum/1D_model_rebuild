@@ -1093,9 +1093,7 @@
                ! Assumption of particle density @ 1.52 g/cm3
                ! -------------------------------------------
                if ( trim(noms(iq)) == "dust_mass" ) then 
-                    zycol(l,iq) = 1./(2.5*((1.5E-4)**3.))
-                    zycol(l,iq) = zycol(l,iq)/(1.333*3.14)
-                    zycol(l,iq) = zq(IG,l,iq)*zycol(l,iq)*pplay(ig,l)/(188.92*zt(ig,l)*1.e3)
+                    zycol(l,iq) = zq(ig,l,iq)
                else 
                     zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
                endif 
@@ -1186,10 +1184,10 @@
                ! Dust - Need special conversion back to
                !        mixing ratio 
                ! --------------------------------------
-               if ( trim(noms(iq)) == "dust_mass" ) then 
-                   ! zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
-                   cycle
-               endif 
+               ! if ( trim(noms(iq)) == "dust_mass" ) then 
+                   ! ! zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
+                   ! cycle
+               ! endif 
                
                if (iq /= iqmax) then
                   dqchim(ig,l,iq) = (zycol(l,iq)*mmol(iq)/mmean(ig,l)  &

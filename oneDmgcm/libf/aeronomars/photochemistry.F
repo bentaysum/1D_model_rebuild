@@ -474,7 +474,8 @@ C cc Output of o2 production and loss rates
      $                  lifetime(:,61))
 
        call WRITEDIAGFI(1,"dust nd","dust nd","cm-3",1,lifetime(:,62))
-
+       call WRITEDIAGFI(1,"cl nd","cl nd","cm-3",1,lifetime(:,63))
+       call WRITEDIAGFI(1,"cl rate","cl rate","cm-3",1,lifetime(:,64))
 
        
 
@@ -548,6 +549,8 @@ c
 #include "chimiedata.h" 
 #include "callkeys.h" 
 #include "tracer.h" 	
+#include "conc.h"
+#include "comcstfi.h"
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     input/output:
@@ -710,14 +713,13 @@ c     ---------------------------------------
       real, parameter :: r_eff = 1.5E-4 ! Dust effective radius (cm) 
       real, parameter :: dust_dens = 2.5 ! Dust particle density (g cm-3)
       real, parameter :: cl_percent = 0.5 ! Cl mass percentage in soil
-      
-c     ---------------------------
-c     Photochemically active dust
-c     ---------------------------      
-
-
+      real Ncl(nlayermx) ! Number of Cl-compounds contained in dust per cm-3
       real cl_rate(nlayermx)
-      real photolysed_cl 
+      
+      real, parameter :: X = 1.
+      real, parameter :: gamma = 1.E-4
+      
+      logical exist 
       
 c     O(1D) production via [Dust] x [e-] x elec_dust_rate
 c     =====================================================
@@ -898,31 +900,32 @@ c     volume mixing ratio -> density conversion
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       do iesp = 1,nesp
+         if ( iesp == i_dust ) cycle 
          do l = 1,lswitch-1
-            if ( iesp == i_dust ) then 
-               cc0(l,iesp) = rm(l,iesp)
-            else
                cc0(l,iesp) = rm(l,iesp)*dens(l)
-            endif 
                cc(l,iesp)  = cc0(l,iesp)
-
          end do
       end do
-      
-c      -------------------------
-c      Number of Chlorine atoms 
-c      available to photolyse
-c      -------------------------
-      do l = 1, lswitch-1
-          
-          lifetime(l,62) = cc0(l,i_dust) ! Dust Number Density 
-          
-          cc0(l,i_dust) = (cc0(l,i_dust)*dust_dens*(4./3.)
-     $                  *3.14*(r_eff**3.)*cl_percent/100.) 
-     $                *6.023e23/35.453
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
+c     Dust Mass Mixing Ratio -> density conversion
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc      
+      do l = 1, nlayermx
+          ! MMR -> Mass Concentration
+          ! -------------------------
+          cc0(l,i_dust) = rm(l,i_dust)*press(l)/(rnew(1,l)*t(l)) 
+          ! Mass Concentration -> Volume Concentration
+          ! ------------------------------------------
+          cc0(l,i_dust) = cc0(l,i_dust)/dust_dens 
+          ! Volume Concentration -> Dust Number Density
+          ! -------------------------------------------
+          cc0(l,i_dust) = cc0(l,i_dust)
+     $                  /( (4./3.)*pi*r_eff**3. )
           cc(l,i_dust) = cc0(l,i_dust)
-      enddo 
-c    
+       enddo 
+
+
+C c    
 c DUST NOTES: 
 c DUST NOTES: 
 C ===========
@@ -1287,85 +1290,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       end do
       
-       
-      if ( igcm_cl .ne. 0 ) then 
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     ClOx Species
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      DO l = 1, lswitch-1
-
-      rcl_cloo = (cl001(l)*cc(l,i_o3)
-     $           + cl008(l)*cc(l,i_h2)
-     $           + cl009(l)*cc(l,i_ho2)
-     $           + cl010(l)*cc(l,i_ho2)
-     $           + cl011(l)*cc(l,i_h2o2)
-     $           + cl016(l)*cc(l,i_ch4)
-     $           + cl017(l)*cc(l,i_hcho)
-     $           + cl018(l)*cc(l,i_ch3ooh)
-     $           + cl022(l)*cc(l,i_ch3o2)
-C      $           + cl023(l)*cc(l,i_co)
-     $           + cl024(l)*cc(l,i_cloo)
-     $           + cl025(l)*cc(l,i_cloo)
-     $           + cl028(l)*cc(l,i_o2)
-     $           + cl029(l)*cc(l,i_ch3ocl)
-     $           + cl030(l)*cc(l,i_cl2o2)
-     $           + cl031(l)*cc(l,i_ch3ocl)
-     $           + j(l,j_cloo)
-     $           )
-     $           /
-     $           ( cl024(l)*cc(l,i_cl)
-     $           + cl025(l)*cc(l,i_cl)
-     $           + cl026(l)
-     $           + cl044(l)*cc(l,i_hcooh))
-
-      rclo_cloo = (cl002(l)*cc(l,i_o)
-     $           + cl003(l)*cc(l,i_clo)
-     $           + cl004(l)*cc(l,i_clo)
-     $           + cl005(l)*cc(l,i_clo)
-     $           + cl012(l)*cc(l,i_oh)
-     $           + cl013(l)*cc(l,i_ho2)
-     $           + cl019(l)*cc(l,i_ch3o2)
-     $           + cl020(l)*cc(l,i_ch3o2)
-     $           + cl021(l)*cc(l,i_ch3o2)
-     $           + j(l,j_cloo))
-     $           /
-     $           ( cl024(l)*cc(l,i_cl)
-     $           + cl025(l)*cc(l,i_cl)
-     $           + cl026(l))
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c        cl
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
-         cc(l,i_cl) = cc(l,i_clox)
-     $                 /(1. + (1. + rclo_cloo)/rcl_cloo ) 
-
-         if ( cc(l,i_cl) .lt. 1.e-28*dens(l) )
-     $        cc(l,i_cl) = 0.
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c        cloo
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
-         cc(l,i_cloo) = cc(l,i_cl)/rcl_cloo
-         
-         if ( cc(l,i_cloo) .lt. 1.e-28*dens(l) )
-     $        cc(l,i_cloo) = 0.
-     
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c        clo
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
-         cc(l,i_clo) = cc(l,i_cloo)*rclo_cloo
-         
-         if ( cc(l,i_clo) .lt. 1.e-28*dens(l) )
-     $        cc(l,i_clo) = 0.
-
-      ENDDO 
-
-      endif ! of cl 
-       
-      
-       
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ox species
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1621,6 +1545,96 @@ c
 
       end if
 
+
+      if ( igcm_cl .ne. 0 ) then 
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     ClOx Species
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      DO l = 1, lswitch-1
+
+       cl_rate(l) = gamma*( (press(l)/press(1))**X )
+          
+       ! Number of Cl-atoms contained in dust per cm-3
+       ! =============================================
+       
+       ! Dust number density -> Dust total mass 
+       ! --------------------------------------
+       Ncl(l) = (4./3.)*pi*(r_eff**3.)*dust_dens*cc(l,i_dust) 
+       
+       ! Dust total mass -> chlorine total mass
+       ! --------------------------------------
+       Ncl(l) = Ncl(l)*cl_percent 
+       
+       ! Total chlorine mass -> Cl number density (trapped in dust)
+       ! ----------------------------------------------------------
+       Ncl(l) = Ncl(l)*6.023E23/35.4 
+
+
+
+      rcl_cloo = (cl001(l)*cc(l,i_o3)
+     $           + cl008(l)*cc(l,i_h2)
+     $           + cl009(l)*cc(l,i_ho2)
+     $           + cl010(l)*cc(l,i_ho2)
+     $           + cl011(l)*cc(l,i_h2o2)
+     $           + cl016(l)*cc(l,i_ch4)
+     $           + cl017(l)*cc(l,i_hcho)
+     $           + cl018(l)*cc(l,i_ch3ooh)
+     $           + cl022(l)*cc(l,i_ch3o2)
+     $           + cl024(l)*cc(l,i_cloo)
+     $           + cl025(l)*cc(l,i_cloo)
+     $           + cl028(l)*cc(l,i_o2)
+     $           + cl029(l)*cc(l,i_ch3ocl)
+     $           + cl030(l)*cc(l,i_cl2o2)
+     $           + cl031(l)*cc(l,i_ch3ocl)
+     $           + j(l,j_cloo)
+     $           )
+     $           /
+     $           ( cl024(l)*cc(l,i_cl)
+     $           + cl025(l)*cc(l,i_cl)
+     $           + cl026(l)
+     $           + cl044(l)*cc(l,i_hcooh))
+
+      rclo_cloo = (cl002(l)*cc(l,i_o)
+     $           + cl003(l)*cc(l,i_clo)
+     $           + cl004(l)*cc(l,i_clo)
+     $           + cl005(l)*cc(l,i_clo)
+     $           + cl012(l)*cc(l,i_oh)
+     $           + cl013(l)*cc(l,i_ho2)
+     $           + cl019(l)*cc(l,i_ch3o2)
+     $           + cl020(l)*cc(l,i_ch3o2)
+     $           + cl021(l)*cc(l,i_ch3o2)
+     $           + j(l,j_cloo)
+     $           )
+     $           /
+     $           ( cl024(l)*cc(l,i_cl)
+     $           + cl025(l)*cc(l,i_cl)
+     $           + cl026(l))
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        cl
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c
+         cc(l,i_cl) = cc(l,i_clox)
+     $                 /(1. + (1. + rclo_cloo)/rcl_cloo ) 
+
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        cloo
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c
+         cc(l,i_cloo) = cc(l,i_cl)/rcl_cloo
+         
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        clo
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c
+         cc(l,i_clo) = cc(l,i_cloo)*rclo_cloo
+         
+      ENDDO 
+
+      endif ! of cl 
+       
+      
 
 
 
@@ -2601,8 +2615,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c      ClOx 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       
-      cl_rate(l)=0.
-    
        production(l,i_clox) = cl007(l)*cc(l,i_cl2o2)
      $                      + cl014(l)*cc(l,i_oh)*cc(l,i_hcl)
      $                      + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
@@ -2610,7 +2622,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                      + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
      $                      + cl036(l)*cc(l,i_cl2)*cc(l,i_oh)
      $                      + cl037(l)*cc(l,i_cl2)*cc(l,i_h)
-     $                      + cl038(l)*cc(l,i_cl2)*cc(l,i_ch3)
+C      $                      + cl038(l)*cc(l,i_cl2)*cc(l,i_ch3)
      $                      + cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)*0.88
      $                      + cl040(l)*cc(l,i_o)*cc(l,i_hcl)
      $                      + cl041(l)*cc(l,i_hcl)*cc(l,i_oh)
@@ -2620,11 +2632,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                      + j(l,j_hocl)*cc(l,i_hocl)
      $                      + j(l,j_oclo)*cc(l,i_oclo)
      $                      + j(l,j_cl2o2)*cc(l,i_cl2o2)*2.
-C      $                      + j(l,j_cl2)*cc(l,i_cl2)*2.
+     $                      + j(l,j_cl2)*cc(l,i_cl2)*2.
      
 
          production(l,i_clox) = production(l,i_clox)
-     $                        + cc(l,i_dust)*cl_rate(l)
+     $                        + cl_rate(l)*Ncl(l)
+
+      
        
        loss(l,i_clox) = cl003(l)*cc(l,i_clo)*cc(l,i_clo)*2.
      $                + cl005(l)*cc(l,i_clo)*cc(l,i_clo)
@@ -2659,15 +2673,37 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                        + cl025(l)*cc(l,i_cloo)*cc(l,i_cl)
      $                        + cl029(l)*cc(l,i_cl)*cc(l,i_ch3ocl)
      $                        + cl030(l)*cc(l,i_cl)*cc(l,i_cl2o2)
-     $                        + cl025(l)*cc(l,i_cl)*cc(l,i_cloo)
-     $                        + cl025(l)*cc(l,i_cl)*cc(l,i_cloo)
-     $                        + cl029(l)*cc(l,i_cl)*cc(l,i_ch3co)
 
           loss(l,i_cl2) = cl035(l)*cc(l,i_o1d)
      $                  + cl036(l)*cc(l,i_oh)
      $                  + cl037(l)*cc(l,i_h)
      $                  + cl038(l)*cc(l,i_ch3)
      $                  + j(l,j_cl2)
+
+
+     
+       inquire(file="jcl2.txt", exist=exist)
+       if (exist) then
+         open(12, file="jcl2.txt", status="old", position="append", 
+     $                                       action="write")
+       else
+         open(12, file="jcl2.txt", status="new", action="write")
+       end if
+       
+C        write(12,"(I4,4E15.7)") l, cl025(l),cc(l,i_cloo),cc(l,i_cl)
+C      $                        , cl030(l)*cc(l,i_cl)*cc(l,i_cl2o2)
+       
+       write(12,"(I4,5E15.7)") l, cl025(l), cl030(l), cc(l,i_cl),
+     $                            cc(l,i_cloo), cc(l,i_cl2o2)
+       
+       if ( (iter == niter ) .and. ( l == nlayermx ) )then 
+          write(12,"(A)") "----------------------------"
+
+       endif 
+       
+
+
+
 
 C cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C c       OClO 
@@ -2797,12 +2833,12 @@ c -----------------------------------------------
 
        DO l = 1, lswitch-1
 
-C         IF ( 1./loss(l,i_clox) > dt ) THEN 
+        IF ( 1./loss(l,i_clox) > dt ) THEN 
         cc(l,i_clox) = (cc0(l,i_clox) + production(l,i_clox)*dt)
      $                /(1. + loss(l,i_clox)*dt )
-C         ELSE 
-C         cc(l,i_clox) = production(l,i_clox)/loss(l,i_clox)
-C         ENDIF 
+        ELSE 
+        cc(l,i_clox) = production(l,i_clox)/loss(l,i_clox)
+        ENDIF 
         
 
 
@@ -3090,13 +3126,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       end do
       
-      lifetime(:,:61) = 1./loss(:,:61)
-      lifetime(:,63:) = 1./loss(:,63:)
+      lifetime = 1./loss
 c O2 production and loss 
       lifetime(:,59) = production(:,i_o2) 
       lifetime(:,60) = loss(:,i_o2) 
       lifetime(:,61) = loss(:,i_o2)*cc(:,i_o2)
-      
+      lifetime(:,62) = cc(:,i_dust)
+      lifetime(:,63) = Ncl
+      lifetime(:,64) = cl_rate(:)
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     density -> volume mixing ratio conversion
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
