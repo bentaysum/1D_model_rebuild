@@ -473,7 +473,7 @@ C cc Output of o2 production and loss rates
        call WRITEDIAGFI(1,"o2_loss_flux","o2_loss","cm-3 s",1,
      $                  lifetime(:,61))
 
-       call WRITEDIAGFI(1,"cl dust","cl dust","cm-3",1,lifetime(:,62))
+       call WRITEDIAGFI(1,"dust nd","dust nd","cm-3",1,lifetime(:,62))
 
 
        
@@ -914,6 +914,9 @@ c      Number of Chlorine atoms
 c      available to photolyse
 c      -------------------------
       do l = 1, lswitch-1
+          
+          lifetime(l,62) = cc0(l,i_dust) ! Dust Number Density 
+          
           cc0(l,i_dust) = (cc0(l,i_dust)*dust_dens*(4./3.)
      $                  *3.14*(r_eff**3.)*cl_percent/100.) 
      $                *6.023e23/35.453
@@ -2598,13 +2601,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c      ClOx 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       
-      cl_rate(l)=1.E-3
-      cl_rate(l)=cl_rate(l)*EXP( 1. - dens(1)/dens(l) )
+      cl_rate(l)=0.
     
        production(l,i_clox) = cl007(l)*cc(l,i_cl2o2)
      $                      + cl014(l)*cc(l,i_oh)*cc(l,i_hcl)
      $                      + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
-C      $                      + cl033(l)*cc(l,i_clco)*cc(l,i_clco)
+     $                      + cl033(l)*cc(l,i_clco)*cc(l,i_clco)
      $                      + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
      $                      + cl036(l)*cc(l,i_cl2)*cc(l,i_oh)
      $                      + cl037(l)*cc(l,i_cl2)*cc(l,i_h)
@@ -2698,6 +2700,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                        + cl031(l)*cc(l,i_cl)*Cc(l,i_ch3ocl)
      $                        + cl037(l)*cc(l,i_cl2)*cc(l,i_h)
      $                        + cl044(l)*cc(l,i_cl)*cc(l,i_hcooh)
+     
           
           loss(l,i_hcl) = cl014(l)*cc(l,i_oh)
      $                  + cl039(l)*cc(l,i_o1d)*0.88
@@ -2830,8 +2833,6 @@ C         ENDIF
         ELSE 
           cc(l,i_hcl) = production(l,i_hcl)/loss(l,i_hcl)
         ENDIF 
-
-        cc(l,i_hcl) = 0.
 
         IF ( 1./loss(l,i_hocl) > dt ) THEN 
           cc(l,i_hocl) = (cc0(l,i_hocl) + production(l,i_hocl)*dt)
@@ -3089,13 +3090,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       end do
       
-      lifetime = 1./loss
-      
+      lifetime(:,:61) = 1./loss(:,:61)
+      lifetime(:,63:) = 1./loss(:,63:)
 c O2 production and loss 
       lifetime(:,59) = production(:,i_o2) 
       lifetime(:,60) = loss(:,i_o2) 
       lifetime(:,61) = loss(:,i_o2)*cc(:,i_o2)
-      lifetime(:,62) = cl_rate(:) !cc(:,i_dust)
       
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     density -> volume mixing ratio conversion

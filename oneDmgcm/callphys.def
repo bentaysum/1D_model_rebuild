@@ -61,7 +61,7 @@ L_2=10
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Introducing an instantaneous plume?
-plume=.True.
+plume=.False.
 
 #Days after day0 to release plume?
 plume_day=140
