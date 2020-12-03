@@ -1338,7 +1338,7 @@ c
      $                   + b008(l)*cc(l,i_ch4)
      $                   + b009(l)*cc(l,i_ch4))
 
-
+        if ( l .le. 5 ) cc(l,i_o1d) = cc(l,i_o1d)*1.e6
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o/o3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1941,15 +1941,15 @@ C       ENDIF
       
         
           
-        IF ( l .le. 6 ) THEN 
+C         IF ( l .le. 5 ) THEN 
 
-          k_pseudo =(1./( 3200.))
-     $             -  loss(l,i_ch4)
+C           k_pseudo =(1./( 3200.))
+C      $             -  loss(l,i_ch4)
 
-        loss(l,i_ch4) = loss(l,i_ch4) + k_pseudo
+C         loss(l,i_ch4) = loss(l,i_ch4) + k_pseudo
 
 
-        ENDIF 
+C         ENDIF 
 
 
       
@@ -1977,11 +1977,11 @@ C C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      
 c     Production Rate Adjustment [ BMT 21/08/2020 ] 
 C         IF ( (l .le. 1) .and. (sza < 95.) ) THEN 
-        IF ( l .le. 6 ) THEN 
+C         IF ( l .le. 5 ) THEN 
 
-         production(l,i_ch3) = production(l,i_ch3) 
-     $                       + cc(l,i_ch4)*k_pseudo
-       ENDIF 
+C          production(l,i_ch3) = production(l,i_ch3) 
+C      $                       + cc(l,i_ch4)*k_pseudo
+C        ENDIF 
 
           loss(l,i_ch3) = cab003(l)*cc(l,i_o2)
      $                  + cab004(l)*cc(l,i_o3)
