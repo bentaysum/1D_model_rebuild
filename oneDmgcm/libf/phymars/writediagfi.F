@@ -130,9 +130,9 @@
       ! IF (pertloop) THEN 
         ! RETURN
       ! ENDIF
-
-!     Uninterested in spin-up period 
+      
       IF (plume) RETURN
+      
 
 ! At very first call, check if there is a "diagfi.def" to use and read it
 ! -----------------------------------------------------------------------
@@ -374,6 +374,9 @@ c             call abort
            edges(1)=iip1
            edges(2)=jjp1
            edges(3)=1
+
+
+
 
 
 !#ifdef NC_DOUBLE

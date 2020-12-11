@@ -375,6 +375,8 @@ c Variables for PBL
       REAL L_mo(ngridmx),vhf(ngridmx),vvv(ngridmx)
       REAL zu2(ngridmx),sensibFlux(ngridmx)
 
+
+
 c=======================================================================
 
 c 0.0: Conditional activation of TLM routines
@@ -423,12 +425,6 @@ c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           TLM_trans(:,:) = 0.D0
           TLM(:,:) = 0.D0
        ENDIF 
-
-
-
-
-
-
 
 
 c 1. Initialisation:
@@ -662,13 +658,13 @@ c    1.2.7: MCDv5.3 Interpolation Routines
 c    --------------------------------------
 c  Begin the tracer interpolation routine for the MCD v5.3 look-up
 c  table for tracers CO2, CO, H2, H2O vapour, and O2.
-          IF ( mcd_profiles ) THEN 
+C           IF ( mcd_profiles ) THEN 
                call mcd_trac(ptime,zzlay(1,:),zls*180./pi, 
      &                          pq(1,:,1), pq(1,:,2), 
      &                          pq(1,:,5), pq(1,:,8),
      &                          pq(1,:,15))
-                WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]"
-          ENDIF 
+       if ( mcd_profiles )  WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]"
+C           ENDIF 
 
 c     Interpolate physical variables (temperature, wind,
 c     q2 and surface pressure) 
@@ -1496,12 +1492,26 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
 
       ! tracers
       DO iq=1, nq
+      
         DO l=1,nlayer
           DO ig=1,ngrid
             zq(ig,l,iq)=pq(ig,l,iq) +pdq(ig,l,iq)*ptimestep
+            if ( zq(ig,l,iq) .ne. zq(ig,l,iq) ) goto 405
           ENDDO
         ENDDO
       ENDDO
+      
+      
+      if ( zq(1,1,1) .le. 0.9 ) then
+  405     do iq = 1, nqmx
+               write(*,*) trim(noms(iq))
+               write(*,*) "-----------------------"
+               do l = 1, 10 
+                    write(*,"(A4,E15.7)") l, zq(1,l,iq)
+               enddo 
+          enddo 
+          STOP
+      endif 
       
       ! surface pressure
       DO ig=1,ngrid
@@ -2429,11 +2439,6 @@ C      &                                   ,"kg.m-2",0,co2ice)
      
          colden(:,:) = 0.
          
-         
-        write(*,"(A15)") "***************"
-        write(*,"(E15.7)") zq(1,1,16)
-        write(*,"(A15)") "***************"
-
          
          if(tracer) then
          

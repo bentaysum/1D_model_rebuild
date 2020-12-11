@@ -920,7 +920,7 @@
           ! +   4.6374896E-03*zls &
           ! +   2.8769755E-01)*1.e-9
 
-ch4vmr=0.41275263e-9
+ch4vmr=5.e-9!41275263e-9
 
           do i = 1,iip1
             do j = 1,jjp1
@@ -930,7 +930,6 @@ ch4vmr=0.41275263e-9
                   else
                   pq(i,j,l,igcm_ch4) = 0.
                   endif 
-                  ! if ( l .le. 7 ) pq(i,j,l,igcm_ch4) = 10.e-9*mmol(igcm_ch4)/mmean(i,j,l)
                end do
             end do
          end do
