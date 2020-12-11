@@ -133,8 +133,8 @@ REAL*8 loss_o1d, production_o1d
 REAL*8 A_O1D(2)
 REAL*8 dO1D_dPQ(nqmx*nlayermx)
 ! O3 and O 
-REAL*8 dN_dPQ(nqmx*nlayermx), dD_dPQ(nlayermx*nqmx), dDd_dPQ(nlayermx*nqmx)
-REAL*8 dN_coef(nqmx), dD_coef(nqmx), dDd_coef(nqmx)
+REAL*8 dN_dPQ(nqmx*nlayermx), dD_dPQ(nlayermx*nqmx)
+REAL*8 dN_coef(nqmx), dD_coef(nqmx)
 REAL*8 dro_o3_gamma(4) ! Coefficients for linearising partition function ro_o3
 REAL*8 dro_o3_dPQ(nqmx*nlayermx) ! d(ro_o3)/d(PQ)
 REAL*8 A_O(2), A_O3(2) ! Coefficients for linearising O and O3 
@@ -281,10 +281,7 @@ ro_o3_denominator = a001*cc(i_o2) &
               + cab017*cc(i_ch3o) &
               + cab020*cc(i_hcho) &
               + cab021*cc(i_hco) &
-              + cab037*cc(i_c2h6) &
-              + ((cab074*cc(i_ch3cooo)*cc(i_ho2) &
-               + cab097*cc(i_hoch2co3)*cc(i_ho2) &
-                 )/MAX(cc0(i_o),dens*1.e-30))
+              + cab037*cc(i_c2h6) 
 
 
 
@@ -293,186 +290,265 @@ ro_o3_denominator = a001*cc(i_o2) &
 ! STAGE 1: Excited Atomic Oxygen ( O(1D) )
 ! ============================================ ! 
 !
-! Linearise the production and loss terms
-dPo1d_coeff(:) = 0.
-dPo1d_coeff(t_co2) = j(j_co2_o1d)
-dPo1d_coeff(t_o2) = j(j_o2_o1d)
-dPo1d_coeff(t_o3) = j(j_o3_o1d)
+! cc_O1D(PQ) = P_O1D(PQ)/L_O1D(PQ) 
+!
+! d( cc_O1D(PQ) )/d( PQ ) 
+!			= (1./L) * d( P_O1D(PQ) )/d( PQ )
+!			- (P/L^2) * d( L_O1D(PQ) )/d( PQ )
+!
+! Production and loss terms are constructed as such:
+!
+! P = k_a*cc_A(PQ) + k_b*cc_B(PQ) + ...
+! 
+! dP/dPQ = k_a * d( cc_A(PQ) )/d( PQ )
+!		 + k_b * d( cc_B(PQ) )/d( PQ )
+! 		 + ...
+!
+!	1.1.1: Production Coefficients 
+!	------------------------------ 
+	dPo1d_coeff(:) = 0.
+	dPo1d_coeff(t_co2) = j(j_co2_o1d)
+	dPo1d_coeff(t_o2) = j(j_o2_o1d)
+	dPo1d_coeff(t_o3) = j(j_o3_o1d)
 
-dLo1d_coeff(:) = 0.
-dLo1d_coeff(t_co2) = b001 
-dLo1d_coeff(t_h2ovap) = b002
-dLo1d_coeff(t_h2) = b003 
-dLo1d_coeff(t_o2) = b004 
-dLo1d_coeff(t_o3) = b005 + b006 
-dLo1d_coeff(t_ch4) = b007 + b008 + b009 
+!	1.1.2: Loss Coefficients
+! 	------------------------
+	dLo1d_coeff(:) = 0.
+	dLo1d_coeff(t_co2) = b001 
+	dLo1d_coeff(t_h2ovap) = b002
+	dLo1d_coeff(t_h2) = b003 
+	dLo1d_coeff(t_o2) = b004 
+	dLo1d_coeff(t_o3) = b005 + b006 
+	dLo1d_coeff(t_ch4) = b007 + b008 + b009 
 
-dPo1d_dPQ(:) = 0.
-dLo1d_dPQ(:) = 0.
-DO iq = 1, nqmx
-	x_j = (iq-1)*nlayermx + lyr_m
-	dPo1d_dPQ = dPo1d_dPQ + dPo1d_coeff(iq)*dccn_dpq( x_j, : )
-	dLo1d_dPQ = dLo1d_dPQ + dLo1d_coeff(iq)*dccn_dpq( x_j, : )
-ENDDO
+!	1.1.3: Construct linearised production and 
+!		   Loss vectors 
+!	-------------------------------------------
 
-! Values in Photochemistry.F 
-loss_o1d = (b001*cc(i_co2) &
-			+ b002*cc(i_h2o) &
-			+ b003*cc(i_h2) &
-			+ b004*cc(i_o2) &
-			+ b005*cc0(i_o3) &
-			+ b006*cc0(i_o3) &
-			+ b007*cc(i_ch4) &
-			+ b008*cc(i_ch4) &
-			+ b009*cc(i_ch4))
-			
-production_o1d = j(j_co2_o1d)*cc(I_co2) &
-                        + j(j_o2_o1d)*cc(i_o2) &
-                        + j(j_o3_o1d)*cc0(i_o3)
+	dPo1d_dPQ(:) = 0.
+	dLo1d_dPQ(:) = 0.
+	DO iq = 1, nqmx
+		x_j = (iq-1)*nlayermx + lyr_m
+		dPo1d_dPQ = dPo1d_dPQ + dPo1d_coeff(iq)*dccn_dpq( x_j, : )
+		dLo1d_dPQ = dLo1d_dPQ + dLo1d_coeff(iq)*dccn_dpq( x_j, : )
+	ENDDO
+
+!	1.1.4: Coefficients
+!	-------------------
+
+	loss_o1d = (b001*cc(i_co2) &
+				+ b002*cc(i_h2o) &
+				+ b003*cc(i_h2) &
+				+ b004*cc(i_o2) &
+				+ b005*cc0(i_o3) &
+				+ b006*cc0(i_o3) &
+				+ b007*cc(i_ch4) &
+				+ b008*cc(i_ch4) &
+				+ b009*cc(i_ch4))
+
+	production_o1d = j(j_co2_o1d)*cc(I_co2) &
+	                        + j(j_o2_o1d)*cc(i_o2) &
+	                        + j(j_o3_o1d)*cc0(i_o3)
 	 
 
-A_O1D(1) =  1./loss_o1d
-A_O1D(2) = production_o1d*(A_O1D(1)**2)
+	A_O1D(1) =  1./loss_o1d
+	A_O1D(2) = production_o1d*(A_O1D(1)**2)
 
-dO1D_dPQ = A_O1D(1)*dPo1d_dPQ - A_O1D(2)*dLo1d_dPQ
+!	1.1.5: Calculate d(cc_O1D)/d(PQ)
+!	--------------------------------
+	dO1D_dPQ = A_O1D(1)*dPo1d_dPQ - A_O1D(2)*dLo1d_dPQ
 
-dccn_dpq( (t_o1d-1)*nlayermx + lyr_m, : ) = dO1D_dPQ
+!	1.1.6: Deposit in Linearised number density array 
+!	-------------------------------------------------
+	dccn_dpq( (t_o1d-1)*nlayermx + lyr_m, : ) = dO1D_dPQ
 
 
-		
-		
 
 ! ============================================ ! 
 ! STAGE 2: LINEARISED PARTITION FUNCTION
 ! ============================================ ! 
 !
-! ro_o3 = ( N ) / ( D + d/(cc[o]) )
+! ro_o3 = ( N ) / ( D )
 !
-! Similar to hox routine...
-! dN_dPQ  
-! ------
-dN_coef(:) = 0. 
-dN_coef(t_o) = a003 
-dN_coef(t_h) = c003 
-dN_coef(t_oh) = c014 
-dN_coef(t_ho2) = c015 
+! d(ro_o3)/d(PQ) 
+!	= (1./D) * d( N(PQ) )/d(PQ)
+!	- (N/D^2) * d( D(PQ) )/d(PQ)
+!
+!	2.1: Coefficients 
+!	-------------------
+	dro_o3_gamma(1) = 1./ro_o3_denominator
+	dro_o3_gamma(2) = ro_o3*dro_o3_gamma(1)
 
-IF ( igcm_ch3 .ne. 0 ) dN_coef(t_ch3) = cab004 
-IF ( igcm_ch3o2 .ne. 0 ) dN_coef(t_ch3o2) = cab010 
-IF ( igcm_ch3o .ne. 0 ) dN_coef(t_ch3o) = cab016
+!	2.2: Linearised Numerator Coefficients
+!	--------------------------------------
+!	N = k_a * cc_a(PQ) + ...
+!
+!	d(N)/d(PQ) = k_a * d( cc_a(PQ) )/d(PQ) + ...
+!   
+!   where we remind ourselves that values of 
+!	H, OH, HO2 number densities have been advanced 
+!	1 sub-chemistry timestep
 
-! dD_dPQ 
-! ------
-dD_coef(:) = 0. 
-dD_coef(t_o2) = a001 
-dD_coef(t_ch4) = cab002
+	dN_coef(:) = 0. 
+	dN_coef(t_o) = a003 
+	dN_coef(t_h) = c003 
+	dN_coef(t_oh) = c014 
+	dN_coef(t_ho2) = c015 
 
-IF ( igcm_ch3 .ne. 0 ) dD_coef(t_ch3) = cab005 
-IF ( igcm_ch3o2 .ne. 0 ) dD_coef(t_ch3o2) = cab012
-IF ( igcm_ch3o .ne. 0 ) dD_coef(t_ch3o) = cab017
-IF ( igcm_hcho .ne. 0 ) dD_coef(t_hcho) = cab020 
-IF ( igcm_hco .ne. 0 ) dD_coef(t_hco) = cab021 
-! dDd_dPQ 
-! -------
-dDd_coef(:) = 0. 
-dDd_coef(t_ho2) = cab074*cc(i_ch3cooo) + cab097*cc(i_hoch2co3)
+	IF ( igcm_ch3 .ne. 0 ) dN_coef(t_ch3) = cab004 
+	IF ( igcm_ch3o2 .ne. 0 ) dN_coef(t_ch3o2) = cab010 
+	IF ( igcm_ch3o .ne. 0 ) dN_coef(t_ch3o) = cab016
 
-dN_dPQ(:) = 0.
-dD_dPQ(:) = 0. 
-dDd_dPQ(:) = 0.
-DO iq = 1, nqmx 
-	x_j = (iq-1)*nlayermx + lyr_m
-	dN_dPQ = dN_dPQ + dN_coef(iq)*dccn_dpq( x_j, : )
-	dD_dPQ = dD_dPQ + dD_coef(iq)*dccn_dpq( x_j, : )
-	dDd_dPQ = dDd_dPQ + dDd_coef(iq)*dccn_dpq( x_j, : )
-ENDDO
+!	2.3: Linearised Denominator Coefficients
+!	----------------------------------------
+	dD_coef(:) = 0. 
+	dD_coef(t_o2) = a001 
+	dD_coef(t_ch4) = cab002
 
-! Coefficients 
-! ------------
-dro_o3_gamma(1) = 1./ro_o3_denominator
-dro_o3_gamma(2) = ro_o3*dro_o3_gamma(1)
-dro_o3_gamma(3) = dro_o3_gamma(2)/cc0(i_o)
-dro_o3_gamma(4) = dro_o3_gamma(3)*(cab074*cc(i_ch3cooo)*cc(i_ho2) &
-                     + cab097*cc(i_hoch2co3)*cc(i_ho2))/cc0(i_o)
+	IF ( igcm_ch3 .ne. 0 ) dD_coef(t_ch3) = cab005 
+	IF ( igcm_ch3o2 .ne. 0 ) dD_coef(t_ch3o2) = cab012
+	IF ( igcm_ch3o .ne. 0 ) dD_coef(t_ch3o) = cab017
+	IF ( igcm_hcho .ne. 0 ) dD_coef(t_hcho) = cab020 
+	IF ( igcm_hco .ne. 0 ) dD_coef(t_hco) = cab021 
 
-dro_o3_dPQ = dro_o3_gamma(1)*dN_dPQ &
-		   - dro_o3_gamma(2)*dD_dPQ &
-		   - dro_o3_gamma(3)*dDd_dPQ &
-		   + dro_o3_gamma(4)*dccn_dpq( (t_o-1)*nlayermx+lyr_m,:)
+!	2.4: Construct Linearised N and D
+!	---------------------------------
+	dN_dPQ(:) = 0.
+	dD_dPQ(:) = 0. 
+
+	DO iq = 1, nqmx 
+		x_j = (iq-1)*nlayermx + lyr_m
+		dN_dPQ = dN_dPQ + dN_coef(iq)*dccn_dpq( x_j, : )
+		dD_dPQ = dD_dPQ + dD_coef(iq)*dccn_dpq( x_j, : )
+	ENDDO
+
+!	2.5: Construct Linearised Partition Function 
+!	--------------------------------------------
+	dro_o3_dPQ = dro_o3_gamma(1)*dN_dPQ &
+			   - dro_o3_gamma(2)*dD_dPQ 
 
 ! ============================================ ! 
 ! STAGE 3: LINEARISED O3 
 ! ============================================ ! 
-A_O3(1) =  1./(1.+ro_o3)
-A_O3(2) = cc(i_ox)*(A_O3(1)**2)
+!
+! cc_O3(PQ) = cc_OX(PQ)/( 1 + ro_o3(PQ) )
+!
+! d( cc_O3(PQ) )/d( PQ )
+!		=	(1 + ro_o3)^-1 * d( cc_OX )/d( PQ ) 
+!		-   (cc_OX * (1+ro_o3)^-2 ) * d(ro_o3)/d(PQ) 
+!
+!	3.1: Coefficients
+!	-----------------
+	A_O3(1) =  1./(1.+ro_o3)
+	A_O3(2) = cc(i_ox)*(A_O3(1)**2)
 
-dO3_dPQ = A_O3(1)*dOX_dPQ( lyr_m, : ) - A_O3(2)*dro_o3_dPQ
+!	3.2: Linearised O3 Number density 
+!	---------------------------------
+	dO3_dPQ = A_O3(1)*dOX_dPQ( lyr_m, : ) - A_O3(2)*dro_o3_dPQ
+
 ! ============================================ ! 
 ! STAGE 4: LINEARISED O 
 ! ============================================ ! 
-A_O(1) = ro_o3
-A_O(2) = cc(i_o3) 
+!
+! cc_O = cc_O3*ro_o3 
+!
+! d(cc_O)/d(PQ) = ro_o3 * d(cc_O3)/d(PQ)
+!				- cc_O3 * d(ro_o3)/d(pq)
 
-dO_dPQ = A_O(1)*dO3_dPQ + A_O(2)*dro_o3_dPQ 
+!	4.1: Coefficients
+!	-----------------
+	A_O(1) = ro_o3
+	A_O(2) = cc(i_o3) 
 
-dccn_dpq( (t_o-1)*nlayermx + lyr_m, : ) = dO_dPQ
-dccn_dpq( (t_o3-1)*nlayermx + lyr_m, : ) = dO3_dPQ
+!	4.2: Calculation
+!	-----------------
+	dO_dPQ = A_O(1)*dO3_dPQ + A_O(2)*dro_o3_dPQ 
+
+!	4.3: Deposition in Array 
+!	------------------------
+	dccn_dpq( (t_o-1)*nlayermx + lyr_m, : ) = dO_dPQ
+	dccn_dpq( (t_o3-1)*nlayermx + lyr_m, : ) = dO3_dPQ
 
 ! ============================================ ! 
 ! STAGE 5: LINEARISED OX 
 ! ============================================ ! 
-dPox_coef(:) = 0. 
-dPox_coef(t_co2) = j(j_co2_o) + j(j_co2_o1d)
-dPox_coef(t_o2) = 2.*j(j_o2_o) + 2.*j(j_o2_o1d)
-dPox_coef(t_ho2) = j(j_ho2) + c006*cc(i_h) &
-					+ cab074*cc(i_ch3cooo) + cab097*cc(i_hoch2co3)
-dPox_coef(t_h) = c006*cc(i_ho2)
-dPox_coef(t_oh) = 2.*c013*cc(i_oh)
+!
+! The sum of O and O3 is handled via the SIBEM 
+! equation during daylight.
+!
+! cc_OX = cc0_OX + P_OX(PQ)*dt_c 
+!		/(1 + L_OX(PQ)*dt_c/cc_OX )
+!
+! using ' to denote linearisation by PQ to make
+! this read easier
+!
+! cc_OX' =  (1 + L*dt_c/cc_OX^t )^-1 * cc0_OX'
+!		 + dt_c/(1 + L*dt_c/cc_OX^t ) * P_OX' 
+!		 - (cc0_ox + P_ox*dt_c)/(1 + L*dt_c/cc_ox^t) * (dt_c/cc_ox^t) * L_OX' 
+!		 +   "				 " / " 				   " * "            " * (L/cc_ox^t) * cc_OX^t'
+!
+!	5.1: Coefficients
+!	-----------------
+	ox_gamma(1) = 1./(1. + loss_ox*dt_c) 
+	ox_gamma(2) = ox_gamma(1)*dt_c
+	ox_gamma(3) = ccOX_tplus1*ox_gamma(1)*dt_c/cc(i_ox)
+	ox_gamma(4) = dt_c*ccOX_tplus1*ox_gamma(1)*loss_ox/cc(i_ox)
 
-dLox_coef(:) = 0.
-dLox_coef(t_co) = e002*cc(i_o)
-dLox_coef(t_o) = 4.*a002*cc(i_o) + 2.*a003*cc(i_o3) &
-				+ c001*cc(i_ho2) + c002*cc(i_oh) &
-				+ c012*cc(i_h2o2) + e002*cc(i_co) &
-				+ cab002*cc(i_ch4) + cab012*cc(i_ch3o2) &
-				+ cab017*cc(i_ch3o) + cab020*cc(i_hcho) &
-				+ cab021*cc(i_hco) + cab037*cc(i_c2h6) 
-dLox_coef(t_o3) = 2.*a003*cc(i_o) + c003*cc(i_h) &
-				+ c014*cc(i_oh) + c015*cc(i_ho2) &
-				+ cab004*cc(i_ch3) + cab010*cc(i_ch3o2) &
-				+ cab016*cc(i_ch3o) 
-dLox_coef(t_h) = c003*cc(i_o3) 
-dLox_coef(t_oh) = c002*cc(i_o) + c014*cc(i_o3) 
-dLox_coef(t_ho2) = c001*cc(i_o) + c015*cc(i_o3) 
-dLox_coef(t_h2o2) = c012*cc(i_o) 
-dLox_coef(t_ch4) = cab002*cc(i_o)
+!	5.2: Linearised Production Coefficients
+!	---------------------------------------
+!	
+!	P_ox = k_ab * cc_a(PQ) * cc_b(PQ) + k_ac * cc_a(PQ) * cc_b(PQ) + ... 
+!
+!	L_ox =  k_ab * cc_a(PQ) * cc_b(PQ) + k_ac * cc_a(PQ) * cc_b(PQ) + ... 
 
-IF ( igcm_ch3 .ne. 0 ) dLox_coef(t_ch3) = cab004*cc(i_o3)
-IF ( igcm_ch3o2 .ne. 0 ) dLox_coef(t_ch3o2) = cab010*cc(i_o3) + cab012*cc(i_o)
-IF ( igcm_ch3o .ne. 0 ) dLox_coef(t_ch3o) = cab016*cc(i_o3) + cab017*cc(i_o)
-IF ( igcm_hcho .ne. 0 ) dLox_coef(t_hcho) = cab020*cc(i_o)
-IF ( igcm_hco .ne. 0 ) dLox_coef(t_hco) = cab021*cc(i_o)
+	dPox_coef(:) = 0. 
+	dPox_coef(t_co2) = j(j_co2_o) + j(j_co2_o1d)
+	dPox_coef(t_o2) = 2.*j(j_o2_o) + 2.*j(j_o2_o1d)
+	dPox_coef(t_ho2) = j(j_ho2) + c006*cc(i_h) &
+						+ cab074*cc(i_ch3cooo) + cab097*cc(i_hoch2co3)
+	dPox_coef(t_h) = c006*cc(i_ho2)
+	dPox_coef(t_oh) = 2.*c013*cc(i_oh)
 
-dPox_dPQ(:) = 0.
-dLox_dPQ(:) = 0.
-DO iq = 1,nqmx
-	x_j = (iq-1)*nlayermx + lyr_m 
-	dPox_dPQ = dPox_dPQ + dPox_coef(iq)*dccn_dpq(x_j, : )
-	dLox_dPQ = dLox_dPQ + dLox_coef(iq)*dccn_dpq(x_j, : )
-ENDDO 
-	
-! Coefficients
-ox_gamma(1) = 1./(1. + loss_ox*dt_c) 
-ox_gamma(2) = ox_gamma(1)*dt_c
-ox_gamma(3) = ccOX_tplus1*ox_gamma(1)*dt_c/cc(i_ox)
-ox_gamma(4) = dt_c*ccOX_tplus1*ox_gamma(1)*loss_ox/cc(i_ox)
+	dLox_coef(:) = 0.
+	dLox_coef(t_co) = e002*cc(i_o)
+	dLox_coef(t_o) = 4.*a002*cc(i_o) + 2.*a003*cc(i_o3) &
+					+ c001*cc(i_ho2) + c002*cc(i_oh) &
+					+ c012*cc(i_h2o2) + e002*cc(i_co) &
+					+ cab002*cc(i_ch4) + cab012*cc(i_ch3o2) &
+					+ cab017*cc(i_ch3o) + cab020*cc(i_hcho) &
+					+ cab021*cc(i_hco) + cab037*cc(i_c2h6) 
+	dLox_coef(t_o3) = 2.*a003*cc(i_o) + c003*cc(i_h) &
+					+ c014*cc(i_oh) + c015*cc(i_ho2) &
+					+ cab004*cc(i_ch3) + cab010*cc(i_ch3o2) &
+					+ cab016*cc(i_ch3o) 
+	dLox_coef(t_h) = c003*cc(i_o3) 
+	dLox_coef(t_oh) = c002*cc(i_o) + c014*cc(i_o3) 
+	dLox_coef(t_ho2) = c001*cc(i_o) + c015*cc(i_o3) 
+	dLox_coef(t_h2o2) = c012*cc(i_o) 
+	dLox_coef(t_ch4) = cab002*cc(i_o)
 
-! Linearisation:
-!---------------
-dOX_dPQ(lyr_m,:) = ox_gamma(1)*dOX0_dPQ(lyr_m,:) &
-				+ ox_gamma(2)*dPox_dPQ &
-				- ox_gamma(3)*dLox_dPQ &
-				+ ox_gamma(4)*dOX_dPQ(lyr_m,:)
+	IF ( igcm_ch3 .ne. 0 ) dLox_coef(t_ch3) = cab004*cc(i_o3)
+	IF ( igcm_ch3o2 .ne. 0 ) dLox_coef(t_ch3o2) = cab010*cc(i_o3) + cab012*cc(i_o)
+	IF ( igcm_ch3o .ne. 0 ) dLox_coef(t_ch3o) = cab016*cc(i_o3) + cab017*cc(i_o)
+	IF ( igcm_hcho .ne. 0 ) dLox_coef(t_hcho) = cab020*cc(i_o)
+	IF ( igcm_hco .ne. 0 ) dLox_coef(t_hco) = cab021*cc(i_o)
+
+!	5.3: Calculate linearised produciton and loss 
+!	---------------------------------------------
+	dPox_dPQ(:) = 0.
+	dLox_dPQ(:) = 0.
+	DO iq = 1,nqmx
+		x_j = (iq-1)*nlayermx + lyr_m 
+		dPox_dPQ = dPox_dPQ + dPox_coef(iq)*dccn_dpq(x_j, : )
+		dLox_dPQ = dLox_dPQ + dLox_coef(iq)*dccn_dpq(x_j, : )
+	ENDDO 
+
+! 	5.4: Construct Array
+!	---------------------
+	dOX_dPQ(lyr_m,:) = ox_gamma(1)*dOX0_dPQ(lyr_m,:) &
+					+ ox_gamma(2)*dPox_dPQ &
+					- ox_gamma(3)*dLox_dPQ &
+					+ ox_gamma(4)*dOX_dPQ(lyr_m,:)
 
 				
 RETURN 
