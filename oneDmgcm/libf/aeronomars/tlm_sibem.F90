@@ -120,7 +120,8 @@ real cab001, cab002, cab003, &
 ! ====================================================================================
 !									Local Variables
 ! ====================================================================================
-REAL*8 dP_coeff(nqmx,nqmx), dL_coeff(nqmx,nqmx)
+REAL*8 dP_coeff(nqmx,nqmx)
+REAL*8 dL_coeff(nqmx,nqmx)
 REAL*8 dP_dPQ(nqmx,nqmx*nlayermx), dL_dPQ(nqmx,nqmx*nlayermx)
 
 REAL*8 A(nqmx,3) ! Coefficients
@@ -257,6 +258,15 @@ j_ch3cooh      =  40     ! ch3cooh  + hv -> ch3 + cooh
 j_ch3coooh     =  41     ! ch3c(o)ooh + hv -> ch3 + oh + co2 
 j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products 
 
+
+! 0.0 : Initialisation of Array 
+! -----------------------------
+dP_coeff(:,:) = 0.D0
+dL_coeff(:,:) = 0.D0 
+dP_dPQ(:,:) = 0.D0
+dL_dPQ(:,:) = 0.D0
+
+
 ! Remainder of Chemistry linearisation occurs in this file.
 ! Two methods exist for calculating number density, Steady
 ! State [SS], and the Semi-Implicit Backwards Euler Method [SIBEM]
@@ -321,8 +331,6 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 
 ! 	1.1: Initialise to prevent issues
 ! 	---------------------------------
-   P_coeff(:,:) = 0.D0
-
 !   1.1.1: CO2 [SIBEM]
 !   ------------------
     dP_coeff(t_co2,t_co) = e001*cc(i_oh) + e002*cc(i_o) 
@@ -603,7 +611,6 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 
 !   2.0: Construct the Linearised Production Array
 !   ----------------------------------------------
-    dP_dPQ(:,:) = 0.
     DO iq_j = 1, nqmx
         
         DO iq_i = 1, nqmx
@@ -669,7 +676,6 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 ! ============================================
 ! STAGE TWO : LINEARISING THE LOSS TERMS 
 ! ============================================
-    dL_coeff(:,:) = 0.
     ! 2.1.1: CO 
     ! ------------------------
     dL_coeff(t_co,t_oh) = e001 
@@ -820,7 +826,6 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 
 !   2.3: Create Linearised loss array 
 !   ---------------------------------
-    dL_dPQ(:,:) = 0. 
     DO iq_j = 1,nqmx
 
         DO iq_i = 1, nqmx
@@ -861,113 +866,128 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 ! ENDIF 
 
 
-
-
-
-
-
-
-
-
-
-
 ! ============================================
 ! STAGE THREE : EQUATION COEFFICIENTS
 ! ============================================
-A(:,:) = 0.
-A(t_co2,1) = 1./( 1. + loss(i_co2)*dt_c)
-A(t_co,1) = 1./( 1. + loss(i_co)*dt_c)
-A(t_o2,1) = 1./( 1. + loss(i_o2)*dt_c)
-A(t_h2ovap,1) = 1./( 1. + loss(i_h2o)*dt_c)
-A(t_h2,1) = 1./( 1. + loss(i_h2)*dt_c)
-A(t_h2o2,1) = 1./( 1. + loss(i_h2o2)*dt_c)
-A(t_ch4,1) = 1./( 1. + loss(i_ch4)*dt_c)
-! Methane Oxidation
-! ------------------------
-IF ( igcm_ch3ooh .ne. 0 ) THEN 
-	A(t_ch3ooh,1) = 1./( 1. + loss(t_ch3ooh)*dt_c)
-ENDIF 		
-IF ( igcm_ch3oh .ne. 0 ) THEN 
-	A(t_ch3oh,1) = 1./( 1. + loss(t_ch3oh)*dt_c)
-ENDIF 		
-IF ( igcm_hcho .ne. 0 ) THEN 
-	A(t_hcho,1) = 1./( 1. + loss(t_hcho)*dt_c)
-ENDIF 		
-IF ( igcm_hcho .ne. 0 ) THEN 
-	A(t_hcooh,1) = 1./( 1. + loss(t_hcooh)*dt_c)
-ENDIF 	
-IF ( igcm_hoch2oh .ne. 0 ) THEN 
-	A(t_hoch2oh,1) = 1./( 1. + loss(t_hoch2oh)*dt_c)
-ENDIF 	
-IF ( igcm_hoch2ooh .ne. 0 ) THEN 
-	A(t_hoch2ooh,1) = 1./( 1. + loss(t_hoch2ooh)*dt_c)
-ENDIF 	
+!
+! SIBEM : cc^t+1 = ( cc0 + P*dt )/( 1 + L*dt )
+!
+!  cc^t+1 ' = A1 * cc0 '
+!           + A2 * P'
+!           - A3 * L'
+!
+!  A1 = 1/(1 + L*dt)
+!  A2 = dt/(1 + L*dt)
+!  A3 = dt*(cc0 + P*dt)/(1 + L*dt)^2 
+!   
+! STEADY-STATE : cc^t+1 = P/L 
+!
+! cc^t+1 = A1 * P'
+!        - A2 * L' 
+!
+! A1 = 1/L 
+! A2 = P/L^2 
 
-IF ( sza > 95. ) THEN
-	A(t_o,1) = 1./( 1. + loss(i_o)*dt_c)
-	A(t_o3,1) = 1./( 1. + loss(i_o3)*dt_c)
+    A(:,:) = 0.
+
+    A(t_co2,1) = 1./( 1. + loss(i_co2)*dt_c)
+    A(t_co,1) = 1./( 1. + loss(i_co)*dt_c)
+    A(t_o2,1) = 1./( 1. + loss(i_o2)*dt_c)
+    A(t_h2ovap,1) = 1./( 1. + loss(i_h2o)*dt_c)
+    A(t_h2,1) = 1./( 1. + loss(i_h2)*dt_c)
+    A(t_h2o2,1) = 1./( 1. + loss(i_h2o2)*dt_c)
+    A(t_ch4,1) = 1./( 1. + loss(i_ch4)*dt_c)
+
+    ! Methane Oxidation
+    ! ------------------------
+    IF ( igcm_ch3ooh .ne. 0 ) THEN 
+    A(t_ch3ooh,1) = 1./( 1. + loss(t_ch3ooh)*dt_c)
+    ENDIF 
+    IF ( igcm_ch3oh .ne. 0 ) THEN 
+    A(t_ch3oh,1) = 1./( 1. + loss(t_ch3oh)*dt_c)
+    ENDIF 
+    IF ( igcm_hcho .ne. 0 ) THEN 
+    A(t_hcho,1) = 1./( 1. + loss(t_hcho)*dt_c)
+    ENDIF 
+    IF ( igcm_hcho .ne. 0 ) THEN 
+    A(t_hcooh,1) = 1./( 1. + loss(t_hcooh)*dt_c)
+    ENDIF
+    IF ( igcm_hoch2oh .ne. 0 ) THEN 
+    A(t_hoch2oh,1) = 1./( 1. + loss(t_hoch2oh)*dt_c)
+    ENDIF
+    IF ( igcm_hoch2ooh .ne. 0 ) THEN 
+    A(t_hoch2ooh,1) = 1./( 1. + loss(t_hoch2ooh)*dt_c)
+    ENDIF
+
+    IF ( sza > 95. ) THEN
+    A(t_o,1) = 1./( 1. + loss(i_o)*dt_c)
+    A(t_o3,1) = 1./( 1. + loss(i_o3)*dt_c)
+    ENDIF 
+
+    A(:,2) = A(:,1)*dt_c 
+
+    A(t_co2,3) = (cc0(i_co2) + production(i_co2)*dt_c)*(A(t_co2,1)**2)*dt_c
+    A(t_co,3) = (cc0(i_co) + production(i_co)*dt_c)*(A(t_co,1)**2)*dt_c
+    A(t_o2,3) = (cc0(i_o2) + production(i_o2)*dt_c)*(A(t_o2,1)**2)*dt_c
+    A(t_h2,3) = (cc0(i_h2) + production(i_h2)*dt_c)*(A(t_h2,1)**2)*dt_c
+    A(t_h2o2,3) = (cc0(i_h2o2) + production(i_h2o2)*dt_c)*(A(t_h2o2,1)**2)*dt_c
+    A(t_h2ovap,3) = (cc0(i_h2o) + production(i_h2o)*dt_c)*(A(t_h2ovap,1)**2)*dt_c
+    A(t_ch4,3) = (cc0(i_ch4) + production(i_ch4)*dt_c)*(A(t_ch4,1)**2)*dt_c
+    ! Methane Oxidation
+    ! ------------------------
+    IF ( igcm_ch3ooh .ne. 0 ) THEN 
+    	A(t_ch3ooh,3) = (cc0(i_ch3ooh) + production(i_ch3ooh)*dt_c)*(A(t_ch3ooh,1)**2)*dt_c
+    ENDIF 		
+    IF ( igcm_ch3oh .ne. 0 ) THEN 
+    	A(t_ch3oh,3) = (cc0(i_ch3oh) + production(i_ch3oh)*dt_c)*(A(t_ch3oh,1)**2)*dt_c
+    ENDIF 		
+    IF ( igcm_hcho .ne. 0 ) THEN 
+    	A(t_hcho,3) = (cc0(i_hcho) + production(i_hcho)*dt_c)*(A(t_hcho,1)**2)*dt_c
+    ENDIF 		
+    IF ( igcm_hcooh .ne. 0 ) THEN 
+    	A(t_hcooh,3) = (cc0(i_hcooh) + production(i_hcooh)*dt_c)*(A(t_hcooh,1)**2)*dt_c
+    ENDIF 		
+    IF ( igcm_hoch2oh .ne. 0 ) THEN 
+    	A(t_hoch2oh,3) = (cc0(i_hoch2oh) + production(i_hoch2oh)*dt_c)*(A(t_hoch2oh,1)**2)*dt_c
+    ENDIF 		
+    IF ( igcm_hoch2ooh .ne. 0 ) THEN 
+    	A(t_hoch2ooh,3) = (cc0(i_hoch2ooh) + production(i_hoch2ooh)*dt_c)*(A(t_hoch2ooh,1)**2)*dt_c
+    ENDIF 		
+
+    IF ( sza > 95. ) THEN 
+    	A(t_o,3) = (cc0(i_o) + production(i_o)*dt_c)*(A(t_o,1)**2)*dt_c
+    	A(t_o3,3) = (cc0(i_o3) + production(i_o3)*dt_c)*(A(t_o3,1)**2)*dt_c
+    ENDIF 
+    		
+    ! Steady State Assumptions 
+    ! ------------------------
+    IF ( igcm_ch3 .ne. 0 ) THEN 
+    	A(t_ch3,1) = 1./loss(i_ch3)
+    	A(t_ch3,2) = production(i_ch3)*(A(t_ch3,1)**2.)
+    ENDIF
+    IF ( igcm_ch3o2 .ne. 0 ) THEN 
+    	A(t_ch3o2,1) = 1./loss(i_ch3o2)
+    	A(t_ch3o2,2) = production(i_ch3o2)*(A(t_ch3o2,1)**2.)
+    ENDIF 
+    IF ( igcm_ch3o .ne. 0 ) THEN 
+    	A(t_ch3o,1) = 1./loss(i_ch3o)
+    	A(t_ch3o,2) = production(i_ch3o)*(A(t_ch3o,1)**2.)
+    ENDIF 
+    IF ( igcm_hoch2o2 .ne. 0 ) THEN 
+    	A(t_hoch2o2,1) = 1./loss(i_hoch2o2)
+    	A(t_hoch2o2,2) = production(i_hoch2o2)*(A(t_hoch2o2,1)**2.)
+    ENDIF 
+    IF ( igcm_hco .ne. 0 ) THEN 
+    	A(t_hco,1) = 1./loss(i_hco)
+    	A(t_hco,2) = production(i_hco)*(A(t_hco,1)**2.)
 ENDIF 
 
-A(:,2) = A(:,1)*dt_c 
-
-A(t_co2,3) = (cc0(i_co2) + production(i_co2)*dt_c)*(A(t_co2,1)**2)*dt_c
-A(t_co,3) = (cc0(i_co) + production(i_co)*dt_c)*(A(t_co,1)**2)*dt_c
-A(t_o2,3) = (cc0(i_o2) + production(i_o2)*dt_c)*(A(t_o2,1)**2)*dt_c
-A(t_h2,3) = (cc0(i_h2) + production(i_h2)*dt_c)*(A(t_h2,1)**2)*dt_c
-A(t_h2o2,3) = (cc0(i_h2o2) + production(i_h2o2)*dt_c)*(A(t_h2o2,1)**2)*dt_c
-A(t_h2ovap,3) = (cc0(i_h2o) + production(i_h2o)*dt_c)*(A(t_h2ovap,1)**2)*dt_c
-A(t_ch4,3) = (cc0(i_ch4) + production(i_ch4)*dt_c)*(A(t_ch4,1)**2)*dt_c
-! Methane Oxidation
-! ------------------------
-IF ( igcm_ch3ooh .ne. 0 ) THEN 
-	A(t_ch3ooh,3) = (cc0(i_ch3ooh) + production(i_ch3ooh)*dt_c)*(A(t_ch3ooh,1)**2)*dt_c
-ENDIF 		
-IF ( igcm_ch3oh .ne. 0 ) THEN 
-	A(t_ch3oh,3) = (cc0(i_ch3oh) + production(i_ch3oh)*dt_c)*(A(t_ch3oh,1)**2)*dt_c
-ENDIF 		
-IF ( igcm_hcho .ne. 0 ) THEN 
-	A(t_hcho,3) = (cc0(i_hcho) + production(i_hcho)*dt_c)*(A(t_hcho,1)**2)*dt_c
-ENDIF 		
-IF ( igcm_hcooh .ne. 0 ) THEN 
-	A(t_hcooh,3) = (cc0(i_hcooh) + production(i_hcooh)*dt_c)*(A(t_hcooh,1)**2)*dt_c
-ENDIF 		
-IF ( igcm_hoch2oh .ne. 0 ) THEN 
-	A(t_hoch2oh,3) = (cc0(i_hoch2oh) + production(i_hoch2oh)*dt_c)*(A(t_hoch2oh,1)**2)*dt_c
-ENDIF 		
-IF ( igcm_hoch2ooh .ne. 0 ) THEN 
-	A(t_hoch2ooh,3) = (cc0(i_hoch2ooh) + production(i_hoch2ooh)*dt_c)*(A(t_hoch2ooh,1)**2)*dt_c
-ENDIF 		
-
-IF ( sza > 95. ) THEN 
-	A(t_o,3) = (cc0(i_o) + production(i_o)*dt_c)*(A(t_o,1)**2)*dt_c
-	A(t_o3,3) = (cc0(i_o3) + production(i_o3)*dt_c)*(A(t_o3,1)**2)*dt_c
-ENDIF 
-		
-! Steady State Assumptions 
-! ------------------------
-IF ( igcm_ch3 .ne. 0 ) THEN 
-	A(t_ch3,1) = 1./loss(i_ch3)
-	A(t_ch3,2) = production(i_ch3)*(A(t_ch3,1)**2.)
-ENDIF
-IF ( igcm_ch3o2 .ne. 0 ) THEN 
-	A(t_ch3o2,1) = 1./loss(i_ch3o2)
-	A(t_ch3o2,2) = production(i_ch3o2)*(A(t_ch3o2,1)**2.)
-ENDIF 
-IF ( igcm_ch3o .ne. 0 ) THEN 
-	A(t_ch3o,1) = 1./loss(i_ch3o)
-	A(t_ch3o,2) = production(i_ch3o)*(A(t_ch3o,1)**2.)
-ENDIF 
-IF ( igcm_hoch2o2 .ne. 0 ) THEN 
-	A(t_hoch2o2,1) = 1./loss(i_hoch2o2)
-	A(t_hoch2o2,2) = production(i_hoch2o2)*(A(t_hoch2o2,1)**2.)
-ENDIF 
-IF ( igcm_hco .ne. 0 ) THEN 
-	A(t_hco,1) = 1./loss(i_hco)
-	A(t_hco,2) = production(i_hco)*(A(t_hco,1)**2.)
-ENDIF 
 ! ============================================
 ! STAGE 5 : ODD-HYDROGEN FAMILY 
 ! ============================================
+!
+! cc_HOx^t+1 = (cc0_HOx + P*dt)/(1 + L/cc_HOx^t *dt )
+!
 ! Linearised Production 
 dPhox_coeff(:) = 0. 
 
@@ -1073,7 +1093,7 @@ dHOX_dPQ(lyr_m,:) = A_hox(1)*( dHOX0_dPQ(lyr_m,:) + dPhox_dPQ*dt_c ) &
 
 
 ! ============================================
-! STAGE 4 : CALCULATIONS
+! STAGE 6 : CALCULATIONS AND STORAGE IN ARRAYS
 ! ============================================
 
 ! CO2
