@@ -419,195 +419,101 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       call chimtogcm(zycol, lswitch, nesp, rm) 
 c      
-     
-C        IF ( .not. plume ) THEN 
-
-C        call WRITEDIAGFI(1,"j_o3_o",
-C      $    "$O_3 + h\\nu \longrightarrow O_2 + O(^3P)$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,1))
-     
-C        call WRITEDIAGFI(1,"j_o3_o1d",
-C      $    "$O_3 + h\\nu \longrightarrow O_2 + O(^1D)$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,2))
-
-C        call WRITEDIAGFI(1,"a002",
-C      $    "$O(^3P) + O(^3P) + M \longrightarrow O_2 + M$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,3))
-
-C        call WRITEDIAGFI(1,"a003",
-C      $    "$O(^3P) + O_3 \longrightarrow O_2 + O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,4))
-
-C        call WRITEDIAGFI(1,"b005",
-C      $    "$O(^1D) + O_3 \longrightarrow O_2 + O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,5))
-     
-C        call WRITEDIAGFI(1,"b006",
-C      $    "$O(^1D) + O_3 \longrightarrow O_2 + 2O(^3P)$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,6))
-
-C        call WRITEDIAGFI(1,"c001",
-C      $    "$O(^3P) + HO_2 \longrightarrow OH + O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,7))
-
-C        call WRITEDIAGFI(1,"c002",
-C      $    "$O(^3P) + OH  \longrightarrow O_2 + H$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,8))
-
-C        call WRITEDIAGFI(1,"c003",
-C      $    "$H + O_3  \longrightarrow  OH + O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,9))
-     
-C        call WRITEDIAGFI(1,"c005",
-C      $    "$H + HO_2  \longrightarrow H_2 + O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,10))
-
-C        call WRITEDIAGFI(1,"c007",
-C      $    "$OH + HO_2  \longrightarrow H_2O + O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,11))
-
-C        call WRITEDIAGFI(1,"c008",
-C      $    "$HO_2 + HO_2 + M  \longrightarrow H_2O_2 + O_2 + M$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,12))
-
-C        call WRITEDIAGFI(1,"c014",
-C      $    "$O_3 + OH \longrightarrow O_2 + HO_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,13))
-
-C        call WRITEDIAGFI(1,"c015",
-C      $    "$O_3 + HO_2 \longrightarrow 2O_2 + OH$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,14))
-
-C        call WRITEDIAGFI(1,"c016",
-C      $    "$HO_2 + HO_2 + M \longrightarrow H_2O_2 + O_2 + M$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,15))
-
-C        call WRITEDIAGFI(1,"cab6",
-C      $    "$CH_3O_2 + HO_2  \longrightarrow CH_3OOH + O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,16))
-     
-C        call WRITEDIAGFI(1,"cab7",
-C      $    "$CH_3O_2 + HO_2  \longrightarrow HCHO + H_2O + O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,17))
-
-C        call WRITEDIAGFI(1,"cab8",
-C      $    "$CH_3O_2 + RO_2  \longrightarrow CH_3O + 0.5O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,18))
-     
-C        call WRITEDIAGFI(1,"cab9",
-C      $    "$CH_3O_2 + RO_2  \longrightarrow 0.5HCHO"
-C      $    // "+ 0.5CH_3OH + 0.5O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,19))     
-     
-C        call WRITEDIAGFI(1,"cab10",
-C      $    "$CH_3O_2 + O_3  \longrightarrow CH_3O + 2O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,20))     
-     
-C        call WRITEDIAGFI(1,"cab12",
-C      $    "$CH_3O_2 + O(^3P)  \longrightarrow CH_3O + O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,21))  
-
-C        call WRITEDIAGFI(1,"cab16",
-C      $    "$CH_3O + O_3  \longrightarrow CH_3O_2 + O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,22))  
-     
-C        call WRITEDIAGFI(1,"cab17",
-C      $    "$CH_3O + O(^3P)  \longrightarrow CH_3 + O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,23))  
-     
-C        call WRITEDIAGFI(1,"cab29",
-C      $    "$HOCH_2O_2 + HO_2  \longrightarrow ... 0.8O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,24))  
-     
-C        call WRITEDIAGFI(1,"cab31",
-C      $    "$HOCH_2O_2 + RO_2  \longrightarrow 0.5HCOOH + "
-C      $    // "0.5HOCH_2OH + 0.5O_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,25))  
-     
-C C      ! O2 Loss Rates 
-C C      ! =============
-C        call WRITEDIAGFI(1,"j_o2_o",
-C      $    "$O_2 + h\\nu  \longrightarrow O(^3P) + O(^3)P$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,26))  
-     
-C        call WRITEDIAGFI(1,"j_o2_o1d",
-C      $    "$O_2 + h\\nu  \longrightarrow O(^1D) + O(^3)P$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,27))  
-
-C        call WRITEDIAGFI(1,"a001",
-C      $    "$O(^3P) + O_2 + M  \longrightarrow  O_3 + M$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,28))  
-
-C        call WRITEDIAGFI(1,"c011",
-C      $    "$H + O_2 + M  \longrightarrow HO_2 + M$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,29))  
-
-C        call WRITEDIAGFI(1,"cab3",
-C      $    "$CH_3 + O_2 + M  \longrightarrow CH_3O_2 + M$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,30))  
-     
-C        call WRITEDIAGFI(1,"cab015",
-C      $    "$CH_3O + O_2  \longrightarrow  HO_2 + HCHO$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,31))  
-     
-C        call WRITEDIAGFI(1,"cab026",
-C      $    "$HCO + O_2  \longrightarrow  CO + HO_2$",
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,32))  
-     
-C        call WRITEDIAGFI(1,"j_hoch2ooh",
-C      $ "$HOCH_2OOH + h\\nu + O_2 \longrightarrow HCOOH + HO_2 + OH$", 
-C      $    "molec. cm-3",
-C      $    1,lifetime(:,33))  
 
        call WRITEDIAGFI(1,"o2_tau","o2_tau", "s",
+     $                  1,lifetime(:,23))
+
+       call WRITEDIAGFI(1,"o2_nd","o2_nd", "s",
+     $                  1,lifetime(:,24))
+
+       call WRITEDIAGFI(1,"O + O2 + M -> O3","a001", "s",
      $                  1,lifetime(:,1))
 
-       call WRITEDIAGFI(1,"j_o2_o","j_o2_o", "s",
+       call WRITEDIAGFI(1,"H + O2 + M -> HO2","c011", "s",
      $                  1,lifetime(:,2))
-     
-       call WRITEDIAGFI(1,"j_o2_o1d","j_o2_o1d", "s",
+
+       call WRITEDIAGFI(1,"O2 + hv -> O + O","j_o2_o", "s",
      $                  1,lifetime(:,3))
 
-       call WRITEDIAGFI(1,"a001","a001", "s",
+       call WRITEDIAGFI(1,"HO2 + hv -> OH + H","j_ho2", "s",
      $                  1,lifetime(:,4))
-     
-       call WRITEDIAGFI(1,"c011","c011", "s",
+
+       call WRITEDIAGFI(1,"H2O2 + hv -> OH + OH","j_h2o2", "s",
      $                  1,lifetime(:,5))
-     
-       call WRITEDIAGFI(1,"ch4_tau","ch4_tau", "s",
+
+       call WRITEDIAGFI(1,"H + HO2 -> OH + OH","c004", "s",
+     $                  1,lifetime(:,6))
+
+       call WRITEDIAGFI(1,"H + HO2 -> O + H2O","c006", "s",
+     $                  1,lifetime(:,7))
+
+       call WRITEDIAGFI(1,"NO + HO2 -> NO2 + OH","d003", "s",
+     $                  1,lifetime(:,8))
+
+
+
+
+       call WRITEDIAGFI(1,"O3 + hv -> O2 + O","j_o3_o", "s",
+     $                  1,lifetime(:,9))
+
+       call WRITEDIAGFI(1,"O3 + hv -> O2 + O1D ","j_o3_o1d", "s",
+     $                  1,lifetime(:,10))
+
+       call WRITEDIAGFI(1,"O + O3 -> O2 + O2","a003", "s",
+     $                  1,lifetime(:,11))
+
+       call WRITEDIAGFI(1,"O1D + O3 -> O2 + O2","b005", "s",
      $                  1,lifetime(:,12))
+
+       call WRITEDIAGFI(1,"O1D + O3 -> O2 + O + O ","j_ho2", "s",
+     $                  1,lifetime(:,13))
+
+       call WRITEDIAGFI(1,"H + O3 -> OH + O2","c003", "s",
+     $                  1,lifetime(:,14))
+
+       call WRITEDIAGFI(1,"HO2 + O3 -> OH + O2 + O2","c015", "s",
+     $                  1,lifetime(:,15))
+
+       call WRITEDIAGFI(1,"NO + O3 -> NO2 + O2","d002", "s",
+     $                  1,lifetime(:,16))
+
+       call WRITEDIAGFI(1,"H + HO2 -> H2 + O2","c005", "s",
+     $                  1,lifetime(:,17))
+
+      call WRITEDIAGFI(1,"OH + O3 -> HO2 + O2","c014", "s",
+     $                  1,lifetime(:,18))
+
+       call WRITEDIAGFI(1,"O + HO2 -> OH + O2","c001", "s",
+     $                  1,lifetime(:,19))
+
+       call WRITEDIAGFI(1,"OH + HO2 -> H2O + O2","c006", "s",
+     $                  1,lifetime(:,21))
+
+       call WRITEDIAGFI(1,"HO2 + HO2 -> H2O2 + O2","c008", "s",
+     $                  1,lifetime(:,22))
+
+
+       ! NET LIFETIMES ? 
+       call WRITEDIAGFI(1,"j_o2_o_tau","s", "s",
+     $                  1,lifetime(:,25))
+       call WRITEDIAGFI(1,"j_ho2_tau","s", "s",
+     $                  1,lifetime(:,26))
+       call WRITEDIAGFI(1,"j_h2o2_tau","s", "s",
+     $                  1,lifetime(:,27))
+       call WRITEDIAGFI(1,"c004_tau","s", "s",
+     $                  1,lifetime(:,28))
+       call WRITEDIAGFI(1,"c006_tau","s", "s",
+     $                  1,lifetime(:,29))
+       call WRITEDIAGFI(1,"d003_tau","s", "s",
+     $                  1,lifetime(:,30))
+
+
+
+
+
+
+
+
       return
       end
 c
@@ -2667,18 +2573,85 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       end do
   
-      lifetime(:,:) = 1/loss
+      
+      ! O + O2 + M [gross loss]
+      lifetime(:,1) = a001(:)*cc(:,i_o)*cc(:,i_o2) 
+      ! H + OH + M [gross loss]
+      lifetime(:,2) = c011(:)*cc(:,i_h)*cc(:,i_o2)
 
-      lifetime(:,1) = 1./loss(:,i_o2) 
+      ! "Net" Losses
+      ! O2 + hv -> O + O 
+      lifetime(:,3) = j(:,i_o2)*cc(:,i_o2)
+      ! HO2 + hv -> OH + H 
+      lifetime(:,4) = j(:,j_ho2)*cc(:,i_ho2)
+      ! H2O2 + hv -> 
+      lifetime(:,5) = j(:,j_h2o2)*cc(:,i_h2o2) 
+      ! H + HO2 -> 2OH 
+      lifetime(:,6) = c004(:)*cc(:,i_h)*cc(:,i_ho2)
+      ! H + HO2 -> O + H2O 
+      lifetime(:,7) = c006(:)*cc(:,i_h)*cc(:,i_ho2)
+      ! NO + HO2 -> NO2 + OH
+      lifetime(:,8) = d003(:)*cc(:,i_ho2)*no(:)
 
+      ! O2 Resupplies from O3 and HO2 
       
+      ! O3 + hv -> O2 + O
+      lifetime(:,9) = j(:,j_o3_o)*cc(:,i_o3)
+      ! O3 + hv -> O2 + O1D 
+      lifetime(:,10) = j(:,j_o3_o1d)*cc(:,i_o3)
+      !	O + O3 -> O2 + O2 
+      lifetime(:,11) = a003*cc(:,i_o3)*cc(:,i_o)
+      ! O1D + O3 -> O2 + O2 
+      lifetime(:,12) = b005*cc(:,i_o3)*cc(:,i_o1d)
+      ! O1D + O3 -> O2 + O + O 
+      lifetime(:,13) = b006*cc(:,i_o3)*cc(:,i_o1d)
+      ! H + O3 -> OH + O2 
+      lifetime(:,14) = c003*cc(:,i_h)*cc(:,i_o3)
+      ! HO2 + O3 -> OH + O2 + O2 
+      lifetime(:,15) = c015*cc(:,i_o3)*cc(:,i_ho2) 
+      ! NO + O3 -> NO2 + O2 
+      lifetime(:,16) = d002*cc(:,i_o3)*no 
+      ! H + HO2 -> H2 + O2 
+      lifetime(:,17) = c005*cc(:,i_h)*cc(:,i_ho2)
+      ! OH + O3 -> HO2 + O2 
+      lifetime(:,18) = c014*cc(:,i_oh)*cc(:,i_o3)
+      ! O + HO2 -> OH + O2 
+      lifetime(:,19) = c001*cc(:,i_o)*cc(:,i_ho2)
+      ! H + HO2 -> H2 + O2 
+      lifetime(:,20) = c005*cc(:,i_h)*cc(:,i_ho2)
+      ! OH + HO2 -> H2O + O2 
+      lifetime(:,21) = c006*cc(:,i_oh)*cc(:,i_ho2)
+      ! HO2 + HO2 -> H2O2 + O2 
+      lifetime(:,22) = c008*cc(:,i_ho2)*cc(:,i_ho2)
       
-      lifetime(:,2) = 1./j(:,j_o2_o)
-      lifetime(:,3) = 1./j(:,j_o2_o1d)
-      lifetime(:,4) = 1./(a001(:)*cc0(:,i_o))
-      lifetime(:,5) = 1./(c011(:)*cc0(:,i_h))
-      
-     
+
+      ! O2 Lifetime
+      lifetime(:,23) = 1./loss(:,i_o2)
+
+      lifetime(:,24) = cc(:,i_o2)
+
+
+
+      ! Net Lifetimes ?
+      lifetime(:,25) = j(:,j_o2_o)
+      lifetime(:,26) = j(:,j_ho2)
+      lifetime(:,27) = j(:,j_h2o2)
+      lifetime(:,28) = cc(:,i_h)*c004
+      lifetime(:,29) = cc(:,i_h)*c006
+      lifetime(:,30) = d003*no
+
+
+
+
+
+
+
+
+
+
+
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     density -> volume mixing ratio conversion
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc

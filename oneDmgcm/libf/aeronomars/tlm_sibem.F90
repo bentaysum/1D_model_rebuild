@@ -321,7 +321,7 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 
 ! 	1.1: Initialise to prevent issues
 ! 	---------------------------------
-   P_coeff(:,:) = 0.
+   P_coeff(:,:) = 0.D0
 
 !   1.1.1: CO2 [SIBEM]
 !   ------------------
