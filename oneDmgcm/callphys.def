@@ -8,7 +8,7 @@ tracer=.true.
 datadir=/exports/csce/datastore/geos/users/s1215319/cleaning_gcm/mgcm-datafile
 
 #Diurnal cycle ?  if diurnal=False, diurnal averaged solar heating
-diurnal=.false.
+diurnal=.true.
 
 #Seasonal cycle ? if season=False, Ls stays constant, to value set in "start"
 season = .false. 
@@ -30,11 +30,11 @@ calleofdump = .false.
 mcd_profiles = .True. 
 
 # Longitudinal mean values of all MCD v5.3 variables?
-long_mean= .True.
+long_mean= .False.
 longitude=137.4
 
 ## Tracer interpolation shutdown parameters 
-mcd_dayfin = 200
+mcd_dayfin = 140
 mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
@@ -60,10 +60,10 @@ L_2=10
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Introducing an instantaneous plume?
-plume=.False.
+plume=.True.
 
 #Days after day0 to release plume?
-plume_day=10
+plume_day=98
 
 #Local time to release plume?
 plume_lt=0.
@@ -84,13 +84,13 @@ p_high = 5
 #  =30 Mars Year 30 
 iaervar = 1
 # Dust opacity at 610 Pa (when constant, i.0e. for the iaervar=1 case)
-tauvis=0.3
+tauvis=0.8080
 # Dust vertical distribution: 
 # (=0: old distrib. (Pollack90), =1: top set by "topdustref",
 #  =2: Viking scenario; =3 MGS scenario)
-iddist  = 3
+iddist  = 1
 # Dust top altitude (km). (Matters only if iddist=1)
-topdustref=40.
+topdustref=35.
 
 ## Physical Parameterizations :
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -104,7 +104,7 @@ callnlte = .false.
 # 2-> New scheme
 nltemodel = 1
 # call CO2 NIR absorption ?   matters only if callrad=T
-callnirco2 = .true.
+callnirco2 = .false.
 # NIR NLTE correction ? matters only if callnirco2=T
 nircorr=1
 # call turbulent vertical diffusion ?

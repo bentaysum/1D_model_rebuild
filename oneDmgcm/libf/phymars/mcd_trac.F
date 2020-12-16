@@ -360,14 +360,13 @@ C        ===
           h2o(y)  = h2o(y)*mmol(15)/mmean(1,y) 
 
 
-          IF ( mcd_profiles ) THEN 
+C           IF ( mcd_profiles ) THEN 
 C         O2 
 C         ===
           call interp_line(mcdv5_lt, zo2(:,y), N_LT,
      &                    local_time, o2(y), 1)
           o2(y) = o2(y)*mmol(5)/mmean(1,y) 
           
-          ENDIF 
 
 
 C         H2 
@@ -384,7 +383,7 @@ c         ===
           co(y)  = co(y)*mmol(2)/mmean(1,y) 
 
           
-          
+C           ENDIF 
 
 
 

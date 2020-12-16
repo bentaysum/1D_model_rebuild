@@ -3,6 +3,7 @@ libf/aeronomars/chemthermos.F90
 libf/aeronomars/euvheat.F90
 libf/aeronomars/inichim_newstart.F90
 libf/aeronomars/moldiff_red.F90
+libf/aeronomars/TLM_chem.F90
 libf/aeronomars/tlm_hox.F90
 libf/aeronomars/tlm_ox.F90
 libf/aeronomars/tlm_sibem.F90

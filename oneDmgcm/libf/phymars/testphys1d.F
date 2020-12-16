@@ -921,7 +921,7 @@ C            mcd_profiles = .False.
           DO ilayer=1,nlayer
      
                if ( (trim(noms(iq)) == "ch4" ) .and. 
-     $              (ilayer .le. 1) ) cycle 
+     $              (ilayer .le. 5) ) cycle 
 
              q(ilayer,iq)=q(ilayer,iq)+dtphys*dq(ilayer,iq)
          
