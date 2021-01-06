@@ -937,7 +937,7 @@ C      $           )
      $           +   c002(l)*cc(l,i_o)*cc(l,i_oh)
      $           +   c010(l)*cc(L,i_OH)*cc(l,i_h2)
      $           +   e001(l)*cc(l,i_co)*cc(l,i_oh)
-     $           +   cab002(l)*cc(l,i_o)*cc(l,i_oh)
+     $           +   cab002(l)*cc(l,i_o)*cc(l,i_ch4)
      $           +   cab004(l)*cc(l,i_ch3)*cc(l,i_o3)*0.956
      $           +   cab005(l)*cc(l,i_ch3)*cc(l,i_o)*0.83 
      $           +   j(l,j_h2o)*cc(l,i_h2o)
@@ -945,8 +945,7 @@ C      $           )
      $           +   k_pseudo(l)*cc(l,i_ch4)
      $             )/MAX( dens(l)*1.e-30, cc(l,i_ho2) ) 
      $           ) 
-     $           /( c011(l)*cc(l,i_o2)
-     $           +  c003(l)*cc(l,i_o3)
+     $           /( c003(l)*cc(l,i_o3)
      $           +  c004(l)*cc(l,i_ho2)
      $           +  c005(l)*cc(l,i_ho2)
      $           +  c006(l)*cc(l,i_ho2)
@@ -962,7 +961,7 @@ C      $           )
      $              + cab028(l)*cc(l,i_hoch2o2)
      $              + cab030(l)*cc(l,i_hoch2o2)*ro2(l)
      $              + cab032(l)*cc(l,i_hcooh)*cc(l,i_oh)
-     $              + cab035(l)*cc(l,i_hoch2oh)
+     $              + cab035(l)*cc(l,i_hoch2oh)*cc(l,i_oh)
      $              )/MAX( cc(l,i_h) , dens(l)*1.e-30 )              
      $           )
 
@@ -1184,7 +1183,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  cab103(l), cab104(l), cab105(l),
      $  cab106(l), cab107(l),
      $  dccn_dpq, dcc0_dpq,
-     $  dHOX_dPQ, dHOX0_dPQ)
+     $  dHOX_dPQ, dHOX0_dPQ,
+     $  ro2(l), k_pseudo(l))
        ENDIF
 
       end do

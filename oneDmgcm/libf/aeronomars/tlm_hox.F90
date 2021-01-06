@@ -33,7 +33,8 @@ SUBROUTINE tlm_hox(iter, lyr_m, dens,sza,&
 					cab101, cab102, cab103, cab104, cab105, &
 					cab106, cab107, &
                     dccn_dpq, dcc0_dpq, &
-                    dHOX_dPQ, dHOX0_dPQ)
+                    dHOX_dPQ, dHOX0_dPQ, &
+                    ro2, k_pseudo)
 
 USE TLMvars
 
@@ -72,6 +73,7 @@ real cc(nesp), cc_prev(nesp) ! number density of species after and before the
 real*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
 real*8, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 real*8 dHOX_dPQ(nlayermx, nqmx*nlayermx), dHOX0_dPQ(nlayermx,nqmx*nlayermx)
+REAL ro2, k_pseudo
 
 real j(nd) ! photolysis values 
 
@@ -190,7 +192,8 @@ integer, parameter :: i_h2o  = 54
 integer, parameter :: i_n2   = 55
 integer, parameter :: i_hox  = 56
 integer, parameter :: i_ox   = 57
-integer, parameter :: i_RO2  = 58
+integer, parameter :: i_dust = 58
+integer, parameter :: i_elec = 59 
 
 ! Photolysis indexes as in photochemistry.F
 ! =========================================
@@ -214,8 +217,16 @@ integer iq ! Tracer iterations
 
 ! Stage 1 
 ! -------
-REAL*8 A_RH(2), A_ROH(2)
-REAL*8 B_H(2,nqmx), B_OH(2,nqmx)
+REAL*8 A_RH(6), A_ROH(2)
+REAL*8 PHn, LHn, PHd, LHd
+REAL*8 POHn, LOHn, POHd, LOHd
+
+REAL*8 B_H(4,nqmx), B_OH(2,nqmx)
+
+REAL*8 dPn_dPQ(nqmx*nlayermx), dPd_dPQ(nqmx*nlayermx)
+REAL*8 dLn_dPQ(nqmx*nlayermx), dLd_dPQ(nqmx*nlayermx)
+
+
 REAL*8 dN_dPQ(nqmx*nlayermx), &
         dD_dPQ(nqmx*nlayermx) 
 REAL*8 drh_ho2(nqmx*nlayermx),droh_ho2(nqmx*nlayermx) ! Linearised partition functions
@@ -289,15 +300,28 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 !
 ! rh_ho2 and roh_ho2 have the form:
 !
-! rX_ho2 = ( N[PQ] ) / ( D[PQ] ) 
+! rX_ho2 = ( Pn + Ln/[HO2]^t )
+!        / ( Pd + Ld/[X]^t)
 !
-! Linearisng with respect to mixing ratios:
+!  d(rX_ho2)/d(PQ) =  A_RX(1) * dPn/dPQ 
+!                  +  A_RX(2) * dLn/dPQ
+!                  -  A_RX(3) * d[HO2]^t/dPQ 
+!                  -  A_RX(4) * dPd/dPQ 
+!                  -  A_RX(5) * dLd/dPQ
+!                  +  A_RX(6) * d[X]^t/dPQ
 !
-!  d(rX_ho2)/d(PQ) = [1/D] * dN/dPQ 
-!                  - [N*D^-2] * dD/dPQ 
-!  
-! A_RX(1) = 1/D 
-! A_RX(2) = N*(D^-2)
+! A_RX(1) =  1./(Pd + Ld/[X]^t)
+! A_RX(2) =  A_RX(1) * 1./[HO2]^t 
+! A_RX(3) =  A_RX(2) * Ln/[HO2]^t 
+! A_RX(4) =  A_RX(1) * rX_ho2
+! A_RX(5) =  A_RX(4) * 1./[X]^t 
+! A_RX(6) =  A_RX(5) * Ld/[X]^t
+
+
+
+
+
+
 !
 ! ----------------------------------
 ! 1.1: Constructing  d(RH_HO2)/d(PQ)
@@ -305,29 +329,65 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 !
 !       1.1.1: A_RH Coefficients
 !       -------------------------
-        rh_ho2_denominator = c011*cc(i_o2) &
-                           + cab027*cc(i_hco) &
-                           + cab042*cc(i_c2h5) 
+     LHn =           b003*cc(i_o1d)*cc(i_h2) &
+                +   b008*cc(i_ch4)*cc(i_o1d) &
+                +   c002*cc(i_o)*cc_prev(i_oh) &
+                +   c010*cc_prev(i_OH)*cc(i_h2) &
+                +   e001*cc(i_co)*cc_prev(i_oh) &
+                +   cab002*cc(i_o)*cc(i_ch4) &
+                +   cab004*cc(i_ch3)*cc(i_o3)*0.956 &
+                +   cab005*cc(i_ch3)*cc(i_o)*0.83  &
+                +   j(j_h2o)*cc(i_h2o) &
+                +   j(j_ch2o_hco)*cc(i_hcho) &
+                +   k_pseudo*cc(i_ch4)
 
-        A_RH(1) = 1./rh_ho2_denominator 
-        A_RH(2) = rh_ho2*A_RH(1) 
+     LHd = c009*cc(i_h2o2)*cc_prev(i_oh) &
+                   + c012*cc(i_h2o2)*cc(i_o) &
+                   + c014*cc(i_oh)*cc(i_o3) &
+                   + cab011*cc(i_ch3o2)*cc_prev(i_oh) &
+                   + cab015*cc(i_ch3o)*cc(i_o2) &
+                   + cab026*cc(i_hco)*cc(i_o2) &
+                   + cab028*cc(i_hoch2o2) &
+                   + cab030*cc(i_hoch2o2)*ro2 &
+                   + cab032*cc(i_hcooh)*cc_prev(i_oh) &
+                   + cab035*cc(i_hoch2oh)*cc_prev(i_oh)
 
-!       1.1.2: d(N)/d(PQ) B Coefficients 
+    rh_ho2_denominator = c011*cc(i_o2) &
+                        +  c003*cc(i_o3) &
+                        +  c004*cc_prev(i_ho2) &
+                        +  c005*cc_prev(i_ho2) &
+                        +  c006*cc_prev(i_ho2) &
+                        +  c011*cc(i_o2) &
+                        +  c018*cc_prev(i_h) &
+                        +  LHd/MAX( cc_prev(i_h) , dens*1.e-30 ) 
+
+
+    A_RH(1) = 1./rh_ho2_denominator 
+    A_RH(2) = A_RH(1)/cc_prev(i_ho2) 
+    A_RH(3) = A_RH(2)*LHn/cc_prev(i_ho2)
+    A_RH(4) = A_RH(1)*RH_HO2
+    A_RH(5) = A_RH(4)/cc_prev(i_h)
+    A_RH(6) = A_RH(5)*LHd/cc_prev(i_H)
+
+
+
+!       1.1.2: d(Pn)/d(PQ) B Coefficients 
 !       --------------------------------
-!       N = k_a*cc(PQ_a) + k_b*cc(PQ_b) + ... 
-!       
+!       Pn [ and Pl ] = k_a*cc(PQ_a) + k_b*cc(PQ_b) + ... 
+!   
 !       For a species that has 2+ relevant reactions:
 !       
-!       N = (k_a1 + k_a2 + ...)*cc(PQ_a) + k_b*cc(PQ_b) + ...
+!       Pn = (k_a1 + k_a2 + ...)*cc(PQ_a) + k_b*cc(PQ_b) + ...
 !         = B_a*cc(PQ_a) + B_b*cc(PQ_b) + ...
-!       
+!
 !       where B_i is the sum of the relevant rate coefficients.
-!        
-!       d(N)_d(PQ) = B_a * d[cc(PQ_a)]/d[PQ] 
+!
+!       d(Pn)_d(PQ) = B_a * d[cc(PQ_a)]/d[PQ] 
 !                  + B_b * d[cc(PQ_b)]/d[PQ]
 !                  + ...
 
-        B_h(:,:) = 0.
+        B_h(:,:) = 0.D0
+
         B_h(1,t_h) = c004 + c005 + c006 
         B_h(1,t_oh) = c007 
         B_h(1,t_ho2) = 2.*c008 + 2.*c016
@@ -337,30 +397,72 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
         IF ( igcm_hcho .ne. 0 ) B_H(1,t_hcho) = cab019 
         IF ( igcm_hoch2o2 .ne. 0 ) B_H(1,t_hoch2o2) = 0.8*cab029 
 
-!       1.1.3: d(D)/d(PQ) B Coefficients
+!       1.1.3: d(Ln)/d(PQ) B Coefficients
 !       -------------------------------- 
-        B_h(2,t_o2) = c011 
-        IF ( igcm_hco .ne. 0 ) B_h(2,t_hco) = cab027
+        B_h(2,t_co) = e001*cc_prev(i_oh)
+        B_h(2,t_o) = c002*cc_prev(i_oh) &
+                   + cab002*cc(i_ch4) &
+                   + cab005*cc(i_ch3)*0.83
+        B_h(2,t_o1d) = b003*cc(i_h2) 
+        B_h(2,t_o3) = 0.956*cab004*cc(i_ch3)
+        B_h(2,t_oh) = c002*cc(i_o) &
+                    + c010*cc(i_h2) &
+                    + e001*cc(i_co)
+        B_h(2,t_h2) = b003*cc(i_o1d) &
+                    + b008*cc_prev(i_oh)
+        B_h(2,t_h2ovap) = j(j_h2o) 
+        B_h(2,t_ch4) = b008*cc(i_o1d) &
+                     + cab002*cc(i_o) &
+                     + k_pseudo
 
-!       1.1.4: Constructing the d(N)/d(PQ) and
-!               d(D)/d(PQ) Vectors 
-!       ---------------------------------------
-        dN_dPQ(:) = 0.
-        dD_dPQ(:) = 0.
+        IF ( igcm_ch3 .ne. 0 ) B_h(2,t_ch3) = cab004*cc(i_o3)*0.956 & 
+                                            + cab005*cc(i_o)*0.83 
+        IF ( igcm_hcho .ne. 0 ) B_h(2,t_hcho) = j(j_ch2o_hco)
 
-        DO iq = 1, nqmx
+!       1.1.4: d(Pd)/d(PQ) B Coefficients
+!       ---------------------------------
+        B_H(3,t_o2) = c011 
+        B_H(3,t_o3) = c003 
+        B_H(3,t_ho2) = c004 + c005 + c006 
+        B_H(3,t_h) = c018 
+
+!       1.1.5: d(Ld)/d(PQ) B Coefficients
+!       ---------------------------------
+        B_H(4,t_o2) = cab026*cc(i_hco) + cab015*cc(i_ch3o)
+        B_H(4,t_o3) = c014*cc_prev(i_oh) 
+        B_H(4,t_oh) = c009*cc(i_h2o2) + c014*cc(i_o3) + cab011*cc(i_ch3o2) &
+                    + cab032*cc(i_hcooh) 
+        B_H(4,t_h2o2) = c009*cc_prev(i_oh) + c012*cc(i_h2o2)
+        B_H(4,t_o) = c012*cc(i_h2o2)
+
+        if ( igcm_ch3o2 .ne. 0 ) B_H(4,t_ch3o2) = cab011*cc_prev(i_oh) + cab030*cc(i_hoch2o2) 
+        if ( igcm_ch3o .ne. 0 ) B_H(4,t_ch3o) = cab015*cc(i_o2) 
+        if ( igcm_hoch2o2 .ne. 0 ) B_H(4,t_hoch2o2) = cab028 + 2.*cab030*cc(i_hoch2o2)
+        if ( igcm_hcooh .ne. 0 ) B_H(4,t_hcooh) = cab032*cc_prev(i_oh)
+        if ( igcm_hco .ne. 0 ) B_H(4,t_hco) = cab026*cc(i_o2)
+        if ( igcm_hoch2oh .ne. 0 ) B_H(4,t_hoch2oh) = cab035*cc_prev(i_oh)
+
+
+        dPn_dPQ(:) = 0.D0
+        dLn_dPQ(:) = 0.D0 
+        dPd_dPQ(:) = 0.D0 
+        dLd_dPQ(:) = 0.D0
+
+        DO iq = 1,nqmx
 
             x_j = (iq-1)*nlayermx + lyr_m
 
-            dN_dPQ = dN_dPQ + B_h(1,iq)*dccn_dpq( x_j, : )
-
-            dD_dPQ = dD_dPQ + B_h(2,iq)*dccn_dpq( x_j, : )
+            dPn_dPQ = dPn_dPQ + B_H(1,iq)*dccn_dpq( x_j,: )
+            dLn_dPQ = dLn_dPQ + B_H(2,iq)*dccn_dpq( x_j,: )
+            dPd_dPQ = dPd_dPQ + B_H(3,iq)*dccn_dpq( x_j,: )
+            dLd_dPQ = dLd_dPQ + B_H(4,iq)*dccn_dpq( x_j,: )
 
         ENDDO
 
-!       1.1.5: Build d(rh_ho2)/d(PQ)
+!       1.1.6: Build d(rh_ho2)/d(PQ) 
 !       ----------------------------
-        drh_ho2 = A_RH(1)*dN_dPQ - A_RH(2)*dD_dPQ 
+        drh_ho2 = A_RH(1)*dPn_dPQ + A_RH(2)*dLn_dPQ - A_RH(3)*dccn_dpq( (t_ho2-1)*nlayermx + lyr_m , :) &
+                - A_RH(4)*dPd_dPQ - A_RH(5)*dLd_dPQ + A_RH(6)*dccn_dpq( (t_h-1)*nlayermx + lyr_m , :)
 
 !   ----------------------------------
 !   1.2: Constructing d(ROH_HO2)/d(PQ)
