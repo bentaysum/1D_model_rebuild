@@ -920,12 +920,12 @@
           ! +   4.6374896E-03*zls &
           ! +   2.8769755E-01)*1.e-9
 
-ch4vmr=0.3994e-9
+ch4vmr=4.1275263e-9
 
           do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
-                  if ( l <= 5 ) then 
+                  if ( l <= 5) then 
                   pq(i,j,l,igcm_ch4) = ch4vmr*mmol(igcm_ch4)/mmean(i,j,l)
                   else
                   pq(i,j,l,igcm_ch4) = 0.

@@ -988,7 +988,11 @@
 
             do i = 1,nbq
                iq = niq(i) ! get tracer index
+               ! IF ( ( trim(noms(iq)) == "ch4" ) .and. (l .le. 5) ) THEN 
+               !    zq(ig,l,iq) = pq(ig,l,iq)
+               ! ELSE  
                zq(ig,l,iq) = pq(ig,l,iq) + pdq(ig,l,iq)*ptimestep
+               ! ENDIF 
                zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
             end do
             
