@@ -217,11 +217,11 @@ integer iq ! Tracer iterations
 
 ! Stage 1 
 ! -------
-REAL*8 A_RH(6), A_ROH(2)
+REAL*8 A_RH(6), A_ROH(6)
 REAL*8 PHn, LHn, PHd, LHd
 REAL*8 POHn, LOHn, POHd, LOHd
 
-REAL*8 B_H(4,nqmx), B_OH(2,nqmx)
+REAL*8 B_H(4,nqmx), B_OH(4,nqmx)
 
 REAL*8 dPn_dPQ(nqmx*nlayermx), dPd_dPQ(nqmx*nlayermx)
 REAL*8 dLn_dPQ(nqmx*nlayermx), dLd_dPQ(nqmx*nlayermx)
@@ -470,6 +470,20 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 !
 !       1.2.1: A_ROH Coefficients
 !       -------------------------
+        LOHn =  j(j_h2o)*cc(i_h2o) &
+                 + j(j_h2o2)*cc(i_h2o2)*2. &
+                 + j(j_ch3o2h)*cc(i_ch3ooh) &
+                 + j(j_hoch2ooh)*cc(i_hoch2ooh) &
+                 + b002*cc(i_h2o)*cc(i_o1d)*2. &
+                 + b003*cc(i_o1d)*cc(i_h2) &
+                 + b007*cc(i_ch4)*cc(i_o1d) &
+                 + c003*cc(i_o3)*cc_prev(i_h) &
+                 + c012*cc(i_o)*cc(i_h2o2) &
+                 + cab002*cc(i_o)*cc(i_ch4) & 
+                 + cab020*cc(i_hcho)*cc(i_o) &
+                 + cab021*cc(i_hco)*cc(i_o)
+
+        LOHd = 0.D0
 
         roh_ho2_denominator = c002*cc(i_o) &
                     + c007*cc_prev(i_ho2) &
@@ -509,61 +523,81 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
                     + cab102*cc(i_hcoco3h) &
                     + cab107*cc(i_ch3)
 
-        A_roh(1) = 1./roh_ho2_denominator 
-        A_roh(2) = roh_ho2*A_roh(1) 
 
-!       1.2.2: d(N)/d(PQ) B Coefficients 
+        A_ROH(1) = 1./roh_ho2_denominator
+        A_ROH(2) = A_ROH(1)/cc_prev(i_ho2)
+        A_ROH(3) = A_ROH(2)*LOHn/cc_prev(i_ho2)
+        A_ROH(4) = A_ROH(1)*roh_ho2
+        A_ROH(5) = A_ROH(4)/cc_prev(i_oh)
+        A_ROH(6) = A_ROH(5)*LOHd/cc_prev(i_OH)
+!
+
+!       1.2.2: d(Pn)/d(PQ) B Coefficients 
 !       --------------------------------
         B_OH(:,:) = 0. 
         B_OH(1,t_o) = c001
-        B_OH(1,t_o3) = c003*rh_ho2 + c015
-        B_OH(1,t_h) = 2.*c004 
-        B_OH(1,t_ho2) = 2.*c008
-        IF ( igcm_ch3o2 .ne. 0 ) B_OH(1,t_ch3o2) = cab006 + cab007
-        IF ( igcm_hcho .ne. 0 ) B_OH(1,t_hcho) = cab019  
-        IF ( igcm_hoch2o2 .ne. 0 ) B_OH(1,t_hoch2o2) = 0.25*cab029
+        B_OH(1,t_o3) =  c015
+        B_OH(1,t_ho2) = 2.*c004
+
+!       1.2.3: d(dL)/d(PQ) B Coefficients 
+!       ---------------------------------
+        B_OH(2,t_h) = c003*cc(i_o3)
+        B_OH(2,t_h2ovap) = j(j_h2o) + b002*cc(i_o1d)*2.
+        B_OH(2,t_h2o2) = j(j_h2o2)*2. + c012*cc(i_o)
+        B_OH(2,t_o) = c012*cc(i_h2o2) + cab002*cc(i_ch4) + cab020*cc(i_hcho) &
+                    + cab021*cc(i_hco)
+        B_OH(2,t_o1d) = b002*cc(i_h2o)*2. + b003*cc(i_h2) + b007*cc(i_ch4)
+        B_OH(2,t_h2) = b003*cc(i_o1d) 
+        B_OH(2,t_ch4) = b007*cc(i_o1d) + cab002*cc(i_o)
+
+        IF (igcm_ch3ooh .ne. 0 ) B_OH(2,t_ch3ooh) = j(j_ch3o2h)
+        IF (igcm_hoch2ooh .ne. 0 ) B_OH(2,t_hoch2ooh) = j(j_hoch2ooh)
+        IF (igcm_hcho .ne. 0) B_OH(2,t_hcho) = cab020*cc(i_o)
+        IF (igcm_hco .ne. 0 ) B_OH(2,t_hco) = cab021*cc(i_o)
+
+
  
-!       1.2.3: d(D)/d(PQ) B Coefficients 
+!       1.2.4: d(Pd)/d(PQ) B Coefficients 
 !       --------------------------------
-        B_OH(2,t_co) = e001 
-        B_OH(2,t_o) = c002 
-        B_OH(2,t_ho2) = c007
-        B_OH(2,t_h2o2) = c009 
-        B_OH(2,t_oh) = 2.*(c013 + c017)
-        B_OH(2,t_ch4) = cab001 
-        IF ( igcm_ch3 .ne. 0 ) B_OH(2,t_ch3) = cab107
-        IF ( igcm_ch3o2 .ne. 0 ) B_OH(2,t_ch3o2) = 2.*cab011
-        IF ( igcm_ch3ooh .ne. 0 ) B_OH(2,t_ch3ooh) = 0.6*cab014
-        IF ( igcm_ch3oh .ne. 0 ) B_OH(2,t_ch3oh) = 0.15*cab013 
-        IF ( igcm_hcho .ne. 0 ) B_OH(2,t_hcho) = cab018 
-        IF ( igcm_ch3ooh .ne. 0 ) B_OH(2,t_hcooh) = 2.*cab032
-        IF ( igcm_hoch2oh .ne. 0 ) B_OH(2,t_hoch2oh) = 2.*cab035
-        IF ( igcm_hoch2ooh .ne. 0 ) B_OH(2,t_hoch2ooh) = cab033 
-        IF ( igcm_hco .ne. 0 ) B_OH(2,t_hco) = cab025
+        B_OH(3,t_co) = e001 
+        B_OH(3,t_o) = c002 
+        B_OH(3,t_ho2) = c007
+        B_OH(3,t_h2o2) = c009 
+        B_OH(3,t_oh) = 2.*(c013 + c017)
+        B_OH(3,t_ch4) = cab001 
+        IF ( igcm_ch3 .ne. 0 ) B_OH(3,t_ch3) = cab107
+        IF ( igcm_ch3o2 .ne. 0 ) B_OH(3,t_ch3o2) = 2.*cab011
+        IF ( igcm_ch3ooh .ne. 0 ) B_OH(3,t_ch3ooh) = 0.6*cab014
+        IF ( igcm_ch3oh .ne. 0 ) B_OH(3,t_ch3oh) = 0.15*cab013 
+        IF ( igcm_hcho .ne. 0 ) B_OH(3,t_hcho) = cab018 
+        IF ( igcm_ch3ooh .ne. 0 ) B_OH(3,t_hcooh) = 2.*cab032
+        IF ( igcm_hoch2oh .ne. 0 ) B_OH(3,t_hoch2oh) = 2.*cab035
+        IF ( igcm_hoch2ooh .ne. 0 ) B_OH(3,t_hoch2ooh) = cab033 
+        IF ( igcm_hco .ne. 0 ) B_OH(3,t_hco) = cab025
 
 !       1.2.4: Constructing the d(N)/d(PQ) and
 !               d(D)/d(PQ) Vectors 
 !       ---------------------------------------
 
-        dN_dPQ(:) = 0.      
-        dD_dPQ(:) = 0.
+        dPn_dPQ(:) = 0.D0   
+        dPd_dPQ(:) = 0.D0
+        dLn_dPQ(:) = 0.D0
 
         DO iq = 1, nqmx
 
             x_j = (iq-1)*nlayermx + lyr_m
 
-            dN_dPQ = dN_dPQ + B_OH(1,iq)*dccn_dpq( x_j, : )
-
-            dD_dPQ = dD_dPQ + B_OH(2,iq)*dccn_dpq( x_j, : )
+            dPn_dPQ = dPn_dPQ + B_OH(1,iq)*dccn_dpq( x_j,: )
+            dLn_dPQ = dLn_dPQ + B_OH(2,iq)*dccn_dpq( x_j,: )
+            dPd_dPQ = dPd_dPQ + B_OH(3,iq)*dccn_dpq( x_j,: )
 
         ENDDO
 
 !       1.2.5: Build d(rh_ho2)/d(PQ)
 !       ----------------------------
-        droh_ho2 = A_ROH(1)*dN_dPQ - A_ROH(2)*dD_dPQ 
 
-        droh_ho2 = droh_ho2 + A_ROH(1)*c003*cc(i_o3)*drh_ho2
-
+        droh_ho2 = A_ROH(1)*dPn_dPQ + A_ROH(2)*dLn_dPQ - A_ROH(3)*dccn_dpq( (t_ho2-1)*nlayermx + lyr_m , :) &
+                - A_ROH(4)*dPd_dPQ - A_ROH(5)*dLd_dPQ + A_ROH(6)*dccn_dpq( (t_oh-1)*nlayermx + lyr_m , :)
 
 ! ============================================ ! 
 ! STAGE 2: LINEARISING HYDROGEN ATOMS  
