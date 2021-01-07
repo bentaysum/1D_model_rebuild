@@ -904,69 +904,129 @@ C      $           + cab042(l)*cc(l,i_c2h5)
 C      $           )
 
 
-!     BMT v2
-        rh_ho2 = ( c001(l)*cc(l,i_o)
-     $           + c004(l)*cc(l,i_h)
-     $           + c005(l)*cc(l,i_h)
-     $           + c006(l)*cc(l,i_h)
-     $           + c007(l)*cc(l,i_oh)
-     $           + 2.*c008(l)*cc(l,i_ho2)
-     $           + c015(l)*cc(l,i_o3)
-     $           + 2.*c016(l)*cc(l,i_ho2)
-     $           + d003(l)*no(l)             ! ajout 20090401
-     $           + j(l,j_ho2)
-     $           + h001(l)*hetero_ice 
-     $           + h003(l)*hetero_dust
-     $           + cab006(l)*cc(l,i_ch3o2)
-     $           + cab007(l)*cc(l,i_ch3o2)
-     $           + cab019(l)*cc(l,i_hcho)
-     $           + cab029(l)*cc(l,i_hoch2o2)*0.8
-     $           + cab043(l)*cc(l,i_c2h5o2)
-     $           + cab049(l)*cc(l,i_hoch2ch2o2)
-     $           + cab050(l)*cc(l,i_hoch2ch2o2)
-     $           + cab059(l)*cc(l,i_ch3cho)
-     $           + cab065(l)*cc(l,i_ch3choho2)
-     $           + cab072(l)*cc(l,i_ch3cooo)
-     $           + cab073(l)*cc(l,i_ch3cooo)
-     $           + cab074(l)*cc(l,i_ch3cooo)
-     $           + cab079(l)*cc(l,i_hcoch2o2)
-     $           + cab096(l)*cc(l,i_hoch2co3)
-     $           + cab097(l)*cc(l,i_hoch2co3)
-     $           + ( b003(l)*cc(l,i_o1d)*cc(l,i_h2)
-     $           +   b008(l)*cc(l,i_ch4)*cc(L,i_o1d)
-     $           +   c002(l)*cc(l,i_o)*cc(l,i_oh)
-     $           +   c010(l)*cc(L,i_OH)*cc(l,i_h2)
-     $           +   e001(l)*cc(l,i_co)*cc(l,i_oh)
-     $           +   cab002(l)*cc(l,i_o)*cc(l,i_ch4)
-     $           +   cab004(l)*cc(l,i_ch3)*cc(l,i_o3)*0.956
-     $           +   cab005(l)*cc(l,i_ch3)*cc(l,i_o)*0.83 
-     $           +   j(l,j_h2o)*cc(l,i_h2o)
-     $           +   j(l,j_ch2o_hco)*cc(l,i_hcho)
-     $           +   k_pseudo(l)*cc(l,i_ch4)
-     $             )/MAX( dens(l)*1.e-30, cc(l,i_ho2) ) 
-     $           ) 
-     $           /( c003(l)*cc(l,i_o3)
-     $           +  c004(l)*cc(l,i_ho2)
-     $           +  c005(l)*cc(l,i_ho2)
-     $           +  c006(l)*cc(l,i_ho2)
-     $           +  c011(l)*cc(l,i_o2)
-     $           +  c018(l)*cc(L,i_h)
-     $           +  ( t001(l)*cc(l,i_h2o)
-     $              + c009(l)*cc(l,i_h2o2)*cc(l,i_oh)
-     $              + c012(l)*cc(l,i_h2o2)*cc(l,i_o)
-     $              + c014(l)*cc(l,i_oh)*cc(l,i_o3)
-     $              + cab011(l)*cc(l,i_ch3o2)*cc(l,i_oh)
-     $              + cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
-     $              + cab026(l)*cc(l,i_hco)*cc(l,i_o2)
-     $              + cab028(l)*cc(l,i_hoch2o2)
-     $              + cab030(l)*cc(l,i_hoch2o2)*ro2(l)
-     $              + cab032(l)*cc(l,i_hcooh)*cc(l,i_oh)
-     $              + cab035(l)*cc(l,i_hoch2oh)*cc(l,i_oh)
-     $              )/MAX( cc(l,i_h) , dens(l)*1.e-30 )              
-     $           )
+C !     BMT v2
+C         rh_ho2 = ( c001(l)*cc(l,i_o)
+C      $           + c004(l)*cc(l,i_h)
+C      $           + c005(l)*cc(l,i_h)
+C      $           + c006(l)*cc(l,i_h)
+C      $           + c007(l)*cc(l,i_oh)
+C      $           + 2.*c008(l)*cc(l,i_ho2)
+C      $           + c015(l)*cc(l,i_o3)
+C      $           + 2.*c016(l)*cc(l,i_ho2)
+C      $           + d003(l)*no(l)             ! ajout 20090401
+C      $           + j(l,j_ho2)
+C      $           + h001(l)*hetero_ice 
+C      $           + h003(l)*hetero_dust
+C      $           + cab006(l)*cc(l,i_ch3o2)
+C      $           + cab007(l)*cc(l,i_ch3o2)
+C      $           + cab019(l)*cc(l,i_hcho)
+C      $           + cab029(l)*cc(l,i_hoch2o2)*0.8
+C      $           + cab043(l)*cc(l,i_c2h5o2)
+C      $           + cab049(l)*cc(l,i_hoch2ch2o2)
+C      $           + cab050(l)*cc(l,i_hoch2ch2o2)
+C      $           + cab059(l)*cc(l,i_ch3cho)
+C      $           + cab065(l)*cc(l,i_ch3choho2)
+C      $           + cab072(l)*cc(l,i_ch3cooo)
+C      $           + cab073(l)*cc(l,i_ch3cooo)
+C      $           + cab074(l)*cc(l,i_ch3cooo)
+C      $           + cab079(l)*cc(l,i_hcoch2o2)
+C      $           + cab096(l)*cc(l,i_hoch2co3)
+C      $           + cab097(l)*cc(l,i_hoch2co3)
+C      $           + ( b003(l)*cc(l,i_o1d)*cc(l,i_h2)
+C      $           +   b008(l)*cc(l,i_ch4)*cc(L,i_o1d)
+C      $           +   c002(l)*cc(l,i_o)*cc(l,i_oh)
+C      $           +   c010(l)*cc(L,i_OH)*cc(l,i_h2)
+C      $           +   e001(l)*cc(l,i_co)*cc(l,i_oh)
+C      $           +   cab002(l)*cc(l,i_o)*cc(l,i_ch4)
+C      $           +   cab004(l)*cc(l,i_ch3)*cc(l,i_o3)*0.956
+C      $           +   cab005(l)*cc(l,i_ch3)*cc(l,i_o)*0.83 
+C      $           +   j(l,j_h2o)*cc(l,i_h2o)
+C      $           +   j(l,j_ch2o_hco)*cc(l,i_hcho)
+C      $           +   k_pseudo(l)*cc(l,i_ch4)
+C      $             )/MAX( dens(l)*1.e-30, cc(l,i_ho2) ) 
+C      $           ) 
+C      $           /( c003(l)*cc(l,i_o3)
+C      $           +  c004(l)*cc(l,i_ho2)
+C      $           +  c005(l)*cc(l,i_ho2)
+C      $           +  c006(l)*cc(l,i_ho2)
+C      $           +  c011(l)*cc(l,i_o2)
+C      $           +  c018(l)*cc(L,i_h)
+C      $           +  ( t001(l)*cc(l,i_h2o)
+C      $              + c009(l)*cc(l,i_h2o2)*cc(l,i_oh)
+C      $              + c012(l)*cc(l,i_h2o2)*cc(l,i_o)
+C      $              + c014(l)*cc(l,i_oh)*cc(l,i_o3)
+C      $              + cab011(l)*cc(l,i_ch3o2)*cc(l,i_oh)
+C      $              + cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
+C      $              + cab026(l)*cc(l,i_hco)*cc(l,i_o2)
+C      $              + cab028(l)*cc(l,i_hoch2o2)
+C      $              + cab030(l)*cc(l,i_hoch2o2)*ro2(l)
+C      $              + cab032(l)*cc(l,i_hcooh)*cc(l,i_oh)
+C      $              + cab035(l)*cc(l,i_hoch2oh)*cc(l,i_oh)
+C      $              )/MAX( cc(l,i_h) , dens(l)*1.e-30 )              
+C      $           )
 
 
-  
+C     BMT v3.0
+c            PRODUCTION(H)/CC[HO2]
+C            CCCCCCCCCCCCCCCCCCCCC
+      rh_ho2 = (
+     $         ( b003(l)*cc(l,i_o1d)*cc(l,i_h2)
+     $         + b008(l)*cc(l,i_o1d)*cc(l,i_ch4)
+     $         + c002(l)*cc(l,i_o)*cc(l,i_oh)
+     $         + c010(l)*cc(l,i_oh)*cc(l,i_h2)
+     $         + e001(l)*cc(l,i_co)*cc(l,i_oh)
+     $         + 0.49*cab002(l)*cc(l,i_ch4)*cc(l,i_o)
+     $         + 0.956*cab004(l)*cc(l,i_o3)*cc(l,i_ch3)
+     $         + 0.83*cab005(l)*cc(l,i_o)*cc(l,i_ch3)
+     $         + k_pseudo(l)*cc(l,i_ch4)
+     $         + j(l,j_h2o)*cc(l,i_h2o)
+     $         + j(l,j_ch4_ch3_h)*cc(l,i_ch4)
+     $         + 2.*j(l,j_ch4_3ch2_h_h)*cc(l,i_ch4)
+     $         + j(l,j_ch4_ch_h2_h)*cc(l,i_ch4) 
+     $         + j(l,j_ch2o_hco)*cc(l,i_hcho)
+     $         + j(l,j_ch3oh)*cc(l,i_ch3oh)
+     $         )/MAX(cc(l,i_ho2),dens(l)*1.e-30)
+c            LOSS[HO2]
+C            CCCCCCCCC
+     $        + c001(l)*cc(l,i_o)
+     $        + c004(l)*cc(l,i_h)
+     $        + c005(l)*cc(l,i_h)
+     $        + c006(l)*cc(l,i_h)
+     $        + c007(l)*cc(l,i_oh)
+     $        + c008(l)*cc(l,i_ho2)
+     $        + c015(l)*cc(l,i_o3)
+     $        + c016(L)*cc(l,i_ho2)
+     $        + cab006(l)*cc(l,i_ch3o2)
+     $        + cab007(l)*cc(l,i_ch3o2)
+     $        + cab019(l)*cc(l,i_hcho)
+     $        + cab029(l)*cc(l,i_hoch2o2)*0.8)
+C            PRODUCTION(HO2)/CC[H]
+C            CCCCCCCCCCCCCCCCCCCCC
+     $      /( c011(l)*cc(l,i_o2) 
+     $       + ( c009(l)*cc(l,i_h2o2)*cc(l,i_oh)
+     $         + c012(l)*cc(l,i_o)*cc(l,i_h2o2)
+     $         + c014(l)*cc(l,i_oh)*cc(l,i_o3)
+     $         + cab011(l)*cc(l,i_ch3o2)*cc(l,i_oh)
+     $         + cab013(l)*cc(l,i_ch3oh)*cc(l,i_oh)*0.85
+     $         + cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
+     $         + cab026(l)*cc(l,i_hco)*cc(l,i_o2)
+     $         + cab028(l)*cc(l,i_hoch2o2)
+     $         + cab030(l)*cc(l,i_hoch2o2)*ro2(l)
+     $         + cab032(l)*cc(l,i_hcooh)*cc(l,i_oh)
+     $         + cab035(l)*cc(l,i_hoch2oh)*cc(l,i_oh)
+     $         + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
+     $         )/MAX(cc(l,i_h),dens(l)*1.e-30)
+c            LOSS[H]
+c            ccccccc
+     $     + c003(l)*cc(l,i_o3)
+     $     + c004(l)*cc(l,i_ho2)
+     $     + c005(l)*cc(l,i_ho2)
+     $     + c006(l)*cc(l,i_ho2)
+     $     + c011(l)*cc(l,i_o2)
+     $     + c018(l)*cc(l,i_h)
+     $     + cab027(l)*cc(l,i_hco)
+     $    )
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        oh/ho2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1039,66 +1099,138 @@ C      $            )
 
 
 C     BMT Version 2.0
-      roh_ho2 = ( j(l,j_ho2) 
-     $        +   c001(l)*cc(l,i_o)
-     $        +   2.*c004(l)*cc(l,i_ho2)
-     $        +   c015(l)*cc(l,i_o3)
-     $        +   d003(l)*no(l)
-     $        +   ( j(l,j_h2o)*cc(l,i_h2o)
-     $            + j(l,j_h2o2)*cc(l,i_h2o2)*2.
-     $            + j(l,j_ch3o2h)*cc(l,i_ch3ooh)
-     $            + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
-     $            + b002(l)*cc(l,i_h2o)*cc(l,i_o1d)*2.
-     $            + b003(l)*cc(l,i_o1d)*cc(l,i_h2)
-     $            + b007(l)*cc(l,i_ch4)*cc(l,i_o1d)
-     $            + c003(l)*cc(l,i_o3)*cc(l,i_h)
-     $            + c012(l)*cc(l,i_o)*cc(l,i_h2o2)
-     $            + cab002(l)*cc(l,i_o)*cc(l,i_ch4)
-     $            + cab020(l)*cc(l,i_hcho)*cc(l,i_o)
-     $            + cab021(l)*cc(l,i_hco)*cc(l,i_o)
-     $            )/MAX(dens(l)*1.e-30,cc(l,i_ho2))
-     $        )
-     $        /(c002(l)*cc(l,i_o)
-     $         + c007(l)*cc(l,i_ho2)
-     $         + c009(l)*cc(l,i_h2o2)         ! ajout 20090401
-     $         + c013(l)*cc(l,i_oh)        ! ajout 20090401
-     $         + c017(l)*cc(l,i_oh)        ! ajout 20090401
-     $         + e001(l)*cc(l,i_co) 
-     $         + h002(l)*hetero_ice
-     $         + cab001(l)*cc(l,i_ch4)
-     $         + cab011(l)*cc(l,i_ch3o2)
-     $         + cab013(l)*cc(l,i_ch3oh)
-     $         + cab014(l)*cc(l,i_ch3ooh)
-     $         + cab018(l)*cc(l,i_hcho)
-     $         + cab025(l)*cc(l,i_hco)
-     $         + cab032(l)*cc(l,i_hcooh)
-     $         + cab033(l)*cc(l,i_hoch2ooh)
-     $         + cab035(l)*cc(l,i_hoch2oh)
-     $         + cab036(l)*cc(l,i_c2h6)
-     $         + cab045(l)*cc(l,i_c2h5ooh)
-     $         + cab047(l)*cc(l,i_c2h5oh)
-     $         + cab053(l)*cc(l,i_ethgly)
-     $         + cab054(l)*cc(l,i_hyetho2h)
-     $         + cab056(l)*cc(l,i_hyetho2h)
-     $         + cab057(l)*cc(l,i_ch3cho)
-     $         + cab058(l)*cc(l,i_ch3cho)
-     $         + cab062(l)*cc(l,i_ch2choh)
-     $         + cab067(l)*cc(l,i_ch3cooh)
-     $         + cab069(l)*cc(l,i_ch3chohooh)
-     $         + cab077(l)*cc(l,i_ch3coooh)
-     $         + cab081(l)*cc(l,i_glyox)
-     $         + cab085(l)*cc(l,i_hooch2cho)
-     $         + cab088(l)*cc(l,i_hoch2cho)
-     $         + cab089(l)*cc(l,i_hoch2cho)
-     $         + cab098(l)*cc(l,i_hoch2co2h)
-     $         + cab099(l)*cc(l,i_hcoco2h)
-     $         + cab100(l)*cc(l,i_hoch2co3h)
-     $         + cab101(l)*cc(l,i_hoch2co3h)
-     $         + cab102(l)*cc(l,i_hcoco3h)
-     $         + cab107(l)*cc(l,i_ch3)
-     $            )
+C       roh_ho2 = ( j(l,j_ho2) 
+C      $        +   c001(l)*cc(l,i_o)
+C      $        +   2.*c004(l)*cc(l,i_ho2)
+C      $        +   c015(l)*cc(l,i_o3)
+C      $        +   d003(l)*no(l)
+C      $        +   ( j(l,j_h2o)*cc(l,i_h2o)
+C      $            + j(l,j_h2o2)*cc(l,i_h2o2)*2.
+C      $            + j(l,j_ch3o2h)*cc(l,i_ch3ooh)
+C      $            + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
+C      $            + b002(l)*cc(l,i_h2o)*cc(l,i_o1d)*2.
+C      $            + b003(l)*cc(l,i_o1d)*cc(l,i_h2)
+C      $            + b007(l)*cc(l,i_ch4)*cc(l,i_o1d)
+C      $            + c003(l)*cc(l,i_o3)*cc(l,i_h)
+C      $            + c012(l)*cc(l,i_o)*cc(l,i_h2o2)
+C      $            + cab002(l)*cc(l,i_o)*cc(l,i_ch4)
+C      $            + cab020(l)*cc(l,i_hcho)*cc(l,i_o)
+C      $            + cab021(l)*cc(l,i_hco)*cc(l,i_o)
+C      $            )/MAX(dens(l)*1.e-30,cc(l,i_ho2))
+C      $        )
+C      $        /(c002(l)*cc(l,i_o)
+C      $         + c007(l)*cc(l,i_ho2)
+C      $         + c009(l)*cc(l,i_h2o2)         ! ajout 20090401
+C      $         + c013(l)*cc(l,i_oh)        ! ajout 20090401
+C      $         + c017(l)*cc(l,i_oh)        ! ajout 20090401
+C      $         + e001(l)*cc(l,i_co) 
+C      $         + h002(l)*hetero_ice
+C      $         + cab001(l)*cc(l,i_ch4)
+C      $         + cab011(l)*cc(l,i_ch3o2)
+C      $         + cab013(l)*cc(l,i_ch3oh)
+C      $         + cab014(l)*cc(l,i_ch3ooh)
+C      $         + cab018(l)*cc(l,i_hcho)
+C      $         + cab025(l)*cc(l,i_hco)
+C      $         + cab032(l)*cc(l,i_hcooh)
+C      $         + cab033(l)*cc(l,i_hoch2ooh)
+C      $         + cab035(l)*cc(l,i_hoch2oh)
+C      $         + cab036(l)*cc(l,i_c2h6)
+C      $         + cab045(l)*cc(l,i_c2h5ooh)
+C      $         + cab047(l)*cc(l,i_c2h5oh)
+C      $         + cab053(l)*cc(l,i_ethgly)
+C      $         + cab054(l)*cc(l,i_hyetho2h)
+C      $         + cab056(l)*cc(l,i_hyetho2h)
+C      $         + cab057(l)*cc(l,i_ch3cho)
+C      $         + cab058(l)*cc(l,i_ch3cho)
+C      $         + cab062(l)*cc(l,i_ch2choh)
+C      $         + cab067(l)*cc(l,i_ch3cooh)
+C      $         + cab069(l)*cc(l,i_ch3chohooh)
+C      $         + cab077(l)*cc(l,i_ch3coooh)
+C      $         + cab081(l)*cc(l,i_glyox)
+C      $         + cab085(l)*cc(l,i_hooch2cho)
+C      $         + cab088(l)*cc(l,i_hoch2cho)
+C      $         + cab089(l)*cc(l,i_hoch2cho)
+C      $         + cab098(l)*cc(l,i_hoch2co2h)
+C      $         + cab099(l)*cc(l,i_hcoco2h)
+C      $         + cab100(l)*cc(l,i_hoch2co3h)
+C      $         + cab101(l)*cc(l,i_hoch2co3h)
+C      $         + cab102(l)*cc(l,i_hcoco3h)
+C      $         + cab107(l)*cc(l,i_ch3)
+C      $            )
      
 
+c     BMT v3.0
+c     cccccccc
+C                 PRODUCTION(OH)/CC[HO2]
+C                 CCCCCCCCCCCCCCCCCCCCCC
+      roh_ho2 = ( c001(l)*cc(l,i_o)
+     $        +   c004(l)*cc(l,i_h)*2.
+     $        +   c015(l)*cc(l,i_o3)
+     $        +   0.2*cab029(l)*cc(l,i_hoch2o2)
+     $        +   2.*j(l,j_ho2)
+     $        +   ( b002(l)*cc(l,i_o1d)*cc(l,i_h2o)*2.
+     $            + b003(l)*cc(l,i_o1d)*cc(l,i_h2)
+     $            + b007(l)*cc(l,i_o1d)*cc(l,i_ch4)
+     $            + c003(l)*cc(l,i_o3)*cc(l,i_h)
+     $            + c012(l)*cc(l,i_h2o2)*cc(l,i_o)
+     $            + cab020(l)*cc(l,i_hcho)*cc(l,i_o)
+     $            + cab021(l)*cc(l,i_hco)*cc(l,i_o)
+     $            + j(l,j_h2o)*cc(l,i_h2o)
+     $            + j(l,j_ch3o2h)*cc(l,i_ch3ooh)
+     $            + 2.*j(l,j_h2o2)*cc(l,i_h2o2)
+     $            + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
+     $            )/MAX(cc(l,i_ho2),dens(l)*1.e-30)
+C                 LOSS(HO2)
+C                 CCCCCCCCC
+     $        + c001(l)*cc(l,i_o)
+     $        + c004(l)*cc(l,i_h)
+     $        + c005(l)*cc(l,i_h)
+     $        + c006(l)*cc(l,i_h)
+     $        + c007(l)*cc(l,i_oh)
+     $        + c008(l)*cc(l,i_ho2)
+     $        + c015(l)*cc(l,i_o3)
+     $        + c016(L)*cc(l,i_ho2)
+     $        + cab006(l)*cc(l,i_ch3o2)
+     $        + cab007(l)*cc(l,i_ch3o2)
+     $        + cab019(l)*cc(l,i_hcho)
+     $        + cab029(l)*cc(l,i_hoch2o2)*0.8)  
+     $        /
+c             PRODUCTION(HO2)/CC[OH]
+c             CCCCCCCCCCCCCCCCCCCCCC
+     $        ( c009(l)*cc(l,i_h2o2)
+     $        + c014(l)*cc(l,i_o3)
+     $        + cab011(l)*cc(l,i_ch3o2)
+     $        + cab013(l)*cc(l,i_ch3oh)*0.85
+     $        + cab032(l)*cc(l,i_hcooh)
+     $        + cab035(L)*cc(l,i_hoch2oh)
+     $        + ( c011(l)*cc(l,i_h)*cc(l,i_o2)
+     $         + c012(l)*cc(l,i_o)*cc(l,i_h2o2)
+     $         + cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
+     $         + cab026(l)*cc(l,i_hco)*cc(l,i_o2)
+     $         + cab028(l)*cc(l,i_hoch2o2)
+     $         + cab030(l)*cc(l,i_hoch2o2)*ro2(l)
+     $         + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh) 
+     $          )/MAX(cc(l,i_oh),dens(l)*1.e-30)
+c             LOSS(OH)
+C             CCCCCCCC
+     $       + c002(l)*cc(l,i_o)
+     $       + c007(l)*cc(l,i_ho2)
+     $       + c009(l)*cc(l,i_h2o2)
+     $       + c010(l)*cc(l,i_h2)
+     $       + c013(l)*cc(l,i_oh)
+     $       + c014(l)*cc(l,i_o3)
+     $       + c017(l)*cc(l,i_oh)
+     $       + e001(l)*cc(l,i_co)
+     $       + cab001(l)*cc(l,i_ch4)
+     $       + cab011(l)*cc(l,i_ch3o2)
+     $       + cab013(l)*cc(l,i_ch3oh)
+     $       + cab014(l)*cc(l,i_ch3ooh)
+     $       + cab018(l)*cc(l,i_hcho)
+     $       + cab025(l)*cc(l,i_hco)
+     $       + cab032(l)*cc(l,i_hcooh)
+     $       + cab033(l)*cc(l,i_hoch2ooh)
+     $       + cab035(l)*cc(l,i_hoch2oh)
+     $       )
 
           IF ( tlm_on ) THEN 
 
@@ -1685,21 +1817,21 @@ C       ENDIF
       
         
           
-C         IF ( l .eq. 5 ) THEN 
+        IF ( l .eq. 5 ) THEN 
 
-C           k_pseudo(l) =(1./( 31540000.))
-C      $             -  loss(l,i_ch4)
-
-
-C         loss(l,i_ch4) = loss(l,i_ch4) + k_pseudo(l)
-
-C         else
-
-C         k_pseudo(l) = 0.
+          k_pseudo(l) =(1./( 31540000.))
+     $             -  loss(l,i_ch4)
 
 
+        loss(l,i_ch4) = loss(l,i_ch4) + k_pseudo(l)
 
-C         ENDIF 
+        else
+
+        k_pseudo(l) = 0.
+
+
+
+        ENDIF 
 
 
 

@@ -334,33 +334,39 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
                 +   c002*cc(i_o)*cc_prev(i_oh) &
                 +   c010*cc_prev(i_OH)*cc(i_h2) &
                 +   e001*cc(i_co)*cc_prev(i_oh) &
-                +   cab002*cc(i_o)*cc(i_ch4) &
+                +   cab002*cc(i_o)*cc(i_ch4)*0.49 &
                 +   cab004*cc(i_ch3)*cc(i_o3)*0.956 &
                 +   cab005*cc(i_ch3)*cc(i_o)*0.83  &
+                +   k_pseudo*cc(i_ch4) &
                 +   j(j_h2o)*cc(i_h2o) &
                 +   j(j_ch2o_hco)*cc(i_hcho) &
-                +   k_pseudo*cc(i_ch4)
+                +   j(j_ch4_ch3_h)*cc(i_ch4) &
+                +   2.*j(j_ch4_3ch2_h_h)*cc(i_ch4) &
+                +   j(j_ch4_ch_h2_h)*cc(i_ch4) &
+                +   j(j_ch2o_hco)*cc(i_hcho) &
+                +   j(j_ch3oh)*cc(i_ch3oh)
 
      LHd = c009*cc(i_h2o2)*cc_prev(i_oh) &
                    + c012*cc(i_h2o2)*cc(i_o) &
                    + c014*cc(i_oh)*cc(i_o3) &
                    + cab011*cc(i_ch3o2)*cc_prev(i_oh) &
+                   + cab013*cc(i_ch3oh)*cc_prev(i_oh)*0.85 &
                    + cab015*cc(i_ch3o)*cc(i_o2) &
                    + cab026*cc(i_hco)*cc(i_o2) &
                    + cab028*cc(i_hoch2o2) &
                    + cab030*cc(i_hoch2o2)*ro2 &
                    + cab032*cc(i_hcooh)*cc_prev(i_oh) &
-                   + cab035*cc(i_hoch2oh)*cc_prev(i_oh)
+                   + cab035*cc(i_hoch2oh)*cc_prev(i_oh) &
+                   + j(j_hoch2ooh)*cc(i_hoch2ooh)
 
-    rh_ho2_denominator = c011*cc(i_o2) &
+    rh_ho2_denominator = 2.*c011*cc(i_o2) &
                         +  c003*cc(i_o3) &
                         +  c004*cc_prev(i_ho2) &
                         +  c005*cc_prev(i_ho2) &
                         +  c006*cc_prev(i_ho2) &
-                        +  c011*cc(i_o2) &
                         +  c018*cc_prev(i_h) &
+                        +  cab027*cc(i_hco) &
                         +  LHd/MAX( cc_prev(i_h) , dens*1.e-30 ) 
-
 
     A_RH(1) = 1./rh_ho2_denominator 
     A_RH(2) = A_RH(1)/cc_prev(i_ho2) 
@@ -368,8 +374,6 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
     A_RH(4) = A_RH(1)*RH_HO2
     A_RH(5) = A_RH(4)/cc_prev(i_h)
     A_RH(6) = A_RH(5)*LHd/cc_prev(i_H)
-
-
 
 !       1.1.2: d(Pn)/d(PQ) B Coefficients 
 !       --------------------------------
@@ -403,7 +407,7 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
         B_h(2,t_o) = c002*cc_prev(i_oh) &
                    + cab002*cc(i_ch4) &
                    + cab005*cc(i_ch3)*0.83
-        B_h(2,t_o1d) = b003*cc(i_h2) 
+        B_h(2,t_o1d) = b003*cc(i_h2) + b008*cc(i_ch4)
         B_h(2,t_o3) = 0.956*cab004*cc(i_ch3)
         B_h(2,t_oh) = c002*cc(i_o) &
                     + c010*cc(i_h2) &
@@ -412,19 +416,24 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
                     + b008*cc_prev(i_oh)
         B_h(2,t_h2ovap) = j(j_h2o) 
         B_h(2,t_ch4) = b008*cc(i_o1d) &
-                     + cab002*cc(i_o) &
+                     + cab002*cc(i_o)*0.49 &
+                     + ( j(j_ch4_ch_h2_h) + j(j_ch4_3ch2_h_h)*2. &
+                     +   j(j_ch4_ch3_h) ) &
                      + k_pseudo
 
         IF ( igcm_ch3 .ne. 0 ) B_h(2,t_ch3) = cab004*cc(i_o3)*0.956 & 
                                             + cab005*cc(i_o)*0.83 
         IF ( igcm_hcho .ne. 0 ) B_h(2,t_hcho) = j(j_ch2o_hco)
+        IF ( igcm_ch3oh .ne. 0 ) B_h(2,t_ch3oh) = j(j_ch3oh)
 
 !       1.1.4: d(Pd)/d(PQ) B Coefficients
 !       ---------------------------------
-        B_H(3,t_o2) = c011 
+        B_H(3,t_o2) = 2.*c011 
         B_H(3,t_o3) = c003 
         B_H(3,t_ho2) = c004 + c005 + c006 
         B_H(3,t_h) = c018 
+
+        IF ( igcm_hco .ne. 0 ) B_H(3,t_hco) = cab027
 
 !       1.1.5: d(Ld)/d(PQ) B Coefficients
 !       ---------------------------------
@@ -483,45 +492,31 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
                  + cab020*cc(i_hcho)*cc(i_o) &
                  + cab021*cc(i_hco)*cc(i_o)
 
-        LOHd = 0.D0
+        LOHd =   c011*cc(i_h)*cc(i_o2) &
+              + c012*cc(i_o)*cc(i_h2o2) &
+              + cab015*cc(i_ch3o)*cc(i_o2) &
+              + cab026*cc(i_hco)*cc(i_o2) &
+              + cab028*cc(i_hoch2o2) &
+              + cab030*cc(i_hoch2o2)*ro2 &
+              + j(j_hoch2ooh)*cc(i_hoch2ooh) 
 
         roh_ho2_denominator = c002*cc(i_o) &
                     + c007*cc_prev(i_ho2) &
                     + c009*cc(i_h2o2) &        ! ajout 20090401
-                    + 2.*c013*cc_prev(i_oh) &        ! ajout 20090401
-                    + 2.*c017*cc_prev(i_oh) &        ! ajout 20090401
+                    + c010*cc(i_h2) &
+                    + c013*cc_prev(i_oh) &        ! ajout 20090401
+                    + c017*cc_prev(i_oh) &        ! ajout 20090401
                     + e001*cc(i_co) &
                     + cab001*cc(i_ch4) &
-                    + 2.*cab011*cc(i_ch3o2) &
-                    + 0.15*cab013*cc(i_ch3oh) &
-                    + 0.6*cab014*cc(i_ch3ooh) &
+                    + cab011*cc(i_ch3o2) &
+                    + cab013*cc(i_ch3oh) &
+                    + cab014*cc(i_ch3ooh) &
                     + cab018*cc(i_hcho) &
                     + cab025*cc(i_hco) &
-                    + 2.*cab032*cc(i_hcooh) &
+                    + cab032*cc(i_hcooh) &
                     + cab033*cc(i_hoch2ooh) &
-                    + 2.*cab035*cc(i_hoch2oh) &
-                    + cab036*cc(i_c2h6) &
-                    + cab045*cc(i_c2h5ooh) &
-                    + cab047*cc(i_c2h5oh)*1.95 &
-                    + 2.*cab053*cc(i_ethgly) &
-                    + cab054*cc(i_hyetho2h) &
-                    + 2.*cab056*cc(i_hyetho2h) &
-                    + cab057*cc(i_ch3cho) &
-                    + cab058*cc(i_ch3cho) &
-                    + 2.*cab062*cc(i_ch2choh) &
-                    + cab067*cc(i_ch3cooh) &
-                    + cab069*cc(i_ch3chohooh) &
-                    + cab077*cc(i_ch3coooh) &
-                    + cab081*cc(i_glyox) &
-                    + cab085*cc(i_hooch2cho) &
-                    + cab088*cc(i_hoch2cho) &
-                    + cab089*cc(i_hoch2cho) &
-                    + cab098*cc(i_hoch2co2h)*2. &
-                    + cab099*cc(i_hcoco2h)*.2 &
-                    + cab100*cc(i_hoch2co3h) &
-                    + cab101*cc(i_hoch2co3h)*2. &
-                    + cab102*cc(i_hcoco3h) &
-                    + cab107*cc(i_ch3)
+                    + cab035*cc(i_hoch2oh) &
+                    + LOHd/cc_prev(i_oh) 
 
 
         A_ROH(1) = 1./roh_ho2_denominator
@@ -535,9 +530,15 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 !       1.2.2: d(Pn)/d(PQ) B Coefficients 
 !       --------------------------------
         B_OH(:,:) = 0. 
-        B_OH(1,t_o) = c001
-        B_OH(1,t_o3) =  c015
-        B_OH(1,t_ho2) = 2.*c004
+        B_OH(1,t_o) = 2.*c001
+        B_OH(1,t_o3) =  2.*c015
+        B_OH(1,t_h) = 3.*c004 + c005 + c006 
+        B_OH(1,t_oh) = c007
+        B_OH(1,t_ho2) = c008 + c016
+
+        if ( igcm_ch3o2 .ne. 0 ) B_OH(1,t_ch3o2) = cab006 + cab007 
+        if ( igcm_hcho .ne. 0 ) B_OH(1,t_hcho) =  cab019 
+        if ( igcm_hoch2o2 .ne. 0 ) B_OH(1,t_hoch2o2) = cab029
 
 !       1.2.3: d(dL)/d(PQ) B Coefficients 
 !       ---------------------------------
@@ -555,33 +556,49 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
         IF (igcm_hcho .ne. 0) B_OH(2,t_hcho) = cab020*cc(i_o)
         IF (igcm_hco .ne. 0 ) B_OH(2,t_hco) = cab021*cc(i_o)
 
-
- 
 !       1.2.4: d(Pd)/d(PQ) B Coefficients 
 !       --------------------------------
         B_OH(3,t_co) = e001 
         B_OH(3,t_o) = c002 
         B_OH(3,t_ho2) = c007
-        B_OH(3,t_h2o2) = c009 
+        B_OH(3,t_h2o2) = 2.*c009 
         B_OH(3,t_oh) = 2.*(c013 + c017)
         B_OH(3,t_ch4) = cab001 
         IF ( igcm_ch3 .ne. 0 ) B_OH(3,t_ch3) = cab107
         IF ( igcm_ch3o2 .ne. 0 ) B_OH(3,t_ch3o2) = 2.*cab011
-        IF ( igcm_ch3ooh .ne. 0 ) B_OH(3,t_ch3ooh) = 0.6*cab014
-        IF ( igcm_ch3oh .ne. 0 ) B_OH(3,t_ch3oh) = 0.15*cab013 
+        IF ( igcm_ch3ooh .ne. 0 ) B_OH(3,t_ch3ooh) = cab014
+        IF ( igcm_ch3oh .ne. 0 ) B_OH(3,t_ch3oh) = 1.85*cab013 
         IF ( igcm_hcho .ne. 0 ) B_OH(3,t_hcho) = cab018 
         IF ( igcm_ch3ooh .ne. 0 ) B_OH(3,t_hcooh) = 2.*cab032
         IF ( igcm_hoch2oh .ne. 0 ) B_OH(3,t_hoch2oh) = 2.*cab035
         IF ( igcm_hoch2ooh .ne. 0 ) B_OH(3,t_hoch2ooh) = cab033 
         IF ( igcm_hco .ne. 0 ) B_OH(3,t_hco) = cab025
 
+! 		1.2.5 : d(Ld)/d(PQ) B coefficients
+!		----------------------------------
+        B_OH(4,t_o) = c012*cc(i_h2o2)
+        B_OH(4,t_h) = c011*cc(i_o2)
+        B_OH(4,t_h2o2) = c012*cc(i_o)
+        B_OH(4,t_o2) = c011*cc(i_h) &
+                     + cab015*cc(i_ch3o) &
+                     + cab026*cc(i_hco)
+        IF ( igcm_ch3o .ne. 0 ) B_OH(4,t_ch3o) = cab015*cc(i_o2)
+        IF ( igcm_hco .ne. 0 ) B_OH(4,t_hco) = cab026*cc(i_o2)
+        IF ( igcm_hoch2o2 .ne. 0 ) B_OH(4,t_hoch2o2) = cab028 &
+                                                       + cab030*(ro2+cc(i_hoch2o2))
+        IF ( igcm_ch3o2 .ne. 0 ) B_OH(4,t_ch3o2) = cab030*cc(i_hoch2o2)
+        IF ( igcm_hoch2ooh .ne. 0 ) B_OH(4,t_hoch2ooh) = j(j_hoch2ooh) 
+
+
 !       1.2.4: Constructing the d(N)/d(PQ) and
 !               d(D)/d(PQ) Vectors 
 !       ---------------------------------------
 
+
         dPn_dPQ(:) = 0.D0   
         dPd_dPQ(:) = 0.D0
         dLn_dPQ(:) = 0.D0
+        dLd_dPQ(:) = 0.D0 
 
         DO iq = 1, nqmx
 
@@ -590,6 +607,7 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
             dPn_dPQ = dPn_dPQ + B_OH(1,iq)*dccn_dpq( x_j,: )
             dLn_dPQ = dLn_dPQ + B_OH(2,iq)*dccn_dpq( x_j,: )
             dPd_dPQ = dPd_dPQ + B_OH(3,iq)*dccn_dpq( x_j,: )
+            dLd_dPQ = dLd_dPQ + B_OH(4,iq)*dccn_dpq( x_j,: )
 
         ENDDO
 
