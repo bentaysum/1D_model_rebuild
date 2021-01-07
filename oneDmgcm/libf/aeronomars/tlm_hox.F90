@@ -406,12 +406,15 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
         B_h(2,t_co) = e001*cc_prev(i_oh)
         B_h(2,t_o) = c002*cc_prev(i_oh) &
                    + cab002*cc(i_ch4) &
-                   + cab005*cc(i_ch3)*0.83
-        B_h(2,t_o1d) = b003*cc(i_h2) + b008*cc(i_ch4)
+                   + cab005*cc(i_ch3)*0.83 &
+                   - cab002*cc(i_ch4) ! k_pseudo
+        B_h(2,t_o1d) = b003*cc(i_h2) + b008*cc(i_ch4) &
+                     - (b007 + b008 + b009)*cc(i_ch4) ! k_pseudo ch4 
         B_h(2,t_o3) = 0.956*cab004*cc(i_ch3)
         B_h(2,t_oh) = c002*cc(i_o) &
                     + c010*cc(i_h2) &
-                    + e001*cc(i_co)
+                    + e001*cc(i_co) &
+                    - cab001*cc(i_ch4) ! k_pseudo ch4 
         B_h(2,t_h2) = b003*cc(i_o1d) &
                     + b008*cc_prev(i_oh)
         B_h(2,t_h2ovap) = j(j_h2o) 

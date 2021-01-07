@@ -2546,7 +2546,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $         cab101(l), cab102(l), cab103(l), cab104(l), cab105(l),  
      $         cab106(l), cab107(l),
      $         dccn_dpq, dcc0_dpq,
-     $         dHOX_dPQ, dHOX0_dPQ)          
+     $         dHOX_dPQ, dHOX0_dPQ, k_pseudo)          
 
           ENDIF 
   

@@ -13,7 +13,7 @@ time=0.
 day_step=48
 #day_step=144
 # Number of sols to run 
-ndt=100
+ndt=200
 
 #### Physical parameters
 #
@@ -21,7 +21,7 @@ ndt=100
 psurf= 610
 # Reference dust opacity at 610 Pa, in the visible (true tau~tauref*psurf/610)
 tauvis=0.2
-latitude=-30.
+latitude=-4.5
 # Albedo of bare ground
 albedo=0.2
 # Soil thermal inertia (SI)

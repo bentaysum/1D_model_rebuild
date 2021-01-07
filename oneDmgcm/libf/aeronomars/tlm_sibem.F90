@@ -33,7 +33,7 @@ SUBROUTINE tlm_sibem(iter, niter, lyr_m, dens, sza, &
 					cab101, cab102, cab103, cab104, cab105, &
 					cab106, cab107, &
 					dccn_dpq, dcc0_dpq, &
-					dHOX_dPQ, dHOX0_dPQ)
+					dHOX_dPQ, dHOX0_dPQ, k_pseudo)
 
 USE TLMvars
 
@@ -61,6 +61,7 @@ real cc_hox_next ! cc(hox)^{t+1}
 real*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
 real*8, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 real*8 dHOX_dPQ(nlayermx,nqmx*nlayermx), dHOX0_dPQ(nlayermx,nlayermx*nqmx)
+REAL k_pseudo 
 
 real j(nd), production(nesp), loss(nesp) ! photolysis, production and loss values 
 real methane_enhancement ! Methane enhancement factor 
@@ -465,11 +466,15 @@ dL_dPQ(:,:) = 0.D0
 !   1.1.8: CH3 [Steady-State]
 !   ------------------------- 
     IF ( igcm_ch3 .ne. 0 ) THEN 
-        dP_coeff( t_ch3, t_o1d ) = b007*cc(i_ch4)
+        dP_coeff( t_ch3, t_o1d ) = b007*cc(i_ch4) &
+                                 - (b007+b008+b009)*cc(i_ch4) ! k_pseudo 
         dP_coeff( t_ch3, t_ch4) = b007*cc(i_o1d) + cab001*cc(i_oh) &
-                                +  0.51*cab002*cc(i_o) + j(j_ch4_ch3_h)
-        dP_coeff( t_ch3, t_oh) = cab001*cc(i_ch4) + cab067*cc(i_ch3cooh) 
-        dP_coeff( t_ch3, t_o) = 0.51*cab002*cc(i_ch4) + 0.75*cab017*cc(i_ch3o)
+                                +  0.51*cab002*cc(i_o) + j(j_ch4_ch3_h) &
+                                + k_pseudo 
+        dP_coeff( t_ch3, t_oh) = cab001*cc(i_ch4) + cab067*cc(i_ch3cooh) &
+                               - cab001*cc(i_ch4) ! k_pseudo 
+        dP_coeff( t_ch3, t_o) = 0.51*cab002*cc(i_ch4) + 0.75*cab017*cc(i_ch3o) &
+                              - cab002*cc(i_ch4) ! k_pseudo 
         dP_coeff( t_ch3, t_ho2) = 0.2*cab065*cc(i_ch3choho2) + cab072*cc(i_ch3cooo)
         dP_coeff( t_ch3, t_h) = cab042*cc(i_c2h5)*2.
         IF ( igcm_ch3o .ne. 0 ) dP_coeff(t_ch3,t_ch3o) = 0.75*cab017*cc(i_o)
@@ -549,7 +554,6 @@ dL_dPQ(:,:) = 0.D0
     IF ( igcm_hcooh .ne. 0 ) THEN 
         dP_coeff(t_hcooh,t_ho2) = 0.5*cab029*cc(i_hoch2o2) + 0.2*cab065*cc(i_ch3choho2) 
         dP_coeff(t_hcooh,t_oh) = cab034*cc(i_hoch2ooh) + cab035*cc(i_hoch2oh) + cab061*cc(i_ch2choh) 
-        dP_coeff(t_hcooh,t_o2) = j(j_hoch2ooh)*3.5e-14*cc(i_hoch2ooh)
 
         IF ( igcm_ch3o2 .ne. 0 ) dP_coeff(t_hcooh,t_ch3o2) = cab030*cc(i_hoch2o2) + 0.5*cab031*cc(i_hoch2o2) &
                                                            + cab066*cc(i_ch3choho2)
@@ -709,6 +713,11 @@ dL_dPQ(:,:) = 0.D0
     dL_coeff(t_ch4,t_o1d) = b007 + b008 + b009 
     dL_coeff(t_ch4,t_oh) = cab001 
     dL_coeff(t_ch4,t_o) = cab002 
+
+!   -------------------------------------
+!   Forced Lifetime via k_pseudo reaction 
+!   -------------------------------------
+    dL_coeff(t_ch4,:) = 0.D0 
 
     ! 2.1.7: CH3 
     ! -----------
@@ -1009,7 +1018,8 @@ dPhox_coeff(t_h2) = 2.*b003*cc(i_o1d)
 
 dPhox_coeff(t_ch4) = cab002*cc(i_o) + b007*cc(i_o1d) &
 					+ b008*cc(i_o1d) + j(j_ch4_ch3_h) &
-					+ 2.*j(j_ch4_3ch2_h_h) + j(j_ch4_ch_h2_h)
+					+ 2.*j(j_ch4_3ch2_h_h) + j(j_ch4_ch_h2_h) &
+                    + k_pseudo*cc(i_ch4)
 
 dPhox_coeff(t_o2) = cab015*cc(i_ch3o) + cab026*cc(i_hco) &
 					+ cab041*cc(i_c2h5) + cab051*cc(i_hoch2ch2o) &

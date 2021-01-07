@@ -97,11 +97,13 @@ IF ( initialisation ) THEN
     ! All Trace Gas Species
     ! ---------------------
     DO iq = 1, nqmx 
+      DO l = 1,nlayermx
         x_j = ( iq - 1 )*nlayermx + l 
         dccn_dpq( x_j, : ) = ( TLM_ident( x_j, :)+TLM_trans( x_j, :)*ptimestep) &
                            *Avmr(l,iq)*dens(l)
 
         dcc0_dpq( x_j, : ) = dccn_dpq( x_j, : )
+      ENDDO 
     ENDDO ! nqmx
 
     !  Save the very first Linearised state 
