@@ -51,6 +51,9 @@ INTEGER x_j ! TLM Indices
 ! ========================
 IF ( initialisation ) THEN 
 
+    ! Initialise K_Pseudo
+    dKpseudo_dPQ(:,:) = 0.D0
+
     ! VMR --> MMR Conversion Factors 
     ! ------------------------------
     DO iq = 1, nqmx

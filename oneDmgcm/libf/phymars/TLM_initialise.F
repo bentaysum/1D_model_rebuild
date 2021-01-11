@@ -26,7 +26,9 @@
 
           ALLOCATE(tlm_ident(nlayermx*nqmx,nlayermx*nqmx))
 
+          ALLOCATE(o2_coefficient_array(nqmx*nlayermx))
 
+          ALLOCATE(dKpseudo_dPQ(nlayermx,nqmx))
 
           ! Initialise to 0
           tlm(:,:) = 0.D0

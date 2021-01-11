@@ -131,8 +131,7 @@
         ! RETURN
       ! ENDIF
       
-      IF (plume) RETURN
-      
+      if ( call_tlm ) RETURN
 
 ! At very first call, check if there is a "diagfi.def" to use and read it
 ! -----------------------------------------------------------------------

@@ -22,7 +22,13 @@ INTEGER t_co2, t_co, t_o, t_o1d, t_o2, t_o3, t_h, t_h2, t_oh, &
 	  t_ch3cooo, t_ch3coooh, t_hcoch2o2, t_glyox, t_hcoco, t_hooch2cho, &
 	  t_hoch2cho, t_hochcho, t_hoch2co, t_hoch2co3, t_hoch2co2h, &
 	  t_hcoco2h, t_hcoco3h, t_hcoco3, t_hoch2co3h, t_h2ovap, t_h2oice
-	  
+
+! Array of coefficients used to calculated 
+! linearised steady-state O2
+REAL*8, DIMENSION(:), allocatable, SAVE :: o2_coefficient_array(:)  
+! Linearised pseudo-rate coefficient for CH4 destruction
+REAL*8, DIMENSION(:,:), allocatable, SAVE :: dKpseudo_dPQ(:,:)
+
 CONTAINS
 
 ! -----------------------------------

@@ -406,15 +406,12 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
         B_h(2,t_co) = e001*cc_prev(i_oh)
         B_h(2,t_o) = c002*cc_prev(i_oh) &
                    + cab002*cc(i_ch4) &
-                   + cab005*cc(i_ch3)*0.83 &
-                   - cab002*cc(i_ch4) ! k_pseudo
-        B_h(2,t_o1d) = b003*cc(i_h2) + b008*cc(i_ch4) &
-                     - (b007 + b008 + b009)*cc(i_ch4) ! k_pseudo ch4 
+                   + cab005*cc(i_ch3)*0.83 
+        B_h(2,t_o1d) = b003*cc(i_h2) + b008*cc(i_ch4) 
         B_h(2,t_o3) = 0.956*cab004*cc(i_ch3)
         B_h(2,t_oh) = c002*cc(i_o) &
                     + c010*cc(i_h2) &
-                    + e001*cc(i_co) &
-                    - cab001*cc(i_ch4) ! k_pseudo ch4 
+                    + e001*cc(i_co) 
         B_h(2,t_h2) = b003*cc(i_o1d) &
                     + b008*cc_prev(i_oh)
         B_h(2,t_h2ovap) = j(j_h2o) 
@@ -422,12 +419,15 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
                      + cab002*cc(i_o)*0.49 &
                      + ( j(j_ch4_ch_h2_h) + j(j_ch4_3ch2_h_h)*2. &
                      +   j(j_ch4_ch3_h) ) &
-                     + k_pseudo
+                     + k_pseudo 
+
 
         IF ( igcm_ch3 .ne. 0 ) B_h(2,t_ch3) = cab004*cc(i_o3)*0.956 & 
                                             + cab005*cc(i_o)*0.83 
         IF ( igcm_hcho .ne. 0 ) B_h(2,t_hcho) = j(j_ch2o_hco)
         IF ( igcm_ch3oh .ne. 0 ) B_h(2,t_ch3oh) = j(j_ch3oh)
+        
+        B_H(2,:) = B_H(2,:) + dKpseudo_dPQ(lyr_m,:)
 
 !       1.1.4: d(Pd)/d(PQ) B Coefficients
 !       ---------------------------------

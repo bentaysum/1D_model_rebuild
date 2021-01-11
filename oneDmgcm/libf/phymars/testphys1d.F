@@ -920,8 +920,8 @@ C            mcd_profiles = .False.
           
           DO ilayer=1,nlayer
      
-               if ( (trim(noms(iq)) == "ch4" ) .and. 
-     $              (ilayer .le. 5) ) cycle 
+               if  (trim(noms(iq)) == "ch4" ) CYCLE
+C      $              (ilayer .le. 1) ) cycle 
 
              q(ilayer,iq)=q(ilayer,iq)+dtphys*dq(ilayer,iq)
          
@@ -935,7 +935,9 @@ C            mcd_profiles = .False.
 c     Tangent Linear Matrix 
 c    ~~~~~~~~~~~~~~~~~~~~~~
       IF ( tlm_on ) THEN 
-          CALL TLM_ADJ_out(idt,time*24.)
+
+      CALL TLM_ADJ_out(idt,time*24.)
+
       ENDIF 
       
       

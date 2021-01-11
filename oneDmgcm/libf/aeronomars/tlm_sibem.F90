@@ -133,6 +133,11 @@ REAL*8 dPhox_dPQ(nqmx*nlayermx), dLhox_dPQ(nqmx*nlayermx)
 
 integer iq_j,iq_i, iq
 integer x_i, x_j
+
+! Optional Outputs
+! ================
+
+
 ! Tracer indexing as in photochemistry.F 
 ! ======================================
 integer, parameter :: i_co2  =  1
@@ -267,6 +272,13 @@ dL_coeff(:,:) = 0.D0
 dP_dPQ(:,:) = 0.D0
 dL_dPQ(:,:) = 0.D0
 
+! 0.1 : If k_pseudo > 0., we need to linearise this TERMS
+! -----------------------------
+if ( ( lyr_m .le. 5 ) .and. ( k_pseudo .ne. 0. ) ) then
+    dKpseudo_dPQ(lyr_m,t_o1d) = -(b007 + b008 + b009)
+    dKpseudo_dPQ(lyr_m,t_o) = -cab002 
+    dKpseudo_dPQ(lyr_m,t_oh) = -cab001 
+endif
 
 ! Remainder of Chemistry linearisation occurs in this file.
 ! Two methods exist for calculating number density, Steady
@@ -466,18 +478,16 @@ dL_dPQ(:,:) = 0.D0
 !   1.1.8: CH3 [Steady-State]
 !   ------------------------- 
     IF ( igcm_ch3 .ne. 0 ) THEN 
-        dP_coeff( t_ch3, t_o1d ) = b007*cc(i_ch4) &
-                                 - (b007+b008+b009)*cc(i_ch4) ! k_pseudo 
+        dP_coeff( t_ch3, t_o1d ) = b007*cc(i_ch4) 
         dP_coeff( t_ch3, t_ch4) = b007*cc(i_o1d) + cab001*cc(i_oh) &
                                 +  0.51*cab002*cc(i_o) + j(j_ch4_ch3_h) &
                                 + k_pseudo 
-        dP_coeff( t_ch3, t_oh) = cab001*cc(i_ch4) + cab067*cc(i_ch3cooh) &
-                               - cab001*cc(i_ch4) ! k_pseudo 
-        dP_coeff( t_ch3, t_o) = 0.51*cab002*cc(i_ch4) + 0.75*cab017*cc(i_ch3o) &
-                              - cab002*cc(i_ch4) ! k_pseudo 
+        dP_coeff( t_ch3, t_oh) = cab001*cc(i_ch4) + cab067*cc(i_ch3cooh) 
+        dP_coeff( t_ch3, t_o) = 0.51*cab002*cc(i_ch4) + 0.75*cab017*cc(i_ch3o) 
         dP_coeff( t_ch3, t_ho2) = 0.2*cab065*cc(i_ch3choho2) + cab072*cc(i_ch3cooo)
         dP_coeff( t_ch3, t_h) = cab042*cc(i_c2h5)*2.
         IF ( igcm_ch3o .ne. 0 ) dP_coeff(t_ch3,t_ch3o) = 0.75*cab017*cc(i_o)
+        dP_coeff( t_ch3, : ) = dP_coeff( t_ch3, : ) + dKpseudo_dPQ(lyr_m,:)
     ENDIF 
 
 !   1.1.9: CH3O2 [Steady-State]
@@ -717,6 +727,7 @@ dL_dPQ(:,:) = 0.D0
 !   -------------------------------------
 !   Forced Lifetime via k_pseudo reaction 
 !   -------------------------------------
+    if ( (lyr_m .le. 5) .and. (k_pseudo .ne. 0.) ) &
     dL_coeff(t_ch4,:) = 0.D0 
 
     ! 2.1.7: CH3 
@@ -844,6 +855,37 @@ dL_dPQ(:,:) = 0.D0
         ENDDO 
 
     ENDDO 
+
+! ================
+! Optional Outputs
+! ================
+!
+! 1: Steady-State O2 VMR
+! ----------------------
+! At surface, we want to assess
+! how sensitive the steady-state O2 
+! [P/L] is to tracer species in the 
+! model.
+!
+! Equation breaks down to:
+!
+! d[O2_steady]/d[PQ] =
+!       *( 1/L * dP/dPQ - P/L^2 * dL/dPQ) * d(PQ^t)/d(PQ^t0)
+!
+! where d(PQ^t)/d(PQ^t0) is the sensitivity array of lyr_m 
+! for all tracers at forecast timestep t with respect to 
+! tracers at backtrace timestep t0, calculated via the
+! adjoint externally. 
+if ( lyr_m == 1 ) then 
+o2_coefficient_array(:) = 0.D0
+    do iq_i = 1,nqmx
+         o2_coefficient_array( iq_i ) = (1./loss(i_o2))*dP_coeff(t_o2,iq_i) &
+                   - (production(i_o2)/(loss(i_o2)**2.))*dL_coeff(t_o2,iq_i)
+    enddo
+
+endif 
+
+
 
 ! ===============================================================
 ! ADDITIONAL CHEMISTRY 
@@ -1008,7 +1050,7 @@ dPhox_coeff(t_o) = 2.*c012*cc(i_h2o2) + cab002*cc(i_ch4) &
 dPhox_coeff(t_o3) = 0.956*cab004*cc(i_ch3)
 
 dPhox_coeff(t_o1d) = 2.*b002*cc(i_h2o) + 2.*b003*cc(i_h2) &
-					+ b007*cc(i_ch4) + b008*cc(i_ch4)
+					+ b007*cc(i_ch4) + b008*cc(i_ch4) 
 
 dPhox_coeff(t_h2ovap) = j(j_h2o)*2. + 2.*b002*cc(i_o1d)
 
@@ -1019,7 +1061,7 @@ dPhox_coeff(t_h2) = 2.*b003*cc(i_o1d)
 dPhox_coeff(t_ch4) = cab002*cc(i_o) + b007*cc(i_o1d) &
 					+ b008*cc(i_o1d) + j(j_ch4_ch3_h) &
 					+ 2.*j(j_ch4_3ch2_h_h) + j(j_ch4_ch_h2_h) &
-                    + k_pseudo*cc(i_ch4)
+                    + k_pseudo
 
 dPhox_coeff(t_o2) = cab015*cc(i_ch3o) + cab026*cc(i_hco) &
 					+ cab041*cc(i_c2h5) + cab051*cc(i_hoch2ch2o) &
@@ -1028,6 +1070,7 @@ dPhox_coeff(t_o2) = cab015*cc(i_ch3o) + cab026*cc(i_hco) &
 
 dPhox_coeff(t_ho2) = cab080*cc(i_hcoch2o2) + cab095*cc(i_hoch2co3) &
 					+ cab106*cc(i_hcoco3)
+
 IF ( igcm_ch3 .ne. 0 ) dPhox_coeff(t_ch3) = 0.956*cab004*cc(i_o3) + cab005*cc(I_o) 
 IF ( igcm_ch3ooh .ne. 0 ) dPhox_coeff(t_ch3ooh) = j(j_ch3o2h)
 IF ( igcm_ch3oh .ne. 0 ) dPhox_coeff(t_ch3oh) = j(j_ch3oh)
@@ -1038,6 +1081,9 @@ IF ( igcm_hoch2o2 .ne. 0 ) dPhox_coeff(t_hoch2o2) = cab028 + cab030*(cc(i_hoch2o
 										+ 0.6*cab078*cc(i_hcoch2o2) + cab093*cc(i_hoch2co3) &
 										+ cab104*cc(i_hcoco3)
 IF ( igcm_hco .ne. 0 ) dPhox_coeff(t_hco) = cab021*cc(i_o) + cab026*cc(i_o2) 
+
+dPhox_coeff(:) = dPhox_coeff(:) + dKpseudo_dPQ(lyr_m,:)
+
 
 dPhox_dPQ(:) = 0.
 DO iq = 1,nqmx
@@ -1074,7 +1120,7 @@ dLhox_coeff(t_ho2) = 2.*c005*cc(i_h) + 2.*c006*cc(i_h) &
 					+ cab080*cc(i_hcoch2o2) + cab096*cc(i_hoch2co3) &
 					+ cab097*cc(i_hoch2co3)
 				
-dLhox_coeff(t_ch4) = cab001*cc(i_oh)
+dLhox_coeff(t_ch4) = cab001*cc(i_oh) 
 
 IF ( igcm_ch3 .ne. 0 ) dLhox_coeff(t_ch3) = cab107*cc(i_oh)
 IF ( igcm_ch3o2 .ne. 0 ) dLhox_coeff(t_ch3o2) = cab006*cc(i_ho2) + cab007*cc(i_ho2) 

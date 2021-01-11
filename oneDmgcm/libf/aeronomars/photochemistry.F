@@ -325,110 +325,6 @@ c
        call WRITEDIAGFI(1,"o=o_loss_rate","o=o_loss", "cm-3 s-1",
      $                  1,lifetime(:,26))
 
-       call WRITEDIAGFI(1,"hcooh_tau","hcooh_tau", "s-1",
-     $                  1,lifetime(:,27))
-
-
-       call WRITEDIAGFI(1,"hoch2ooh_tau","hoch2ooh_tau", "s-1",
-     $                  1,lifetime(:,28))
-
-       call WRITEDIAGFI(1,"o=o_loss_rate_hcooh","o=o", "s-1",
-     $                  1,lifetime(:,29))
-
-
-       call WRITEDIAGFI(1,"o=o_steady","o=o", "s-1",
-     $                  1,lifetime(:,30))
-
-C        call WRITEDIAGFI(1,"o2_steady_lefevre","o2_steady_L", "s",
-C      $                  1,lifetime(:,27))
-
-C        call WRITEDIAGFI(1,"O + O2 + M -> O3","a001", "s",
-C      $                  1,lifetime(:,1))
-
-C        call WRITEDIAGFI(1,"H + O2 + M -> HO2","c011", "s",
-C      $                  1,lifetime(:,2))
-
-       call WRITEDIAGFI(1,"O2 + hv -> O + O","j_o2_o", "s",
-     $                  1,lifetime(:,3))
-
-       call WRITEDIAGFI(1,"HO2 + hv -> OH + H","j_ho2", "s",
-     $                  1,lifetime(:,4))
-
-       call WRITEDIAGFI(1,"H2O2 + hv -> OH + OH","j_h2o2", "s",
-     $                  1,lifetime(:,5))
-
-       call WRITEDIAGFI(1,"H + HO2 -> OH + OH","c004", "s",
-     $                  1,lifetime(:,6))
-
-       call WRITEDIAGFI(1,"H + HO2 -> O + H2O","c006", "s",
-     $                  1,lifetime(:,7))
-
-       call WRITEDIAGFI(1,"NO + HO2 -> NO2 + OH","d003", "s",
-     $                  1,lifetime(:,8))
-
-       call WRITEDIAGFI(1,"CH3O2 + HO2 -> HCHO + H2O + O2","CAB007","s",
-     $                  1,lifetime(:,9))
-
-       call WRITEDIAGFI(1,"CH3O2 + RO2 -> CH3O + 0.5*O2","CAB008", "s",
-     $                  1,lifetime(:,10))
-
-       call WRITEDIAGFI(1,"CH3O2 + RO2 -> 0.5*HCHO + 0.5*CH3OH + 0.5*O2"
-     $                   ,"CAB009", "s",
-     $                  1,lifetime(:,11))
-
-       call WRITEDIAGFI(1,"CH3OOH + OH -> 0.6*CH3O2 + 0.4*HCHO + 0.4*OH"
-     $      // " + 0.5*O2","CAB014", "s",
-     $                  1,lifetime(:,12))
-
-       call WRITEDIAGFI(1,"CH3OOH + hv -> CH3O + OH","j_ch3o2h", "s",
-     $                  1,lifetime(:,13))
-
-
-
-C        call WRITEDIAGFI(1,"O3 + hv -> O2 + O","j_o3_o", "s",
-C      $                  1,lifetime(:,9))
-
-C        call WRITEDIAGFI(1,"O3 + hv -> O2 + O1D ","j_o3_o1d", "s",
-C      $                  1,lifetime(:,10))
-
-C        call WRITEDIAGFI(1,"O + O3 -> O2 + O2","a003", "s",
-C      $                  1,lifetime(:,11))
-
-C        call WRITEDIAGFI(1,"O1D + O3 -> O2 + O2","b005", "s",
-C      $                  1,lifetime(:,12))
-
-C        call WRITEDIAGFI(1,"O1D + O3 -> O2 + O + O ","j_ho2", "s",
-C      $                  1,lifetime(:,13))
-
-C        call WRITEDIAGFI(1,"H + O3 -> OH + O2","c003", "s",
-C      $                  1,lifetime(:,14))
-
-C        call WRITEDIAGFI(1,"HO2 + O3 -> OH + O2 + O2","c015", "s",
-C      $                  1,lifetime(:,15))
-
-C        call WRITEDIAGFI(1,"NO + O3 -> NO2 + O2","d002", "s",
-C      $                  1,lifetime(:,16))
-
-C        call WRITEDIAGFI(1,"H + HO2 -> H2 + O2","c005", "s",
-C      $                  1,lifetime(:,17))
-
-C       call WRITEDIAGFI(1,"OH + O3 -> HO2 + O2","c014", "s",
-C      $                  1,lifetime(:,18))
-
-C        call WRITEDIAGFI(1,"O + HO2 -> OH + O2","c001", "s",
-C      $                  1,lifetime(:,19))
-
-C        call WRITEDIAGFI(1,"OH + HO2 -> H2O + O2","c006", "s",
-C      $                  1,lifetime(:,21))
-
-C        call WRITEDIAGFI(1,"HO2 + HO2 -> H2O2 + O2","c008", "s",
-C      $                  1,lifetime(:,22))
-
-
-
-
-
-
 
 
 
@@ -1693,7 +1589,6 @@ c
      $                + cab083(l)*cc(l,i_hcoco)
      $                + cab091(l)*cc(l,i_hoch2co)
      $                + cab092(l)*cc(l,i_hoch2co)
-     $                + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)*3.5e-14 ! Factor from Veyret, B. et al. [1982]
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1819,9 +1714,8 @@ C       ENDIF
           
         IF ( l .eq. 5 ) THEN 
 
-          k_pseudo(l) =(1./( 31540000.))
+          k_pseudo(l) =(1./( 3600. ))
      $             -  loss(l,i_ch4)
-
 
         loss(l,i_ch4) = loss(l,i_ch4) + k_pseudo(l)
 

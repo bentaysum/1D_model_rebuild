@@ -5,15 +5,17 @@
 
 #### Time integration parameters
 # Initial date (in martian sols ; =0 at Ls=0)
-day0=641
+#day0=193
+#day0=372
+#day0=515
+day0=669
 
 # Initial local time (in hours, between 0 and 24)
 time=0.
 # Number of time steps per sol
 day_step=48
-#day_step=144
 # Number of sols to run 
-ndt=200
+ndt=105
 
 #### Physical parameters
 #

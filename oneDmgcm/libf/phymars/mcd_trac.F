@@ -352,6 +352,9 @@ C         ===
      
           co2(y) = co2(y)*mmol(1)/43.34!mmean(1,y)
           
+
+
+         IF ( mcd_profiles ) THEN 
 c        H2O 
 C        ===
           call interp_line(mcdv5_lt, zh2o(:,y), N_LT,
@@ -360,30 +363,28 @@ C        ===
           h2o(y)  = h2o(y)*mmol(15)/mmean(1,y) 
 
 
-C           IF ( mcd_profiles ) THEN 
 C         O2 
 C         ===
-          call interp_line(mcdv5_lt, zo2(:,y), N_LT,
+            call interp_line(mcdv5_lt, zo2(:,y), N_LT,
      &                    local_time, o2(y), 1)
-          o2(y) = o2(y)*mmol(5)/mmean(1,y) 
-          
 
+            o2(y) = o2(y)*mmol(5)/mmean(1,y) 
 
 C         H2 
 C         ===
-          call interp_line(mcdv5_lt, zh2(:,y), N_LT,
+            call interp_line(mcdv5_lt, zh2(:,y), N_LT,
      &                     local_time, h2(y), 1)
-          h2(y)  = h2(y)*mmol(8)/mmean(1,y) 
-          
-          
+           h2(y)  = h2(y)*mmol(8)/mmean(1,y) 
+
 c         CO 
 c         ===
-          call interp_line(mcdv5_lt, zco(:,y), N_LT,
+           call interp_line(mcdv5_lt, zco(:,y), N_LT,
      &                     local_time, co(y), 1)
-          co(y)  = co(y)*mmol(2)/mmean(1,y) 
+           co(y)  = co(y)*mmol(2)/mmean(1,y) 
 
-          
-C           ENDIF 
+
+          ENDIF
+
 
 
 
