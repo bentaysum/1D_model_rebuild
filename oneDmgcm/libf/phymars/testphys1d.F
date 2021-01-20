@@ -742,6 +742,7 @@ c     the chemistry routine.
 
 
 
+
 !     Check if the MCD v5.3 tracer interpolation routine has reached
 !     the desired shutdown point 
       IF ( mcd_profiles ) THEN 
@@ -900,38 +901,43 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
           date = idt*(dtphys/daysec) 
 
 !      Plume/perturbation scenarios engaged here
-        IF ( plume ) THEN 
+C         IF ( plume ) THEN 
 
-           IF ( idt == ndt_plume ) THEN
+C            IF ( idt == ndt_plume ) THEN
 
            
-C            call tracer_release(dq)
+C C            call tracer_release(dq)
            
-           plume = .False.
-C            mcd_profiles = .False. 
+C            plume = .False.
+C C            mcd_profiles = .False. 
            
-           ENDIF
-        ENDIF 
-
-
+C            ENDIF
+C         ENDIF 
 
 !       increment tracers
         DO iq = 1, nqmx
           
           DO ilayer=1,nlayer
      
-               if  (trim(noms(iq)) == "ch4" ) CYCLE
-C      $              (ilayer .le. 1) ) cycle 
+               if ( ( trim(noms(iq)) == "ch4" ) .AND.
+     $              (ilayer == 1)  ) cycle 
 
              q(ilayer,iq)=q(ilayer,iq)+dtphys*dq(ilayer,iq)
          
 
-          ENDDO
-          
+          ENDDO    
           
         ENDDO
         
-        
+
+      IF ( pertloop ) THEN 
+        IF ( idt == ndt_plume-1 ) THEN 
+C C          cALL scalar_perturbation(q)
+          plume = .false.
+          pertloop = .false.
+        ENDIF 
+      ENDIF        
+
 c     Tangent Linear Matrix 
 c    ~~~~~~~~~~~~~~~~~~~~~~
       IF ( tlm_on ) THEN 
@@ -939,8 +945,6 @@ c    ~~~~~~~~~~~~~~~~~~~~~~
       CALL TLM_ADJ_out(idt,time*24.)
 
       ENDIF 
-      
-      
       
 
 c    L-BFGS-B Optimization 

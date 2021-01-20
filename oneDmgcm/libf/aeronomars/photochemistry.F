@@ -313,20 +313,101 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       call chimtogcm(zycol, lswitch, nesp, rm) 
 c      
 
-       call WRITEDIAGFI(1,"o2_tau","o2_tau", "s",
-     $                  1,lifetime(:,23))
 
-       call WRITEDIAGFI(1,"o2_nd","o2_nd", "s",
-     $                  1,lifetime(:,24))
 
-       call WRITEDIAGFI(1,"o2_steady","o2_steady", "s",
-     $                  1,lifetime(:,25))
+
+
+C        call WRITEDIAGFI(1,"o2_tau","o2_tau", "s",
+C      $                  1,lifetime(:,23))
+
+C        call WRITEDIAGFI(1,"o2_nd","o2_nd", "s",
+C      $                  1,lifetime(:,24))
+
+C        call WRITEDIAGFI(1,"o2_steady","o2_steady", "s",
+C      $                  1,lifetime(:,25))
+
+C        call WRITEDIAGFI(1,"o=o_loss_rate","o=o_loss", "cm-3 s-1",
+C      $                  1,lifetime(:,26))
 
        call WRITEDIAGFI(1,"o=o_loss_rate","o=o_loss", "cm-3 s-1",
-     $                  1,lifetime(:,26))
+     $                  1,lifetime(:,1))
+
+       call WRITEDIAGFI(1,"ch4_loss_rate","ch4_loss", "cm-3 s-1",
+     $                  1,lifetime(:,2))
+
+       call WRITEDIAGFI(1,"j_o2_o",
+     $         "O_2 + h\\nu \longrightarrow 2O(^3P)",
+     $         "cm-3 s-1", 1,lifetime(:,3))
+
+       call WRITEDIAGFI(1,"j_o2_o1d",
+     $         "O_2 + h\\nu \longrightarrow O(^3P) + O(^1D)",
+     $         "cm-3 s-1", 1,lifetime(:,4))
+
+       call WRITEDIAGFI(1,"j_ho2",
+     $         "HO_2 + h\\nu \longrightarrow H + OH",
+     $         "cm-3 s-1", 1,lifetime(:,5))
+
+       call WRITEDIAGFI(1,"j_h2o2",
+     $         "H_2O_2 + h\\nu \longrightarrow OH + OOH",
+     $         "cm-3 s-1", 1,lifetime(:,6))
+
+       call WRITEDIAGFI(1,"j_ch3o2h",
+     $         "CH_3OOH + h\\nu \longrightarrow CH_3O + OH",
+     $         "cm-3 s-1", 1,lifetime(:,7))
+
+       call WRITEDIAGFI(1,"c004",
+     $         "H + HO_2 \longrightarrow OH + OH",
+     $         "cm-3 s-1", 1,lifetime(:,8))
+
+       call WRITEDIAGFI(1,"c006",
+     $         "H + HO_2 \longrightarrow H_2O + O",
+     $         "cm-3 s-1", 1,lifetime(:,9))
+
+       call WRITEDIAGFI(1,"d003",
+     $         "NO + HO_2 \longrightarrow NO_2 + OH",
+     $         "cm-3 s-1", 1,lifetime(:,10))
+
+       call WRITEDIAGFI(1,"cab007",
+     $         "CH_3O_2 + HO_2 \longrightarrow HCHO + H_2O + O_2",
+     $         "cm-3 s-1", 1,lifetime(:,11))
+
+       call WRITEDIAGFI(1,"cab008",
+     $        "CH_3O_2 + RO_2 \longrightarrow CH_3O + 0.5*O_2",
+     $         "cm-3 s-1", 1,lifetime(:,12))
+
+       call WRITEDIAGFI(1,"cab009",
+     $         "CH_3O_2 + RO_2 \longrightarrow 0.5*HCHO + 0.5*CH_3OH"
+     $         // " + 0.5*O_2",
+     $         "cm-3 s-1", 1,lifetime(:,13))
+
+       call WRITEDIAGFI(1,"cab014",
+     $         "CH_3OOH + OH \longrightarrow 0.6*CH_3O_2 + 0.4*HCHO"
+     $          // " + 0.4*OH + H_2O",
+     $         "cm-3 s-1", 1,lifetime(:,14))
+
+       call WRITEDIAGFI(1,"cab029",
+     $         "HOCH_2O_2 + HO_2 \longrightarrow 0.5*HOCH_2OOH"
+     $          // " + 0.5*HCOOH + 0.2*OH + 0.2*HO_2 + 0.3*H_2O + "
+     $          // "0.8*O_2",
+     $         "cm-3 s-1", 1,lifetime(:,15))
+
+       call WRITEDIAGFI(1,"cab034",
+     $         "HOCH_2OOH + OH \longrightarrow HCOOH + H_2O + OH",
+     $         "cm-3 s-1", 1,lifetime(:,16))
+
+       call WRITEDIAGFI(1,"steady_o2",
+     $         "steady_o2",
+     $         "mol/mol", 1,lifetime(:,17))
+
+       call WRITEDIAGFI(1,"o2_nd", "o2_number_density", "molec. cm-3",1,
+     $                  lifetime(:,18))
+
+       call WRITEDIAGFI(1,"k_pseudo", "k_pseudo", "molec. cm-3",1,
+     $                  lifetime(:,19))
 
 
 
+        write(*,*) "CH3 = ", rm(1,13)
 
       return
       end
@@ -537,7 +618,21 @@ c     ===============================================
       real k_pseudo(nlayermx)
       
       real o2_loss_rate(nlayermx)
-      
+
+
+c     -------------------------------
+c     Electric Field Study
+c     -------------------------------
+      real Efield 
+      parameter(Efield=1.)
+
+      real edens
+      parameter(edens=8.e3) ! Electron Number Density 
+
+      ! Rate Coefficients
+      real ke_co2(nlayermx), ke_h2o(nlayermx), ke_ch4(nlayermx) 
+      real kech4_X
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     tracer numbering in the chemistry
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -674,6 +769,25 @@ C                                ! hyetho2h + hv -> hoch2ch2o + oh [ = (ch3ooh +
                                  ! hooch2cho + hv -> oh + hcho + co + ho2 [= j_ch3o2h + SUM(j_hoch2cho)] (2)
 c (1) : A model for studies of tropospheric ozone and nonmethane hydrocarbons: Model description and ozone results   
 c (2) : Sander et al. (2014) [CAABA 4.0]
+
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+cc    Electrochemical Rate Coefficients [Jackson et al 2009]
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      ke_ch4(2:)=0.
+      ke_h2o(2:)=0.
+      ke_co2(2:)=0.
+
+      kech4_X = -151708./(Efield*1.e3)
+      if ( kech4_X > LOG(1.e-31) ) then 
+           ke_ch4(1) = 1.9e-13*exp( kech4_X )*1000000.
+      else 
+           ke_ch4(1) = 0. 
+      endif 
+
+      ke_co2(1) = 0.39e-16*exp( -12493./(Efield*1.e3) )*1000000.
+
+      ke_h2o(1) = 0.25e-14*exp( -31264./(Efield*1.e3) )*1000000. 
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -881,6 +995,8 @@ C            CCCCCCCCCCCCCCCCCCCCC
      $         + j(l,j_ch4_ch_h2_h)*cc(l,i_ch4) 
      $         + j(l,j_ch2o_hco)*cc(l,i_hcho)
      $         + j(l,j_ch3oh)*cc(l,i_ch3oh)
+     $         + ke_h2o(l)*cc(l,i_h2o)
+     $         + ke_ch4(l)*cc(l,i_ch4)
      $         )/MAX(cc(l,i_ho2),dens(l)*1.e-30)
 c            LOSS[HO2]
 C            CCCCCCCCC
@@ -1075,6 +1191,7 @@ C                 CCCCCCCCCCCCCCCCCCCCCC
      $            + j(l,j_ch3o2h)*cc(l,i_ch3ooh)
      $            + 2.*j(l,j_h2o2)*cc(l,i_h2o2)
      $            + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
+     $            + ke_h2o(l)*cc(l,i_h2o)
      $            )/MAX(cc(l,i_ho2),dens(l)*1.e-30)
 C                 LOSS(HO2)
 C                 CCCCCCCCC
@@ -1272,6 +1389,8 @@ cccc Original Routine
      $              + cab004(l)*cc(l,i_ch3)
      $              + cab010(l)*cc(l,i_ch3o2)
      $              + cab016(l)*cc(l,i_ch3o)
+     $              + (ke_co2(l)*cc(l,i_co2)
+     $                 /cc(l,i_o3) )
      $              )
      $              /(a001(l)*cc(l,i_o2))
      
@@ -1302,6 +1421,7 @@ c
      $                   + d003(l)*cc(l,i_ho2)*no(l)
      $                   + cab074(l)*cc(l,i_ch3cooo)*cc(l,i_ho2)
      $                   + cab097(l)*cc(l,i_hoch2co3)*cc(l,i_ho2)
+     $                   + ke_co2(l)*cc(l,i_co2)
 c
             loss(l,i_ox) = 2.*a002(l)*cc(l,i_o)*cc(l,i_o)
      $                   + 2.*a003(l)*cc(l,i_o)*cc(l,i_o3)
@@ -1428,6 +1548,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
             production(l,i_o) = c006(l)*cc(l,i_h)*cc(l,i_ho2)
      $                        + c013(l)*cc(l,i_oh)*cc(l,i_oh)
+     $                        + ke_co2(l)*cc(l,i_co2)
 c
 
             loss(l,i_o)  =  a001(l)*cc(l,i_o2)
@@ -1530,6 +1651,7 @@ c
      $                 + j(l,j_hoch2cho_co)
      $                 + j(l,j_hoch2cho_hco)
      $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
+     $                 + ke_co2(l)*cc(l,i_co2)
      
          loss(l,i_co) = e001(l)*cc(l,i_oh)
      $                + e002(l)*cc(l,i_o)
@@ -1693,47 +1815,22 @@ c
      $                 + j(l,j_ch4_ch3_h)
      $                 + j(l,j_ch4_3ch2_h_h)
      $                 + j(l,j_ch4_ch_h2_h)
+     $                 + ke_ch4(l) 
      
-C       Loss Rate Adjustment [ BMT 21/08/2020]
-C        IF ( sza .le. 95. ) THEN
-       
-C         k_pseudo = (methane_enhancement - 1.)
-C      $             *(b007(l)*cc(l,i_o1d)
-C      $                 + b008(l)*cc(l,i_o1d)
-C      $                 + b009(l)*cc(l,i_o1d)
-C      $                 + cab001(l)*cc(l,i_oh)
-C      $                 + cab002(l)*cc(l,i_o))
-     
-C       ELSE
-        
-C         k_pseudo = 0. 
-      
-C       ENDIF 
-      
-        
-          
-        IF ( l .eq. 5 ) THEN 
+C         IF ( l <= 5 ) THEN 
 
-          k_pseudo(l) =(1./( 3600. ))
-     $             -  loss(l,i_ch4)
+C           k_pseudo(l) =(1./( 604800.))
+C      $             -  loss(l,i_ch4)
 
-        loss(l,i_ch4) = loss(l,i_ch4) + k_pseudo(l)
+C         loss(l,i_ch4) = loss(l,i_ch4) + k_pseudo(l)
 
-        else
+C         else
 
-        k_pseudo(l) = 0.
+C         k_pseudo(l) = 0.
 
 
 
-        ENDIF 
-
-
-
-
-
-
-
-
+C         ENDIF 
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1800,6 +1897,8 @@ c
      $                 + j(l,j_hoch2cho_hco)
      $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
      $                 + k_pseudo(l)*cc(l,i_ch4)
+     $                 + ke_h2o(l)*cc(l,i_h2o)
+     $                 + ke_ch4(l)*cc(l,i_ch4)
      
      
           loss(l,i_hox) = 2.*c005(l)*cc(l,i_h)*cc(l,i_ho2)
@@ -1877,13 +1976,9 @@ C C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                        + j(l,j_ch3cho_ch3)*cc(l,i_ch3cho)
      $                        + j(l,j_ch3cooh)*cc(l,i_ch3cooh)
      $                        + j(l,j_ch3coooh)*cc(l,i_ch3coooh)
-     $                        + 0.75*cab017(l)*cc(l,i_o)*cc(l,i_ch3o)
-     
-c     Production Rate Adjustment [ BMT 21/08/2020 ] 
-C         IF ( (l .le. 1) .and. (sza < 95.) ) THEN 
-
-         production(l,i_ch3) = production(l,i_ch3) 
-     $                       + cc(l,i_ch4)*k_pseudo(l)
+     $                        + 0.75*cab017(l)*cc(l,i_o)*cc(l,i_ch3o) 
+     $                        + cc(l,i_ch4)*k_pseudo(l)
+     $                        + ke_ch4(l)*cc(l,i_ch4)
 
           loss(l,i_ch3) = cab003(l)*cc(l,i_o2)
      $                  + cab004(l)*cc(l,i_o3)
@@ -2473,12 +2568,12 @@ c
      $              /(1. + loss(l,i_hox)*dt)
      
 C !      Methane Oxidation
-C       if ( l .gt. 5 ) then 
+      if ( l == 1 ) then 
+         cc(l,i_ch4) = cc(l,i_ch4)
+      else
          cc(l,i_ch4) = (cc0(l,i_ch4) + production(l,i_ch4)*dt)
      $              /(1. + loss(l,i_ch4)*dt)
-C       else 
-C          cc(l,i_ch4) = cc0(l,i_ch4)
-C       endif   
+      endif
 
          if ( igcm_ch3 .ne. 0 )
      $   cc(l,i_ch3) = production(l,i_ch3)/loss(l,i_ch3)
@@ -2523,6 +2618,7 @@ C       endif
      
 
 C !     Alkane Oxidation
+         if ( igcm_c2h6 .ne. 0 ) then
          cc(l,i_c2h6) = (cc0(l,i_c2h6) + production(l,i_c2h6)*dt)
      $              /(1. + loss(l,i_c2h6)*dt)
 
@@ -2623,6 +2719,8 @@ C !     Alkane Oxidation
          cc(l,i_hcoco3)=production(l,i_hcoco3)/
      $                     loss(l,i_hcoco3)
      
+      ENDIF 
+
       IF (igcm_ch3o2 .ne. 0) ro2(l) = ro2(l) + cc(l,i_ch3o2)
       IF (igcm_hoch2o2 .ne. 0 ) ro2(l) = ro2(l) + cc(l,i_hoch2o2)
       IF (igcm_c2h5o2 .ne. 0 ) ro2(l) = ro2(l) + cc(l,i_c2h5o2)
@@ -2656,14 +2754,18 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     end of loop over iterations
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-
+      
       end do
   
+
+
       ! Loss Rate of O2:
       !
       o2_loss_rate =  j(:,j_o2_o)*cc(:,i_o2)
+     &             +  j(:,j_o2_o1d)*cc(:,i_o2)
      &             +  j(:,j_ho2)*cc(:,i_ho2)
      &             +  j(:,j_h2o2)*cc(:,i_h2o2) 
+     &             +  j(:,j_ch3o2h)*cc(:,i_ch3ooh)     
      &             +  c004(:)*cc(:,i_h)*cc(:,i_ho2)
      &             +  c006(:)*cc(:,i_h)*cc(:,i_ho2)
      &             +  d003(:)*cc(:,i_ho2)*no(:)
@@ -2671,133 +2773,43 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &             +  cab008*cc(:,i_ch3o2)*ro2(:)*1.5
      &             +  cab009*cc(:,i_ch3o2)*ro2(:)*1.5
      &             +  cab014*cc(:,i_ch3ooh)*cc(:,i_oh)*0.4 
-     &             +  j(:,j_ch3o2h)*cc(:,i_ch3ooh)
+     &             +  0.5*cab029*cc(:,i_hoch2o2)*cc(:,i_ho2)
+     &             +  cab034*cc(:,i_hoch2ooh)*cc(:,i_hoch2ooh)
       
-      ! O + O2 + M [gross loss]
-      lifetime(:,1) = a001(:)*cc(:,i_o)*cc(:,i_o2) 
-      ! H + O2 + M [gross loss]
-      lifetime(:,2) = c011(:)*cc(:,i_h)*cc(:,i_o2)
+      ! Output Array 
 
-      ! "Net" Losses
-      ! O2 + hv -> O + O 
+      ! O=O Bond Loss Rate (molec. cm-3 s-1)
+      lifetime(:,1) = o2_loss_rate
+
+      ! CH4 Loss Rate (molec. cm-3 s-1)
+      lifetime(:,2) = loss(:,i_ch4)*cc(:,i_ch4) 
+
+      ! Individual Rate Contributions
+      ! to O=O loss rate
       lifetime(:,3) = j(:,j_o2_o)*cc(:,i_o2)
-      ! HO2 + hv -> OH + H 
-      lifetime(:,4) = j(:,j_ho2)*cc(:,i_ho2)
-      ! H2O2 + hv -> 
-      lifetime(:,5) = j(:,j_h2o2)*cc(:,i_h2o2) 
-      ! H + HO2 -> 2OH 
-      lifetime(:,6) = c004(:)*cc(:,i_h)*cc(:,i_ho2)
-      ! H + HO2 -> O + H2O 
-      lifetime(:,7) = c006(:)*cc(:,i_h)*cc(:,i_ho2)
-      ! NO + HO2 -> NO2 + OH
-      lifetime(:,8) = d003(:)*cc(:,i_ho2)*no(:)
+      lifetime(:,4) =   j(:,j_o2_o1d)*cc(:,i_o2)
+      lifetime(:,5) =   j(:,j_ho2)*cc(:,i_ho2)
+      lifetime(:,6) =   j(:,j_h2o2)*cc(:,i_h2o2) 
+      lifetime(:,7) =   j(:,j_ch3o2h)*cc(:,i_ch3ooh)     
+      lifetime(:,8) =   c004(:)*cc(:,i_h)*cc(:,i_ho2)
+      lifetime(:,9) =   c006(:)*cc(:,i_h)*cc(:,i_ho2)
+      lifetime(:,10) =   d003(:)*cc(:,i_ho2)*no(:)
+      lifetime(:,11) =   cab007*cc(:,i_ch3o2)*cc(:,i_ho2) 
+      lifetime(:,12) =   cab008*cc(:,i_ch3o2)*ro2(:)*1.5
+      lifetime(:,13 ) =   cab009*cc(:,i_ch3o2)*ro2(:)*1.5
+      lifetime(:,14) =   cab014*cc(:,i_ch3ooh)*cc(:,i_oh)*0.4 
+      lifetime(:,15) =   0.5*cab029*cc(:,i_hoch2o2)*cc(:,i_ho2)
+      lifetime(:,16) =   cab034*cc(:,i_hoch2ooh)*cc(:,i_OH)
 
+      ! Diel-Steady State O2 
+      lifetime(:,17) = (production(:,i_o2)/loss(:,i_o2))/dens(:)
 
-      ! CH4 Contributions 
-      lifetime(:,9) = cab007*cc(:,i_ch3o2)*cc(:,i_ho2) 
-      lifetime(:,10) = cab008*cc(:,i_ch3o2)*ro2(:)*1.5
-      lifetime(:,11) = cab009*cc(:,i_ch3o2)*ro2(:)*1.5
-      lifetime(:,12) = cab014*cc(:,i_ch3ooh)*cc(:,i_oh)*0.4 
-      lifetime(:,13) = j(:,j_ch3o2h)*cc(:,i_ch3ooh)
+      ! O=O Atmospheric Lifetime (per model level) in years
+      lifetime(:,18) = cc(:,i_o2)
 
-
-      ! 
-      lifetime(:,23) = 1./loss(:,i_o2)
-
-      lifetime(:,24) = cc(:,i_o2)
-
-      lifetime(:,25) = production(:,i_o2)/loss(:,i_o2)
-      
-      lifetime(:,25) = lifetime(:,25)/dens
-
-      lifetime(:,26) = o2_loss_rate
-
-      lifetime(:,27) = 1./loss(:,i_hcooh)
-      lifetime(:,28) = 1./loss(:,i_hoch2ooh)
-      
-      lifetime(:,29) = o2_loss_rate 
-     $               + j(:,j_ch3o2h)*cc(:,i_ch3ooh)
-     $               + cab030*cc(:,i_hoch2o2)*ro2*0.5
-     $               + cab031*cc(:,i_hoch2o2)*ro2*1.5
-     $               + cab034*cc(:,i_hoch2ooh)*ro2
-
-      ! New Attempt at O=O Steady-State
-      lifetime(:,30) = (a002*cc(:,i_o)*cc(:,i_o)
-     $               + a003*cc(:,i_o)*cc(:,i_o3)
-     $               + b005*cc(:,i_o1d)*cc(:,i_o3)
-     $               + c002*cc(:,i_o)*cc(:,i_oh)
-     $               + c014*cc(:,i_oh)*cc(:,i_o3)
-     $               + c017*cc(:,i_oh)*cc(:,i_oh)
-     $               + d001*cc(:,i_o)*no
-     $               + cab013*cc(:,i_ch3oh)*cc(:,i_oh)
-     $               + cab016*cc(:,i_ch3o)*cc(:,i_o3)
-     $               + cab017*cc(:,i_ch3o)*cc(:,i_o)*0.75
-     $               + cab032*cc(:,i_hcooh)*cc(:,i_oh)
-     $               + cab035*cc(:,i_hoch2oh)*cc(:,i_oh))
-     $               /(c004*cc(:,i_h)*cc(:,i_ho2)
-     $               + c006*cc(:,i_h)*cc(:,i_ho2)
-     $               + d003*no*cc(:,i_HO2)
-     $               + j(:,j_o2_o)*cc(:,i_o2)
-     $               + j(:,j_o2_o1d)*cc(:,i_o2)
-     $               + j(:,j_h2o2)*cc(:,i_h2o2)
-     $               + j(:,j_ho2)*cc(:,i_ho2)
-     $               + cab007*cc(:,i_ch3o2)*cc(:,i_ho2)
-     $               + cab008*cc(:,i_ch3o2)*ro2*1.5
-     $               + cab009*cc(:,i_ch3o2)*ro2*1.5
-     $               + cab014*cc(:,i_ch3ooh)*cc(:,i_oh)*0.4
-     $               + cab030*cc(:,i_hoch2o2)*ro2
-     $               + cab031*cc(:,i_hoch2o2)*ro2*1.5
-     $               + cab034*cc(:,i_hoch2ooh)*cc(:,i_oh)
-     $               + j(:,j_ch3o2h)*cc(:,i_ch3ooh)
-     $               )
-      lifetime(:,30) = lifetime(:,30)
-     $               *( cc(:,i_o2) + cc(:,i_ho2)
-     $               + cc(:,i_h2o2) + ro2
-     $               + cc(:,i_ch3ooh) )
-
-
-
-
-
-
-      ! O2 Resupplies from O3 and HO2 
-      
-C       ! O3 + hv -> O2 + O
-C       lifetime(:,9) = j(:,j_o3_o)*cc(:,i_o3)
-C       ! O3 + hv -> O2 + O1D 
-C       lifetime(:,10) = j(:,j_o3_o1d)*cc(:,i_o3)
-C       !	O + O3 -> O2 + O2 
-C       lifetime(:,11) = a003*cc(:,i_o3)*cc(:,i_o)
-C       ! O1D + O3 -> O2 + O2 
-C       lifetime(:,12) = b005*cc(:,i_o3)*cc(:,i_o1d)
-C       ! O1D + O3 -> O2 + O + O 
-C       lifetime(:,13) = b006*cc(:,i_o3)*cc(:,i_o1d)
-C       ! H + O3 -> OH + O2 
-C       lifetime(:,14) = c003*cc(:,i_h)*cc(:,i_o3)
-C       ! HO2 + O3 -> OH + O2 + O2 
-C       lifetime(:,15) = c015*cc(:,i_o3)*cc(:,i_ho2) 
-C       ! NO + O3 -> NO2 + O2 
-C       lifetime(:,16) = d002*cc(:,i_o3)*no 
-C       ! H + HO2 -> H2 + O2 
-C       lifetime(:,17) = c005*cc(:,i_h)*cc(:,i_ho2)
-C       ! OH + O3 -> HO2 + O2 
-C       lifetime(:,18) = c014*cc(:,i_oh)*cc(:,i_o3)
-C       ! O + HO2 -> OH + O2 
-C       lifetime(:,19) = c001*cc(:,i_o)*cc(:,i_ho2)
-C       ! H + HO2 -> H2 + O2 
-C       lifetime(:,20) = c005*cc(:,i_h)*cc(:,i_ho2)
-C       ! OH + HO2 -> H2O + O2 
-C       lifetime(:,21) = c006*cc(:,i_oh)*cc(:,i_ho2)
-C       ! HO2 + HO2 -> H2O2 + O2 
-C       lifetime(:,22) = c008*cc(:,i_ho2)*cc(:,i_ho2)
-      
-
-
-
-
-
-
-
+      ! k_pseudo
+      lifetime(:,19) = k_pseudo
+      lifetime(:,20) = k_pseudo*cc(:,i_ch4)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     density -> volume mixing ratio conversion

@@ -38,9 +38,9 @@ integer,save :: t_idx = 1
 integer, save :: ndt = 0
 character(len=20) filename
 ! character(len=*), parameter :: directory = "/exports/csce/datastore/geos/users/s1215319/paper2/tlmfiles/"
-! character(len=*), parameter :: directory = "/scratch/local/s1215319/"
-character(len=*), parameter :: directory = "/exports/csce/datastore/geos/users/" &
-                                // "s1215319/paper3/version2/tlmfiles/o2sensitivity/fastfloor/"
+character(len=*), parameter :: directory = "/scratch/local/s1215319/"
+! character(len=*), parameter :: directory = "/exports/csce/datastore/geos/users/" &
+!                                 // "s1215319/paper3/version2/tlmfiles/o2sensitivity/standard/"
 
 integer, parameter :: nx = nlayermx*nqmx
 integer, parameter :: ny = nlayermx*nqmx

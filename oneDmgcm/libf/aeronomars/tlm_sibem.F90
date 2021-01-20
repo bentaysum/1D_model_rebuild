@@ -278,6 +278,8 @@ if ( ( lyr_m .le. 5 ) .and. ( k_pseudo .ne. 0. ) ) then
     dKpseudo_dPQ(lyr_m,t_o1d) = -(b007 + b008 + b009)
     dKpseudo_dPQ(lyr_m,t_o) = -cab002 
     dKpseudo_dPQ(lyr_m,t_oh) = -cab001 
+else
+    dKpseudo_dPQ(lyr_m,:) = 0.D0
 endif
 
 ! Remainder of Chemistry linearisation occurs in this file.

@@ -663,7 +663,6 @@ C           IF ( mcd_profiles ) THEN
      &                          pq(1,:,1), pq(1,:,2), 
      &                          pq(1,:,5), pq(1,:,8),
      &                          pq(1,:,15))
-       if ( mcd_profiles )  WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]"
 C           ENDIF 
 
 c     Interpolate physical variables (temperature, wind,
