@@ -402,7 +402,7 @@ c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      $      .and. pertloop ) THEN 
 
 
-           CALL scalar_perturbation(pq(1,:,:))
+C            CALL scalar_perturbation(pq(1,:,:))
 
 
             mcd_profiles = .False. ! Interpolation routines will 
@@ -1491,11 +1491,16 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
 
       ! tracers
       DO iq=1, nq
-      
         DO l=1,nlayer
           DO ig=1,ngrid
+
+            if ( (trim(noms(iq)) == 'ch4') .and. (l==1) ) then 
+                pdq(ig,l,iq) = 0.
+            endif 
             zq(ig,l,iq)=pq(ig,l,iq) +pdq(ig,l,iq)*ptimestep
+
             if ( zq(ig,l,iq) .ne. zq(ig,l,iq) ) goto 405
+
           ENDDO
         ENDDO
       ENDDO
@@ -1506,7 +1511,7 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
                write(*,*) trim(noms(iq))
                write(*,*) "-----------------------"
                do l = 1, 10 
-                    write(*,"(A4,E15.7)") l, zq(1,l,iq)
+                    write(*,"(I4,E15.7)") l, zq(1,l,iq)
                enddo 
           enddo 
           STOP
