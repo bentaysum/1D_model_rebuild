@@ -1784,7 +1784,7 @@ ch4vmr=0.41275263e-9
       end if 
       ! HCl
       if (igcm_hcl /= 0) then
-         vmr = 0.
+         vmr = 100.e-9
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
