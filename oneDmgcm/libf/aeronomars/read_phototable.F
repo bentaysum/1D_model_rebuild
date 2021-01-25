@@ -47,6 +47,13 @@ ccc Organic netCDF File
       integer numorgs 
       parameter(numorgs = 13)
       character(len=30) organic_reactions(numorgs)
+ccc Chlorine compounds inside organic netCDF
+      real chlor_j(ntemp,nsza, 201, nozo,ntau)
+      integer clvarid 
+      integer numchlor
+      parameter (numchlor = 4)
+      character(len=30) chlor_reactions(numchlor)
+
       integer i 
 c
       
@@ -90,8 +97,8 @@ c
 c                    print*, colairtab(iz), xsza, table_ozo(iozo)
                      read(fic,'(7e11.4)')
      $               (jphot(itemp,isza,iz,iozo,itau,ij),
-     $                                       ij= 1, nd-numorgs)
-                     do ij = 1,nd-numorgs
+     $                                       ij= 1, nd-numorgs-numchlor)
+                     do ij = 1,nd-numorgs-numchlor
                         if (jphot(itemp,isza,iz,iozo,itau,ij)
      $                     .eq. 1.e-30) then
                            jphot(itemp,isza,iz,iozo,itau,ij) = 0.
@@ -116,7 +123,9 @@ c  netCDF file located in datafile
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       ! NetCDF file name 
-       netcdf_phototable = "/jmars_organics.nc"
+C        netcdf_phototable = "/jmars_organics.nc"
+       netcdf_phototable = "/jmars_organics_cl.nc"
+
        write(*,*) "NEW ORGANIC PHOTOLYSIS:"
        WRITE(*,*) trim(datafile) // trim(netcdf_phototable)
        retval = nf_open(trim(datafile) // trim(netcdf_phototable), 
@@ -141,7 +150,15 @@ c save file size
        organic_reactions(12) = "CH3CO(OOH) -> Products"
        organic_reactions(13) = "CH3COCO(OH) -> Products"
        
-       
+c     Chlorine species 
+       chlor_reactions(1) = "Cl2 -> Cl + Cl"
+       chlor_reactions(2) = "ClOO -> Products"
+       chlor_reactions(3) = "OClO -> Products"
+       chlor_reactions(4) = "ClOOCl -> Cl + ClOO "
+
+
+
+
        ! Iterate through the reaction strings and store
        ! the values extracted from the netCDF table and
        ! place in the jphot array
@@ -157,9 +174,24 @@ c save file size
 	   
 
        end do 
+
+
+       do i = 1, numchlor
+       
+       retval = nf_inq_varid(ncid,TRIM(chlor_reactions(i)),clvarid)
+       if (retval .ne. nf_noerr) call net_err(retval)
+       retval = nf_get_var_real(ncid, clvarid, chlor_j)
+       if (retval .ne. nf_noerr) call net_err(retval)       
+
+       jphot(:,:,:,:,:,ij+numorgs + i - 1) = chlor_j
+     
+
+       end do 
+
        
        retval = nf_close(ncid)
        if (retval .ne. nf_noerr) call net_err(retval)       
+
 
       return
       end

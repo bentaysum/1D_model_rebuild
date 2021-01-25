@@ -1,4 +1,4 @@
-27
+38
 co2
 co
 o
@@ -26,8 +26,6 @@ hoch2o2
 hoch2oh
 hoch2ooh 
 hco
-dust_mass
-dust_number
 cl
 clo
 cl2
@@ -39,7 +37,8 @@ cloo
 ch3ocl
 clco
 clo3
-
+dust_mass
+dust_number
 
 elec
 

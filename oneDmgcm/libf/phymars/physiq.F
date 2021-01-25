@@ -613,57 +613,16 @@ c    --------------------------------
 
 
 
-C C c-----------------------------------------------------------------------
-C c    1.2.6 Optional CH4 interpolation
-C c    ----------------------------------
-C c     Line of Best fit for surface CH4:
-C c     values from Webster et. al 2018 analysis of Curiousity SAM 
-C c     CH4 values. Line of best fit is a 6th degree polynomial.
-C C     Requires to be turned off during TLM operation
-C       IF ( .not. tlm_on ) THEN 
-C         IF ( idt == ndt_tlm ) THEN 
-C         zls = zls*180./pi
-C         DO iq = 1,nqmx
-C           IF (TRIM(noms(iq)) == "ch4" ) THEN
-C             pq(1,:,iq) =  
-C      $        (-8.1565118E-14*zls**6
-C      $     +   8.3522676E-11*zls**5
-C      $     -   3.0856216E-08*zls**4
-C      $     +   4.8741198E-06*zls**3
-C      $     -   2.9426485E-04*zls**2
-C      $     +   4.6374896E-03*zls
-C      $     +   2.8769755E-01)*1.e-9
-C      $     *mmol(iq)/mmean(1,:)
-C           ENDIF 
-C         ENDDO
-C         zls = zls*pi/180.
-C         ENDIF 
-C C C       ENDIF 
-
-C        IF ( idt == ndt_tlm ) THEN 
-C           DO iq = 1, nqmx 
-C                IF ( trim(noms(iq)) == "ch4" ) THEN 
-C                     pq(1,1:7,iq) = 1.e-9*mmol(iq)/mmean(1,1:7)
-C                     EXIT 
-C                ENDIF 
-C           ENDDO 
-C        ENDIF 
-
-
-
-
 
 c-----------------------------------------------------------------------
 c    1.2.7: MCDv5.3 Interpolation Routines
 c    --------------------------------------
 c  Begin the tracer interpolation routine for the MCD v5.3 look-up
 c  table for tracers CO2, CO, H2, H2O vapour, and O2.
-C           IF ( mcd_profiles ) THEN 
-               call mcd_trac(ptime,zzlay(1,:),zls*180./pi, 
+      call mcd_trac(ptime,zzlay(1,:),zls*180./pi, 
      &                          pq(1,:,1), pq(1,:,2), 
      &                          pq(1,:,5), pq(1,:,8),
      &                          pq(1,:,15))
-C           ENDIF 
 
 c     Interpolate physical variables (temperature, wind,
 c     q2 and surface pressure) 
@@ -672,11 +631,11 @@ c     q2 and surface pressure)
      &              q2(1,:))
      
 c    Dust profiles in kg/kg supplied by MCD dataset 
-         IF ( doubleq ) THEN 
-               call mcd_dust(ptime*24.,zzlay(1,:),zls*180./pi,
+      IF ( doubleq ) THEN 
+        call mcd_dust(ptime*24.,zzlay(1,:),zls*180./pi,
      &                       pq(1,:,:), 
      &                       pplay(1,:), zt(1,:) )
-         ENDIF 
+      ENDIF 
 
 
 c----------------------------------------------------------------------
@@ -1443,29 +1402,6 @@ c       Thermal inertia feedback
         ENDIF
       ENDIF
       
-c ======================================================================
-c 10.0: Construct the 1-D model Jacobian [TLM] and advance perturbation
-c       vector [PERTS] to next time-step then call the netCDF save routine
-c ======================================================================
-
-c COMMENTED OUT 29/06/2020 TO MAKE WAY FOR L-BFGS-B OPTIMIZATION ROUTINES
-
-c          IF (tlm_on) THEN
-
-C                TLM = TLM_trans + TLM_photo
-C                TLM = tlm_ident + TLM*ptimestep
-
-C                TLM( (t_co2-1)*nlayermx + 1 :
-C      $              t_co2*nlayermx, : ) = 0.D0
-
-
-c              call TLM_ADJ_out(idt,ptime*24.)
-              
-
-c          ENDIF
-          
-
-
 c-----------------------------------------------------------------------
 c  10. Write output files
 c  ----------------------
@@ -1493,18 +1429,11 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
       DO iq=1, nq
         DO l=1,nlayer
           DO ig=1,ngrid
-
-            if ( (trim(noms(iq)) == 'ch4') .and. (l==1) ) then 
-                pdq(ig,l,iq) = 0.
-            endif 
             zq(ig,l,iq)=pq(ig,l,iq) +pdq(ig,l,iq)*ptimestep
-
             if ( zq(ig,l,iq) .ne. zq(ig,l,iq) ) goto 405
-
           ENDDO
         ENDDO
       ENDDO
-      
       
       if ( zq(1,1,1) .le. 0.9 ) then
   405     do iq = 1, nqmx

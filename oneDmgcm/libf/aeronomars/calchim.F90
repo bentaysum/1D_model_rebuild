@@ -176,6 +176,22 @@
        ! Dust 
        integer,save :: i_dust = 0 
        
+       
+!  Chlorine Compounds
+     integer,save :: i_cl = 0
+     integer,save :: i_clo = 0
+     integer,save :: i_cl2 = 0
+     integer,save :: i_oclo = 0
+     integer,save :: i_cl2o2 = 0
+     integer,save :: i_hcl = 0
+     integer,save :: i_hocl = 0
+     integer,save :: i_cloo = 0
+     integer,save :: i_ch3ocl = 0
+     integer,save :: i_clco = 0
+     integer,save :: i_clo3 = 0
+       
+       
+       
       integer :: ig_vl1
 
       real    :: latvl1, lonvl1
@@ -679,6 +695,97 @@
             nbq = nbq + 1
             niq(nbq) = i_elec
          end if
+
+!        Chlorine Compounds 
+           i_cl = igcm_cl
+         if (i_cl == 0) then
+            write(*,*) "calchim: Error; no cl tracer !!!"
+            write(*,*) "cl will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_cl
+         end if
+           i_cl2 = igcm_cl2
+         if (i_cl2 == 0) then
+            write(*,*) "calchim: Error; no cl2 tracer !!!"
+            write(*,*) "cl2 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_cl2
+         end if
+           i_clo = igcm_clo
+         if (i_clo == 0) then
+            write(*,*) "calchim: Error; no clo tracer !!!"
+            write(*,*) "clo will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_clo
+         end if
+           i_oclo = igcm_oclo
+         if (i_oclo == 0) then
+            write(*,*) "calchim: Error; no oclo tracer !!!"
+            write(*,*) "oclo will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_oclo
+         end if
+           i_cl2o2 = igcm_cl2o2
+         if (i_cl2o2 == 0) then
+            write(*,*) "calchim: Error; no cl2o2 tracer !!!"
+            write(*,*) "cl2o2 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_cl2o2
+         end if
+           i_hcl = igcm_hcl
+         if (i_hcl == 0) then
+            write(*,*) "calchim: Error; no hcl tracer !!!"
+            write(*,*) "hcl will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hcl
+         end if
+           i_hocl = igcm_hocl
+         if (i_hocl == 0) then
+            write(*,*) "calchim: Error; no hocl tracer !!!"
+            write(*,*) "hocl will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hocl
+         end if
+           i_cloo = igcm_cloo
+         if (i_cloo == 0) then
+            write(*,*) "calchim: Error; no cloo tracer !!!"
+            write(*,*) "cloo will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_cloo
+         end if
+           i_ch3ocl = igcm_ch3ocl
+         if (i_ch3ocl== 0) then
+            write(*,*) "calchim: Error; no ch3ocl tracer !!!"
+            write(*,*) "ch3ocl will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_ch3ocl
+         end if
+           i_clco = igcm_clco
+         if (i_clco== 0) then
+            write(*,*) "calchim: Error; no clco tracer !!!"
+            write(*,*) "clco will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_clco
+         end if
+           i_clo3 = igcm_clo3
+         if (i_clo3== 0) then
+            write(*,*) "calchim: Error; no clo3 tracer !!!"
+            write(*,*) "clo3 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_clo3
+         end if
+         
          
          
          !Check tracers needed for thermospheric chemistry
@@ -973,38 +1080,32 @@
 !=======================================================================
 !     loop over grid
 !=======================================================================
-
-!     Re-define the molar mass of mars dust as that derived from
-!     doi:10.1002/2015GL066675 [ BMT 28/07/2020]
-      IF (igcm_dust_mass .ne. 0 ) THEN 
-          mmol(igcm_dust_mass) = 66.5
-      ENDIF
       
       do ig = 1,ngridmx
          
          foundswitch = 0
          do l = 1,nlayermx
          
-
-            do i = 1,nbq
-               iq = niq(i) ! get tracer index
-
-               IF ( ( trim(noms(iq)) == "ch4" ) .and. (l == 1) ) THEN 
-                  zq(ig,l,iq) = pq(ig,l,iq)
-               ELSE  
-               zq(ig,l,iq) = pq(ig,l,iq) + pdq(ig,l,iq)*ptimestep
-               ENDIF 
-               
-               zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
-               
-            end do
-            
-            
-            
             zt(ig,l)  = pt(ig,l) + pdt(ig,l)*ptimestep
             zu(ig,l)  = pu(ig,l) + pdu(ig,l)*ptimestep
             zv(ig,l)  = pv(ig,l) + pdv(ig,l)*ptimestep
 
+            do i = 1,nbq
+               iq = niq(i) ! get tracer index
+               zq(ig,l,iq) = pq(ig,l,iq) + pdq(ig,l,iq)*ptimestep
+
+               ! -------------------------------------------
+               ! Special case for Dust (mass concentration)
+               ! Assumption of particle density @ 1.52 g/cm3
+               ! -------------------------------------------
+               if ( trim(noms(iq)) == "dust_mass" ) then 
+                    zycol(l,iq) = zq(ig,l,iq)
+               else 
+                    zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
+               endif 
+               
+            end do
+            
             zpress(l) = pplay(ig,l)/100.
             ztemp(l)  = zt(ig,l)
             zdens(l)  = zpress(l)/(kb*1.e4*ztemp(l))
@@ -1040,7 +1141,6 @@
 !=======================================================================
 
 !        chemistry in lower atmosphere
-
          if (photochem) then
             call photochemistry(lswitch,zycol,szacol,ptimestep,    &
                                 zpress,ztemp,zdens,dist_sol,       &
@@ -1071,6 +1171,13 @@
             call deposition(ig, ig_vl1, pplay, pplev, zzlay, zzlev,& 
                             zu, zv, zt, zycol, ptimestep, co2ice)
          end if
+
+!        Chlorine deposition [BMT 20/11/2020]
+         ! if ( igcm_hcl .ne. 0 ) then
+         !    call chlorine_deposition(ig,pplay,zzlay,zzlev,zu,zv,zt,zycol,ptimestep)
+         ! endif 
+
+
 !=======================================================================
 !     tendencies
 !=======================================================================
@@ -1085,6 +1192,16 @@
             iqmax=iloc(1)
             do i = 1,nbq
                iq = niq(i) ! get tracer index
+               
+               ! --------------------------------------
+               ! Dust - Need special conversion back to
+               !        mixing ratio 
+               ! --------------------------------------
+               if ( trim(noms(iq)) == "dust_mass" ) then 
+                   ! zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
+                   cycle
+               endif 
+               
                if (iq /= iqmax) then
                   dqchim(ig,l,iq) = (zycol(l,iq)*mmol(iq)/mmean(ig,l)  &
                                    - zq(ig,l,iq))/ptimestep

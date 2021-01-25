@@ -5,7 +5,7 @@ tracer=.true.
 
 #Where are the external files (dust, topography; chemistry,...)
 #datadir=/u/forget/WWW/datagcm/datafile
-datadir=/exports/csce/datastore/geos/users/s1215319/cleaning_gcm/mgcm-datafile
+datadir=/home/s1215319/mgcm/mgcm-datafile
 
 #Diurnal cycle ?  if diurnal=False, diurnal averaged solar heating
 diurnal=.true.
@@ -51,7 +51,7 @@ t_forecast=992
 
 ## Handled by bash script
 ## perturbation_cycle.sh 
-pertloop=.True.
+pertloop=.false.
 PERTGAS=ch4
 SCALAR=1.E1
 L_1=1
@@ -60,7 +60,7 @@ L_2=3
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Introducing an instantaneous plume?
-plume=.True.
+plume=.false.
 
 #Days after day0 to release plume?
 plume_day=110
