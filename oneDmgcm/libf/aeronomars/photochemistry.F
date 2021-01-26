@@ -938,6 +938,7 @@ C            CCCCCCCCCCCCCCCCCCCCC
      $         + j(l,j_ch4_ch_h2_h)*cc(l,i_ch4) 
      $         + j(l,j_ch2o_hco)*cc(l,i_hcho)
      $         + j(l,j_ch3oh)*cc(l,i_ch3oh)
+     $         + cl008(l)*cc(l,i_cl)*cc(l,i_h2)
      $         )/MAX(cc(l,i_ho2),dens(l)*1.e-30)
 c            LOSS[HO2]
 C            CCCCCCCCC
@@ -952,7 +953,10 @@ C            CCCCCCCCC
      $        + cab006(l)*cc(l,i_ch3o2)
      $        + cab007(l)*cc(l,i_ch3o2)
      $        + cab019(l)*cc(l,i_hcho)
-     $        + cab029(l)*cc(l,i_hoch2o2)*0.8)
+     $        + cab029(l)*cc(l,i_hoch2o2)*0.8
+     $        + cl009(l)*cc(l,i_cl)
+     $        + cl010(l)*cc(l,i_cl)
+     $        + cl013(l)*cc(l,i_clo) )
 C            PRODUCTION(HO2)/CC[H]
 C            CCCCCCCCCCCCCCCCCCCCC
      $      /( c011(l)*cc(l,i_o2) 
@@ -968,6 +972,8 @@ C            CCCCCCCCCCCCCCCCCCCCC
      $         + cab032(l)*cc(l,i_hcooh)*cc(l,i_oh)
      $         + cab035(l)*cc(l,i_hoch2oh)*cc(l,i_oh)
      $         + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
+     $         + cl011(l)*cc(l,i_cl)*cc(l,i_h2o2)
+     $         + cl012(l)*cc(l,i_clo)*cc(l,i_oh)*0.94
      $         )/MAX(cc(l,i_h),dens(l)*1.e-30)
 c            LOSS[H]
 c            ccccccc
@@ -1004,6 +1010,7 @@ C                 CCCCCCCCCCCCCCCCCCCCCC
      $            + j(l,j_ch3o2h)*cc(l,i_ch3ooh)
      $            + 2.*j(l,j_h2o2)*cc(l,i_h2o2)
      $            + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
+     $            + cl010(l)*cc(l,i_cl)*cc(l,i_ho2)
      $            )/MAX(cc(l,i_ho2),dens(l)*1.e-30)
 C                 LOSS(HO2)
 C                 CCCCCCCCC
@@ -1018,7 +1025,10 @@ C                 CCCCCCCCC
      $        + cab006(l)*cc(l,i_ch3o2)
      $        + cab007(l)*cc(l,i_ch3o2)
      $        + cab019(l)*cc(l,i_hcho)
-     $        + cab029(l)*cc(l,i_hoch2o2)*0.8)  
+     $        + cab029(l)*cc(l,i_hoch2o2)*0.8
+     $        + cl009(l)*cc(l,i_cl)
+     $        + cl010(l)*cc(l,i_cl)
+     $        + cl013(l)*cc(l,i_clo) )  
      $        /
 c             PRODUCTION(HO2)/CC[OH]
 c             CCCCCCCCCCCCCCCCCCCCCC
@@ -1028,6 +1038,7 @@ c             CCCCCCCCCCCCCCCCCCCCCC
      $        + cab013(l)*cc(l,i_ch3oh)*0.85
      $        + cab032(l)*cc(l,i_hcooh)
      $        + cab035(L)*cc(l,i_hoch2oh)
+     $        + 0.94*cl012(l)*cc(l,i_clo)     
      $        + ( c011(l)*cc(l,i_h)*cc(l,i_o2)
      $         + c012(l)*cc(l,i_o)*cc(l,i_h2o2)
      $         + cab015(l)*cc(l,i_ch3o)*cc(l,i_o2)
@@ -1035,6 +1046,7 @@ c             CCCCCCCCCCCCCCCCCCCCCC
      $         + cab028(l)*cc(l,i_hoch2o2)
      $         + cab030(l)*cc(l,i_hoch2o2)*ro2(l)
      $         + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh) 
+     $         + cl011(l)*cc(l,i_cl)*cc(l,i_h2o2)
      $          )/MAX(cc(l,i_oh),dens(l)*1.e-30)
 c             LOSS(OH)
 C             CCCCCCCC
@@ -1055,6 +1067,9 @@ C             CCCCCCCC
      $       + cab032(l)*cc(l,i_hcooh)
      $       + cab033(l)*cc(l,i_hoch2ooh)
      $       + cab035(l)*cc(l,i_hoch2oh)
+     $       + cl012(l)*cc(l,i_clo)
+     $       + cl014(l)*cc(l,i_hcl)
+     $       + cl015(l)*cc(l,i_hocl)
      $       )
 
           IF ( tlm_on ) THEN 
@@ -1252,6 +1267,7 @@ c
      $                   + cab021(l)*cc(l,i_hco)*cc(l,i_o)
      $                   + cab037(l)*cc(l,i_c2h6)*cc(l,i_o)
      $                   + cl001(l)*cc(l,i_o3)*cc(l,i_cl)
+     $                   + cl002(l)*cc(l,i_o)*cc(l,i_clo)
 
             loss(l,i_ox) = loss(l,i_ox)/cc(l,i_ox)
 
@@ -1374,6 +1390,7 @@ c
      $                   + cab020(l)*cc(l,i_hcho)
      $                   + cab021(l)*cc(l,i_hco)
      $                   + cab037(l)*cc(l,i_c2h6)
+     $                   + cl002(l)*cc(l,i_clo)
 
        end do 
 
@@ -1638,6 +1655,12 @@ c
      $                + cab065(l)*cc(l,i_ch3choho2)*cc(L,i_ho2)
      $                + cab105(l)*cc(l,i_hcoco3)*ro2(l)*0.1
      $                + cl001(l)*cc(l,i_o3)*cc(l,i_cl)
+     $                + cl002(l)*cc(l,i_o)*cc(l,i_clo)
+     $                + cl003(l)*cc(L,i_clo)*cc(l,i_clo)
+     $                + cl004(l)*cc(l,i_clo)*cc(l,i_clo)
+     $                + cl009(l)*cc(l,i_cl)*cc(l,i_ho2)
+     $                + cl012(l)*cc(l,i_clo)*cc(l,i_oh)*0.06
+     $                + cl013(l)*cc(l,i_clo)*cc(l,i_ho2)
 
          loss(l,i_o2) = j(l,j_o2_o)
      $                + j(l,j_o2_o1d)
@@ -1672,7 +1695,8 @@ c
 
          loss(l,i_h2) = b003(l)*cc(l,i_o1d)
      $                + c010(l)*cc(l,i_oh)
-c
+     $                + cl008(l)*cc(l,i_cl)
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        h2o
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1715,6 +1739,8 @@ c
      $                 + cab100(l)*cc(l,i_oh)*Cc(l,i_hoch2co3h)
      $                 + cab102(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
      $                 + cab103(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
+     $                 + cl014(l)*cc(l,i_oh)*cc(l,i_hcl)
+     $                 + cl015(l)*cc(l,i_oh)*cc(l,i_hocl)
 
          loss(l,i_h2o) = j(l,j_h2o)
      $                 + b002(l)*cc(l,i_o1d)
@@ -1737,6 +1763,7 @@ c
      $                  + c012(l)*cc(l,i_o)
      $                  + h004(l)*hetero_ice
      $                  + h005(l)*hetero_dust
+     $                  + cl011(l)*cc(l,i_cl)
 c
 
 
@@ -1839,8 +1866,8 @@ c
      $                 + j(l,j_hoch2cho_hco)
      $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
      $                 + k_pseudo(l)*cc(l,i_ch4)
-
-     
+     $                 + cl008(l)*cc(l,i_cl)*cc(l,i_h2)
+     $                 + cl011(l)*cc(l,i_cl)*cc(l,i_h2o2)
      
           loss(l,i_hox) = 2.*c005(l)*cc(l,i_h)*cc(l,i_ho2)
      $                 + 2.*c006(l)*cc(l,i_h)*cc(l,i_ho2)
@@ -1891,7 +1918,12 @@ c
      $                 + cab100(l)*cc(l,i_oh)*Cc(l,i_hoch2co3h)
      $                 + cab102(l)*cc(l,i_oh)*cc(l,i_hcoco3h)
      $                 + cab107(l)*cc(l,i_oh)*cc(l,i_ch3)
-     
+     $                 + cl009(l)*cc(l,i_cl)*cc(l,i_ho2)
+     $                 + 0.06*cl012(l)*cc(l,i_clo)*cc(l,i_oh)
+     $                 + cl013(l)*cc(l,i_clo)*cc(l,i_ho2)
+     $                 + cl014(l)*cc(l,i_hcl)*cc(l,i_oh)
+     $                 + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
+
       loss(l,i_hox) = loss(l,i_hox)/cc(l,i_hox)
 c
 
