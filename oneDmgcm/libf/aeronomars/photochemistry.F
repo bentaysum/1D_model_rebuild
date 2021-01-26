@@ -1253,7 +1253,7 @@ c
      $                   + j(l,j_clo)*cc(l,i_clo)
      $                   + j(l,j_cloo)*cc(l,i_cloo)
      $                   + j(l,j_oclo)*cc(l,i_oclo)
-     
+
 c
             loss(l,i_ox) = 2.*a002(l)*cc(l,i_o)*cc(l,i_o)
      $                   + 2.*a003(l)*cc(l,i_o)*cc(l,i_o3)
@@ -1621,9 +1621,11 @@ c
      $                 + j(l,j_hoch2cho_co)
      $                 + j(l,j_hoch2cho_hco)
      $                 + j(l,j_hoch2cho_oh) )*cc(l,i_hoch2cho)
+     $                 + cl033(l)*cc(l,i_clco)
      
          loss(l,i_co) = e001(l)*cc(l,i_oh)
      $                + e002(l)*cc(l,i_o)
+     $                + cl023(l)*cc(l,i_cl)
 c
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
