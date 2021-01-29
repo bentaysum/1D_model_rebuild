@@ -187,6 +187,7 @@ c------------------------------------------------------------
       igcm_ch3ocl=0
       igcm_clco=0
       igcm_clo3=0
+      igcm_hclo4=0
 
       igcm_n2=0
       igcm_ar=0
@@ -583,6 +584,12 @@ c     Chlorine Scheme 22/04/2020
           mmol(igcm_clo3)=83.45
           count=count+1
         endif
+        if (noms(iq).eq."hclo4") then
+          igcm_hclo4=iq
+          mmol(igcm_hclo4)=100.46
+          count=count+1
+        endif
+
 
         if (noms(iq).eq."ar") then
           igcm_ar=iq

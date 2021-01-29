@@ -189,6 +189,7 @@
      integer,save :: i_ch3ocl = 0
      integer,save :: i_clco = 0
      integer,save :: i_clo3 = 0
+     integer,save :: i_hclo4 = 0
        
        
        
@@ -785,8 +786,15 @@
             nbq = nbq + 1
             niq(nbq) = i_clo3
          end if
-         
-         
+           i_hclo4 = igcm_hclo4
+         if (i_hclo4== 0) then
+            write(*,*) "calchim: Error; no hclo4 tracer !!!"
+            write(*,*) "hclo4 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_hclo4
+         end if
+                  
          
          !Check tracers needed for thermospheric chemistry
          if(thermochem) then
