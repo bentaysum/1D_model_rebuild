@@ -141,7 +141,10 @@ cc    Chlorine Reaction Scheme
      $ ,cl034(nlayermx), cl035(nlayermx), cl036(nlayermx)
      $ ,cl037(nlayermx), cl038(nlayermx), cl039(nlayermx)
      $ ,cl040(nlayermx), cl041(nlayermx), cl042(nlayermx)
-     $ ,cl043(nlayermx)
+     $ ,cl043(nlayermx), cl044(nlayermx), cl045(nlayermx)
+     $ ,cl046(nlayermx), cl047(nlayermx), cl048(nlayermx)
+     $ ,cl049(nlayermx), cl050(nlayermx), cl051(nlayermx)
+     $ ,cl052(nlayermx)
 
 
       REAL Ncl(nlayermx)
@@ -238,7 +241,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $               cl034, cl035, cl036,
      $               cl037, cl038, cl039,
      $               cl040, cl041, cl042,
-     $               cl043)
+     $               cl043, cl044, cl045, cl046, cl047, cl048,
+     $               cl049, cl050, cl051, cl052)
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     interpolation of photolysis rates in the lookup table      c
@@ -335,7 +339,8 @@ c =================================================================
      $               cl034, cl035, cl036,
      $               cl037, cl038, cl039,
      $               cl040, cl041, cl042,
-     $               cl043, 
+     $               cl043, cl044, cl045, cl046, cl047, cl048,
+     $               cl049, cl050, cl051, cl052,
      $               dccn_dpq, dcc0_dpq,
      $               dHOX_dPQ, dHOX0_dPQ,
      $               dOX_dPQ, dOX0_dPQ)
@@ -463,7 +468,8 @@ c
      $               cl034, cl035, cl036,
      $               cl037, cl038, cl039,
      $               cl040, cl041, cl042,
-     $               cl043, 
+     $               cl043, cl044, cl045, cl046, cl047, cl048,
+     $               cl049, cl050, cl051, cl052,
      $               dccn_dpq, dcc0_dpq,
      $               dHOX_dPQ, dHOX0_dPQ,
      $               dOX_dPQ, dOX0_dPQ)
@@ -572,7 +578,10 @@ c
      $ ,cl034(nlayermx), cl035(nlayermx), cl036(nlayermx)
      $ ,cl037(nlayermx), cl038(nlayermx), cl039(nlayermx)
      $ ,cl040(nlayermx), cl041(nlayermx), cl042(nlayermx)
-     $ ,cl043(nlayermx)
+     $ ,cl043(nlayermx), cl044(nlayermx), cl045(nlayermx)
+     $ ,cl046(nlayermx), cl047(nlayermx), cl048(nlayermx)
+     $ ,cl049(nlayermx), cl050(nlayermx), cl051(nlayermx)
+     $ ,cl052(nlayermx)
 
 c     Tangent Linear Model 
       REAL*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
@@ -721,7 +730,9 @@ c
        integer, parameter :: i_cloo = 67 
        integer, parameter :: i_ch3ocl = 68
        integer, parameter :: i_clco = 69
-       integer, parameter :: i_clox = 70
+       integer, parameter :: i_clo3 = 70
+       integer, parameter :: i_hclo4 = 71
+       integer, parameter :: i_clox = 72
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     numbering of photolysis rates
@@ -2594,6 +2605,14 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       loss(l,i_clco) = cl033(l)
 
 
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     HClO4
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      production(l,i_hclo4) = cl048(l)*cc(l,i_clo3)*cc(l,i_oh)
+     $                      + cl049(l)*cc(l,i_clo3)*cc(l,i_oh)
+
+      loss(l,i_hclo4) = 0.
+
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  
@@ -2845,6 +2864,9 @@ ccccccccccccccccccccccccc
 
         cc(l,i_ch3ocl) = (cc0(l,i_ch3ocl) + production(l,i_ch3ocl)*dt)
      $              /(1. + loss(l,i_ch3ocl)*dt)
+
+        cc(l,i_hclo4) = (cc0(l,i_hclo4) + production(l,i_hclo4)*dt)
+     $              /(1. + loss(l,i_hclo4)*dt)
 
 
        if ( 1./loss(l,i_clco) .gt. dt ) then 
@@ -3467,8 +3489,9 @@ c
        integer, parameter :: i_cloo = 67 
        integer, parameter :: i_ch3ocl = 68
        integer, parameter :: i_clco = 69
-       integer, parameter :: i_clox = 70
-
+       integer, parameter :: i_clo3 = 70
+       integer, parameter :: i_hclo4 = 71
+       integer, parameter :: i_clox = 72
 
        
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -3972,8 +3995,27 @@ c
             rm(l,i_clco) = max(zycol(l,igcm_clco), 1.e-30)
          end do
       end if
-     
-      
+      if (igcm_clo3 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_clo3) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_clo3) = max(zycol(l,igcm_clo3), 1.e-30)
+         end do
+      end if      
+      if (igcm_hclo4 .eq. 0) then
+         do l = 1,lswitch-1
+            rm(l,i_hclo4) = 0.
+         end do
+      else
+         do l = 1,lswitch-1
+            rm(l,i_hclo4) = max(zycol(l,igcm_hclo4), 1.e-30)
+         end do
+      end if
+
+
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     initialise chemical families                     c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -3985,7 +4027,7 @@ c
          rm(l,i_ox)  = rm(l,i_o) 
      $               + rm(l,i_o3)
 
-         rm(l,i_clox) = MAX( rm(l,i_cl) + rm(l,i_clo),
+         rm(l,i_clox) = MAX( rm(l,i_cl) + rm(l,i_clo) + rm(l,i_clo3),
      $                       1.e-30 )
       end do
 c
@@ -4105,7 +4147,9 @@ c
        integer, parameter :: i_cloo = 67 
        integer, parameter :: i_ch3ocl = 68
        integer, parameter :: i_clco = 69
-       integer, parameter :: i_clox = 70
+       integer, parameter :: i_clo3 = 70
+       integer, parameter :: i_hclo4 = 71
+       integer, parameter :: i_clox = 72
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     save mixing ratios for the gcm
@@ -4394,6 +4438,17 @@ c
             zycol(l,igcm_clco) = rm(l,i_clco)
          end do
       end if
+      if (igcm_clo3 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_clo3) = rm(l,i_clo3)
+         end do
+      end if
+      if (igcm_hclo4 .ne. 0) then
+         do l = 1,lswitch-1
+            zycol(l,igcm_hclo4) = rm(l,i_hclo4)
+         end do
+      end if
+
 
 
       return
@@ -4450,7 +4505,8 @@ c
      $               cl034, cl035, cl036,
      $               cl037, cl038, cl039,
      $               cl040, cl041, cl042,
-     $               cl043)
+     $               cl043, cl044, cl045, cl046, cl047, cl048,
+     $               cl049, cl050, cl051, cl052)
 c
 c*****************************************************************
 c
@@ -4547,7 +4603,10 @@ c
      $ ,cl034(nlayermx), cl035(nlayermx), cl036(nlayermx)
      $ ,cl037(nlayermx), cl038(nlayermx), cl039(nlayermx)
      $ ,cl040(nlayermx), cl041(nlayermx), cl042(nlayermx)
-     $ ,cl043(nlayermx)
+     $ ,cl043(nlayermx), cl044(nlayermx), cl045(nlayermx)
+     $ ,cl046(nlayermx), cl047(nlayermx), cl048(nlayermx)
+     $ ,cl049(nlayermx), cl050(nlayermx), cl051(nlayermx)
+     $ ,cl052(nlayermx)
      
       real k_clo_clo 
 
@@ -4596,7 +4655,7 @@ cccc Organic parameters [CAABA v4.0]
       real, parameter :: f_cho = 0.55
       real, parameter :: f_co2h = 1.67
      
-      real j_5_2, k0, kinf
+      real j_5_2, k0, kinf, A, B 
      
 
 
@@ -5804,39 +5863,72 @@ c     cl043 : hcooh + cl -> hcl + products
 c     Evaluated Kinetic and Photochemical Data for Atmospheric Chemistry. Supplement IV, IUPAC Subcommittee on Gas Kinetic Data Evaluation for Atmospheric Chemistry
       cl043(l) = 2.01e-13
 
-c
-
 C     cl044 : Cl + O3 + M -> ClO3 + M 
-c     cl044(l) = 2.5e-31*dens(l)
+      cl044(l) = 2.5e-31*dens(l)
 
 c     cl045 : ClO + ClO3 -> ClOO + OClO 
-C     cl045(l) = 1.85e-18*exp(-2417./t(l))*(t(l)**2)*0.28 
+      cl045(l) = 1.85e-18*exp(-2417./t(l))*(t(l)**2)*0.28 
 
 c     cl046 : ClO + ClO3 -> OClO + OClO 
-c     cl046(l) = 1.42e-18*exp(-2870./t(l))*(t(l)**2)*0.11
-
+      cl046(l) = 1.42e-18*exp(-2870./t(l))*(t(l)**2)*0.11
+ 
 c     cl407 : ClO + ClO3 + M -> Cl2O4 + M
-c     k0 = 3.57e-1*exp(10079./t(l))/(t(l)**10.19)
-c     kinf = 1.43e-10*exp(-82./t(l))*t(l)**0.09
+      k0 = 3.57e-1*exp(10079./t(l))/(t(l)**10.19)
+      kinf = 1.43e-10*exp(-82./t(l))*t(l)**0.09
+      
+      A = k0*dens(l)/( 1. + (k0*dens(l))/kinf )
+      B = 1. + log10( k0*dens(l)/kinf )**2.
+
+      cl047(l) = A*0.6**(1./B)
 
 c     cl048 : ClO3 + OH -> HClO4 
-c     cl048(l) = 6.67e-13
+      cl048(l) = 6.67e-13
 
 c     cl049 : ClO3 + OH + M -> HClO4
-C     cl049(l) = dens(l)*4.85e36*exp(-5542./t(l))/(t(l)**15.3)
+      cl049(l) = dens(l)*4.85e36*exp(-5542./t(l))/(t(l)**15.3)
 
 c     cl050 : ClO3 + OH -> OClO + HO2 
-c     cl050(l) = 2.1e-10*exp(-18./t(l))*t(l)**0.09
+      cl050(l) = 2.1e-10*exp(-18./t(l))*t(l)**0.09
 
 c     cl051 : OClO + O + M -> ClO3 
-c     k0 = 7.25e-31*(300./t(l))**(3.1) 
-c     kinf = 8.3e-12
+      k0 = 7.25e-31*(300./t(l))**(3.1) 
+      kinf = 8.3e-12
+
+      A = k0*dens(l)/( 1. + (k0*dens(l))/kinf )
+      B = 1. + log10( k0*dens(l)/kinf )**2.
+
+      cl051(l) = A*0.6**(1./B)
 
 c     cl052 : OClO + O3 -> ClO3 + O2 
-C     cl052(l) = 2.1e-12*exp(-4700./t(l))
+      cl052(l) = 2.1e-12*exp(-4700./t(l))
 
 
+C       REAL FUNCTION k_3body(t_atm, M_dens, k0_300, n_3bod,
+C      $              kinf_300, m_3bod, fc_3bod, iupac)
+     
+C           IMPLICIT NONE 
+          
+C           REAL t_atm, M_dens, k0_300, n_3bod, kinf_300, m_3bod, fc_3bod 
+C           LOGICAL iupac
+C           REAL ratio, k_holding 
 
+C           REAL k0, kinf, N_cap 
+          
+C           k0 = k0_300*(300./t_atm)**n_3bod
+C           kinf = kinf_300*(300./t_atm)**m_3bod
+C           ratio = k0*2.5*M_dens/kinf 
+          
+C           IF ( iupac ) THEN 
+C                N_cap = 0.75 - 1.27*log10(fc_3bod)
+C                k_holding = 1./( 1. + ( log10(ratio)/N_cap)**2.)
+C                k_3body = (2.5*M_dens*k0/(1. + ratio))*fc_3bod**k_holding
+C           ELSE 
+C                k_holding = 1./( 1. + ( log10(ratio))**2.)
+C                k_3body = (2.5*M_dens*k0/(1. + ratio))*fc_3bod**k_holding
+C           ENDIF 
+         
+C           RETURN 
+C       END 
 
 
 
