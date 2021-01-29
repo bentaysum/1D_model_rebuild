@@ -362,90 +362,45 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       call chimtogcm(zycol, lswitch, nesp, rm) 
 c      
 
+       call WRITEDIAGFI(1,"o=o_loss_rate","o=o_loss", "cm-3 s-1",
+     $                  1,lifetime(:,1))
+
+       call WRITEDIAGFI(1,"ch4_tau","ch4_tau", "s",
+     $                  1,lifetime(:,6))
+
+       call WRITEDIAGFI(1,"steady_o2","steady_o2", "s",
+     $                  1,lifetime(:,7))
 
 
-C        call WRITEDIAGFI(1,"o2_tau","o2_tau", "s",
-C      $                  1,lifetime(:,23))
 
-C        call WRITEDIAGFI(1,"o2_nd","o2_nd", "s",
-C      $                  1,lifetime(:,24))
+       call WRITEDIAGFI(1,"hcl_tau", "hcl_tau", "s",
+     $                  1,lifetime(:,65))
 
-C        call WRITEDIAGFI(1,"o2_steady","o2_steady", "s",
-C      $                  1,lifetime(:,25))
+       call WRITEDIAGFI(1,"cl2_tau", "cl2_tau", "s",
+     $                  1,lifetime(:,62))
 
-C        call WRITEDIAGFI(1,"o=o_loss_rate","o=o_loss", "cm-3 s-1",
-C      $                  1,lifetime(:,26))
+       call WRITEDIAGFI(1,"cloo_tau", "cloo_tau", "s",
+     $                  1,lifetime(:,67))
 
-C        call WRITEDIAGFI(1,"o=o_loss_rate","o=o_loss", "cm-3 s-1",
-C      $                  1,lifetime(:,1))
+       call WRITEDIAGFI(1,"hocl_tau", "hocl_tau", "s",
+     $                  1,lifetime(:,66))
 
-C        call WRITEDIAGFI(1,"ch4_loss_rate","ch4_loss", "cm-3 s-1",
-C      $                  1,lifetime(:,2))
+       call WRITEDIAGFI(1,"cl2o2_tau", "cl2o2_tau", "s",
+     $                  1,lifetime(:,64))
 
-C        call WRITEDIAGFI(1,"ch4_tau","ch4_tau", "s",
-C      $                  1,lifetime(:,6))
+       call WRITEDIAGFI(1,"oclo_tau", "oclo_tau", "s",
+     $                  1,lifetime(:,63))
 
-C        call WRITEDIAGFI(1,"steady_o2","steady_o2", "s",
-C      $                  1,lifetime(:,7))
+       call WRITEDIAGFI(1,"ch3ocl_tau", "ch3ocl_tau", "s",
+     $                  1,lifetime(:,68))
 
+       call WRITEDIAGFI(1,"clco_tau", "clco_tau", "s",
+     $                  1,lifetime(:,69))
 
-C        call WRITEDIAGFI(1,"o2_nd", "o2_nd", "s",
-C      $                  1,lifetime(:,8))
-
-C        call WRITEDIAGFI(1,"hcl_tau", "hcl_tau", "s",
-C      $                  1,lifetime(:,65))
-
-C        call WRITEDIAGFI(1,"cl2_tau", "cl2_tau", "s",
-C      $                  1,lifetime(:,62))
-
-C        call WRITEDIAGFI(1,"cloo_tau", "cloo_tau", "s",
-C      $                  1,lifetime(:,67))
-
-C        call WRITEDIAGFI(1,"hocl_tau", "hocl_tau", "s",
-C      $                  1,lifetime(:,66))
-
-C        call WRITEDIAGFI(1,"cl2o2_tau", "cl2o2_tau", "s",
-C      $                  1,lifetime(:,64))
-
-C        call WRITEDIAGFI(1,"oclo_tau", "oclo_tau", "s",
-C      $                  1,lifetime(:,63))
-
-C        call WRITEDIAGFI(1,"ch3ocl_tau", "ch3ocl_tau", "s",
-C      $                  1,lifetime(:,68))
-
-C        call WRITEDIAGFI(1,"clco_tau", "clco_tau", "s",
-C      $                  1,lifetime(:,69))
-
-C        call WRITEDIAGFI(1,"clox", "clox", "s",
-C      $                  1,rm(:,70))
+       call WRITEDIAGFI(1,"clox", "clox", "s",
+     $                  1,rm(:,70))
 
 
-      DO l = 1, nlayermx
-        Ncl(l) = (rm(l,60) + rm(l,61) + rm(l,62)*2. + rm(l,63)
-     $         + rm(l,64)*2. + rm(l,65) + rm(l,66) + rm(l,67)
-     $         + rm(l,68) + rm(l,69))*dens(l)
-      ENDDO
-
-
-       call WRITEDIAGFI(1,"Ncl", "Ncl", "s",
-     $                  1,Ncl)
-
-      write(*,"(11A15)") "Cl", "ClO", "Cl2", "OClO", "Cl2O2", "HCl",
-     $                  "HOCl", "ClOO", "CH3OCl", "ClCO", "ClOx"
-      write(*,"(11E15.7)") rm(1,60:)
-      write(*,"(11E15.7)") rm(20,60:)
-
-C        integer, parameter :: i_cl = 60
-C        integer, parameter :: i_clo = 61
-C        integer, parameter :: i_cl2 = 62
-C        integer, parameter :: i_oclo = 63
-C        integer, parameter :: i_cl2o2 = 64
-C        integer, parameter :: i_hcl = 65
-C        integer, parameter :: i_hocl = 66 
-C        integer, parameter :: i_cloo = 67 
-C        integer, parameter :: i_ch3ocl = 68
-C        integer, parameter :: i_clco = 69
-C        integer, parameter :: i_clox = 70
 
 
 
@@ -2175,8 +2130,6 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $            + cab061(l)*cc(L,i_ch2choh)*cc(l,i_oh)
      $            + 0.2*cab065(l)*cc(l,i_ch3choho2)*cc(L,i_ho2)
      $            + cab066(L)*cc(l,i_ch3choho2)*ro2(l) 
-C      $            + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
-C      $                             *cc(l,i_o2)*3.5e-14 ! ADDED [06/09/2019]
 
           loss(l,i_hcooh) = cab032(l)*cc(l,i_oh)
      $                    + cl043(l)*cc(l,i_cl)
@@ -2914,8 +2867,6 @@ cccccccccccccc
       IF (sza .le. 95.) THEN 
         cc(l,i_cl2) = production(l,i_cl2)/loss(l,i_cl2)
 
-C         cc(l,i_cloo) = production(l,i_cloo)/loss(l,i_cloo)
-
         cc(l,i_cl2o2) = production(l,i_cl2o2)/loss(l,i_cl2o2)
 
         cc(l,i_oclo) = production(l,i_oclo)/loss(l,i_oclo)
@@ -2923,9 +2874,6 @@ C         cc(l,i_cloo) = production(l,i_cloo)/loss(l,i_cloo)
       ELSE
         cc(l,i_cl2) = (cc0(l,i_cl2) + production(l,i_cl2)*dt)
      $              /(1. + loss(l,i_cl2)*dt)
-
-C         cc(l,i_cloo) = (cc0(l,i_cloo) + production(l,i_cloo)*dt)
-C      $              /(1. + loss(l,i_cloo)*dt)
 
         cc(l,i_cl2o2) = (cc0(l,i_cl2o2) + production(l,i_cl2o2)*dt)
      $              /(1. + loss(l,i_cl2o2)*dt)
@@ -2987,14 +2935,17 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &             +  cab014*cc(:,i_ch3ooh)*cc(:,i_oh)*0.4 
      &             +  0.5*cab029*cc(:,i_hoch2o2)*cc(:,i_ho2)
      &             +  cab034*cc(:,i_hoch2ooh)*cc(:,i_hoch2ooh)
-      
+     $             + cl010*cc(:,i_cl)*cc(:,i_ho2)
+     $             + cl018*cc(:,i_cl)*cc(:,i_ch3ooh)
+     $             + cl021*cc(:,i_clo)*cc(:,i_ch3o2)
+     $             + cl022*cc(:,i_cl)*Cc(:,i_ch3o2)*0.5
+     $             + cl024*cc(:,i_cloo)*cc(:,i_cl)
+     $             + j(:,j_cloo)*cc(:,i_cloo) 
+
       ! Output Array 
 
       ! O=O Bond Loss Rate (molec. cm-3 s-1)
       lifetime(:,1) = o2_loss_rate
-
-      ! CH4 Loss Rate (molec. cm-3 s-1)
-      lifetime(:,2) = loss(:,i_ch4)*cc(:,i_ch4) 
 
       ! CH4 Lifetime
       lifetime(:,6) = 1./loss(:,i_ch4)
@@ -3002,8 +2953,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       ! O2 Steady-State
       lifetime(:,7) = (production(:,i_o2)/loss(:,i_o2))/dens
 
-      ! O2 Number Density
-      lifetime(:,8) = cc(:,i_o2)
 
       ! Cl Lifetimes
       lifetime(:,i_hcl) = 1./loss(:,i_hcl)
@@ -5856,6 +5805,42 @@ c     Evaluated Kinetic and Photochemical Data for Atmospheric Chemistry. Supple
       cl043(l) = 2.01e-13
 
 c
+
+C     cl044 : Cl + O3 + M -> ClO3 + M 
+c     cl044(l) = 2.5e-31*dens(l)
+
+c     cl045 : ClO + ClO3 -> ClOO + OClO 
+C     cl045(l) = 1.85e-18*exp(-2417./t(l))*(t(l)**2)*0.28 
+
+c     cl046 : ClO + ClO3 -> OClO + OClO 
+c     cl046(l) = 1.42e-18*exp(-2870./t(l))*(t(l)**2)*0.11
+
+c     cl407 : ClO + ClO3 + M -> Cl2O4 + M
+c     k0 = 3.57e-1*exp(10079./t(l))/(t(l)**10.19)
+c     kinf = 1.43e-10*exp(-82./t(l))*t(l)**0.09
+
+c     cl048 : ClO3 + OH -> HClO4 
+c     cl048(l) = 6.67e-13
+
+c     cl049 : ClO3 + OH + M -> HClO4
+C     cl049(l) = dens(l)*4.85e36*exp(-5542./t(l))/(t(l)**15.3)
+
+c     cl050 : ClO3 + OH -> OClO + HO2 
+c     cl050(l) = 2.1e-10*exp(-18./t(l))*t(l)**0.09
+
+c     cl051 : OClO + O + M -> ClO3 
+c     k0 = 7.25e-31*(300./t(l))**(3.1) 
+c     kinf = 8.3e-12
+
+c     cl052 : OClO + O3 -> ClO3 + O2 
+C     cl052(l) = 2.1e-12*exp(-4700./t(l))
+
+
+
+
+
+
+
       end do
      
      

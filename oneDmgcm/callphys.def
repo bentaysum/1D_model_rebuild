@@ -34,7 +34,7 @@ long_mean= .False.
 longitude=137.4
 
 ## Tracer interpolation shutdown parameters 
-mcd_dayfin = 10.
+mcd_dayfin = 95.
 mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
