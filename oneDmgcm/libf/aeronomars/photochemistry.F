@@ -406,17 +406,6 @@ c
 
 
 
-       write(*,"(13A15)") "Cl", "ClO", "Cl2",
-     $                    "OClO", "Cl2O2", "HCl",
-     $                    "HOCl", "ClOO", "CH3OCl",
-     $                    "ClCO", "ClO3", "HClO4",
-     $                    "ClOX"
-       write(*,"(13E15.7)") rm(1,60:)
-       write(*,"(13E15.7)") rm(20,60:)
-
-
-
-
 
       return
       end
@@ -1564,9 +1553,9 @@ c     ClO
 c     ClO3 
        cc(l,i_clo3) = cc(l,i_cl)*rclo3_cl
       ELSE 
-        cc(l,i_cl) = 0.
-        cc(l,i_clo) = 0. 
-        cc(l,i_clo3) = 0.
+        cc(l,i_cl) = 1.E-30*dens(l)
+        cc(l,i_clo) =  1.E-30*dens(l)
+        cc(l,i_clo3) =  1.E-30*dens(l)
       ENDIF 
 
       ENDDO 
@@ -2949,6 +2938,8 @@ C !     Alkane Oxidation
 ccccccccccccccccccccccccc
 cccccc Chlorine Chemistry
 ccccccccccccccccccccccccc
+      IF ( igcm_cl .ne. 0 ) THEN 
+
       cc(l,i_clox) = ( cc0(l,i_clox) + production(l,i_clox)*dt) 
      $             /( 1. + loss(l,i_clox)*dt )
 
@@ -3000,6 +2991,10 @@ cccccccccccccc
 
 
       ENDIF 
+
+      ENDIF 
+
+
 
       end do
 
@@ -6000,13 +5995,12 @@ c     cl051 : OClO + O + M -> ClO3
 
       cl051(l) = A*0.6**(1./B)
 
-
-
 c     cl052 : OClO + O3 -> ClO3 + O2 
       cl052(l) = 2.1e-12*exp(-4700./t(l))
 
       end do
      
+      
      
 
       

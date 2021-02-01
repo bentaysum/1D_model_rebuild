@@ -30,11 +30,11 @@ calleofdump = .false.
 mcd_profiles = .True. 
 
 # Longitudinal mean values of all MCD v5.3 variables?
-long_mean= .False.
+long_mean= .True.
 longitude=137.4
 
 ## Tracer interpolation shutdown parameters 
-mcd_dayfin = 90.
+mcd_dayfin = 100.
 mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
