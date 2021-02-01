@@ -1003,21 +1003,12 @@
       if (igcm_ch4 /= 0) then
 
 
-        ! Polynomial line of best fit of Webster 2018
-         ! vmr = (-8.1565118E-14*zls**6 &
-          ! +   8.3522676E-11*zls**5 &
-          ! -   3.0856216E-08*zls**4 &
-          ! +   4.8741198E-06*zls**3 &
-          ! -   2.9426485E-04*zls**2 &
-          ! +   4.6374896E-03*zls &
-          ! +   2.8769755E-01)*1.e-9
-!ch4vmr = 410.e-12
-  
-ch4vmr=50.e-12
+ch4vmr=500.e-12
 
           do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
+                    if ( l > 1 ) ch4vmr = 0.
                     pq(i,j,l,igcm_ch4) = ch4vmr*mmol(igcm_ch4)/mmean(i,j,l)
                end do
             end do
@@ -1793,7 +1784,11 @@ ch4vmr=50.e-12
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
+
+                  if ( l > 1 ) vmr = 0.
+               
                   pq(i,j,l,igcm_hcl) = vmr*mmol(igcm_hcl)/mmean(i,j,l)
+               
                end do
             end do
          end do
