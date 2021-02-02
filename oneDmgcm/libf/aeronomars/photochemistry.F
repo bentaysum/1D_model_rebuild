@@ -819,28 +819,34 @@ c     volume mixing ratio -> density conversion
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       do iesp = 1,nesp
-         do l = 1,lswitch-1
-            cc0(l,iesp) = rm(l,iesp)*dens(l)
-            cc(l,iesp)  = cc0(l,iesp)
-         end do
-      end do
-
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Dust Number Density [BMT 02/2021]
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      if ( igcm_dust_mass .ne. 0 ) then 
-        do l = 1, lswitch-1
+         if ( iesp == i_dust ) then 
+            do l = 1, lswitch-1
 c     Mass Mixing Ratio -> Mass Concentration
-        cc0(l,i_dust) = rm(l,i_dust)*(press(l)*100.)
+            cc0(l,i_dust) = rm(l,i_dust)*(press(l)*100.)
      $                 /(Rnew(1,l)*t(l))
 c     Mass Concentration -> Volume Concentration
-        cc0(l,i_dust) = cc0(l,i_dust)/dustdens
+            cc0(l,i_dust) = cc0(l,i_dust)/dustdens
 c     Volume Concentration -> Number Density (cm-3)
-        cc0(l,i_dust) = cc0(l,i_dust)/
+            cc0(l,i_dust) = cc0(l,i_dust)/
      $                ( 1.333333*dustradius**3)*1.e-6
-        cc(l,i_esp) = cc0(l,i_dust)
-        enddo
-      endif
+            cc(l,i_dust) = cc0(l,i_dust)
+            enddo
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     Gas-phase number density
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+         else 
+             do l = 1,lswitch-1
+                cc0(l,iesp) = rm(l,iesp)*dens(l)
+                cc(l,iesp)  = cc0(l,iesp)
+             end do
+         endif 
+      end do
+
+
+      
 
 
 
@@ -2980,7 +2986,6 @@ cccccccccccccc
       ENDIF 
 
 
-
       end do
 
        
@@ -3061,6 +3066,7 @@ c     density -> volume mixing ratio conversion
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       do iesp = 1,nesp
+         if ( iesp == i_dust ) cycle 
          do l = 1,lswitch-1
             rm(l,iesp) = max(cc(l,iesp)/dens(l), 1.e-30)
          end do
