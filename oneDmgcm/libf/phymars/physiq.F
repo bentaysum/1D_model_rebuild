@@ -629,8 +629,8 @@ c     q2 and surface pressure)
       call mcd_phys(ptime*24.,zzlay,zls*180./pi,
      &              pt(1,:), ps(1), pu(1,:), pv(1,:), 
      &              q2(1,:))
-     
-c    Dust profiles in kg/kg supplied by MCD dataset 
+
+
       IF ( doubleq ) THEN 
         call mcd_dust(ptime*24.,zzlay(1,:),zls*180./pi,
      &                       pq(1,:,:), 
@@ -1473,6 +1473,10 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
               zh(ig,l) = zt(ig,l)*(zplev(ig,1)/zplay(ig,l))**rcp
           ENDDO
        ENDDO
+
+
+
+
 
 
 c    Compute surface stress : (NB: z0 is a common in surfdat.h)

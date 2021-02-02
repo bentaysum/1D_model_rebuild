@@ -402,6 +402,9 @@ c     Computing aerosol optical depth in each layer:
      &      pq,tauscaling,tauref,tau,taucloudtes,aerosol,reffrad,
      &      nueffrad,QREFvis3d,QREFir3d,omegaREFvis3d,omegaREFir3d)
 
+    
+
+
 c     Starting loop on sub-domain
 c     ----------------------------
 

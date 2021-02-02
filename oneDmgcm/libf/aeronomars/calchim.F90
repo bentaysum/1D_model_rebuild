@@ -1099,18 +1099,22 @@
             zv(ig,l)  = pv(ig,l) + pdv(ig,l)*ptimestep
 
             do i = 1,nbq
+
                iq = niq(i) ! get tracer index
+
                zq(ig,l,iq) = pq(ig,l,iq) + pdq(ig,l,iq)*ptimestep
 
-               ! -------------------------------------------
-               ! Special case for Dust (mass concentration)
-               ! Assumption of particle density @ 1.52 g/cm3
-               ! -------------------------------------------
-               if ( trim(noms(iq)) == "dust_mass" ) then 
-                    zycol(l,iq) = zq(ig,l,iq)
-               else 
-                    zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
-               endif 
+               ! Dust Case - Benjamin Taysum 02/02/2021
+               ! --------------------------------------
+               ! Cycle, as we are not interested in 
+               ! a conversion to Volume Mixing Ratio 
+               ! --------------------------------------
+               if ( trim(noms(iq)) == 'dust_mass' ) then
+                  zycol(l,iq) = zq(ig,l,iq)
+                  cycle 
+               endif  
+
+               zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
                
             end do
             
@@ -1200,15 +1204,7 @@
             iqmax=iloc(1)
             do i = 1,nbq
                iq = niq(i) ! get tracer index
-               
-               ! --------------------------------------
-               ! Dust - Need special conversion back to
-               !        mixing ratio 
-               ! --------------------------------------
-               if ( trim(noms(iq)) == "dust_mass" ) then 
-                   ! zycol(l,iq) = zq(ig,l,iq)*mmean(ig,l)/mmol(iq)
-                   cycle
-               endif 
+
                
                if (iq /= iqmax) then
                   dqchim(ig,l,iq) = (zycol(l,iq)*mmol(iq)/mmean(ig,l)  &

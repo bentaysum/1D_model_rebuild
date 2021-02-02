@@ -82,13 +82,13 @@ p_high = 5
 #  =6 "cold" (low dust) scenario ; =7 "warm" (high dust) scenario
 #  =24 Mars Year 24  ; =25 Mars Year 25 (year with a global dust storm) ; ...
 #  =30 Mars Year 30 
-iaervar = 1
+iaervar = 3
 # Dust opacity at 610 Pa (when constant, i.0e. for the iaervar=1 case)
 tauvis=1.0063
 # Dust vertical distribution: 
 # (=0: old distrib. (Pollack90), =1: top set by "topdustref",
 #  =2: Viking scenario; =3 MGS scenario)
-iddist  = 1
+iddist  = 3
 # Dust top altitude (km). (Matters only if iddist=1)
 topdustref=40.
 
@@ -138,21 +138,21 @@ callslope = .false.
 ## Tracer (dust water, ice and/or chemical species) options (used if tracer=T):
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # DUST: Transported dust ? (if >0, use 'dustbin' dust bins)
-dustbin    = 0
+dustbin    = 2
 # DUST: Radiatively active dust ? (matters if dustbin>0)
-active  = .False.
+active  = .True.
 # DUST: use mass and number mixing ratios to predict dust size ?
-doubleq   = .False.
+doubleq   = .True.
 # DUST: lifted by GCM surface winds ?
-lifting = .false.
+lifting = .False.
 # DUST: lifted by dust devils ?
 callddevil = .false.
 # DUST: Scavenging by CO2 snowfall ?
 scavenging = .false.
 # DUST/WATERICE: Gravitationnal sedimentation ?
-sedimentation = .true.
+sedimentation = .False.
 # WATERICE: Radiatively active transported atmospheric water ice ?
-activice   = .false.
+activice   = .False.
 # WATER: Compute water cycle
 water = .true.
 # WATER: current permanent caps at both poles. True IS RECOMMENDED

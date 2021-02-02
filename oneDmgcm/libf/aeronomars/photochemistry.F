@@ -478,6 +478,7 @@ c
 #include "chimiedata.h" 
 #include "callkeys.h" 
 #include "tracer.h" 	
+#include "conc.h"
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     input/output:
@@ -646,7 +647,14 @@ c     ================
       real pcl, pclo, pclo3
       real lcl, lclo, lclo3
 
-
+c     Dust Parameters
+c     ===============
+      real dustradius
+      parameter ( dustradius = 1.5e-6 ) ! meters
+      real dustdens 
+      parameter ( dustdens = 2.5e3) ! kg/m3
+      real dust_clwt
+      parameter ( dust_clwt = 0.5 ) ! Chlorine weight % in soil
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     tracer numbering in the chemistry
@@ -816,6 +824,27 @@ c
             cc(l,iesp)  = cc0(l,iesp)
          end do
       end do
+
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     Dust Number Density [BMT 02/2021]
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      if ( igcm_dust_mass .ne. 0 ) then 
+        do l = 1, lswitch-1
+c     Mass Mixing Ratio -> Mass Concentration
+        cc0(l,i_dust) = rm(l,i_dust)*(press(l)*100.)
+     $                 /(Rnew(1,l)*t(l))
+c     Mass Concentration -> Volume Concentration
+        cc0(l,i_dust) = cc0(l,i_dust)/dustdens
+c     Volume Concentration -> Number Density (cm-3)
+        cc0(l,i_dust) = cc0(l,i_dust)/
+     $                ( 1.333333*dustradius**3)*1.e-6
+        cc(l,i_esp) = cc0(l,i_dust)
+        enddo
+      endif
+
+
+
+
 c      
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     co2 and nox number densities (cm-3)    
