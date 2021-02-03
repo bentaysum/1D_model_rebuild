@@ -185,6 +185,7 @@
      igcm_clco = 0
      igcm_clo3 = 0 
      igcm_hclo4 = 0 
+     igcm_clo4 = 0 
 
 ! 1.2 find dust tracers
 
@@ -686,8 +687,12 @@
           count=count+1
           nbqchem = nbqchem + 1
         endif
-                
-        
+        if (noms(iq).eq."clo4") then
+          igcm_clo4=iq
+          mmol(igcm_clo4)=99.45
+          count=count+1
+          nbqchem = nbqchem + 1
+        endif        
         
         
         
@@ -1868,8 +1873,19 @@ ch4vmr=50.e-12
          ! set surface value to zero
          qsurf(1:ngridmx,igcm_hclo4) = 0.
       end if       
-      
-      
+      ! ClO4
+      if (igcm_clo4 /= 0) then
+         vmr = 0.       
+         do i = 1,iip1
+            do j = 1,jjp1
+               do l = 1,llm
+                  pq(i,j,l,igcm_clo4) = vmr*mmol(igcm_clo4)/mmean(i,j,l)
+               end do
+            end do
+         end do
+         ! set surface value to zero
+         qsurf(1:ngridmx,igcm_clo4) = 0.
+      end if       
       
       
 	  

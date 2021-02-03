@@ -123,6 +123,7 @@
       integer :: igcm_clco  
       integer :: igcm_clo3
       integer :: igcm_hclo4 
+      integer :: igcm_clo4
       ! Ions
       integer :: igcm_co2plus
       integer :: igcm_oplus
@@ -165,6 +166,6 @@
      & igcm_hoch2co,igcm_hoch2co3,igcm_hoch2co2h,igcm_hcoco2h,          &
      & igcm_hoch2co3h,igcm_hcoco3h,igcm_hcoco3,igcm_ch2choh,igcm_cl,    &
      & igcm_clo,igcm_cl2,igcm_oclo,igcm_cl2o2,igcm_hcl,igcm_hocl,       &
-     & igcm_cloo,igcm_ch3ocl,igcm_clco,igcm_clo3,igcm_hclo4!,nbqchem,niqchem               
+     & igcm_cloo,igcm_ch3ocl,igcm_clco,igcm_clo3,igcm_hclo4,igcm_clo4!,nbqchem,niqchem               
       COMMON/tracer3/noms
 !-----------------------------------------------------------------------

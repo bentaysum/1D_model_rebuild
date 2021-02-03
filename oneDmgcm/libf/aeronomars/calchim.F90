@@ -190,7 +190,7 @@
      integer,save :: i_clco = 0
      integer,save :: i_clo3 = 0
      integer,save :: i_hclo4 = 0
-       
+     integer,save :: i_clo4 = 0
        
        
       integer :: ig_vl1
@@ -794,8 +794,14 @@
             nbq = nbq + 1
             niq(nbq) = i_hclo4
          end if
-                  
-         
+           i_clo4 = igcm_clo4
+         if (i_clo4== 0) then
+            write(*,*) "calchim: Error; no clo4 tracer !!!"
+            write(*,*) "clo4 will be ignored in the chemistry"
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_clo4
+         end if         
          !Check tracers needed for thermospheric chemistry
          if(thermochem) then
             chemthermod=0  !Default: C/O/H chemistry
