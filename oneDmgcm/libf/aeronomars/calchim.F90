@@ -1211,6 +1211,7 @@
             do i = 1,nbq
                iq = niq(i) ! get tracer index
 
+               if ( trim(noms(iq)) == "dust_mass" ) cycle
                
                if (iq /= iqmax) then
                   dqchim(ig,l,iq) = (zycol(l,iq)*mmol(iq)/mmean(ig,l)  &
