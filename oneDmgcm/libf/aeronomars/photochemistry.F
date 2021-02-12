@@ -376,47 +376,48 @@ c
        call WRITEDIAGFI(1,"steady_o2","steady_o2", "s",
      $                  1,lifetime(:,7))
 
-       call WRITEDIAGFI(1,"clox rate","clox rate", "s",
-     $                  0,lifetime(1,8))
-
-
-       call WRITEDIAGFI(1,"hcl_tau", "hcl_tau", "s",
-     $                  1,lifetime(:,65))
-
-       call WRITEDIAGFI(1,"cl2_tau", "cl2_tau", "s",
-     $                  1,lifetime(:,62))
-
-       call WRITEDIAGFI(1,"cloo_tau", "cloo_tau", "s",
-     $                  1,lifetime(:,67))
-
-       call WRITEDIAGFI(1,"hocl_tau", "hocl_tau", "s",
-     $                  1,lifetime(:,66))
-
-       call WRITEDIAGFI(1,"cl2o2_tau", "cl2o2_tau", "s",
-     $                  1,lifetime(:,64))
-
-       call WRITEDIAGFI(1,"oclo_tau", "oclo_tau", "s",
-     $                  1,lifetime(:,63))
-
-       call WRITEDIAGFI(1,"ch3ocl_tau", "ch3ocl_tau", "s",
-     $                  1,lifetime(:,68))
-
-       call WRITEDIAGFI(1,"clco_tau", "clco_tau", "s",
-     $                  1,lifetime(:,69))
-
        call WRITEDIAGFI(1,"rclo_cl", "rclo_cl", "s",
      $                  1,lifetime(:,8))
 
-       call WRITEDIAGFI(1,"clox", "clox", "s",
-     $                  1,rm(:,72))
+       call WRITEDIAGFI(1,"dust density", "dust density", "s",
+     $                  1, lifetime(:,9) )
 
-       call WRITEDIAGFI(1,"clo3_tau", "clo3_tau", "s",
-     $                  1,lifetime(:,70))
-       call WRITEDIAGFI(1,"hclo4_tau", "hclo4_tau", "s",
-     $                  1,lifetime(:,71))
+       call WRITEDIAGFI(1,"clox_surfrate", "clox_surfrate", "s",
+     $                  0, lifetime(1,10) )
 
-       call WRITEDIAGFI(1,"clo4_tau", "clo4_tau", "s",
-     $                  1,lifetime(:,72))
+
+C        call WRITEDIAGFI(1,"hcl_tau", "hcl_tau", "s",
+C      $                  1,lifetime(:,65))
+
+C        call WRITEDIAGFI(1,"cl2_tau", "cl2_tau", "s",
+C      $                  1,lifetime(:,62))
+
+C        call WRITEDIAGFI(1,"cloo_tau", "cloo_tau", "s",
+C      $                  1,lifetime(:,67))
+
+C        call WRITEDIAGFI(1,"hocl_tau", "hocl_tau", "s",
+C      $                  1,lifetime(:,66))
+
+C        call WRITEDIAGFI(1,"cl2o2_tau", "cl2o2_tau", "s",
+C      $                  1,lifetime(:,64))
+
+C        call WRITEDIAGFI(1,"oclo_tau", "oclo_tau", "s",
+C      $                  1,lifetime(:,63))
+
+C        call WRITEDIAGFI(1,"ch3ocl_tau", "ch3ocl_tau", "s",
+C      $                  1,lifetime(:,68))
+
+C        call WRITEDIAGFI(1,"clco_tau", "clco_tau", "s",
+C      $                  1,lifetime(:,69))
+
+C        call WRITEDIAGFI(1,"clo3_tau", "clo3_tau", "s",
+C      $                  1,lifetime(:,70))
+
+C        call WRITEDIAGFI(1,"hclo4_tau", "hclo4_tau", "s",
+C      $                  1,lifetime(:,71))
+
+C        call WRITEDIAGFI(1,"clo4_tau", "clo4_tau", "s",
+C      $                  1,lifetime(:,72))
 
       return
       end
@@ -3088,8 +3089,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       ! O2 Steady-State
       lifetime(:,7) = (production(:,i_o2)/loss(:,i_o2))/dens
 
-      ! ClOx Rate at surface
-      lifetime(1,8) = cc(1,i_dust)*clox_prod
+      ! Partition Functions
+      lifetime(:,8) = rclo_cl
+
+      ! Dust Number Density
+      lifetime(:,9) = cc0(:,i_dust)
+
+      ! Surfaec ClOx Rate
+      lifetime(1,10) = cc(1,i_dust)*clox_prod
 
 
       ! Cl Lifetimes
@@ -3105,8 +3112,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       lifetime(:,i_hclo4) = 1./loss(:,i_hclo4)
       lifetime(:,i_clo4) = 1./loss(:,i_clo4)
 
-      ! Partition Functions
-      lifetime(:,8) = rclo_cl
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     density -> volume mixing ratio conversion

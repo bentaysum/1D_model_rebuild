@@ -1008,7 +1008,7 @@
       if (igcm_ch4 /= 0) then
 
 
-ch4vmr=50.e-12
+ch4vmr=2.33046543e-9
 
           do i = 1,iip1
             do j = 1,jjp1
