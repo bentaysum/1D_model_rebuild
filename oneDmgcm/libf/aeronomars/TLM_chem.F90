@@ -17,12 +17,12 @@ IMPLICIT NONE
 ! =====
 ! Input
 ! =====
-REAL*8 dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx) ! Initial Linearised Number Denisty Array 
-REAL*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx) ! Sub-timestep n Linearised Number Density Array 
-REAL*8 dHOX_dPQ(nlayermx,nqmx*nlayermx) ! Linearised HOx Number Density
-REAL*8 dOX_dPQ(nlayermx,nqmx*nlayermx) ! Linearised Ox Number Density
-REAL*8 dHOX0_dPQ(nlayermx,nqmx*nlayermx) ! Initial Linearised HOx Number Density
-REAL*8 dOX0_dPQ(nlayermx,nqmx*nlayermx) ! Initial Linearised Ox Number Density
+real dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx) ! Initial Linearised Number Denisty Array 
+real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx) ! Sub-timestep n Linearised Number Density Array 
+real dHOX_dPQ(nlayermx,nqmx*nlayermx) ! Linearised HOx Number Density
+real dOX_dPQ(nlayermx,nqmx*nlayermx) ! Linearised Ox Number Density
+real dHOX0_dPQ(nlayermx,nqmx*nlayermx) ! Initial Linearised HOx Number Density
+real dOX0_dPQ(nlayermx,nqmx*nlayermx) ! Initial Linearised Ox Number Density
 
 REAL ptimestep ! Physical Time-step 
 INTEGER istep ! Chemistry Sub-timestep iteration 
@@ -35,7 +35,7 @@ LOGICAL initialisation ! Logical for initialisation of arrays
 ! =====
 ! Local
 ! =====
-REAL*8, SAVE :: dcc0_dpq_firstcall(nqmx*nlayermx,nqmx*nlayermx) 
+real, SAVE :: dcc0_dpq_firstcall(nqmx*nlayermx,nqmx*nlayermx) 
 
 INTEGER iq ! Tracer Iterator
 INTEGER l ! Layer iterator
@@ -52,7 +52,7 @@ INTEGER x_j ! TLM Indices
 IF ( initialisation ) THEN 
 
     ! Initialise K_Pseudo
-    dKpseudo_dPQ(:,:) = 0.D0
+    dKpseudo_dPQ(:,:) = 0.0
 
     ! VMR --> MMR Conversion Factors 
     ! ------------------------------

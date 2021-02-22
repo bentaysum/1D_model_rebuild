@@ -148,6 +148,8 @@ $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(TLM_chem.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(tlm_hox.o)
 
+$(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(tlm_nox.o)
+
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(tlm_ox.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(tlm_sibem.o)
@@ -343,6 +345,7 @@ $(LIBF)/phymars/dimphys.h \
 $(LIBF)/aeronomars/chimiedata.h \
 $(LIBF)/phymars/callkeys.h \
 $(LIBF)/phymars/tracer.h \
+$(LIBF)/aeronomars/conc.h \
 $(LIBF)/grid/dimensions.h \
 $(LIBF)/phymars/dimphys.h \
 $(LIBF)/aeronomars/chimiedata.h \
@@ -517,6 +520,19 @@ $(LIBO)/libaeronomars.a(tlm_hox.o) : $(LIBF)/aeronomars/tlm_hox.F90
 	$(AR) d $(LIBO)/libaeronomars.a tlm_hox.o ; \
 	$(COMPTRU90) $(LIBF)/aeronomars/tlm_hox.F90 ; \
 	$(AR) r $(LIBO)/libaeronomars.a tlm_hox.o ; $(RM) tlm_hox.o ; \
+	cd $(GCM)
+
+$(LIBO)/libaeronomars.a(tlm_nox.o) : $(LIBF)/aeronomars/tlm_nox.F90 \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h \
+$(LIBF)/aeronomars/chimiedata.h \
+$(LIBF)/phymars/tracer.h \
+$(LIBF)/phymars/callkeys.h \
+$(LIBF)/aeronomars/conc.h
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libaeronomars.a tlm_nox.o ; \
+	$(COMPTRU90) $(LIBF)/aeronomars/tlm_nox.F90 ; \
+	$(AR) r $(LIBO)/libaeronomars.a tlm_nox.o ; $(RM) tlm_nox.o ; \
 	cd $(GCM)
 
 $(LIBO)/libaeronomars.a(tlm_ox.o) : $(LIBF)/aeronomars/tlm_ox.F90

@@ -36,9 +36,9 @@ REAL :: za(nlayermx), zb(nlayermx), zc(nlayermx), zd(nlayermx)
 REAL :: ptimestep
 
 ! Local variables
-REAL*8 :: z1(nlayermx) ! Z1 from vdifc
-REAL*8 :: M(nlayermx,nlayermx) 
-REAL*8 :: zcdiff(nlayermx,nlayermx)! The matrix used to compute zc''
+REAL :: z1(nlayermx) ! Z1 from vdifc
+REAL :: M(nlayermx,nlayermx) 
+REAL :: zcdiff(nlayermx,nlayermx)! The matrix used to compute zc''
 INTEGER :: x, y ! Loop iterators
 INTEGER :: i, n, a, b, c, d, e ! Loop iterators matching the LaTeX document
 REAL    :: coeff ! Holds the summation values
@@ -48,8 +48,8 @@ REAL    :: coeff ! Holds the summation values
 ! Step One : Initialise M and the TLM identity matrix
 !==========================
 
-M(:,:) = 0.D0
-zcdiff(:,:) = 0.D0
+M(:,:) = 0.
+zcdiff(:,:) = 0.
 !===============================
 ! Step Two : Compute z1 values =
 !===============================
@@ -69,7 +69,7 @@ z1(1) = 1./(za(1) + zb(1) + zb(2)*(1.-zd(2)))
 DO n = 1,nlayermx
 	DO i = 1, nlayermx
 		IF (i .lt. n) THEN
-			zcdiff(n,i) = 0.D0
+			zcdiff(n,i) = 0.
 		ELSE IF (i == n) THEN
 			zcdiff(n,i) = za(i)*z1(i)
 		ELSE IF (i .gt. n) THEN
@@ -90,7 +90,7 @@ DO n = 1,nlayermx
 ENDDO
 
 DO n = 1,nlayermx
-	M(n,n) = M(n,n) - 1.D0
+	M(n,n) = M(n,n) - 1.
 ENDDO
 
 !============================================== 

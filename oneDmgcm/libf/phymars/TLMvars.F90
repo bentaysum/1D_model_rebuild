@@ -1,17 +1,17 @@
 MODULE TLMvars
 ! Matrixes
 ! TLM = TLMtrans + TLMphoto
-REAL*8, DIMENSION(:,:), allocatable,save :: tlm, tlm_photo, tlm_trans
+REAL, DIMENSION(:,:), allocatable,save :: tlm, tlm_photo, tlm_trans
 REAL, DIMENSION(:), allocatable,save :: pertvector
 ! Perturbation Vectors
 !REAL, DIMENSION(:), allocatable,save :: perts
 ! TLM semi-identity matrix
-REAL*8, DIMENSION(:,:), allocatable, save :: tlm_ident
+REAL, DIMENSION(:,:), allocatable, save :: tlm_ident
 ! Callkeys for TLM runs
 LOGICAL,SAVE :: TLM_on = .False.
 LOGICAL,SAVE :: TLM_read = .True.
 ! Conversion factors for mmr -> vmr 
-REAL*8, DIMENSION(:,:), allocatable, save :: Avmr
+REAL, DIMENSION(:,:), allocatable, save :: Avmr
 ! Indexes inside the tangent linear model 
 INTEGER t_co2, t_co, t_o, t_o1d, t_o2, t_o3, t_h, t_h2, t_oh, &
 	  t_ho2, t_h2o2, t_ch4, t_ch3, t_ch3o2, t_ch3ooh, t_ch3oh, &
@@ -25,9 +25,15 @@ INTEGER t_co2, t_co, t_o, t_o1d, t_o2, t_o3, t_h, t_h2, t_oh, &
 
 ! Array of coefficients used to calculated 
 ! linearised steady-state O2
-REAL*8, DIMENSION(:), allocatable, SAVE :: o2_coefficient_array(:)  
+REAL, DIMENSION(:), allocatable, SAVE :: o2_coefficient_array(:)  
 ! Linearised pseudo-rate coefficient for CH4 destruction
-REAL*8, DIMENSION(:,:), allocatable, SAVE :: dKpseudo_dPQ(:,:)
+REAL, DIMENSION(:,:), allocatable, SAVE :: dKpseudo_dPQ(:,:)
+
+! Linearised NOx = [NO] + [NO2] compounds in photochemistry
+REAL, DIMENSION(:,:), allocatable, SAVE :: dNO_dPQ(:,:)
+REAL, DIMENSION(:,:), allocatable, SAVE :: dNO2_dPQ(:,:)
+
+
 
 CONTAINS
 

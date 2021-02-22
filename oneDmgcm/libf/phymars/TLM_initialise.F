@@ -30,17 +30,21 @@
 
           ALLOCATE(dKpseudo_dPQ(nlayermx,nqmx))
 
+          ALLOCATE(dNO_dPQ(nlayermx,nqmx*nlayermx))
+          
+          ALLOCATE(dNO2_dPQ(nlayermx,nqmx*nlayermx))
+
           ! Initialise to 0
-          tlm(:,:) = 0.D0
-          tlm_photo(:,:) = 0.D0
-          tlm_trans(:,:) = 0.D0
+          tlm(:,:) = 0.
+          tlm_photo(:,:) = 0.
+          tlm_trans(:,:) = 0.
           ! Establish the TLM identity matrix
           DO a = 1, nlayermx*nqmx 
           DO b = 1, nlayermx*nqmx
           IF (a==b) THEN
-          TLM_ident(a,b) = 1.D0
+          TLM_ident(a,b) = 1.
           ELSE
-          TLM_ident(a,b) = 0.D0
+          TLM_ident(a,b) = 0.
           ENDIF
           ENDDO
           ENDDO

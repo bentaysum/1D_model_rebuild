@@ -150,13 +150,13 @@ cc    Chlorine Reaction Scheme
       REAL Ncl(nlayermx)
 
 c     Tangent Linear Model variables
-      REAL*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
-      REAL*8, save :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
-      REAL*8 dcc0_dpq_firstcall(nqmx*nlayermx,nlayermx*nqmx)
-      REAL*8 dHOX_dPQ(nlayermx,nlayermx*nqmx)
-      REAL*8 dHOX0_dPQ(nlayermx,nlayermx*nqmx)
-      REAL*8 dOX_dPQ(nlayermx,nlayermx*nqmx)
-      REAL*8 dOX0_dPQ(nlayermx,nlayermx*nqmx)
+      real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      real, save :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      real dcc0_dpq_firstcall(nqmx*nlayermx,nlayermx*nqmx)
+      real dHOX_dPQ(nlayermx,nlayermx*nqmx)
+      real dHOX0_dPQ(nlayermx,nlayermx*nqmx)
+      real dOX_dPQ(nlayermx,nlayermx*nqmx)
+      real dOX0_dPQ(nlayermx,nlayermx*nqmx)
 
       REAL lifetime(nlayermx,nesp)
 
@@ -590,12 +590,12 @@ c
      $ ,cl052(nlayermx), cl053(nlayermx), cl054(nlayermx)
 
 c     Tangent Linear Model 
-      REAL*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
-      REAL*8, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
-      REAL*8 dHOX_dPQ(nlayermx,nqmx*nlayermx)
-      REAL*8 dHOX0_dPQ(nlayermx,nqmx*nlayermx)
-      REAL*8 dOX_dPQ(nlayermx,nqmx*nlayermx)
-      REAL*8 dOX0_dPQ(nlayermx,nqmx*nlayermx)
+      real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      real, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+      real dHOX_dPQ(nlayermx,nqmx*nlayermx)
+      real dHOX0_dPQ(nlayermx,nqmx*nlayermx)
+      real dOX_dPQ(nlayermx,nqmx*nlayermx)
+      real dOX0_dPQ(nlayermx,nqmx*nlayermx)
 
       REAL lifetime(nlayermx,nesp)
       
@@ -924,7 +924,25 @@ c        no2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
          no2(l) = no(l)*rno2_no
-c
+
+
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c       Tangent Linear
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      IF ( tlm_on ) THEN 
+
+          call tlm_nox(iter, l, dens(l), nesp, 
+     $               nox(l), no(l), no2(l), rno2_no, 
+     $               cc(l,:), d001(l), d002(l), d003(l), 
+     $               j(l,j_no2), 
+     $              dccn_dpq)
+
+      ENDIF 
+
+
+
       end do
 
 
@@ -1147,7 +1165,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       call tlm_hox(iter, l, dens(l), sza,
      $  rh_ho2, roh_ho2,
      $  dt, ptimestep,
-     $  nesp, cc(l,:), cc_prev(:),
+     $  nesp, cc(l,:), cc_prev(:), ro2(l),
      $  j(l,:),
      $  a001(l), a002(l), a003(l),
      $  b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),
@@ -1194,7 +1212,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  cab106(l), cab107(l),
      $  dccn_dpq, dcc0_dpq,
      $  dHOX_dPQ, dHOX0_dPQ,
-     $  ro2(l), k_pseudo(l))
+     $  k_pseudo(l))
        ENDIF
 
       end do
@@ -1237,11 +1255,7 @@ c
      $                   + cl035(l)*cc(l,i_cl2)
      $                   + cl039(l)*cc(l,i_hcl))
 
-
-
-C       if ( l .le. 5 ) cc(l,i_o1d) = cc(l,i_o1d)*1.e4
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        o/o3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
@@ -1348,6 +1362,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  c001(l), c002(l), c003(l), c004(l), c005(l), c006(l), 
      $  c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),
      $  c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),
+     $  d001(l), d002(l), d003(l),
      $  e001(l), e002(l), e003(l),
      $  cab001(l), cab002(l), cab003(l),
      $  cab004(l), cab005(l), cab006(l),
@@ -1385,8 +1400,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  cab100(l), cab101(l), cab102(l),
      $  cab103(l), cab104(l), cab105(l),
      $  cab106(l), cab107(L),
+     $  no(l), no2(l),
      $  dccn_dpq, dcc0_dpq,
      $  dOX_dPQ, dOX0_dPQ)
+
+
+
         ENDIF
        
        
@@ -2698,10 +2717,10 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                     + j(l,j_hcl)*cc(l,i_hcl)
      $                     + j(l,j_hocl)*cc(l,i_hocl)
 
-      IF ( l == 1 ) THEN 
-          production(l,i_clox) = production(l,i_clox) 
-     $                         + clox_prod*cc(l,i_dust)
-      ENDIF 
+C       IF ( l == 1 ) THEN 
+C           production(l,i_clox) = production(l,i_clox) 
+C      $                         + clox_prod*cc(l,i_dust)
+C       ENDIF 
 
       loss(l,i_clox) = 2.*cl003(l)*cc(l,i_clo)
      $               + cl005(l)*cc(l,i_clo)
@@ -2741,6 +2760,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       cc_hox_next = (cc0(l,i_hox) + production(l,i_hox)*dt)
      $            /(1. + loss(l,i_hox)*dt)
 
+
+
+
+
                call tlm_sibem(iter,niter, l, dens(l), sza,
      $         dt, ptimestep,  
      $         nesp, cc(l,:), cc0(l,:), cc_hox_next,
@@ -2752,6 +2775,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $         c001(l), c002(l), c003(l), c004(l), c005(l), c006(l),  
      $         c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),  
      $         c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),  
+     $         d001(l), d002(l), d003(l),
      $         e001(l), e002(l), e003(l),  
      $         cab001(l), cab002(l), cab003(l), cab004(l), cab005(l),  
      $         cab006(l), cab007(l), cab008(l), cab009(l), cab010(l),  
@@ -2776,7 +2800,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $         cab101(l), cab102(l), cab103(l), cab104(l), cab105(l),  
      $         cab106(l), cab107(l),
      $         dccn_dpq, dcc0_dpq,
+     $         ro2(l), no(l), no2(l),
      $         dHOX_dPQ, dHOX0_dPQ, k_pseudo)          
+
+
+
 
           ENDIF 
   

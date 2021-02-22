@@ -9,6 +9,7 @@ SUBROUTINE tlm_ox(iter, lyr_m, dens,&
 					c001, c002, c003, c004, c005, c006, &
 					c007, c008, c009, c010, c011, c012, &
 					c013, c014, c015, c016, c017, c018, &
+					d001, d002, d003, &
 					e001, e002, e003, &
 					cab001, cab002, cab003, cab004, cab005, &
 					cab006, cab007, cab008, cab009, cab010, &
@@ -31,7 +32,8 @@ SUBROUTINE tlm_ox(iter, lyr_m, dens,&
 					cab091, cab092, cab093, cab094, cab095, &
 					cab096, cab097, cab098, cab099, cab100, & 
 					cab101, cab102, cab103, cab104, cab105, &
-					cab106, cab107,&
+					cab106, cab107,& 
+					no, no2, &
 					dccn_dpq, dcc0_dpq,&
 					dOX_dPQ, dOX0_dPQ)
 
@@ -53,14 +55,15 @@ integer iter ! iteration in the chimie routine
 integer lyr_m ! layer we are differentiating 
 real dens ! atmospheric number density 
 real ro_o3 ! partition function of O and O3 
-real*8 ro_o3_denominator ! denominator value of ro_o3 
+REAL ro_o3_denominator ! denominator value of ro_o3 
 real dt_c, dt_p ! chemical and physical timestep
 integer nesp ! number of species in the chemistry routines
 real cc(nesp), cc0(nesp) ! number density of species after and before the
 						 ! odd-hydrogen calculations (only H, OH and HO2 are effected)
-real*8 dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
-real*8, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
-real*8 dOX_dPQ(nlayermx,nqmx*nlayermx), dOX0_dPQ(nlayermx,nqmx*nlayermx)
+real no, no2 ! NO and NO2 number densities
+REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
+REAL, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
+REAL dOX_dPQ(nlayermx,nqmx*nlayermx), dOX0_dPQ(nlayermx,nqmx*nlayermx)
 
 real j(nd) ! photolysis values 
 real loss_ox, prod_ox ! loss and production terms for the Odd Oxygen summed family
@@ -78,6 +81,8 @@ real c001, c002, c003, &
      c010, c011, c012, &
      c013, c014, c015, &
      c016, c017, c018
+ ! nitrogen Rates 
+ real d001, d002, d003
 ! Carbon Reaction Rates 
 real e001, e002, e003
 ! Organic Reaction Rates 
@@ -127,22 +132,22 @@ integer o_j, o3_j, o1d_j ! Locations for arrays
 integer x_j 
 integer iq ! Tracer iterator
 ! O1D 
-REAL*8 dPo1d_coeff(nqmx), dLo1d_coeff(nqmx) 
-REAL*8 dPo1d_dPQ(nqmx*nlayermx), dLo1d_dPQ(nqmx*nlayermx)
-REAL*8 loss_o1d, production_o1d
-REAL*8 A_O1D(2)
-REAL*8 dO1D_dPQ(nqmx*nlayermx)
+REAL dPo1d_coeff(nqmx), dLo1d_coeff(nqmx) 
+REAL dPo1d_dPQ(nqmx*nlayermx), dLo1d_dPQ(nqmx*nlayermx)
+REAL loss_o1d, production_o1d
+REAL A_O1D(2)
+REAL dO1D_dPQ(nqmx*nlayermx)
 ! O3 and O 
-REAL*8 dN_dPQ(nqmx*nlayermx), dD_dPQ(nlayermx*nqmx)
-REAL*8 dN_coef(nqmx), dD_coef(nqmx)
-REAL*8 dro_o3_gamma(4) ! Coefficients for linearising partition function ro_o3
-REAL*8 dro_o3_dPQ(nqmx*nlayermx) ! d(ro_o3)/d(PQ)
-REAL*8 A_O(2), A_O3(2) ! Coefficients for linearising O and O3 
-REAL*8 dO_dPQ(nqmx*nlayermx), dO3_dPQ(nqmx*nlayermx) 
+REAL dN_dPQ(nqmx*nlayermx), dD_dPQ(nlayermx*nqmx)
+REAL dN_coef(nqmx), dD_coef(nqmx)
+REAL dro_o3_gamma(4) ! Coefficients for linearising partition function ro_o3
+REAL dro_o3_dPQ(nqmx*nlayermx) ! d(ro_o3)/d(PQ)
+REAL A_O(2), A_O3(2) ! Coefficients for linearising O and O3 
+REAL dO_dPQ(nqmx*nlayermx), dO3_dPQ(nqmx*nlayermx) 
 ! Odd-Oxygen Family
-REAL*8 ox_gamma(4) ! Coefficients
-REAL*8 dPox_dPQ(nqmx*nlayermx), dLox_dPQ(nqmx*nlayermx) ! Linearised loss and production 
-REAL*8 dPox_coef(nqmx), dLox_coef(nqmx) ! Coefficients for linearised loss and prod.
+REAL ox_gamma(4) ! Coefficients
+REAL dPox_dPQ(nqmx*nlayermx), dLox_dPQ(nqmx*nlayermx) ! Linearised loss and production 
+REAL dPox_coef(nqmx), dLox_coef(nqmx) ! Coefficients for linearised loss and prod.
 
 ! Tracer indexing as in photochemistry.F 
 ! ======================================
@@ -207,6 +212,22 @@ integer, parameter :: i_n2   = 55
 integer, parameter :: i_hox  = 56
 integer, parameter :: i_ox   = 57
 integer, parameter :: i_RO2  = 58
+integer, parameter :: i_dust = 59
+!      Chlorine Compounds 
+integer, parameter :: i_cl = 60
+integer, parameter :: i_clo = 61
+integer, parameter :: i_cl2 = 62
+integer, parameter :: i_oclo = 63
+integer, parameter :: i_cl2o2 = 64
+integer, parameter :: i_hcl = 65
+integer, parameter :: i_hocl = 66 
+integer, parameter :: i_cloo = 67 
+integer, parameter :: i_ch3ocl = 68
+integer, parameter :: i_clco = 69
+integer, parameter :: i_clo3 = 70
+integer, parameter :: i_hclo4 = 71
+integer, parameter :: i_clo4 = 72
+integer, parameter :: i_clox = 73 
 
 ! Photolysis indexes as in photochemistry.F
 ! =========================================
@@ -274,15 +295,7 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 ! STAGE 0: INITIALISATION OF THE ARRAYS 
 ! ============================================ ! 
 
-ro_o3_denominator = a001*cc(i_o2) &
-              + cab002*cc(i_ch4) &
-              + cab005*cc(i_ch3) &
-              + cab012*cc(i_ch3o2) &
-              + cab017*cc(i_ch3o) &
-              + cab020*cc(i_hcho) &
-              + cab021*cc(i_hco) &
-              + cab037*cc(i_c2h6) 
-
+ro_o3_denominator = a001*cc(i_o2)
 
 
 
@@ -307,17 +320,17 @@ ro_o3_denominator = a001*cc(i_o2) &
 !	1.1.1: Production Coefficients 
 !	------------------------------ 
 	dPo1d_coeff(:) = 0.
-	dPo1d_coeff(t_co2) = j(j_co2_o1d)
-	dPo1d_coeff(t_o2) = j(j_o2_o1d)
-	dPo1d_coeff(t_o3) = j(j_o3_o1d)
+	dPo1d_coeff(t_co2) = j(j_co2_o1d)  
+	dPo1d_coeff(t_o2) = j(j_o2_o1d)  
+	dPo1d_coeff(t_o3) = j(j_o3_o1d)  
 
 !	1.1.2: Loss Coefficients
 ! 	------------------------
 	dLo1d_coeff(:) = 0.
-	dLo1d_coeff(t_co2) = b001 
-	dLo1d_coeff(t_h2ovap) = b002
-	dLo1d_coeff(t_h2) = b003 
-	dLo1d_coeff(t_o2) = b004 
+	dLo1d_coeff(t_co2) = b001   
+	dLo1d_coeff(t_h2ovap) = b002  
+	dLo1d_coeff(t_h2) = b003   
+	dLo1d_coeff(t_o2) = b004   
 	dLo1d_coeff(t_o3) = b005 + b006 
 	dLo1d_coeff(t_ch4) = b007 + b008 + b009 
 
@@ -325,7 +338,7 @@ ro_o3_denominator = a001*cc(i_o2) &
 !		   Loss vectors 
 !	-------------------------------------------
 
-	dPo1d_dPQ(:) = 0.
+	dPo1d_dPQ(:) = 0.  
 	dLo1d_dPQ(:) = 0.
 	DO iq = 1, nqmx
 		x_j = (iq-1)*nlayermx + lyr_m
@@ -390,26 +403,19 @@ ro_o3_denominator = a001*cc(i_o2) &
 !	1 sub-chemistry timestep
 
 	dN_coef(:) = 0. 
-	dN_coef(t_o) = a003 
-	dN_coef(t_h) = c003 
-	dN_coef(t_oh) = c014 
-	dN_coef(t_ho2) = c015 
+	dN_coef(t_o) = a003   
+	dN_coef(t_h) = c003   
+	dN_coef(t_oh) = c014   
+	dN_coef(t_ho2) = c015   
 
-	IF ( igcm_ch3 .ne. 0 ) dN_coef(t_ch3) = cab004 
-	IF ( igcm_ch3o2 .ne. 0 ) dN_coef(t_ch3o2) = cab010 
-	IF ( igcm_ch3o .ne. 0 ) dN_coef(t_ch3o) = cab016
+	IF ( igcm_ch3 .ne. 0 ) dN_coef(t_ch3) = cab004   
+	IF ( igcm_ch3o2 .ne. 0 ) dN_coef(t_ch3o2) = cab010   
+	IF ( igcm_ch3o .ne. 0 ) dN_coef(t_ch3o) = cab016  
 
 !	2.3: Linearised Denominator Coefficients
 !	----------------------------------------
 	dD_coef(:) = 0. 
-	dD_coef(t_o2) = a001 
-	dD_coef(t_ch4) = cab002
-
-	IF ( igcm_ch3 .ne. 0 ) dD_coef(t_ch3) = cab005 
-	IF ( igcm_ch3o2 .ne. 0 ) dD_coef(t_ch3o2) = cab012
-	IF ( igcm_ch3o .ne. 0 ) dD_coef(t_ch3o) = cab017
-	IF ( igcm_hcho .ne. 0 ) dD_coef(t_hcho) = cab020 
-	IF ( igcm_hco .ne. 0 ) dD_coef(t_hco) = cab021 
+	dD_coef(t_o2) = a001   
 
 !	2.4: Construct Linearised N and D
 !	---------------------------------
@@ -425,7 +431,8 @@ ro_o3_denominator = a001*cc(i_o2) &
 !	2.5: Construct Linearised Partition Function 
 !	--------------------------------------------
 	dro_o3_dPQ = dro_o3_gamma(1)*dN_dPQ &
-			   - dro_o3_gamma(2)*dD_dPQ 
+			   - dro_o3_gamma(2)*dD_dPQ &
+			   + dro_o3_gamma(1)*d002*dNO_dPQ(lyr_m,:)
 
 ! ============================================ ! 
 ! STAGE 3: LINEARISED O3 
@@ -457,8 +464,8 @@ ro_o3_denominator = a001*cc(i_o2) &
 
 !	4.1: Coefficients
 !	-----------------
-	A_O(1) = ro_o3
-	A_O(2) = cc(i_o3) 
+	A_O(1) = ro_o3  
+	A_O(2) = cc(i_o3)   
 
 !	4.2: Calculation
 !	-----------------
@@ -501,11 +508,11 @@ ro_o3_denominator = a001*cc(i_o2) &
 !
 !	L_ox =  k_ab * cc_a(PQ) * cc_b(PQ) + k_ac * cc_a(PQ) * cc_b(PQ) + ... 
 
-	dPox_coef(:) = 0. 
+	dPox_coef(:) = 0.
 	dPox_coef(t_co2) = j(j_co2_o) + j(j_co2_o1d)
 	dPox_coef(t_o2) = 2.*j(j_o2_o) + 2.*j(j_o2_o1d)
 	dPox_coef(t_ho2) = j(j_ho2) + c006*cc(i_h) &
-						+ cab074*cc(i_ch3cooo) + cab097*cc(i_hoch2co3)
+					 + d003*no
 	dPox_coef(t_h) = c006*cc(i_ho2)
 	dPox_coef(t_oh) = 2.*c013*cc(i_oh)
 
@@ -513,6 +520,7 @@ ro_o3_denominator = a001*cc(i_o2) &
 	dLox_coef(t_co) = e002*cc(i_o)
 	dLox_coef(t_o) = 4.*a002*cc(i_o) + 2.*a003*cc(i_o3) &
 					+ c001*cc(i_ho2) + c002*cc(i_oh) &
+					+ d001*no2 &
 					+ c012*cc(i_h2o2) + e002*cc(i_co) &
 					+ cab002*cc(i_ch4) + cab012*cc(i_ch3o2) &
 					+ cab017*cc(i_ch3o) + cab020*cc(i_hcho) &
@@ -536,7 +544,7 @@ ro_o3_denominator = a001*cc(i_o2) &
 !	5.3: Calculate linearised produciton and loss 
 !	---------------------------------------------
 	dPox_dPQ(:) = 0.
-	dLox_dPQ(:) = 0.
+	dLox_dPQ(:) = 0. 
 	DO iq = 1,nqmx
 		x_j = (iq-1)*nlayermx + lyr_m 
 		dPox_dPQ = dPox_dPQ + dPox_coef(iq)*dccn_dpq(x_j, : )
@@ -548,7 +556,12 @@ ro_o3_denominator = a001*cc(i_o2) &
 	dOX_dPQ(lyr_m,:) = ox_gamma(1)*dOX0_dPQ(lyr_m,:) &
 					+ ox_gamma(2)*dPox_dPQ &
 					- ox_gamma(3)*dLox_dPQ &
-					+ ox_gamma(4)*dOX_dPQ(lyr_m,:)
+					+ ox_gamma(4)*dOX_dPQ(lyr_m,:) 
+
+! Nitrogen Contributions
+ dOX_dPQ(lyr_m,:) = dOX_dPQ(lyr_m,:) &
+                  + ox_gamma(2)*d003*cc(i_ho2)*dNO_dPQ(lyr_m,:) &
+                  - ox_gamma(3)*d001*cc(i_o)*dNO2_dPQ(lyr_m,:)
 
 				
 RETURN 

@@ -53,7 +53,7 @@ integer :: iq
 ! -------
 integer x, y ! Loop iterators
 integer,save :: t 
-integer, parameter :: wl = 8
+integer, parameter :: wl = 4
 integer :: length
 integer :: l
 integer :: iostat
