@@ -41,7 +41,7 @@ mcd_ltfin = 0.
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 call_tlm=.true.
 tlm_day=10
-tlm_lt=0.
+tlm_lt=12.
 
 ## L-BFGS-B Routines 
 ## ~~~~~~~~~~~~~~~~~

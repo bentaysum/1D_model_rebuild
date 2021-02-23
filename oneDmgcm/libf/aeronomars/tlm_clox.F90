@@ -556,11 +556,11 @@ dClO_dPQ = rclo_cl*dCl_dPQ &
 
 ! Cl
 x_j = (t_cl-1)*nlayermx + lyr_m 
-dccn_dpq( x_j, : ) = dCl_dPQ 
+dccn_dpq( x_j, : ) = 0.!dCl_dPQ 
 
 ! ClO 
 x_j = (t_clo-1)*nlayermx + lyr_m 
-dccn_dpq( x_j, : ) = dClO_dPQ 
+dccn_dpq( x_j, : ) = 0.! dClO_dPQ 
 
 
 RETURN
