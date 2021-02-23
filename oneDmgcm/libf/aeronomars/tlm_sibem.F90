@@ -33,6 +33,24 @@ SUBROUTINE tlm_sibem(iter, niter, lyr_m, dens, sza, &
 					cab096, cab097, cab098, cab099, cab100, & 
 					cab101, cab102, cab103, cab104, cab105, &
 					cab106, cab107, &
+                    cl001, cl002, cl003 &
+                    ,cl004, cl005, cl006 &
+                    ,cl007, cl008, cl009 &
+                    ,cl010, cl011, cl012 &
+                    ,cl013, cl014, cl015 &
+                    ,cl016, cl017, cl018 &
+                    ,cl019, cl020, cl021 &
+                    ,cl022, cl023, cl024 &
+                    ,cl025, cl026, cl027 &
+                    ,cl028, cl029, cl030 &
+                    ,cl031, cl032, cl033 &
+                    ,cl034, cl035, cl036 &
+                    ,cl037, cl038, cl039 &
+                    ,cl040, cl041, cl042 &
+                    ,cl043, cl044, cl045 &
+                    ,cl046, cl047, cl048 &
+                    ,cl049, cl050, cl051 &
+                    ,cl052, cl053, cl054, &
 					dccn_dpq, dcc0_dpq, &
                     ro2, no, no2, &
 					dHOX_dPQ, dHOX0_dPQ, k_pseudo)
@@ -122,6 +140,25 @@ real cab001, cab002, cab003, &
      cab100, cab101, cab102, &
      cab103, cab104, cab105, &
      cab106, cab107
+
+real cl001, cl002, cl003 &
+ ,cl004, cl005, cl006 &
+ ,cl007, cl008, cl009 &
+ ,cl010, cl011, cl012 &
+ ,cl013, cl014, cl015 &
+ ,cl016, cl017, cl018 &
+ ,cl019, cl020, cl021 &
+ ,cl022, cl023, cl024 &
+ ,cl025, cl026, cl027 &
+ ,cl028, cl029, cl030 &
+ ,cl031, cl032, cl033 &
+ ,cl034, cl035, cl036 &
+ ,cl037, cl038, cl039 &
+ ,cl040, cl041, cl042 &
+ ,cl043, cl044, cl045 &
+ ,cl046, cl047, cl048 &
+ ,cl049, cl050, cl051 &
+ ,cl052, cl053, cl054
 
 ! ====================================================================================
 !									Local Variables
@@ -226,17 +263,21 @@ integer, parameter :: i_clox = 73
 ! Photolysis indexes as in photochemistry.F
 ! =========================================
 integer j_o2_o, j_o2_o1d, j_co2_o, j_co2_o1d, &
-		j_o3_o1d, j_o3_o, j_h2o, j_hdo, j_h2o2, &
-		j_ho2, j_no2, j_ch4_ch3_h, j_ch4_1ch2_h2, &
-		j_ch4_3ch2_h_h, j_ch4_ch_h2_h, j_ch3o2h, &
-		j_ch2o_co, j_ch2o_hco, j_ch3oh, j_c2h6, j_hcl, &
-		j_hocl, j_clo, j_so2, j_so, j_h2s, j_so3, &
-		j_hno3, j_hno4, &
-		j_ch3cho_ch3, j_ch3cho_ch4, j_ch3cho_h, &
-		j_hoch2ooh, j_hoch2cho_hco, j_hoch2cho_co, &
-		j_hoch2cho_oh, j_glyox_hco, j_glyox_hcho, &
-		j_glyox_h2, j_ch3cooh, j_ch3coooh, j_ch3cocooh
-		
+          j_o3_o1d, j_o3_o, j_h2o, j_hdo, j_h2o2, &
+          j_ho2, j_no2, j_ch4_ch3_h, j_ch4_1ch2_h2, &
+          j_ch4_3ch2_h_h, j_ch4_ch_h2_h, j_ch3o2h, &
+          j_ch2o_co, j_ch2o_hco, j_ch3oh, j_c2h6, j_hcl, &
+          j_hocl, j_clo, j_so2, j_so, j_h2s, j_so3, &
+          j_hno3, j_hno4, &
+          j_ch3cho_ch3, j_ch3cho_ch4, j_ch3cho_h, & 
+          j_hoch2ooh, j_hoch2cho_hco, j_hoch2cho_co, &
+          j_hoch2cho_oh, j_glyox_hco, j_glyox_hcho, &
+          j_glyox_h2, j_ch3cooh, j_ch3coooh, j_ch3cocooh, &
+          j_cl2, j_cloo, j_cl2o2, j_oclo
+
+! =================================================== !
+!     numbering of photolysis rates
+! =================================================== !
 j_o2_o         =  1      ! o2 + hv     -> o + o
 j_o2_o1d       =  2      ! o2 + hv     -> o + o(1d)
 j_co2_o        =  3      ! co2 + hv    -> co + o
@@ -266,24 +307,31 @@ j_h2s          =  26     ! h2s + hv    -> hs + s
 j_so3          =  27     ! so2 + hv    -> so2 + o
 j_hno3         =  28     ! hno3 + hv   -> oh + no2
 j_hno4         =  29     ! hno4 + hv   -> ho2 + no2
+
 j_ch3cho_ch3   =  30     ! ch3cho + hv -> ch3 + hco 
 j_ch3cho_ch4   =  31     ! ch3cho + hv -> ch4 + co 
 j_ch3cho_h     =  32     ! ch3cho + hv -> ch3co + h 
 j_hoch2ooh     =  33     ! hoch2ooh + hv -> hoch2o + oh 
-						   ! hoch2o + o2 -> hcooh + ho2 
-						   ! = hoch2ooh + o2 + hv -> hcooh + ho2 + oh
-						   ! handle via 
+                     ! hoch2o + o2 -> hcooh + ho2 
+                     ! = hoch2ooh + o2 + hv -> hcooh + ho2 + oh
+                     ! handle via 
 j_hoch2cho_hco =  34     ! hoch2cho + hv -> ch2oh + hco 
 j_hoch2cho_co  =  35     ! hoch2cho + hv -> ch3oh + co
 j_hoch2cho_oh  =  36     ! hoch2cho + hv -> ch2cho + oh 
-						   ! ch2cho + o2   -> hcoch2o2 
-						   ! hoch2cho + o2 + hv -> hcoch2o2 + oh
+                     ! ch2cho + o2   -> hcoch2o2 
+                     ! hoch2cho + o2 + hv -> hcoch2o2 + oh
 j_glyox_hco    =  37     ! glyoxal  + hv -> hco + hco 
 j_glyox_h2     =  38     ! glyoxal  + hv -> h2 + 2co 
 j_glyox_hcho   =  39     ! glyoxal  + hv -> hcho + co 
 j_ch3cooh      =  40     ! ch3cooh  + hv -> ch3 + cooh 
 j_ch3coooh     =  41     ! ch3c(o)ooh + hv -> ch3 + oh + co2 
 j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products 
+
+j_cl2          = 43      ! cl2 + hv -> 2.*cl
+j_cloo         = 44      ! cloo + hv -> Products 
+j_oclo         = 45      ! oclo + hv -> clo + o
+j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo 
+
 
 
 ! 0.0 : Initialisation of Array 
@@ -405,7 +453,6 @@ endif
                                                + cab026*cc(i_o2) &
                                                + cab027*cc(i_h) 
 
-
 !   1.1.3: O2 [SIBEM]
 !   -----------------
     dP_coeff(t_o2,t_o3) = j(j_o3_o) + j(j_o3_o1d) &
@@ -417,7 +464,9 @@ endif
                         + 2.*c015*cc(i_ho2) &
                         + cab004*cc(i_ch3) &
                         + 2.*cab010*cc(i_ch3o2) &
-                        + cab016*cc(i_ch3o)
+                        + cab016*cc(i_ch3o) &
+                        + cl001*cc(i_cl) &
+                        + cl052*cc(i_oclo)
 
     dP_coeff(t_o2,t_o) = 2.*a002*cc(i_o) &
                        + 2.*a003*cc(i_o3) & 
@@ -425,14 +474,16 @@ endif
                        + c002*cc(i_oh) &
                        + d001*no2 &
                        + cab012*cc(i_ch3o2) &
-                       + 0.75*cab017*cc(i_ch3o)
+                       + 0.75*cab017*cc(i_ch3o) &
+                       + cl002*cc(i_clo)
 
     dP_coeff(t_o2,t_h) = c003*cc(i_o3) &
                         + c005*cc(i_ho2)
 
     dP_coeff(t_o2,t_oh) = c002*cc(i_o) &
                         + c007*cc(i_ho2) &
-                        + c014*cc(i_o3)
+                        + c014*cc(i_o3) &
+                        + 0.06*cl012*cc(i_clo)
 
     dP_coeff(t_o2,t_ho2) = c001*cc(i_o) &
                          + c005*cc(i_h) &
@@ -442,7 +493,9 @@ endif
                          + 2.*c016*cc(i_ho2) &
                          + cab006*cc(i_ch3o2) &
                          + cab007*cc(i_ch3o2) &
-                         + 0.8*cab029*cc(i_ho2)
+                         + 0.8*cab029*cc(i_ho2) &
+                         + cl009*cc(i_cl) &
+                         + cl013*cc(i_clo)
 
     dP_coeff(t_o2,t_o1d) = 2.*b005*cc(i_o3) &
                          + b006*cc(i_o3) 
@@ -457,7 +510,8 @@ endif
                                                    + 0.5*cab009*cc(i_ch3o2) &
                                                    + 2.*cab010*cc(i_o3) &
                                                    + cab012*cc(i_o) &
-                                                   + 0.5*cab031*cc(i_hoch2o2)
+                                                   + 0.5*cab031*cc(i_hoch2o2) &
+                                                   + cl020*cc(i_clo)
 
     IF (igcm_ch3o .ne. 0 ) dP_coeff(t_o2,t_ch3o) = cab016*cc(i_o3) &
                                                  + 0.75*cab017*cc(i_o)
@@ -475,7 +529,8 @@ endif
 
     dP_coeff(t_h2,t_h) = c005*cc(i_ho2) & 
                        + 2.*c008*cc(i_h) &
-                       + cab027*cc(i_hco)
+                       + cab027*cc(i_hco) &
+                       + cl041*cc(i_hcl)
 
     dP_coeff(t_h2,t_ho2) = c005*cc(i_h) 
 
@@ -504,7 +559,10 @@ endif
                             + cab018*cc(i_hcho) &
                             + cab025*cc(i_hco) &
                             + cab032*cc(i_hcooh) &
-                            + cab034*cc(i_hoch2ooh)
+                            + cab034*cc(i_hoch2ooh) &
+                            + cl014*cc(i_hcl) &
+                            + cl015*cc(i_hocl) &
+                            + cl027*cc(i_hclo4) 
 
     dP_coeff(t_h2ovap,t_ho2) = c006*cc(i_h) &
                              + c007*cc(i_oh) &
@@ -559,7 +617,8 @@ endif
         dP_coeff( t_ch3, t_ch4 ) = b007*cc(i_o1d) &
                                  + cab001*cc(i_oh) &
                                  + 0.51*cab002*cc(i_o) &
-                                 + j(j_ch4_ch3_h) 
+                                 + j(j_ch4_ch3_h) &
+                                 + cl016*cc(i_cl)
 
         IF ( igcm_ch3o .ne. 0 ) dP_coeff(t_ch3,t_ch3o) = 0.75*cab017*cc(i_o)
     ENDIF 
@@ -599,7 +658,8 @@ endif
                                + b008*cc(i_o1d) 
 
         dP_coeff(t_ch3o,t_oh) = cab011*cc(i_ch3o2) &
-                              + 0.15*cab013*cc(i_ch3oh)
+                              + 0.15*cab013*cc(i_ch3oh) &
+                              + cl032*cc(i_ch3ocl)
 
         dP_coeff(t_ch3o,t_o1d) = b008*cc(i_ch4) 
 
@@ -617,7 +677,10 @@ endif
         dP_coeff(t_ch3o,t_ch3o2) = cab008*(cc(i_ch3o2)+ro2) &
                                  + cab010*cc(i_o3) &
                                  + cab011*cc(i_oh) &
-                                 + cab012*cc(i_o) 
+                                 + cab012*cc(i_o) &
+                                 + cl019*cc(i_clo) &
+                                 + cl020*cc(i_clo) &
+                                 + 0.5*cl022*cc(i_cl)
 
         dP_coeff(t_ch3o,t_ch3ooh) = j(j_ch3o2h)   
 
@@ -656,7 +719,8 @@ endif
 
         dP_coeff(t_hcho, t_ch3oh) = 0.85*cab013*cc(i_oh)
 
-        dP_coeff(t_hcho, t_ch3ooh) = 0.4*cab014*cc(i_oh)
+        dP_coeff(t_hcho, t_ch3ooh) = 0.4*cab014*cc(i_oh) &
+                                   + cl018*cc(i_cl)
 
         dP_coeff(t_hcho, t_ch3o) = cab015*cc(i_o2) &
                                  + 0.25*cab017*cc(i_o)
@@ -718,7 +782,7 @@ endif
         dP_coeff(t_hco,t_oh) = cab018*cc(i_hcho) 
         dP_coeff(t_hco,t_o) = cab020*cc(i_hcho) 
         dP_coeff(t_hco,t_hcho) = cab018*cc(i_oh) + cab020*cc(i_o) &
-                                                       + j(j_ch2o_co)
+                               + j(j_ch2o_co) + cl017*cc(i_cl)
     ENDIF 
 
 
@@ -736,6 +800,57 @@ endif
         dP_coeff(t_o,t_ho2) = c006*cc(i_h) 
 
         dP_coeff(t_o,t_oh) = 2.*c013*cc(i_oh)
+    ENDIF 
+
+     !   1.3 : Chlorine Chemistry 
+!         Contributions 
+!   ------------------------
+    IF ( igcm_cl .ne. 0) THEN 
+        ! CO 
+        dP_coeff(t_co,t_clco) =cl033 
+        !O2 
+        dP_coeff(t_o2,t_cl) = cl001*cc(i_o3) &
+                            + cl009*cc(i_ho2) &
+                            + cl025*cc(i_cloo) 
+
+        dP_coeff(t_o2,t_clo) = cl002*cc(i_o) &
+                             + 2.*cl003*cc(i_clo) &
+                             + 2.*cl004*cc(i_clo) &
+                             + 0.06*cl012*cc(i_oh) &
+                             + cl013*cc(i_ho2) &
+                             + cl020*cc(i_ch3o2) 
+
+         dP_coeff(t_o2,t_cloo) = cl025*cc(i_cl) &
+                               + cl026
+
+         dP_coeff(t_o2,t_oclo) = cl052*cc(i_o3) 
+
+         ! H2
+         dP_coeff(t_h2,t_hcl) = cl041*cc(i_h)
+
+         ! H2O
+         dP_coeff(t_h2ovap,t_hcl) = cl014*cc(i_oh)
+         dP_coeff(t_h2ovap,t_hocl) = cl015*cc(i_oh)
+         dP_coeff(t_h2ovap,t_hclo4) = cl027*cc(i_oh)
+
+         ! CH3 
+         IF ( igcm_ch3 .ne. 0 ) dP_coeff(t_ch3,t_cl) = cl016*cc(i_ch4)
+
+         ! CH3O 
+         IF ( igcm_ch3o .ne. 0 ) THEN 
+         dP_coeff(t_ch3o,t_clo) = cl019*cc(i_ch3o2) &
+                                + cl020*cc(i_ch3o2) 
+          dP_coeff(t_ch3o,t_cl) = 0.5*cl022*cc(i_ch3o2) &
+                                + cl029*cc(i_ch3ocl) 
+          dP_coeff(t_ch3o,t_ch3ocl) = cl029*cc(i_cl) &
+                                    + cl032*cc(i_oh)
+          ENDIF 
+
+          ! HCHO
+          IF ( igcm_hcho .ne. 0) dP_coeff(t_hcho,t_cl) =cl018*cc(i_ch3ooh)
+          ! HCO 
+          IF ( igcm_hco .ne. 0 ) dP_coeff(t_hco,t_cl) = cl017*cc(i_hcho)
+
     ENDIF 
 
 !   2.0: Construct the Linearised Production Array
@@ -965,6 +1080,48 @@ endif
         IF ( igcm_ch3o .ne. 0 ) dL_coeff(t_o3,t_ch3o) = cab016  
     ENDIF
 
+!    2.2.3: Chlorine Contributions 
+!   ------------------------------
+IF ( igcm_cl .ne. 0 ) THEN 
+     ! CO
+     dL_coeff(t_co,t_cl) = cl023 
+     ! O2 
+     dL_coeff(t_o2,t_cl) = cl028
+     ! H2 
+     dL_coeff(t_h2,t_cl) = cl008 
+     ! H2O2
+     dL_coeff(t_h2o2,t_cl) = cl011
+     ! CH4
+     dL_coeff(t_ch4,t_cl) = cl016
+     ! CH3 
+     dL_coeff(t_ch3,t_cl2) = cl038 
+     ! CH3O2
+     IF ( igcm_ch3o2 .ne. 0 ) THEN 
+          dL_coeff(t_ch3o2,t_clo) = cl019 + cl020 + cl021 
+          dL_coeff(t_ch3o2,t_cl) = cl022 
+     ENDIF 
+     ! CH3OOH
+     IF ( igcm_ch3ooh .ne. 0 ) dL_coeff(t_ch3ooh,t_cl) = cl018
+     ! HCHO
+     IF ( igcm_hcho .ne. 0 ) dL_coeff(t_hcho, t_cl) = cl017 
+     ! HCOOH 
+     IF ( igcm_hcooh .ne. 0 ) dL_coeff(t_hcooh,t_cl) = cl043
+
+     ! Daylight 
+     IF ( sza > 95. ) THEN 
+        ! O3 
+        dL_coeff(t_o3,t_cl) = cl001 + cl044 
+        dL_coeff(t_o3,t_oclo) = cl052 
+        ! O 
+        dL_coeff(t_o,t_clo) = cl002 
+        dL_coeff(t_o,t_hcl) = cl040 
+        dL_coeff(t_o,t_hocl) = cl042 
+        dL_coeff(t_o,t_oclo) = cl051
+
+     ENDIF 
+
+ENDIF 
+
 !   2.3: Create Linearised loss array 
 !   ---------------------------------
     DO iq_j = 1,nqmx
@@ -1166,14 +1323,17 @@ dPhox_coeff(:) = 0.
 dPhox_coeff(t_o1d) = 2.*b002*cc(i_h2o) &
                    + 2.*b003*cc(i_h2) &
                    + b007*cc(I_ch4) &
-                   + b008*cc(i_ch4)
+                   + b008*cc(i_ch4) &
+                   + 0.88*cl039*cc(i_hcl)
 
 dPhox_coeff(t_o) = 2.*c012*cc(i_h2o2) &
                  + cab002*cc(i_ch4) &
                  + cab005*cc(i_ch3) &
                  + 0.25*cab017*cc(i_ch3o) &
                  + cab020*cc(i_hcho) &
-                 + cab021*cc(i_hco)
+                 + cab021*cc(i_hco) &
+                 + cl040*cc(i_hcl) &
+                 + cl042*cc(i_hocl)
 
 dPhox_coeff(t_o2) = cab015*cc(i_ch3o) &
                   + cab026*cc(i_hco)
@@ -1183,10 +1343,12 @@ dPhox_coeff(t_o3) = 0.956*cab004*cc(i_ch3)
 dPhox_coeff(t_h2ovap) = 2.*j(j_h2o) &
                       + 2.*b002*cc(i_o1d)
 
-dPhox_coeff(t_h2) = 2.*b003*cc(i_o1d)
+dPhox_coeff(t_h2) = 2.*b003*cc(i_o1d) &
+                  + cl008*cc(i_cl)
 
 dPhox_coeff(t_h2o2) = 2.*j(j_h2o2) &
-                    + 2.*c012*cc(i_o) 
+                    + 2.*c012*cc(i_o) &
+                    + cl011*cc(i_cl)
 
 dPhox_coeff(t_ch4) = cab002*cc(i_o) &
                    + b007*cc(i_o1d) &
@@ -1204,7 +1366,8 @@ IF ( igcm_ch3o .ne. 0 ) dPhox_coeff(t_ch3o) = cab015*cc(i_o2) &
 IF ( igcm_hcho .ne. 0 ) dPhox_coeff(t_hcho) = cab020*cc(i_o) &
                                             + 2.d0*j(j_ch2o_hco)
 
-IF ( igcm_ch3ooh .ne. 0 ) dPhox_coeff(t_ch3ooh) = j(j_ch3o2h)
+IF ( igcm_ch3ooh .ne. 0 ) dPhox_coeff(t_ch3ooh) = j(j_ch3o2h) &
+                                                + cl018*cc(i_cl)
 
 IF ( igcm_ch3oh .ne. 0 ) dPhox_coeff(t_ch3oh) = j(j_ch3oh)
 
@@ -1215,6 +1378,20 @@ IF ( igcm_hoch2o2 .ne. 0 ) dPhox_coeff(t_hoch2o2) = cab028 &
                                                   + cab030*( cc(i_hoch2o2) + ro2 )
 
 IF ( igcm_ch3o2 .ne. 0 ) dPhox_coeff(t_ch3o2) = cab030*cc(i_hoch2o2)
+
+IF ( igcm_cl .ne. 0 ) THEN 
+    dPhox_coeff(t_cl) = cl008*cc(i_h2) &
+                      + cl011*cc(i_h2o2) &
+                      + cl018*cc(i_ch3ooh) 
+    dPhox_coeff(t_hcl) = j(j_hcl) &
+                       + 0.88*cl039*cc(i_o1d) &
+                       + cl040*cc(i_o) 
+    dPhox_coeff(t_hocl) = j(j_hocl) &
+                        + cl042*cc(i_o) &
+                        + cl054*cc(i_clo4)
+    dPhox_coeff(t_clo4) = cl054*cc(i_hocl) 
+ENDIF 
+
 
 dPhox_dPQ(:) = 0.
 DO iq = 1,nqmx
@@ -1229,7 +1406,9 @@ dLhox_coeff(:) = 0.
 dLhox_coeff(t_h) = 2.*c005*cc(i_ho2) &
                  + 2.*c006*cc(i_ho2) &
                  + 4.*c018*cc(i_h) &
-                 + cab027*cc(i_hco)
+                 + cab027*cc(i_hco) &
+                 + cl037*cc(i_cl2) &
+                 + cl041*cc(i_hcl)
 
 dLhox_coeff(t_oh) = 2.*c007*cc(i_ho2) &
                   + 4.*c013*cc(i_oh) &
@@ -1239,7 +1418,15 @@ dLhox_coeff(t_oh) = 2.*c007*cc(i_ho2) &
                   + cab014*0.6*cc(i_ch3ooh) &
                   + cab018*cc(i_hcho) &
                   + cab025*cc(i_hco) &
-                  + cab034*cc(i_hoch2ooh)
+                  + cab034*cc(i_hoch2ooh) &
+                  + 0.06*cl012*cc(i_clo) &
+                  + cl014*cc(i_hcl) &
+                  + cl015*cc(i_hocl) &
+                  + cl032*cc(i_ch3ocl) &
+                  + cl036*cc(i_cl2) &
+                  + cl048*cc(i_clo3) &
+                  + cl049*cc(i_clo3) &
+                  + cl027*cc(i_hclo4)
 
 dLhox_coeff(t_ho2) = 2.*c005*cc(i_h) &
                    + 2.*c006*cc(i_h) &
@@ -1249,7 +1436,9 @@ dLhox_coeff(t_ho2) = 2.*c005*cc(i_h) &
                    + cab006*cc(i_ch3o2) &
                    + cab007*cc(i_ch3o2) &
                    + cab019*cc(i_hcho) &
-                   + 0.6*cab029*cc(i_hoch2o2) 
+                   + 0.6*cab029*cc(i_hoch2o2) &
+                   + cl009*cc(i_cl) &
+                   + cl013*cc(i_clo)
 
 dLhox_coeff(t_ch4) = cab001*cc(i_oh)
 
@@ -1270,6 +1459,21 @@ IF (igcm_hco .ne. 0 ) dLhox_coeff(t_hco) = cab025*cc(i_oh) &
 
 IF (igcm_hoch2ooh .ne. 0 ) dLhox_coeff(t_hoch2ooh) = cab034*cc(i_oh)
 
+IF (igcm_cl .ne. 0 ) THEN 
+    dLhox_coeff(t_cl) = cl009*cc(i_ho2) 
+    dLhox_coeff(t_clo) = 0.06*cl012*cc(i_oh) &
+                       + cl013*cc(i_ho2)
+    dLhox_coeff(t_clo3) = cl048*cc(i_oh) &  
+                        + cl049*cc(i_oh)
+    dLhox_coeff(t_hcl) = cl014*cc(i_oh) &
+                       + cl041*cc(i_h)
+    dLhox_coeff(t_hocl) = cl015*cc(i_oh)
+    dLhox_coeff(t_ch3ocl) = cl032*cc(i_oh)
+    dLhox_coeff(t_cl2) = cl036*cc(i_oh) &
+                       + cl037*cc(i_h)
+    dLhox_coeff(t_hclo4) = cl027*cc(i_oh)
+ENDIF 
+
 dLhox_dPQ(:) = 0.
 DO iq = 1,nqmx
 	x_j = (iq-1)*nlayermx + lyr_m
@@ -1287,12 +1491,6 @@ dHOX_dPQ(lyr_m,:) = A_hox(1)*dHOX0_dPQ(lyr_m,:) &
                   + A_hox(2)*dPhox_dPQ &
                   - A_hox(3)*dLhox_dPQ &
                   + A_hox(4)*dHOX_dPQ(lyr_m,:)
-
-
-! A_hox(1)*( dHOX0_dPQ(lyr_m,:) + dPhox_dPQ*dt_c ) &
-!                 - A_hox(2)*( dLhox_dPQ - A_hox(3)*dHOX_dPQ(lyr_m,:) )
-
-
 
 ! ============================================
 ! STAGE 6 : CALCULATIONS AND STORAGE IN ARRAYS
@@ -1392,6 +1590,51 @@ IF ( igcm_hco .ne. 0 ) THEN
 	x_j = (t_hco-1)*nlayermx + lyr_m 
 	dccn_dpq( x_j, : ) = A(t_hco,1)*dP_dPQ(t_hco,:) - A(t_hco,2)*dL_dPQ(t_hco,:)
 ENDIF
+
+
+
+! IF ( lyr_m == 1 ) WRITE(*,"(13A15)") "Cl", "ClO", "Cl2", "OClO", "Cl2O2", &
+!                                    "HCl", "HOCl", "ClOO", "CH3OCl", "ClCO", &
+!                                    "ClO3", "HClO4", "ClO4"
+
+! ! write(*,"(13E15.7)") dCl_dPQ( (t_cl-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_clo-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_cl2-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_oclo-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_cl2o2-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_hcl-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_hocl-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_cloo-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_ch3ocl-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_clco-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_clo3-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_hclo4-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_clo4-1)*nlayermx + lyr_m )
+
+! write(*,"(13E15.7)") dHOX_dPQ( lyr_m, (t_cl-1)*nlayermx + lyr_m ), &
+!               dHOX_dPQ( lyr_m,(t_clo-1)*nlayermx + lyr_m ), &
+!               dHOX_dPQ(lyr_m, (t_cl2-1)*nlayermx + lyr_m ), &
+!               dHOX_dPQ( lyr_m,(t_oclo-1)*nlayermx + lyr_m ), &
+!               dHOX_dPQ(lyr_m, (t_cl2o2-1)*nlayermx + lyr_m ), &
+!               dHOX_dPQ( lyr_m,(t_hcl-1)*nlayermx + lyr_m ), &
+!               dHOX_dPQ(lyr_m, (t_hocl-1)*nlayermx + lyr_m ), &
+!               dHOX_dPQ(lyr_m, (t_cloo-1)*nlayermx + lyr_m ), &
+!               dHOX_dPQ(lyr_m, (t_ch3ocl-1)*nlayermx + lyr_m ), &
+!               dHOX_dPQ( lyr_m,(t_clco-1)*nlayermx + lyr_m ), &
+!               dHOX_dPQ( lyr_m,(t_clo3-1)*nlayermx + lyr_m ), &
+!               dHOX_dPQ(lyr_m, (t_hclo4-1)*nlayermx + lyr_m ), &
+!               dHOX_dPQ(lyr_m, (t_clo4-1)*nlayermx + lyr_m )
+
+
+
+
+! IF ( lyr_m == nlayermx ) STOP 
+
+
+
+
+
+
 
 
 
