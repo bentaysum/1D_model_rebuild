@@ -2497,18 +2497,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
           loss(l,i_ch3coooh) = cab077(l)*cc(l,i_oh)
      $                       + j(l,j_ch3coooh)
-     
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c        hcoch2o2
-Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-          production(l,i_hcoch2o2) = 
-     $         cab058(l)*cc(l,i_ch3cho)*cc(l,i_oh)
-     $       + cab085(l)*cc(l,i_hooch2cho)*cc(l,i_oh)
-     $       + j(l,j_hoch2cho_oh)*cc(l,i_hoch2cho)
-     
-          loss(l,i_hcoch2o2) = cab078(l)*ro2(l) 
-     $                       + cab079(l)*cc(l,i_ho2)
-     $                       + cab080(l)*cc(l,i_ho2)
+
           
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        glyox
