@@ -1504,12 +1504,6 @@ c     Cl Production and Loss
      $      + j(l,j_cl2o2)*cc(l,i_cl2o2)
      $      )/MAX( cc(l,i_clo), dens(l)*1.e-30 )
 
-C         pcl = cl002(l)*cc(l,i_o)
-C      $      + 2.*cl004(l)*cc(l,i_clo)
-C      $      + cl005(l)*cc(l,i_clo)
-C      $      + 0.94*cl012(l)*cc(l,i_oh)
-C      $      + j(l,j_clo)
-
         lcl = cl001(l)*cc(l,i_o3) 
      $      + cl008(l)*cc(l,i_h2)
      $      + cl009(l)*cc(l,i_ho2)
@@ -1544,13 +1538,6 @@ c     ClO Production and Loss
      $       + cl053(l)*cc(l,i_clo4)*cc(l,i_cl)
      $       )/MAX( cc(l,i_cl), dens(l)*1.e-30 )
 
-C         pclo = cl001(l)*cc(l,i_o3)
-C      $       + cl010(l)*cc(l,i_ho2)
-C      $       + 0.5*cl022(l)*cc(l,i_ch3o2)
-C      $       + 2.*cl024(l)*cc(l,i_cloo)
-C      $       + cl053(l)*cc(l,i_clo4)
-
-
         lclo = cl002(l)*cc(l,i_o)
      $       + cl003(l)*cc(l,i_clo)
      $       + cl004(l)*cc(l,i_clo)
@@ -1567,12 +1554,6 @@ C      $       + cl053(l)*cc(l,i_clo4)
      $       + j(l,j_clo)
 
 c 	  Partition Function
-C         rclo_cl(l) = (pclo/MAX(cc(l,i_cl),1.e-30*dens(l)) 
-C      $             + lcl)
-C      $             /
-C      $             ( pcl/MAX(cc(l,i_clo),1.e-30*dens(l)) 
-C      $             + lclo ) 
-
         rclo_cl(l) = (pclo+lcl)/(pcl+lclo)
 
 c       Cl Number Density
