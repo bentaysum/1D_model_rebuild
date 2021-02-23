@@ -110,6 +110,8 @@ IF ( initialisation ) THEN
                         + (TLM_ident( clo_j, : )+ TLM_trans( clo_j, :)*ptimestep) &
                         *Avmr(l,t_clo)*dens(l)
 
+        dClOx0_dPQ(l,:) = dClOx_dPQ(l,:)
+
       ENDDO
 
     ENDIF 
