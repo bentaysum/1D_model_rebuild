@@ -35,7 +35,8 @@
           ALLOCATE(dNO2_dPQ(nlayermx,nqmx*nlayermx))
       
           IF (igcm_cl .ne. 0 ) THEN 
-            ALLOCATE( dCLOX_dPQ(nlayermx,nqmx*nlayermx) )
+            ALLOCATE( dClOx_dPQ(nlayermx,nqmx*nlayermx) )
+            ALLOCATE( dClOx0_dPQ(nlayermx,nqmx*nlayermx) )
           ENDIF 
 
           ! Initialise to 0

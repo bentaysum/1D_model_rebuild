@@ -36,7 +36,7 @@ REAL, DIMENSION(:,:), allocatable, SAVE :: dNO_dPQ(:,:)
 REAL, DIMENSION(:,:), allocatable, SAVE :: dNO2_dPQ(:,:)
 
 ! Linearised ClOx = [Cl] + [ClO]
-REAL, DIMENSION(:,:), allocatable, SAVE :: dCLOX_dPQ(:,:)
+REAL, DIMENSION(:,:), allocatable, SAVE :: dClOx_dPQ(:,:), dClOx0_dPQ(:,:)
 
 
 CONTAINS

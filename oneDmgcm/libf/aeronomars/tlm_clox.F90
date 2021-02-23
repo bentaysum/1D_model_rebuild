@@ -89,6 +89,8 @@ REAL drclo_dpq(nqmx*nlayermx) ! Linearised partition function
 INTEGER iq ! Tracer iterator
 INTEGER x_j
 
+REAL dCl_dPQ(nqmx*nlayermx), dClO_dPQ(nqmx*nlayermx) ! Linearised Number Densities 
+
 real j(nd) ! photolysis values 
 
 ! Oxygen Reaction Rates 
@@ -529,11 +531,75 @@ drclo_dpq = A(1)*dLcl_dPQ + A(2)*dPclo_dPQ - A(3)*dccn_dpq( (t_cl-1)*nlayermx + 
 ! ==================================================== !
 ! Stage Two : Linearised [Cl] and [ClO] number density
 ! ==================================================== !
+!
+! [Cl]^t = [ClOx]^t/( 1 + rclo_cl )
+!
+! [ClO]^t = [Cl]^t * rclo_cl 
+!
+! ---------------------------------
+!
+! [Cl]^t ' = (1. + rclo_cl)^-1 * [ClOx]^t ' 
+!          - [ClOx]^t/(1. + rclo_cl)^2 * rclo_cl ' 
+!
+! [ClO]^t ' = rclo_cl * [Cl]^t ' 
+!           + [Cl]^t * rclo_cl ' 
+
+dCl_dPQ = dClOx_dPQ(lyr_m,:)/( 1. + rclo_cl ) &
+        - drclo_dpq*cc(i_cl)/( 1. + rclo_cl )
+
+dClO_dPQ = rclo_cl*dCl_dPQ &
+         + cc(i_cl)*drclo_dpq 
+
+! ==================================================== !
+! Stage Three : Insertion into Arrays
+! ==================================================== !
+
+! Cl
+x_j = (t_cl-1)*nlayermx + lyr_m 
+dccn_dpq( x_j, : ) = dCl_dPQ 
+
+! ClO 
+x_j = (t_clo-1)*nlayermx + lyr_m 
+dccn_dpq( x_j, : ) = dClO_dPQ 
+
+
+RETURN
+! IF ( lyr_m == 1 ) WRITE(*,"(13A15)") "Cl", "ClO", "Cl2", "OClO", "Cl2O2", &
+!                                    "HCl", "HOCl", "ClOO", "CH3OCl", "ClCO", &
+!                                    "ClO3", "HClO4", "ClO4"
+
+! ! write(*,"(13E15.7)") dCl_dPQ( (t_cl-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_clo-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_cl2-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_oclo-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_cl2o2-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_hcl-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_hocl-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_cloo-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_ch3ocl-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_clco-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_clo3-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_hclo4-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_clo4-1)*nlayermx + lyr_m )
+
+! write(*,"(13E15.7)") dClO_dPQ( (t_cl-1)*nlayermx + lyr_m ), &
+!               dClO_dPQ( (t_clo-1)*nlayermx + lyr_m ), &
+!               dClO_dPQ( (t_cl2-1)*nlayermx + lyr_m ), &
+!               dClO_dPQ( (t_oclo-1)*nlayermx + lyr_m ), &
+!               dClO_dPQ( (t_cl2o2-1)*nlayermx + lyr_m ), &
+!               dClO_dPQ( (t_hcl-1)*nlayermx + lyr_m ), &
+!               dClO_dPQ( (t_hocl-1)*nlayermx + lyr_m ), &
+!               dClO_dPQ( (t_cloo-1)*nlayermx + lyr_m ), &
+!               dClO_dPQ( (t_ch3ocl-1)*nlayermx + lyr_m ), &
+!               dClO_dPQ( (t_clco-1)*nlayermx + lyr_m ), &
+!               dClO_dPQ( (t_clo3-1)*nlayermx + lyr_m ), &
+!               dClO_dPQ( (t_hclo4-1)*nlayermx + lyr_m ), &
+!               dClO_dPQ( (t_clo4-1)*nlayermx + lyr_m )
 
 
 
 
-IF ( lyr_m == nlayermx ) STOP 
+! IF ( lyr_m == nlayermx ) STOP 
 
 
 END SUBROUTINE

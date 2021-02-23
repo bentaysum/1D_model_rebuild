@@ -42,6 +42,7 @@ INTEGER l ! Layer iterator
 
 INTEGER h_j, oh_j, ho2_j ! TLM Indices
 INTEGER o_j, o3_j ! TLM Indices 
+INTEGER cl_j, clo_j !TLM Indices
 INTEGER x_j ! TLM Indices
 
 
@@ -96,6 +97,24 @@ IF ( initialisation ) THEN
         ENDDO ! l 
     ENDIF ! of sza 
 
+    ! Linearised ClOx [if chlorine is active]
+    IF (igcm_cl .ne. 0) THEN 
+
+      DO l = 1, nlayermx 
+
+        cl_j = (t_cl-1)*nlayermx + l 
+        clo_j = (t_clo-1)*nlayermx + l 
+
+        dClOx_dPQ(l,:) = (TLM_ident( cl_j, : )+TLM_trans( cl_j, :)*ptimestep) &
+                        *Avmr(l,t_cl)*dens(l) &
+                        + (TLM_ident( clo_j, : )+ TLM_trans( clo_j, :)*ptimestep) &
+                        *Avmr(l,t_clo)*dens(l)
+
+      ENDDO
+
+    ENDIF 
+
+
 
     ! All Trace Gas Species
     ! ---------------------
@@ -132,6 +151,7 @@ dcc0_dpq = dccn_dpq
 dHOX0_dPQ = dHOX_dPQ 
 
 IF ( sza .le. 95. ) dOX0_dPQ = dOX_dPQ 
+IF ( igcm_cl .ne. 0 ) dClOx0_dPQ = dClOx_dPQ
 
 IF ( istep < phychemrat ) RETURN 
 
