@@ -564,42 +564,7 @@ dccn_dpq( x_j, : ) = dClO_dPQ
 
 
 RETURN
-! IF ( lyr_m == 1 ) WRITE(*,"(13A15)") "Cl", "ClO", "Cl2", "OClO", "Cl2O2", &
-!                                    "HCl", "HOCl", "ClOO", "CH3OCl", "ClCO", &
-!                                    "ClO3", "HClO4", "ClO4"
 
-! ! write(*,"(13E15.7)") dCl_dPQ( (t_cl-1)*nlayermx + lyr_m ), &
-! !               dCl_dPQ( (t_clo-1)*nlayermx + lyr_m ), &
-! !               dCl_dPQ( (t_cl2-1)*nlayermx + lyr_m ), &
-! !               dCl_dPQ( (t_oclo-1)*nlayermx + lyr_m ), &
-! !               dCl_dPQ( (t_cl2o2-1)*nlayermx + lyr_m ), &
-! !               dCl_dPQ( (t_hcl-1)*nlayermx + lyr_m ), &
-! !               dCl_dPQ( (t_hocl-1)*nlayermx + lyr_m ), &
-! !               dCl_dPQ( (t_cloo-1)*nlayermx + lyr_m ), &
-! !               dCl_dPQ( (t_ch3ocl-1)*nlayermx + lyr_m ), &
-! !               dCl_dPQ( (t_clco-1)*nlayermx + lyr_m ), &
-! !               dCl_dPQ( (t_clo3-1)*nlayermx + lyr_m ), &
-! !               dCl_dPQ( (t_hclo4-1)*nlayermx + lyr_m ), &
-! !               dCl_dPQ( (t_clo4-1)*nlayermx + lyr_m )
-
-! write(*,"(13E15.7)") dClO_dPQ( (t_cl-1)*nlayermx + lyr_m ), &
-!               dClO_dPQ( (t_clo-1)*nlayermx + lyr_m ), &
-!               dClO_dPQ( (t_cl2-1)*nlayermx + lyr_m ), &
-!               dClO_dPQ( (t_oclo-1)*nlayermx + lyr_m ), &
-!               dClO_dPQ( (t_cl2o2-1)*nlayermx + lyr_m ), &
-!               dClO_dPQ( (t_hcl-1)*nlayermx + lyr_m ), &
-!               dClO_dPQ( (t_hocl-1)*nlayermx + lyr_m ), &
-!               dClO_dPQ( (t_cloo-1)*nlayermx + lyr_m ), &
-!               dClO_dPQ( (t_ch3ocl-1)*nlayermx + lyr_m ), &
-!               dClO_dPQ( (t_clco-1)*nlayermx + lyr_m ), &
-!               dClO_dPQ( (t_clo3-1)*nlayermx + lyr_m ), &
-!               dClO_dPQ( (t_hclo4-1)*nlayermx + lyr_m ), &
-!               dClO_dPQ( (t_clo4-1)*nlayermx + lyr_m )
-
-
-
-
-! IF ( lyr_m == nlayermx ) STOP 
 
 
 END SUBROUTINE

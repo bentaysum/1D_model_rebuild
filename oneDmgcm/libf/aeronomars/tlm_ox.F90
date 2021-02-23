@@ -32,7 +32,25 @@ SUBROUTINE tlm_ox(iter, lyr_m, dens,&
 					cab091, cab092, cab093, cab094, cab095, &
 					cab096, cab097, cab098, cab099, cab100, & 
 					cab101, cab102, cab103, cab104, cab105, &
-					cab106, cab107,& 
+					cab106, cab107, &
+                    cl001, cl002, cl003 &
+                    ,cl004, cl005, cl006 &
+                    ,cl007, cl008, cl009 &
+                    ,cl010, cl011, cl012 &
+                    ,cl013, cl014, cl015 &
+                    ,cl016, cl017, cl018 &
+                    ,cl019, cl020, cl021 &
+                    ,cl022, cl023, cl024 &
+                    ,cl025, cl026, cl027 &
+                    ,cl028, cl029, cl030 &
+                    ,cl031, cl032, cl033 &
+                    ,cl034, cl035, cl036 &
+                    ,cl037, cl038, cl039 &
+                    ,cl040, cl041, cl042 &
+                    ,cl043, cl044, cl045 &
+                    ,cl046, cl047, cl048 &
+                    ,cl049, cl050, cl051 &
+                    ,cl052, cl053, cl054, & 
 					no, no2, &
 					dccn_dpq, dcc0_dpq,&
 					dOX_dPQ, dOX0_dPQ)
@@ -122,6 +140,26 @@ real cab001, cab002, cab003, &
      cab100, cab101, cab102, &
      cab103, cab104, cab105, &
      cab106, cab107
+
+! Chlorine Reaction Rates 
+real cl001, cl002, cl003 &
+ ,cl004, cl005, cl006 &
+ ,cl007, cl008, cl009 &
+ ,cl010, cl011, cl012 &
+ ,cl013, cl014, cl015 &
+ ,cl016, cl017, cl018 &
+ ,cl019, cl020, cl021 &
+ ,cl022, cl023, cl024 &
+ ,cl025, cl026, cl027 &
+ ,cl028, cl029, cl030 &
+ ,cl031, cl032, cl033 &
+ ,cl034, cl035, cl036 &
+ ,cl037, cl038, cl039 &
+ ,cl040, cl041, cl042 &
+ ,cl043, cl044, cl045 &
+ ,cl046, cl047, cl048 &
+ ,cl049, cl050, cl051 &
+ ,cl052, cl053, cl054
 
 ! ====================================================================================
 !									Local Variables
@@ -232,16 +270,17 @@ integer, parameter :: i_clox = 73
 ! Photolysis indexes as in photochemistry.F
 ! =========================================
 integer j_o2_o, j_o2_o1d, j_co2_o, j_co2_o1d, &
-		j_o3_o1d, j_o3_o, j_h2o, j_hdo, j_h2o2, &
-		j_ho2, j_no2, j_ch4_ch3_h, j_ch4_1ch2_h2, &
-		j_ch4_3ch2_h_h, j_ch4_ch_h2_h, j_ch3o2h, &
-		j_ch2o_co, j_ch2o_hco, j_ch3oh, j_c2h6, j_hcl, &
-		j_hocl, j_clo, j_so2, j_so, j_h2s, j_so3, &
-		j_hno3, j_hno4, &
-		j_ch3cho_ch3, j_ch3cho_ch4, j_ch3cho_h, &
-		j_hoch2ooh, j_hoch2cho_hco, j_hoch2cho_co, &
-		j_hoch2cho_oh, j_glyox_hco, j_glyox_hcho, &
-		j_glyox_h2, j_ch3cooh, j_ch3coooh, j_ch3cocooh
+          j_o3_o1d, j_o3_o, j_h2o, j_hdo, j_h2o2, &
+          j_ho2, j_no2, j_ch4_ch3_h, j_ch4_1ch2_h2, &
+          j_ch4_3ch2_h_h, j_ch4_ch_h2_h, j_ch3o2h, &
+          j_ch2o_co, j_ch2o_hco, j_ch3oh, j_c2h6, j_hcl, &
+          j_hocl, j_clo, j_so2, j_so, j_h2s, j_so3, &
+          j_hno3, j_hno4, &
+          j_ch3cho_ch3, j_ch3cho_ch4, j_ch3cho_h, & 
+          j_hoch2ooh, j_hoch2cho_hco, j_hoch2cho_co, &
+          j_hoch2cho_oh, j_glyox_hco, j_glyox_hcho, &
+          j_glyox_h2, j_ch3cooh, j_ch3coooh, j_ch3cocooh, &
+          j_cl2, j_cloo, j_cl2o2, j_oclo
 
 j_o2_o         =  1      ! o2 + hv     -> o + o
 j_o2_o1d       =  2      ! o2 + hv     -> o + o(1d)
@@ -272,24 +311,30 @@ j_h2s          =  26     ! h2s + hv    -> hs + s
 j_so3          =  27     ! so2 + hv    -> so2 + o
 j_hno3         =  28     ! hno3 + hv   -> oh + no2
 j_hno4         =  29     ! hno4 + hv   -> ho2 + no2
+
 j_ch3cho_ch3   =  30     ! ch3cho + hv -> ch3 + hco 
 j_ch3cho_ch4   =  31     ! ch3cho + hv -> ch4 + co 
 j_ch3cho_h     =  32     ! ch3cho + hv -> ch3co + h 
 j_hoch2ooh     =  33     ! hoch2ooh + hv -> hoch2o + oh 
-						   ! hoch2o + o2 -> hcooh + ho2 
-						   ! = hoch2ooh + o2 + hv -> hcooh + ho2 + oh
-						   ! handle via 
+                     ! hoch2o + o2 -> hcooh + ho2 
+                     ! = hoch2ooh + o2 + hv -> hcooh + ho2 + oh
+                     ! handle via 
 j_hoch2cho_hco =  34     ! hoch2cho + hv -> ch2oh + hco 
 j_hoch2cho_co  =  35     ! hoch2cho + hv -> ch3oh + co
 j_hoch2cho_oh  =  36     ! hoch2cho + hv -> ch2cho + oh 
-						   ! ch2cho + o2   -> hcoch2o2 
-						   ! hoch2cho + o2 + hv -> hcoch2o2 + oh
+                     ! ch2cho + o2   -> hcoch2o2 
+                     ! hoch2cho + o2 + hv -> hcoch2o2 + oh
 j_glyox_hco    =  37     ! glyoxal  + hv -> hco + hco 
 j_glyox_h2     =  38     ! glyoxal  + hv -> h2 + 2co 
 j_glyox_hcho   =  39     ! glyoxal  + hv -> hcho + co 
 j_ch3cooh      =  40     ! ch3cooh  + hv -> ch3 + cooh 
 j_ch3coooh     =  41     ! ch3c(o)ooh + hv -> ch3 + oh + co2 
 j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products 
+
+j_cl2          = 43      ! cl2 + hv -> 2.*cl
+j_cloo         = 44      ! cloo + hv -> Products 
+j_oclo         = 45      ! oclo + hv -> clo + o
+j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo 
 
 ! ============================================ ! 
 ! STAGE 0: INITIALISATION OF THE ARRAYS 
@@ -334,6 +379,12 @@ ro_o3_denominator = a001*cc(i_o2)
 	dLo1d_coeff(t_o3) = b005 + b006 
 	dLo1d_coeff(t_ch4) = b007 + b008 + b009 
 
+IF ( igcm_cl .ne. 0 ) THEN 
+	dLo1d_coeff(t_cl2) = cl034 + cl035 
+	dLo1d_coeff(t_hcl) = cl039 
+ENDIF 
+
+
 !	1.1.3: Construct linearised production and 
 !		   Loss vectors 
 !	-------------------------------------------
@@ -349,7 +400,7 @@ ro_o3_denominator = a001*cc(i_o2)
 !	1.1.4: Coefficients
 !	-------------------
 
-	loss_o1d = (b001*cc(i_co2) &
+	loss_o1d = b001*cc(i_co2) &
 				+ b002*cc(i_h2o) &
 				+ b003*cc(i_h2) &
 				+ b004*cc(i_o2) &
@@ -357,7 +408,10 @@ ro_o3_denominator = a001*cc(i_o2)
 				+ b006*cc0(i_o3) &
 				+ b007*cc(i_ch4) &
 				+ b008*cc(i_ch4) &
-				+ b009*cc(i_ch4))
+				+ b009*cc(i_ch4) &
+				+ cl034*cc(i_cl2) &
+				+ cl035*cc(i_cl2) &
+				+ cl039*cc(i_hcl)
 
 	production_o1d = j(j_co2_o1d)*cc(I_co2) &
 	                        + j(j_o2_o1d)*cc(i_o2) &
@@ -411,6 +465,8 @@ ro_o3_denominator = a001*cc(i_o2)
 	IF ( igcm_ch3 .ne. 0 ) dN_coef(t_ch3) = cab004   
 	IF ( igcm_ch3o2 .ne. 0 ) dN_coef(t_ch3o2) = cab010   
 	IF ( igcm_ch3o .ne. 0 ) dN_coef(t_ch3o) = cab016  
+
+    IF ( igcm_cl .ne. 0 ) dN_coef(t_cl) = cl001 + cl044
 
 !	2.3: Linearised Denominator Coefficients
 !	----------------------------------------
@@ -511,10 +567,20 @@ ro_o3_denominator = a001*cc(i_o2)
 	dPox_coef(:) = 0.
 	dPox_coef(t_co2) = j(j_co2_o) + j(j_co2_o1d)
 	dPox_coef(t_o2) = 2.*j(j_o2_o) + 2.*j(j_o2_o1d)
+	dPox_coef(t_o1d) =cl034*cc(i_cl2) + cl039*cc(i_hcl)*0.12 
 	dPox_coef(t_ho2) = j(j_ho2) + c006*cc(i_h) &
 					 + d003*no
 	dPox_coef(t_h) = c006*cc(i_ho2)
 	dPox_coef(t_oh) = 2.*c013*cc(i_oh)
+IF ( igcm_cl .ne. 0 ) THEN 
+	dPox_coef(t_clo) = j(j_clo) 
+	dPox_coef(t_cloo) = j(j_cloo) 
+	dPox_coef(t_oclo) = j(j_oclo)
+	dPox_coef(t_cl2) = cl034*cc(i_o1d)
+	dPox_coef(t_hcl) = cl039*cc(i_o1d)*0.12
+ENDIF 
+
+
 
 	dLox_coef(:) = 0.
 	dLox_coef(t_co) = e002*cc(i_o)
@@ -524,11 +590,14 @@ ro_o3_denominator = a001*cc(i_o2)
 					+ c012*cc(i_h2o2) + e002*cc(i_co) &
 					+ cab002*cc(i_ch4) + cab012*cc(i_ch3o2) &
 					+ cab017*cc(i_ch3o) + cab020*cc(i_hcho) &
-					+ cab021*cc(i_hco) + cab037*cc(i_c2h6) 
+					+ cab021*cc(i_hco) + cab037*cc(i_c2h6) &
+					+ cl002*cc(i_clo) + cl040*cc(i_hcl) &
+					+ cl042*cc(i_hocl) + cl051*cc(i_oclo)
 	dLox_coef(t_o3) = 2.*a003*cc(i_o) + c003*cc(i_h) &
 					+ c014*cc(i_oh) + c015*cc(i_ho2) &
 					+ cab004*cc(i_ch3) + cab010*cc(i_ch3o2) &
-					+ cab016*cc(i_ch3o) 
+					+ cab016*cc(i_ch3o) + cl001*cc(i_cl) &
+					+ cl044*cc(i_cl) + cl052*cc(i_oclo)
 	dLox_coef(t_h) = c003*cc(i_o3) 
 	dLox_coef(t_oh) = c002*cc(i_o) + c014*cc(i_o3) 
 	dLox_coef(t_ho2) = c001*cc(i_o) + c015*cc(i_o3) 
@@ -540,6 +609,17 @@ ro_o3_denominator = a001*cc(i_o2)
 	IF ( igcm_ch3o .ne. 0 ) dLox_coef(t_ch3o) = cab016*cc(i_o3) + cab017*cc(i_o)
 	IF ( igcm_hcho .ne. 0 ) dLox_coef(t_hcho) = cab020*cc(i_o)
 	IF ( igcm_hco .ne. 0 ) dLox_coef(t_hco) = cab021*cc(i_o)
+
+IF (igcm_cl .ne. 0) THEN 
+	dLox_coef(t_cl) = cl001*cc(I_o3) &
+					+ cl044*cc(i_o3)
+	dLox_coef(t_clo) = cl002*cc(i_o)
+	dLox_coef(t_hcl) = cl040*cc(i_o)
+	dLox_coef(t_hocl) = cl042*cc(i_o)
+	dLox_coef(t_oclo) = cl051*cc(i_o) &
+					  + cl052*cc(i_o3)
+ENDIF 
+
 
 !	5.3: Calculate linearised produciton and loss 
 !	---------------------------------------------
@@ -563,7 +643,48 @@ ro_o3_denominator = a001*cc(i_o2)
                   + ox_gamma(2)*d003*cc(i_ho2)*dNO_dPQ(lyr_m,:) &
                   - ox_gamma(3)*d001*cc(i_o)*dNO2_dPQ(lyr_m,:)
 
-				
+
+
+
+! IF ( lyr_m == 1 ) WRITE(*,"(13A15)") "Cl", "ClO", "Cl2", "OClO", "Cl2O2", &
+!                                    "HCl", "HOCl", "ClOO", "CH3OCl", "ClCO", &
+!                                    "ClO3", "HClO4", "ClO4"
+
+! ! write(*,"(13E15.7)") dCl_dPQ( (t_cl-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_clo-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_cl2-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_oclo-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_cl2o2-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_hcl-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_hocl-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_cloo-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_ch3ocl-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_clco-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_clo3-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_hclo4-1)*nlayermx + lyr_m ), &
+! !               dCl_dPQ( (t_clo4-1)*nlayermx + lyr_m )
+
+! write(*,"(13E15.7)") dOX_dPQ( lyr_m, (t_cl-1)*nlayermx + lyr_m ), &
+!               dOX_dPQ( lyr_m,(t_clo-1)*nlayermx + lyr_m ), &
+!               dOX_dPQ(lyr_m, (t_cl2-1)*nlayermx + lyr_m ), &
+!               dOX_dPQ( lyr_m,(t_oclo-1)*nlayermx + lyr_m ), &
+!               dOX_dPQ(lyr_m, (t_cl2o2-1)*nlayermx + lyr_m ), &
+!               dOX_dPQ( lyr_m,(t_hcl-1)*nlayermx + lyr_m ), &
+!               dOX_dPQ(lyr_m, (t_hocl-1)*nlayermx + lyr_m ), &
+!               dOX_dPQ(lyr_m, (t_cloo-1)*nlayermx + lyr_m ), &
+!               dOX_dPQ(lyr_m, (t_ch3ocl-1)*nlayermx + lyr_m ), &
+!               dOX_dPQ( lyr_m,(t_clco-1)*nlayermx + lyr_m ), &
+!               dOX_dPQ( lyr_m,(t_clo3-1)*nlayermx + lyr_m ), &
+!               dOX_dPQ(lyr_m, (t_hclo4-1)*nlayermx + lyr_m ), &
+!               dOX_dPQ(lyr_m, (t_clo4-1)*nlayermx + lyr_m )
+
+
+
+
+! IF ( lyr_m == nlayermx ) STOP 
+
+
+
 RETURN 
 
 
