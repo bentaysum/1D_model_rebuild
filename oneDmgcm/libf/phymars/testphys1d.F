@@ -919,8 +919,6 @@ C         ENDIF
           
           DO ilayer=1,nlayer
 
-             if ( ( trim(noms(iq)) == "ch4" ) .and. ( ilayer == 1 ) )
-     $        cycle 
 
              q(ilayer,iq)=q(ilayer,iq)+dtphys*dq(ilayer,iq)
          

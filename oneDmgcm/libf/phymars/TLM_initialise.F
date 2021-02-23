@@ -33,6 +33,10 @@
           ALLOCATE(dNO_dPQ(nlayermx,nqmx*nlayermx))
           
           ALLOCATE(dNO2_dPQ(nlayermx,nqmx*nlayermx))
+      
+          IF (igcm_cl .ne. 0 ) THEN 
+            ALLOCATE( dCLOX_dPQ(nlayermx,nqmx*nlayermx) )
+          ENDIF 
 
           ! Initialise to 0
           tlm(:,:) = 0.
@@ -215,6 +219,45 @@
           elseif (TRIM(noms(iq)) == "hoch2co3h") then
 		  t_hoch2co3h = iq 
 
+          elseif (TRIM(noms(iq)) == "cl") then
+            t_cl = iq 
+
+          elseif (TRIM(noms(iq)) == "clo") then
+            t_clo = iq 
+
+          elseif (TRIM(noms(iq)) == "cl2") then
+            t_cl2 = iq 
+
+          elseif (TRIM(noms(iq)) == "oclo") then
+            t_oclo = iq 
+
+          elseif (TRIM(noms(iq)) == "cl2o2") then
+            t_cl2o2 = iq 
+
+          elseif (TRIM(noms(iq)) == "hcl") then
+            t_hcl = iq 
+
+          elseif (TRIM(noms(iq)) == "hocl") then
+            t_hocl = iq 
+
+          elseif (TRIM(noms(iq)) == "cloo") then
+            t_cloo = iq
+
+          elseif (TRIM(noms(iq)) == "ch3ocl") then
+            t_ch3ocl = iq 
+
+          elseif (TRIM(noms(iq)) == "clco") then
+            t_clco = iq
+
+          elseif (TRIM(noms(iq)) == "clo3") then
+            t_clo3 = iq 
+
+          elseif (TRIM(noms(iq)) == "hclo4") then
+            t_hclo4 = iq 
+
+          elseif (TRIM(noms(iq)) == "clo4") then
+            t_clo4 = iq 
+            
           endif
 		  
 		  

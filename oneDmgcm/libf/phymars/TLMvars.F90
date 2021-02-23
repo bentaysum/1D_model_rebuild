@@ -21,7 +21,9 @@ INTEGER t_co2, t_co, t_o, t_o1d, t_o2, t_o3, t_h, t_h2, t_oh, &
 	  t_ch2choh, t_ch3choho2, t_ch3cooh, t_ch3chohooh, t_ch3co, &
 	  t_ch3cooo, t_ch3coooh, t_hcoch2o2, t_glyox, t_hcoco, t_hooch2cho, &
 	  t_hoch2cho, t_hochcho, t_hoch2co, t_hoch2co3, t_hoch2co2h, &
-	  t_hcoco2h, t_hcoco3h, t_hcoco3, t_hoch2co3h, t_h2ovap, t_h2oice
+	  t_hcoco2h, t_hcoco3h, t_hcoco3, t_hoch2co3h, t_h2ovap, t_h2oice, &
+	  t_cl, t_clo, t_cl2, t_oclo, t_cl2o2, t_hcl, t_hocl, t_cloo, &
+	  t_ch3ocl, t_clco, t_clo3, t_hclo4, t_clo4 
 
 ! Array of coefficients used to calculated 
 ! linearised steady-state O2
@@ -33,6 +35,8 @@ REAL, DIMENSION(:,:), allocatable, SAVE :: dKpseudo_dPQ(:,:)
 REAL, DIMENSION(:,:), allocatable, SAVE :: dNO_dPQ(:,:)
 REAL, DIMENSION(:,:), allocatable, SAVE :: dNO2_dPQ(:,:)
 
+! Linearised ClOx = [Cl] + [ClO]
+REAL, DIMENSION(:,:), allocatable, SAVE :: dCLOX_dPQ(:,:)
 
 
 CONTAINS

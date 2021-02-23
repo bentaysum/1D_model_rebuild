@@ -1008,12 +1008,11 @@
       if (igcm_ch4 /= 0) then
 
 
-ch4vmr=2.33046543e-9
+ch4vmr=10.e-9
 
           do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
-                    if ( l > 1 ) ch4vmr = 0. 
                     pq(i,j,l,igcm_ch4) = ch4vmr*mmol(igcm_ch4)/mmean(i,j,l)
                end do
             end do
@@ -1785,7 +1784,7 @@ ch4vmr=2.33046543e-9
       end if 
       ! HCl
       if (igcm_hcl /= 0) then
-         vmr = 0.
+         vmr = 10.e-9
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm               

@@ -1528,7 +1528,7 @@ c     ClO Production and Loss
      $       + 2.*cl007(l)*cc(l,i_cl2o2)
      $       + cl010(l)*cc(l,i_ho2)*cc(l,i_cl)
      $       + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
-     $       + 0.5*cl022(l)*cc(l,i_ch3o2)
+     $       + 0.5*cl022(l)*cc(l,i_ch3o2)*cc(l,i_cl)
      $       + 2.*cl024(l)*cc(l,i_cloo)*cc(l,i_cl)
      $       + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
      $       + 0.22*cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)
@@ -1562,6 +1562,82 @@ c       Cl Number Density
 c       ClO Number Density
         cc(l,i_clo) = MAX( cc(l,i_cl)*rclo_cl(l),
      $                    1.E-30*dens(l) )
+
+
+
+c     ==============
+C     Tangent Linear 
+c     ==============
+      IF ( tlm_on ) THEN 
+      call tlm_clox(l, rclo_cl(l),
+     $             pcl, lcl, pclo, lclo,
+     $             cc(l,:), cc_prev(:),
+     $             nesp,
+     $             dccn_dpq, dcc0_dpq,
+     $             j(l,:),
+     $             a001(l), a002(l), a003(l),
+     $             b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),
+     $             b007(l), b008(l), b009(l),
+     $             c001(l), c002(l), c003(l), c004(l), c005(l), c006(l), 
+     $             c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),
+     $             c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),
+     $             e001(l), e002(l), e003(l),
+     $             cab001(l), cab002(l), cab003(l),
+     $             cab004(l), cab005(l), cab006(l),
+     $             cab007(l), cab008(l), cab009(l),
+     $             cab010(l), cab011(l), cab012(l),
+     $             cab013(l), cab014(l), cab015(l),
+     $             cab016(l), cab017(l), cab018(l), 
+     $             cab019(l), cab020(l), cab021(l), 
+     $             cab022(l), cab023(l), cab024(l), 
+     $             cab025(l), cab026(l), cab027(l), 
+     $             cab028(l), cab029(l), cab030(l),
+     $             cab031(l), cab032(l), cab033(l),
+     $             cab034(l), cab035(l), cab036(l),
+     $             cab037(l), cab038(l), cab039(l),
+     $             cab040(l), cab041(l), cab042(l),
+     $             cab043(l), cab044(l), cab045(l),
+     $             cab046(l), cab047(l), cab048(l),
+     $             cab049(l), cab050(l), cab051(l),
+     $             cab052(l), cab053(l), cab054(l),
+     $             cab055(l), cab056(l), cab057(l),
+     $             cab058(l), cab059(l), cab060(l),
+     $             cab061(l), cab062(l), cab063(l),
+     $             cab064(l), cab065(l), cab066(l),
+     $             cab067(l), cab068(l), cab069(l),
+     $             cab070(l), cab071(l), cab072(l),
+     $             cab073(l), cab074(l), cab075(l),
+     $             cab076(l), cab077(l), cab078(l),
+     $             cab079(l), cab080(l), cab081(l),
+     $             cab082(l), cab083(l), cab084(l),
+     $             cab085(l), cab086(l), cab087(l),
+     $             cab088(l), cab089(l), cab090(l),
+     $             cab091(l), cab092(l), cab093(l),
+     $             cab094(l), cab095(l), cab096(l),
+     $             cab097(l), cab098(l), cab099(l),
+     $             cab100(l), cab101(l), cab102(l),
+     $             cab103(l), cab104(l), cab105(l),
+     $             cab106(l), cab107(l),
+     $             cl001(l), cl002(l), cl003(l) 
+     $            ,cl004(l), cl005(l), cl006(l) 
+     $            ,cl007(l), cl008(l), cl009(l) 
+     $            ,cl010(l), cl011(l), cl012(l) 
+     $            ,cl013(l), cl014(l), cl015(l) 
+     $            ,cl016(l), cl017(l), cl018(l) 
+     $            ,cl019(l), cl020(l), cl021(l) 
+     $            ,cl022(l), cl023(l), cl024(l) 
+     $            ,cl025(l), cl026(l), cl027(l) 
+     $            ,cl028(l), cl029(l), cl030(l) 
+     $            ,cl031(l), cl032(l), cl033(l)
+     $            ,cl034(l), cl035(l), cl036(l)
+     $            ,cl037(l), cl038(l), cl039(l)
+     $            ,cl040(l), cl041(l), cl042(l)
+     $            ,cl043(l), cl044(l), cl045(l)
+     $            ,cl046(l), cl047(l), cl048(l)
+     $            ,cl049(l), cl050(l), cl051(l)
+     $            ,cl052(l), cl053(l), cl054(l) )
+
+      ENDIF 
 
 
       ENDDO 
