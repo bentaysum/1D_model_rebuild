@@ -32,6 +32,24 @@ SUBROUTINE tlm_hox(iter, lyr_m, dens,sza,&
 					cab096, cab097, cab098, cab099, cab100, & 
 					cab101, cab102, cab103, cab104, cab105, &
 					cab106, cab107, &
+                    cl001, cl002, cl003 &
+                    ,cl004, cl005, cl006 &
+                    ,cl007, cl008, cl009 &
+                    ,cl010, cl011, cl012 &
+                    ,cl013, cl014, cl015 &
+                    ,cl016, cl017, cl018 &
+                    ,cl019, cl020, cl021 &
+                    ,cl022, cl023, cl024 &
+                    ,cl025, cl026, cl027 &
+                    ,cl028, cl029, cl030 &
+                    ,cl031, cl032, cl033 &
+                    ,cl034, cl035, cl036 &
+                    ,cl037, cl038, cl039 &
+                    ,cl040, cl041, cl042 &
+                    ,cl043, cl044, cl045 &
+                    ,cl046, cl047, cl048 &
+                    ,cl049, cl050, cl051 &
+                    ,cl052, cl053, cl054, &
                     dccn_dpq, dcc0_dpq, &
                     dHOX_dPQ, dHOX0_dPQ, &
                     k_pseudo)
@@ -130,6 +148,25 @@ real cab001, cab002, cab003, &
      cab100, cab101, cab102, &
      cab103, cab104, cab105, &
      cab106, cab107
+! Chlorine Reaction Rates 
+real cl001, cl002, cl003 &
+ ,cl004, cl005, cl006 &
+ ,cl007, cl008, cl009 &
+ ,cl010, cl011, cl012 &
+ ,cl013, cl014, cl015 &
+ ,cl016, cl017, cl018 &
+ ,cl019, cl020, cl021 &
+ ,cl022, cl023, cl024 &
+ ,cl025, cl026, cl027 &
+ ,cl028, cl029, cl030 &
+ ,cl031, cl032, cl033 &
+ ,cl034, cl035, cl036 &
+ ,cl037, cl038, cl039 &
+ ,cl040, cl041, cl042 &
+ ,cl043, cl044, cl045 &
+ ,cl046, cl047, cl048 &
+ ,cl049, cl050, cl051 &
+ ,cl052, cl053, cl054
 
 ! Tracer indexing as in photochemistry.F 
 ! ======================================
@@ -214,16 +251,17 @@ integer, parameter :: i_clox = 73
 ! Photolysis indexes as in photochemistry.F
 ! =========================================
 integer j_o2_o, j_o2_o1d, j_co2_o, j_co2_o1d, &
-        j_o3_o1d, j_o3_o, j_h2o, j_hdo, j_h2o2, &
-        j_ho2, j_no2, j_ch4_ch3_h, j_ch4_1ch2_h2, &
-        j_ch4_3ch2_h_h, j_ch4_ch_h2_h, j_ch3o2h, &
-        j_ch2o_co, j_ch2o_hco, j_ch3oh, j_c2h6, j_hcl, &
-        j_hocl, j_clo, j_so2, j_so, j_h2s, j_so3, &
-        j_hno3, j_hno4, &
-        j_ch3cho_ch3, j_ch3cho_ch4, j_ch3cho_h, &
-        j_hoch2ooh, j_hoch2cho_hco, j_hoch2cho_co, &
-        j_hoch2cho_oh, j_glyox_hco, j_glyox_hcho, &
-        j_glyox_h2, j_ch3cooh, j_ch3coooh, j_ch3cocooh
+          j_o3_o1d, j_o3_o, j_h2o, j_hdo, j_h2o2, &
+          j_ho2, j_no2, j_ch4_ch3_h, j_ch4_1ch2_h2, &
+          j_ch4_3ch2_h_h, j_ch4_ch_h2_h, j_ch3o2h, &
+          j_ch2o_co, j_ch2o_hco, j_ch3oh, j_c2h6, j_hcl, &
+          j_hocl, j_clo, j_so2, j_so, j_h2s, j_so3, &
+          j_hno3, j_hno4, &
+          j_ch3cho_ch3, j_ch3cho_ch4, j_ch3cho_h, & 
+          j_hoch2ooh, j_hoch2cho_hco, j_hoch2cho_co, &
+          j_hoch2cho_oh, j_glyox_hco, j_glyox_hcho, &
+          j_glyox_h2, j_ch3cooh, j_ch3coooh, j_ch3cocooh, &
+          j_cl2, j_cloo, j_cl2o2, j_oclo
 
 ! Local Variables 
 ! ===============
@@ -264,7 +302,9 @@ REAL dHO2_dPQ(nqmx*nlayermx) ! d( CC[HO2] )/d(PQ)
 REAL GAMMA_OH(2) ! Coefficients
 REAL dOH_dPQ(nqmx*nlayermx) ! d( CC[HO2] )/d(PQ) 
 
-
+! =================================================== !
+!     numbering of photolysis rates
+! =================================================== !
 j_o2_o         =  1      ! o2 + hv     -> o + o
 j_o2_o1d       =  2      ! o2 + hv     -> o + o(1d)
 j_co2_o        =  3      ! co2 + hv    -> co + o
@@ -294,17 +334,19 @@ j_h2s          =  26     ! h2s + hv    -> hs + s
 j_so3          =  27     ! so2 + hv    -> so2 + o
 j_hno3         =  28     ! hno3 + hv   -> oh + no2
 j_hno4         =  29     ! hno4 + hv   -> ho2 + no2
+
 j_ch3cho_ch3   =  30     ! ch3cho + hv -> ch3 + hco 
 j_ch3cho_ch4   =  31     ! ch3cho + hv -> ch4 + co 
 j_ch3cho_h     =  32     ! ch3cho + hv -> ch3co + h 
 j_hoch2ooh     =  33     ! hoch2ooh + hv -> hoch2o + oh 
-                         ! hoch2o + o2 -> hcooh + ho2 
-                         ! = hoch2ooh + o2 + hv -> hcooh + ho2 + oh
+                     ! hoch2o + o2 -> hcooh + ho2 
+                     ! = hoch2ooh + o2 + hv -> hcooh + ho2 + oh
+                     ! handle via 
 j_hoch2cho_hco =  34     ! hoch2cho + hv -> ch2oh + hco 
 j_hoch2cho_co  =  35     ! hoch2cho + hv -> ch3oh + co
 j_hoch2cho_oh  =  36     ! hoch2cho + hv -> ch2cho + oh 
-                         ! ch2cho + o2   -> hcoch2o2 
-                         ! hoch2cho + o2 + hv -> hcoch2o2 + oh
+                     ! ch2cho + o2   -> hcoch2o2 
+                     ! hoch2cho + o2 + hv -> hcoch2o2 + oh
 j_glyox_hco    =  37     ! glyoxal  + hv -> hco + hco 
 j_glyox_h2     =  38     ! glyoxal  + hv -> h2 + 2co 
 j_glyox_hcho   =  39     ! glyoxal  + hv -> hcho + co 
@@ -312,7 +354,10 @@ j_ch3cooh      =  40     ! ch3cooh  + hv -> ch3 + cooh
 j_ch3coooh     =  41     ! ch3c(o)ooh + hv -> ch3 + oh + co2 
 j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products 
 
-
+j_cl2          = 43      ! cl2 + hv -> 2.*cl
+j_cloo         = 44      ! cloo + hv -> Products 
+j_oclo         = 45      ! oclo + hv -> clo + o
+j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo 
 
 ! ============================================ ! 
 ! STAGE 1: LINEARISING PARTITION FUNCTIONS 
@@ -368,7 +413,10 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
             +   2.*j(j_ch4_3ch2_h_h)*cc(i_ch4) &
             +   j(j_ch4_ch_h2_h)*cc(i_ch4) &
             +   j(j_ch2o_hco)*cc(i_hcho) &
-            +   j(j_ch3oh)*cc(i_ch3oh)
+            +   j(j_ch3oh)*cc(i_ch3oh) &
+            +   j(j_hcl)*cc(i_hcl) &
+            +   cl008*cc(i_cl)*cc(i_h2) &
+            +   cl039*cc(i_hcl)*cc(i_o1d)*0.22 
 
 !   Loss of [H]
 !   -----------
@@ -377,7 +425,9 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
           + c006*cc_prev(i_ho2) &
           + c011*cc(i_o2) &
           + c018*cc_prev(i_h) &
-          + cab027*cc(i_hco)
+          + cab027*cc(i_hco) &
+          + cl037*cc(i_cl2) &
+          + cl041*cc(i_hcl)
 
 
 !   Production of [HO2]
@@ -394,7 +444,10 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
               + cab030*cc(i_hoch2o2)*ro2&
               + cab032*cc(i_hcooh)*cc_prev(i_oh)&
               + cab035*cc(i_hoch2oh)*cc_prev(i_oh)&
-              + j(j_hoch2ooh)*cc(i_hoch2ooh)
+              + j(j_hoch2ooh)*cc(i_hoch2ooh) & 
+              + cl011*cc(i_cl)*cc(i_h2o2) &
+              + cl012*cc(i_clo)*cc_prev(i_oh)*0.94 &
+              + cl050*cc(i_clo3)*cc_prev(i_oh) 
 
 
 !    Loss of [HO2]
@@ -410,7 +463,10 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
              + cab006*cc(i_ch3o2)&
              + cab007*cc(i_ch3o2)&
              + cab019*cc(i_hcho)&
-             + cab029*cc(i_hoch2o2)*0.8
+             + cab029*cc(i_hoch2o2)*0.8 &
+             + cl009*cc(i_cl) &
+             + cl010*cc(i_cl) &
+             + cl013*cc(i_clo)
 
 !   Partition Function denominator
 !   ------------------------------
@@ -430,7 +486,7 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 
 
 ! -------------------------------------
-! 1.2: Linearise Production of HO2 
+! 1.2: Linearise Loss of HO2 
 ! -------------------------------------
         B_h(:,:) = 0.
 
@@ -443,13 +499,19 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
         if ( t_hcho .ne. 0 )  B_H(1,t_hcho) = cab019  
         if ( t_hoch2o2 .ne. 0 ) B_H(1,t_hoch2o2) = 0.8*cab029 
 
+        IF ( igcm_cl .ne. 0 ) THEN 
+            B_H(1,t_cl) = cl009 + cl010 
+            B_H(1,t_clo) = cl013
+        ENDIF 
+
 ! -------------------------------------
 ! 1.2: Linearise Production of H  
 ! -------------------------------------
         B_H(2,t_co) = e001*cc_prev(i_oh)
 
         B_H(2,t_o1d) = b003*cc(i_h2) &
-                     + b008*cc(i_ch4) 
+                     + b008*cc(i_ch4) &
+                     + cl039*cc(i_hcl)*0.22 
 
         B_H(2,t_o) = c002*cc_prev(i_oh) &
                    + cab002*cc(i_ch4)*0.49 &
@@ -464,7 +526,8 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
         B_H(2,t_h2ovap) = j(j_h2o)  
 
         B_H(2,t_h2) = b003*cc(i_o1d) &
-                    + c010*cc_prev(i_oh) 
+                    + c010*cc_prev(i_oh) &
+                    + cl008*cc(i_cl) 
 
         B_H(2,t_ch4) = b008*cc(i_o1d) & 
                      + cab002*cc(i_o)*0.49 &
@@ -478,6 +541,13 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
         IF ( igcm_hcho .ne. 0 ) B_H(2,t_hcho) = j(j_ch2o_hco)  
         IF ( igcm_ch3oh .ne. 0 ) B_H(2,t_ch3oh) = j(j_ch3oh)  
 
+        IF ( igcm_cl .ne. 0 ) THEN 
+            B_H(2,t_hcl) = j(j_hcl) &
+                         + cl039*cc(i_o1d)*0.22 
+            B_H(2,t_cl) = cl008*cc(i_h2)
+        ENDIF 
+
+
 ! -------------------------------------
 ! 1.3: Linearise Loss of H  
 ! -------------------------------------
@@ -486,6 +556,10 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
         B_H(3,t_o2) = c011  
         B_H(3,t_h) = c018  
         IF ( igcm_hco .ne. 0 )  B_H(3,t_hco) = cab027   
+        IF ( igcm_cl .ne. 0 ) THEN 
+            B_H(3,t_cl2) = cl037 
+            B_H(3,t_hcl) = cl041 
+        ENDIF 
 
 
 ! -------------------------------------
@@ -506,10 +580,13 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
                     + cab011*cc(i_ch3o2) &
                     + cab013*cc(i_ch3oh)*0.85 &
                     + cab032*cc(i_hcooh) &
-                    + cab035*cc(i_hoch2o2) 
+                    + cab035*cc(i_hoch2o2) &
+                    + 0.94*cl012*cc(i_clo) &
+                    + cl050*cc(i_clo3)
 
         B_H(4,t_h2o2) = c009*cc_prev(i_oh) &
-                      + c012*cc(i_o)
+                      + c012*cc(i_o) &
+                      + cl011*cc(i_cl)
 
         IF ( igcm_ch3o2 .ne. 0 ) B_H(4,t_ch3o2) = cab011*cc_prev(i_oh) &
                                                 + cab030*cc(i_hoch2o2)
@@ -531,7 +608,11 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 
         IF ( igcm_hoch2ooh .ne. 0 ) B_H(4,t_hoch2ooh) = j(j_hoch2ooh)
 
-
+        IF ( igcm_cl .ne. 0 ) THEN 
+            B_H(4,t_cl) = cl011*cc(i_h2o2)
+            B_H(4,t_clo) = cl012*cc_prev(i_oh)*0.94 
+            B_H(4,t_clo3) = cl050*cc_prev(i_oh)
+        ENDIF 
 ! -------------------------------------
 ! 1.4: Construct the Linearised Partition 
 !      Function d[rh_ho2]/d[PQ]
@@ -565,8 +646,9 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 ! ----------------------------------
 ! 1.5: Calculate Coefficients A1-A6
 ! ----------------------------------
-!
 
+!   Production of [OH]
+!   ------------------
      Px =  c001*cc(i_o)*cc_prev(i_ho2) &
              +   c004*cc_prev(i_h)*2.*cc_prev(i_ho2) &
              +   c015*cc(i_o3)*cc_prev(i_ho2) &
@@ -582,7 +664,14 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
                  + j(j_h2o)*cc(i_h2o) &
                  + j(j_ch3o2h)*cc(i_ch3ooh) &
                  + 2.*j(j_h2o2)*cc(i_h2o2) &
-                 + j(j_hoch2ooh)*cc(i_hoch2ooh)
+                 + j(j_hoch2ooh)*cc(i_hoch2ooh) &
+                 + cl010*cc(i_cl)*cc_prev(i_ho2) &
+                 + cl018*cc(i_cl)*cc(i_ch3ooh) &
+                 + j(j_hocl)*cc(i_hocl) &
+                 + cl039*cc(i_hcl)*cc(i_o1d)*0.66 &
+                 + cl040*cc(i_hcl)*cc(i_o) &
+                 + cl042*cc(i_hocl)*cc(i_o) &
+                 + cl054*cc(i_clo4)*cc(i_hocl)
 
 !   Loss of [OH]
 !   -----------
@@ -602,7 +691,16 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
             + cab025*cc(i_hco) &
             + cab032*cc(i_hcooh) &
             + cab033*cc(i_hoch2ooh) &
-            + cab035*cc(i_hoch2oh)
+            + cab035*cc(i_hoch2oh) &
+            + cl012*cc(i_clo) &
+            + cl014*cc(i_hcl) &
+            + cl015*cc(i_hocl) &
+            + cl032*cc(i_ch3ocl) &
+            + cl036*cc(i_cl2) &
+            + cl048*cc(i_clo3) &
+            + cl049*cc(i_clo3) &
+            + cl050*cc(i_clo3) &
+            + cl027*cc(i_hclo4) 
 
 
     roh_ho2_denominator = Pho2/MAX( 1.e-30*dens, cc_prev(i_oh) ) &
@@ -626,11 +724,14 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
         B_OH(2,t_o) = c001*cc_prev(i_ho2) &
                     + c012*cc(i_h2o2) &
                     + cab020*cc(i_hcho) &
-                    + cab021*cc(i_hco)
+                    + cab021*cc(i_hco) &
+                    + cl040*cc(i_hcl) &
+                    + cl042*cc(i_hocl)
 
         B_OH(2,t_o1d) = b002*cc(i_h2o)*2. &
                       + b003*cc(i_h2) &
-                      + b007*cc(i_ch4)
+                      + b007*cc(i_ch4) &
+                      + 0.66*cl039*cc(i_hcl)
 
         B_OH(2,t_o3) = c015*cc_prev(i_ho2) &
                      + c003*cc_prev(i_h)
@@ -650,7 +751,8 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
                       + c004*cc_prev(i_h)*2. &
                       + c015*cc(i_o3) &
                       + 0.2*cab029*cc(i_hoch2o2) &
-                      + 2.*j(j_ho2)  
+                      + 2.*j(j_ho2)  &
+                      + cl010*cc(i_cl)
 
         B_OH(2,t_ch4) = b007*cc(i_o1d)
 
@@ -660,9 +762,25 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
 
         IF (t_hco .ne. 0 ) B_OH(2,t_hco) = cab021*cc(i_o)
 
-        IF (t_ch3ooh .ne. 0 ) B_OH(2,t_ch3ooh) = j(j_ch3o2h)  
+        IF (t_ch3ooh .ne. 0 ) B_OH(2,t_ch3ooh) = j(j_ch3o2h)  &
+                                               + cl018*cc(i_cl)
 
         IF (t_hoch2ooh .ne. 0 ) B_OH(2,t_hoch2ooh) = j(j_hoch2ooh)  
+
+        IF ( igcm_cl .ne. 0 ) THEN 
+            B_OH(2,t_cl) = cl010*cc_prev(i_ho2) &
+                         + cl018*cc(i_ch3ooh) 
+
+            B_OH(2,t_hocl) = j(j_hocl) &
+                           + cl042*cc(i_o) &
+                           + cl054*cc(i_clo4)
+
+            B_OH(2,t_hcl) = 0.66*cl039*cc(i_o1d) &
+                          + cl040*cc(i_o)
+
+            B_OH(2,t_clo4) = cl054*cc(i_hocl)
+
+        ENDIF 
 
 ! ----------------------------------
 ! 1.8: Linearised Loss of OH 
@@ -692,6 +810,15 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
         IF ( igcm_hoch2ooh .ne. 0 ) B_OH(3,t_hoch2ooh) = cab033  
         IF ( igcm_hoch2oh .ne. 0 ) B_OH(3,t_hoch2oh) = cab035  
 
+        IF ( igcm_cl .ne. 0 ) THEN
+            B_OH(3,t_clo) = cl012 
+            B_OH(3,t_hcl) = cl014 
+            B_OH(3,t_hocl) = cl015 
+            B_OH(3,t_ch3ocl) = cl032 
+            B_OH(3,t_cl2) = cl036
+            B_OH(3,t_clo3) = cl048 + cl049 + cl050 
+            B_OH(3,t_hclo4) = cl027 
+        ENDIF 
 ! -------------------------------------
 ! 1.9: Construct the Linearised Partition 
 !      Function d[roh_ho2]/d[PQ]
@@ -797,6 +924,43 @@ j_ch3cocooh    =  42     ! ch3coco(oh) + hv -> products
     dccn_dpq( oh_j, : ) = dOH_dPQ
     dccn_dpq( ho2_j, : ) = dHO2_dPQ
 
+
+! IF ( lyr_m == 1 ) WRITE(*,"(13A15)") "Cl", "ClO", "Cl2", "OClO", "Cl2O2", &
+!                                    "HCl", "HOCl", "ClOO", "CH3OCl", "ClCO", &
+!                                    "ClO3", "HClO4", "ClO4"
+
+! write(*,"(13E15.7)") dCl_dPQ( (t_cl-1)*nlayermx + lyr_m ), &
+!               dCl_dPQ( (t_clo-1)*nlayermx + lyr_m ), &
+!               dCl_dPQ( (t_cl2-1)*nlayermx + lyr_m ), &
+!               dCl_dPQ( (t_oclo-1)*nlayermx + lyr_m ), &
+!               dCl_dPQ( (t_cl2o2-1)*nlayermx + lyr_m ), &
+!               dCl_dPQ( (t_hcl-1)*nlayermx + lyr_m ), &
+!               dCl_dPQ( (t_hocl-1)*nlayermx + lyr_m ), &
+!               dCl_dPQ( (t_cloo-1)*nlayermx + lyr_m ), &
+!               dCl_dPQ( (t_ch3ocl-1)*nlayermx + lyr_m ), &
+!               dCl_dPQ( (t_clco-1)*nlayermx + lyr_m ), &
+!               dCl_dPQ( (t_clo3-1)*nlayermx + lyr_m ), &
+!               dCl_dPQ( (t_hclo4-1)*nlayermx + lyr_m ), &
+!               dCl_dPQ( (t_clo4-1)*nlayermx + lyr_m )
+
+! write(*,"(13E15.7)") dOH_dPQ( (t_cl-1)*nlayermx + lyr_m ), &
+!               dOH_dPQ( (t_clo-1)*nlayermx + lyr_m ), &
+!               dOH_dPQ( (t_cl2-1)*nlayermx + lyr_m ), &
+!               dOH_dPQ( (t_oclo-1)*nlayermx + lyr_m ), &
+!               dOH_dPQ( (t_cl2o2-1)*nlayermx + lyr_m ), &
+!               dOH_dPQ( (t_hcl-1)*nlayermx + lyr_m ), &
+!               dOH_dPQ( (t_hocl-1)*nlayermx + lyr_m ), &
+!               dOH_dPQ( (t_cloo-1)*nlayermx + lyr_m ), &
+!               dOH_dPQ( (t_ch3ocl-1)*nlayermx + lyr_m ), &
+!               dOH_dPQ( (t_clco-1)*nlayermx + lyr_m ), &
+!               dOH_dPQ( (t_clo3-1)*nlayermx + lyr_m ), &
+!               dOH_dPQ( (t_hclo4-1)*nlayermx + lyr_m ), &
+!               dOH_dPQ( (t_clo4-1)*nlayermx + lyr_m )
+
+
+
+
+! IF ( lyr_m == nlayermx ) STOP 
 
 
 RETURN
