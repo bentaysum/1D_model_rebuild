@@ -125,14 +125,8 @@ IF ( initialisation ) THEN
 
         x_j = ( iq - 1 )*nlayermx + l 
 
-        ! Constant CH4 floor requires us to ignore 
-        ! transport tendency for the surface
-        IF ( (iq == t_ch4) .and. (l==1) ) THEN          
-          dccn_dpq( x_j, : ) =  TLM_ident( x_j, :)*Avmr(l,iq)*dens(l)
-        ELSE
           dccn_dpq( x_j, : ) = ( TLM_ident( x_j, :)+TLM_trans( x_j, :)*ptimestep) &
                            *Avmr(l,iq)*dens(l)
-        ENDIF 
 
         dcc0_dpq( x_j, : ) = dccn_dpq( x_j, : )
       ENDDO 

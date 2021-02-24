@@ -1605,7 +1605,10 @@ c     ==============
 C     Tangent Linear 
 c     ==============
       IF ( tlm_on ) THEN 
-      call tlm_clox(l, rclo_cl(l),
+
+
+
+      call tlm_clox(l, rclo_cl(l), iter,
      $             pcl, lcl, pclo, lclo,
      $             cc(l,:), cc_prev(:),
      $             nesp,

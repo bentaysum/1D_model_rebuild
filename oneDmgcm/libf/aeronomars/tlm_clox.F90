@@ -1,4 +1,4 @@
-SUBROUTINE tlm_clox(lyr_m, rclo_cl, &
+SUBROUTINE tlm_clox(lyr_m, rclo_cl, iter,&
 				pcl, lcl, pclo, lclo, &
 				cc, cc_prev, &
 				nesp, &
@@ -68,6 +68,7 @@ IMPLICIT NONE
 ! ===============
 INTEGER lyr_m
 REAL rclo_cl ! Chlorine Partition function 
+integer iter
 REAL pcl, lcl, pclo, lclo ! Cl and ClO Production and loss
 REAL cc(nesp), cc_prev(nesp)
 INTEGER nesp
@@ -87,7 +88,7 @@ REAL lcl_coeff(nqmx), lclo_coeff(nqmx) ! Linearising Coefficients for Loss
 REAL drclo_dpq(nqmx*nlayermx) ! Linearised partition function 
 
 INTEGER iq ! Tracer iterator
-INTEGER x_j
+INTEGER x_j, X_I
 
 REAL dCl_dPQ(nqmx*nlayermx), dClO_dPQ(nqmx*nlayermx) ! Linearised Number Densities 
 
@@ -352,16 +353,6 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
 !		 Pcl == Pcl/[ClO]^t and Pclo == Pclo/[Cl]^t
 ! =================================================== !
 
-! 1.1 : Coefficient Values 
-! ------------------------
-A(1) = 1./( Pcl + Lclo )
-A(2) = A(1)/cc_prev(i_cl)
-A(3) = A(2)*Pclo 
-
-A(4) = rclo_cl*A(1) 
-A(5) = A(4)/cc_prev(i_clo) 
-A(6) = A(5)*Pcl 
-
 ! 1.2 : Linearised Production Terms 
 ! ---------------------------------
 
@@ -509,6 +500,10 @@ dLcl_dPQ(:) = 0.
 dPclo_dPQ(:) = 0. 
 dLclo_dPQ(:) = 0. 
 
+
+
+
+
 DO iq = 1,nqmx
 
       x_j = (iq-1)*nlayermx + lyr_m
@@ -522,10 +517,49 @@ DO iq = 1,nqmx
 
 ENDDO
 
+
+
+! Equation:
+!
+! d(rclo_cl)/d(PQ)
+!		= A  )
+
 ! 1.5 : Calculation of the Linearised Partition Function 
 ! ------------------------------------------------------
-drclo_dpq = A(1)*dLcl_dPQ + A(2)*dPclo_dPQ - A(3)*dccn_dpq( (t_cl-1)*nlayermx + lyr_m, : ) &
-          - A(4)*dLclo_dPQ - A(5)*dPcl_dPQ + A(6)*dccn_dpq( (t_clo-1)*nlayermx + lyr_m, : )
+A(1) = 1./( pcl + lclo )
+A(2) = A(1)*rclo_cl
+
+drclo_dpq = A(1)*( dLcl_dPQ  &
+                 + dPclo_dPQ/cc_prev(i_cl) &
+                 - dccn_dpq( (t_cl-1)*nlayermx + lyr_m, : )*pclo/cc_prev(i_cl)   ) &
+          - A(2)*( dLclo_dPQ &
+                 + dPcl_dPQ/cc_prev(i_clo) &
+                 - dccn_dpq( (t_clo-1)*nlayermx + lyr_m, : )*pcl/cc_prev(i_clo) )
+
+
+
+! ===================
+! STAGE 3 : NAN CHECK 
+! ===================
+  do X_J = 1, nlayermx*nqmx
+       IF ( drclo_dpq(X_J) .ne. drclo_dpq(X_J)) THEN 
+            WRITE(*,*) "NAN AT clo", X_J
+
+
+            DO iq = 1, nqmx
+                x_i = (iq-1)*nlayermx + lyr_m
+
+                write(*,"(A15, 8E15.7, 2I15)") TRIM(NOMS(IQ)), drclo_dpq(X_I), dLcl_dPQ(X_I),  dPclo_dPQ(X_I), &
+                                                        dccn_dpq( (t_cl-1)*nlayermx + lyr_m, X_I ), &
+                                                        dLclo_dPQ(X_I), dPcl_dPQ(X_I), dccn_dpq( (t_clo-1)*nlayermx + lyr_m,X_I ), &
+                                                        Avmr(lyr_m,iq), lyr_m, ITER
+            ENDDO 
+
+
+            STOP 
+       ENDIF 
+  enddo 
+
 
 
 ! ==================================================== !
@@ -550,17 +584,36 @@ dCl_dPQ = dClOx_dPQ(lyr_m,:)/( 1. + rclo_cl ) &
 dClO_dPQ = rclo_cl*dCl_dPQ &
          + cc(i_cl)*drclo_dpq 
 
+
+
+
+
+
+
+
+
 ! ==================================================== !
 ! Stage Three : Insertion into Arrays
 ! ==================================================== !
 
 ! Cl
 x_j = (t_cl-1)*nlayermx + lyr_m 
-dccn_dpq( x_j, : ) = 0.!dCl_dPQ 
-
+dccn_dpq( x_j, : ) = dCl_dPQ 
 ! ClO 
 x_j = (t_clo-1)*nlayermx + lyr_m 
-dccn_dpq( x_j, : ) = 0.! dClO_dPQ 
+dccn_dpq( x_j, : ) = dClO_dPQ 
+
+
+
+
+
+
+  ! do X_J = 1, nlayermx*nqmx
+  !      IF ( dCl_dPQ(X_J) .ne. dCl_dPQ(X_J)) THEN 
+  !           WRITE(*,*) "NAN AT cl", X_J
+  !           stop
+  !      ENDIF 
+  ! enddo 
 
 
 RETURN
