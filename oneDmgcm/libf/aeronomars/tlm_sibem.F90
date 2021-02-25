@@ -1330,15 +1330,15 @@ ENDIF
 ! where d(PQ^t)/d(PQ^t0) is the sensitivity array of lyr_m 
 ! for all tracers at forecast timestep t with respect to 
 ! tracers at backtrace timestep t0, calculated via the
-! adjoint externally. 
-if ( lyr_m == 1 ) then 
-o2_coefficient_array(:) = 0.
-    do iq_i = 1,nqmx
-         o2_coefficient_array( iq_i ) = (1./loss(i_o2))*dP_coeff(t_o2,iq_i) &
-                   - (production(i_o2)/(loss(i_o2)**2.))*dL_coeff(t_o2,iq_i)
-    enddo
+! ! adjoint externally. 
+! if ( lyr_m == 1 ) then 
+! o2_coefficient_array(:) = 0.
+!     do iq_i = 1,nqmx
+!          o2_coefficient_array( iq_i ) = (1./loss(i_o2))*dP_coeff(t_o2,iq_i) &
+!                    - (production(i_o2)/(loss(i_o2)**2.))*dL_coeff(t_o2,iq_i)
+!     enddo
 
-endif 
+! endif 
 
 
 

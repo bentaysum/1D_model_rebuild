@@ -122,9 +122,9 @@ IF ( firstcall ) THEN
     if (iostat == 0) close(11, status='delete')
     close(11)
 
-    open(unit=111, iostat=iostat, file=directory // "steady_o2coefficients.bin", status='old')
-    if (iostat == 0) close(111, status='delete')
-    close(111)
+    ! open(unit=111, iostat=iostat, file=directory // "steady_o2coefficients.bin", status='old')
+    ! if (iostat == 0) close(111, status='delete')
+    ! close(111)
 
     ! Adjoint/Tangent Linear Matrix 
     ! =============================
@@ -135,11 +135,11 @@ IF ( firstcall ) THEN
 
     ! Coefficients for O2 Steady-State
     ! ================================
-    open(111,file= directory // "steady_o2coefficients.bin",status="new",action="write",access='stream',form='unformatted')
+    ! open(111,file= directory // "steady_o2coefficients.bin",status="new",action="write",access='stream',form='unformatted')
 
 
     CLOSE(11)
-    CLOSE(111)
+    ! CLOSE(111)
 
 ENDIF
 ! write(*,*) "--------------------------------"
@@ -152,8 +152,8 @@ ENDIF
 ! OPEN(11,file= directory // "tlm.bin" ,action='write',position='append')
 open(11,file= directory // "tlm.bin", status="old",action="write",&
     access='stream',form='unformatted',position='append')
-open(111,file= directory // "steady_o2coefficients.bin", &
-    status="old",action="write",access='stream',form='unformatted',position='append')
+! open(111,file= directory // "steady_o2coefficients.bin", &
+!     status="old",action="write",access='stream',form='unformatted',position='append')
 
 
 loc_max = MAXLOC( TLM )
@@ -178,8 +178,8 @@ WRITE(*,*) T, NT
 WRITE(11) TLM
 CLOSE(11) 
 
-WRITE(111) o2_coefficient_array
-CLOSE(111)
+! WRITE(111) o2_coefficient_array
+! CLOSE(111)
 
 RETURN 
 

@@ -1519,27 +1519,27 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       DO l = 1, lswitch-1
 
 c     Cl Production and Loss 
-C         pcl = (cl002(l)*cc(l,i_clo)*cc(l,i_o)
-C      $      + 2.*cl004(l)*cc(l,i_clo)*cc(l,i_clo)
-C      $      + cl005(l)*cc(l,i_clo)*cc(l,i_clo)
-C      $      + 0.94*cl012(l)*cc(l,i_oh)*cc(l,i_clo)
-C      $      + cl014(l)*cc(l,i_hcl)*cc(l,i_oh)
-C      $      + cl026(l)*cc(l,i_cloo)
-C      $      + cl033(l)*cc(l,i_clco)
-C      $      + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
-C      $      + cl036(l)*cc(l,i_cl2)*cc(l,i_oh)
-C      $      + cl037(l)*cc(l,i_cl2)*cc(l,i_h)
-C      $      + cl038(l)*cc(l,i_ch3)*cc(l,i_cl2)
-C      $      + 0.66*cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)
-C      $      + cl040(l)*cc(l,i_hcl)*cc(l,i_o)     
-C      $      + cl041(l)*cc(l,i_hcl)*cc(l,i_h) 
-C      $      + j(l,j_hcl)*cc(l,i_hcl)
-C      $      + j(l,j_hocl)*cc(l,i_hocl)
-C      $      + j(l,j_clo)*cc(l,i_clo)
-C      $      + 2.*j(l,j_cl2)*cc(l,i_cl2)    
-C      $      + j(l,j_cl2o2)*cc(l,i_cl2o2)
-C      $      )/MAX( cc(l,i_clo), dens(l)*1.e-30 )
-        pcl = 0.
+        pcl = (cl002(l)*cc(l,i_clo)*cc(l,i_o)
+     $      + 2.*cl004(l)*cc(l,i_clo)*cc(l,i_clo)
+     $      + cl005(l)*cc(l,i_clo)*cc(l,i_clo)
+     $      + 0.94*cl012(l)*cc(l,i_oh)*cc(l,i_clo)
+     $      + cl014(l)*cc(l,i_hcl)*cc(l,i_oh)
+     $      + cl026(l)*cc(l,i_cloo)
+     $      + cl033(l)*cc(l,i_clco)
+     $      + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
+     $      + cl036(l)*cc(l,i_cl2)*cc(l,i_oh)
+     $      + cl037(l)*cc(l,i_cl2)*cc(l,i_h)
+     $      + cl038(l)*cc(l,i_ch3)*cc(l,i_cl2)
+     $      + 0.66*cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)
+     $      + cl040(l)*cc(l,i_hcl)*cc(l,i_o)     
+     $      + cl041(l)*cc(l,i_hcl)*cc(l,i_h) 
+     $      + j(l,j_hcl)*cc(l,i_hcl)
+     $      + j(l,j_hocl)*cc(l,i_hocl)
+     $      + j(l,j_clo)*cc(l,i_clo)
+     $      + 2.*j(l,j_cl2)*cc(l,i_cl2)    
+     $      + j(l,j_cl2o2)*cc(l,i_cl2o2)
+     $      )/MAX( cc(l,i_clo), dens(l)*1.e-30 )
+C         pcl = 0.
 
         lcl = cl001(l)*cc(l,i_o3) 
      $      + cl008(l)*cc(l,i_h2)
@@ -1561,20 +1561,20 @@ C      $      )/MAX( cc(l,i_clo), dens(l)*1.e-30 )
      $      + cl053(l)*cc(l,i_clo4)
 
 c     ClO Production and Loss 
-C         pclo = ( cl001(l)*cc(l,i_cl)*cc(l,i_o3)
-C      $       + 2.*cl007(l)*cc(l,i_cl2o2)
-C      $       + cl010(l)*cc(l,i_ho2)*cc(l,i_cl)
-C      $       + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
-C      $       + 0.5*cl022(l)*cc(l,i_ch3o2)*cc(l,i_cl)
-C      $       + 2.*cl024(l)*cc(l,i_cloo)*cc(l,i_cl)
-C      $       + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
-C      $       + 0.22*cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)
-C      $       + cl042(l)*cc(l,i_hocl)*cc(l,i_o)
-C      $       + j(l,j_cloo)*cc(l,i_cloo)
-C      $       + j(l,j_oclo)*cc(l,i_oclo)
-C      $       + cl053(l)*cc(l,i_clo4)*cc(l,i_cl)
-C      $       )/MAX( cc(l,i_cl), dens(l)*1.e-30 )
-        pclo = 0.
+        pclo = ( cl001(l)*cc(l,i_cl)*cc(l,i_o3)
+     $       + 2.*cl007(l)*cc(l,i_cl2o2)
+     $       + cl010(l)*cc(l,i_ho2)*cc(l,i_cl)
+     $       + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
+     $       + 0.5*cl022(l)*cc(l,i_ch3o2)*cc(l,i_cl)
+     $       + 2.*cl024(l)*cc(l,i_cloo)*cc(l,i_cl)
+     $       + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
+     $       + 0.22*cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)
+     $       + cl042(l)*cc(l,i_hocl)*cc(l,i_o)
+     $       + j(l,j_cloo)*cc(l,i_cloo)
+     $       + j(l,j_oclo)*cc(l,i_oclo)
+     $       + cl053(l)*cc(l,i_clo4)*cc(l,i_cl)
+     $       )/MAX( cc(l,i_cl), dens(l)*1.e-30 )
+C         pclo = 0.
 
         lclo = cl002(l)*cc(l,i_o)
      $       + cl003(l)*cc(l,i_clo)
@@ -1682,7 +1682,7 @@ c     ==============
 
 
       ENDDO 
-      
+         
       ENDIF 
 
 

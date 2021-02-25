@@ -343,7 +343,6 @@ C !			- Finally, interpolate with local time in the 1D submodule
 C ! 			  to extract the final values
 C !=======================================================================
       
-         IF ( mcd_profiles  ) THEN 
 
 
       do y = 1, nlayermx
@@ -362,6 +361,11 @@ C        ===
 
           h2o(y)  = h2o(y)*mmol(15)/mmean(1,y) 
 
+
+
+
+
+         IF ( mcd_profiles  ) THEN 
 C         O2 
 C         ===
             call interp_line(mcdv5_lt, zo2(:,y), N_LT,
@@ -381,10 +385,15 @@ c         ===
      &                     local_time, co(y), 1)
            co(y)  = co(y)*mmol(2)/mmean(1,y) 
 
+          endif
+
+
+
+
+
+
       end do
       
-          ENDIF
-     
 
       if ( mcd_profiles ) then
          WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]"
