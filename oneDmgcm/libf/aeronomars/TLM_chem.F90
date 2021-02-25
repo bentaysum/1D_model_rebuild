@@ -165,17 +165,22 @@ ENDDO
 TLM = TLM_trans + TLM_photo
 TLM = tlm_ident + TLM*ptimestep
 
+
+! Non-Variable Tracers 
+! --------------------
+tlm( (t_co2-1)*nlayermx + 1 : t_co2*nlayermx, : ) = 0. 
+
 ! ===================
 ! STAGE 3 : NAN CHECK 
 ! ===================
-do iq = 1, nqmx*nlayermx 
-  do l = 1, nlayermx*nqmx
-       IF ( TLM(iq,l) .ne. TLM(iq,l) ) THEN 
-            WRITE(*,*) "NAN AT ", iq, l 
-            STOP 
-       ENDIF 
-  enddo 
-enddo 
+! do iq = 1, nqmx*nlayermx 
+!   do l = 1, nlayermx*nqmx
+!        IF ( TLM(iq,l) .ne. TLM(iq,l) ) THEN 
+!             WRITE(*,*) "NAN AT ", iq, l 
+!             STOP 
+!        ENDIF 
+!   enddo 
+! enddo 
 
 
 END SUBROUTINE

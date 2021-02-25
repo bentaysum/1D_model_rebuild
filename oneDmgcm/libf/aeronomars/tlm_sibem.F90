@@ -1510,6 +1510,15 @@ endif
             A(t_oclo,2) = production(i_oclo)*(A(t_oclo,1)**2.)
 
         ENDIF 
+
+    ! Steady States
+        A(t_clco,1) = 1./loss(i_clco)
+        A(t_clco,2) = production(i_clco)*(A(t_clco,1)**2.)
+
+        A(t_cloo,1) = 1./loss(i_cloo)
+        A(t_cloo,2) = production(i_cloo)*(A(t_cloo,1)**2.)
+
+
     ENDIF 
 
     ! Steady State Assumptions 
@@ -1908,60 +1917,68 @@ ENDIF
 ! ==================
 ! Chlorine Chemistry 
 ! ==================
-! IF (igcm_cl.ne.0) THEN 
-!     ! HCl
-!     x_j = (t_hcl-1)*nlayermx + lyr_m 
-!     dccn_dpq( x_j, : ) = A(t_hcl,1)*dcc0_dpq( x_j , : ) + A(t_hcl,2)*dP_dPQ(t_hcl,:) &
-!                     - A(t_hcl,3)*dL_dPQ( t_hcl, :)
-!     ! HOCl
-!     x_j = (t_hocl-1)*nlayermx + lyr_m 
-!     dccn_dpq( x_j, : ) = A(t_hocl,1)*dcc0_dpq( x_j , : ) + A(t_hocl,2)*dP_dPQ(t_hocl,:) &
-!                     - A(t_hocl,3)*dL_dPQ( t_hocl, :)
-!     ! CH3OCl
-!     x_j = (t_ch3ocl-1)*nlayermx + lyr_m 
-!     dccn_dpq( x_j, : ) = A(t_ch3ocl,1)*dcc0_dpq( x_j , : ) + A(t_ch3ocl,2)*dP_dPQ(t_ch3ocl,:) &
-!                     - A(t_ch3ocl,3)*dL_dPQ( t_ch3ocl, :)
-!     ! HClO4
-!     x_j = (t_hclo4-1)*nlayermx + lyr_m 
-!     dccn_dpq( x_j, : ) = A(t_hclo4,1)*dcc0_dpq( x_j , : ) + A(t_hclo4,2)*dP_dPQ(t_hclo4,:) &
-!                     - A(t_hclo4,3)*dL_dPQ( t_hclo4, :)
-!     ! ClO4
-!     x_j = (t_clo4-1)*nlayermx + lyr_m 
-!     dccn_dpq( x_j, : ) = A(t_clo4,1)*dcc0_dpq( x_j , : ) + A(t_clo4,2)*dP_dPQ(t_clo4,:) &
-!                     - A(t_clo4,3)*dL_dPQ( t_clo4, :)
-!     ! ClO3
-!     x_j = (t_clo3-1)*nlayermx + lyr_m 
-!     dccn_dpq( x_j, : ) = A(t_clo3,1)*dcc0_dpq( x_j , : ) + A(t_clo3,2)*dP_dPQ(t_clo3,:) &
-!                     - A(t_clo3,3)*dL_dPQ( t_clo3, :)
-!     ! Daylight 
-!     ! --------
-!     IF ( sza > 95. ) THEN 
-!         ! Cl2
-!         x_j = (t_cl2-1)*nlayermx + lyr_m 
-!         dccn_dpq( x_j, : ) = A(t_cl2,1)*dcc0_dpq( x_j , : ) + A(t_cl2,2)*dP_dPQ(t_cl2,:) &
-!                         - A(t_cl2,3)*dL_dPQ( t_cl2, :)
-!         ! Cl2O2
-!         x_j = (t_cl2o2-1)*nlayermx + lyr_m 
-!         dccn_dpq( x_j, : ) = A(t_cl2o2,1)*dcc0_dpq( x_j , : ) + A(t_cl2o2,2)*dP_dPQ(t_cl2o2,:) &
-!                         - A(t_cl2o2,3)*dL_dPQ( t_cl2o2, :)
-!         ! OClO
-!         x_j = (t_oclo-1)*nlayermx + lyr_m 
-!         dccn_dpq( x_j, : ) = A(t_oclo,1)*dcc0_dpq( x_j , : ) + A(t_oclo,2)*dP_dPQ(t_oclo,:) &
-!                       - A(t_oclo,3)*dL_dPQ( t_oclo, :)
-!     ELSE 
-!         ! Cl2
-!         x_j = (t_cl2-1)*nlayermx + lyr_m 
-!         dccn_dpq( x_j, : ) = A(t_cl2,1)*dP_dPQ(t_cl2,:) - A(t_cl2,2)*dL_dPQ(t_cl2,:)
-!         ! Cl2O2
-!         x_j = (t_cl2o2-1)*nlayermx + lyr_m 
-!         dccn_dpq( x_j, : ) = A(t_cl2o2,1)*dP_dPQ(t_cl2o2,:) - A(t_cl2o2,2)*dL_dPQ(t_cl2o2,:)
-!         ! OClO
-!         x_j = (t_oclo-1)*nlayermx + lyr_m 
-!         dccn_dpq( x_j, : ) = A(t_oclo,1)*dP_dPQ(t_oclo,:) - A(t_oclo,2)*dL_dPQ(t_oclo,:)
+IF (igcm_cl.ne.0) THEN 
+    ! HCl
+    x_j = (t_hcl-1)*nlayermx + lyr_m 
+    dccn_dpq( x_j, : ) = A(t_hcl,1)*dcc0_dpq( x_j , : ) + A(t_hcl,2)*dP_dPQ(t_hcl,:) &
+                    - A(t_hcl,3)*dL_dPQ( t_hcl, :)
+    ! HOCl
+    x_j = (t_hocl-1)*nlayermx + lyr_m 
+    dccn_dpq( x_j, : ) = A(t_hocl,1)*dcc0_dpq( x_j , : ) + A(t_hocl,2)*dP_dPQ(t_hocl,:) &
+                    - A(t_hocl,3)*dL_dPQ( t_hocl, :)
+    ! CH3OCl
+    x_j = (t_ch3ocl-1)*nlayermx + lyr_m 
+    dccn_dpq( x_j, : ) = A(t_ch3ocl,1)*dcc0_dpq( x_j , : ) + A(t_ch3ocl,2)*dP_dPQ(t_ch3ocl,:) &
+                    - A(t_ch3ocl,3)*dL_dPQ( t_ch3ocl, :)
+    ! HClO4
+    x_j = (t_hclo4-1)*nlayermx + lyr_m 
+    dccn_dpq( x_j, : ) = A(t_hclo4,1)*dcc0_dpq( x_j , : ) + A(t_hclo4,2)*dP_dPQ(t_hclo4,:) &
+                    - A(t_hclo4,3)*dL_dPQ( t_hclo4, :)
+    ! ClO4
+    x_j = (t_clo4-1)*nlayermx + lyr_m 
+    dccn_dpq( x_j, : ) = A(t_clo4,1)*dcc0_dpq( x_j , : ) + A(t_clo4,2)*dP_dPQ(t_clo4,:) &
+                    - A(t_clo4,3)*dL_dPQ( t_clo4, :)
+    ! ClO3
+    x_j = (t_clo3-1)*nlayermx + lyr_m 
+    dccn_dpq( x_j, : ) = A(t_clo3,1)*dcc0_dpq( x_j , : ) + A(t_clo3,2)*dP_dPQ(t_clo3,:) &
+                    - A(t_clo3,3)*dL_dPQ( t_clo3, :)
+    ! ClCO 
+    x_j = (t_clco-1)*nlayermx + lyr_m 
+    dccn_dpq( x_j, : ) = A(t_clco,1)*dP_dPQ(t_clco,:) - A(t_clco,2)*dL_dPQ(t_clco,:)
+    ! ClOO 
+    x_j = (t_cloo-1)*nlayermx + lyr_m 
+    dccn_dpq( x_j, : ) = A(t_cloo,1)*dP_dPQ(t_cloo,:) - A(t_cloo,2)*dL_dPQ(t_cloo,:)
 
-!     ENDIF 
 
-! ENDIF 
+    ! Daylight 
+    ! --------
+    IF ( sza > 95. ) THEN 
+        ! Cl2
+        x_j = (t_cl2-1)*nlayermx + lyr_m 
+        dccn_dpq( x_j, : ) = A(t_cl2,1)*dcc0_dpq( x_j , : ) + A(t_cl2,2)*dP_dPQ(t_cl2,:) &
+                        - A(t_cl2,3)*dL_dPQ( t_cl2, :)
+        ! Cl2O2
+        x_j = (t_cl2o2-1)*nlayermx + lyr_m 
+        dccn_dpq( x_j, : ) = A(t_cl2o2,1)*dcc0_dpq( x_j , : ) + A(t_cl2o2,2)*dP_dPQ(t_cl2o2,:) &
+                        - A(t_cl2o2,3)*dL_dPQ( t_cl2o2, :)
+        ! OClO
+        x_j = (t_oclo-1)*nlayermx + lyr_m 
+        dccn_dpq( x_j, : ) = A(t_oclo,1)*dcc0_dpq( x_j , : ) + A(t_oclo,2)*dP_dPQ(t_oclo,:) &
+                      - A(t_oclo,3)*dL_dPQ( t_oclo, :)
+    ELSE 
+        ! Cl2
+        x_j = (t_cl2-1)*nlayermx + lyr_m 
+        dccn_dpq( x_j, : ) = A(t_cl2,1)*dP_dPQ(t_cl2,:) - A(t_cl2,2)*dL_dPQ(t_cl2,:)
+        ! Cl2O2
+        x_j = (t_cl2o2-1)*nlayermx + lyr_m 
+        dccn_dpq( x_j, : ) = A(t_cl2o2,1)*dP_dPQ(t_cl2o2,:) - A(t_cl2o2,2)*dL_dPQ(t_cl2o2,:)
+        ! OClO
+        x_j = (t_oclo-1)*nlayermx + lyr_m 
+        dccn_dpq( x_j, : ) = A(t_oclo,1)*dP_dPQ(t_oclo,:) - A(t_oclo,2)*dL_dPQ(t_oclo,:)
+
+    ENDIF 
+
+ENDIF 
 
 
 

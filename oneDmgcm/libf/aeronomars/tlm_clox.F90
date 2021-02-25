@@ -1,4 +1,4 @@
-SUBROUTINE tlm_clox(lyr_m, rclo_cl, iter,&
+SUBROUTINE tlm_clox(lyr_m, rclo_cl, iter, dens,&
 				pcl, lcl, pclo, lclo, &
 				cc, cc_prev, &
 				nesp, &
@@ -69,6 +69,7 @@ IMPLICIT NONE
 INTEGER lyr_m
 REAL rclo_cl ! Chlorine Partition function 
 integer iter
+REAL dens ! Atmospheric Number Density
 REAL pcl, lcl, pclo, lclo ! Cl and ClO Production and loss
 REAL cc(nesp), cc_prev(nesp)
 INTEGER nesp
@@ -87,7 +88,7 @@ REAL lcl_coeff(nqmx), lclo_coeff(nqmx) ! Linearising Coefficients for Loss
 
 REAL drclo_dpq(nqmx*nlayermx) ! Linearised partition function 
 
-INTEGER iq ! Tracer iterator
+INTEGER iq, l ! Tracer iterator
 INTEGER x_j, X_I
 
 REAL dCl_dPQ(nqmx*nlayermx), dClO_dPQ(nqmx*nlayermx) ! Linearised Number Densities 
@@ -529,36 +530,31 @@ ENDDO
 A(1) = 1./( pcl + lclo )
 A(2) = A(1)*rclo_cl
 
-drclo_dpq = A(1)*( dLcl_dPQ  &
-                 + dPclo_dPQ/cc_prev(i_cl) &
-                 - dccn_dpq( (t_cl-1)*nlayermx + lyr_m, : )*pclo/cc_prev(i_cl)   ) &
-          - A(2)*( dLclo_dPQ &
-                 + dPcl_dPQ/cc_prev(i_clo) &
-                 - dccn_dpq( (t_clo-1)*nlayermx + lyr_m, : )*pcl/cc_prev(i_clo) )
+! drclo_dpq = A(1)*( dLcl_dPQ  &
+!                  + dPclo_dPQ/cc_prev(i_cl) &
+!                  - dccn_dpq( (t_cl-1)*nlayermx + lyr_m, : )*pclo/cc_prev(i_cl)   ) &
+!           - A(2)*( dLclo_dPQ &
+!                  + dPcl_dPQ/cc_prev(i_clo) &
+!                  - dccn_dpq( (t_clo-1)*nlayermx + lyr_m, : )*pcl/cc_prev(i_clo) )
+
+drclo_dpq = A(1)*dLcl_dPQ - A(2)*dLclo_dPQ 
 
 
 
-! ===================
-! STAGE 3 : NAN CHECK 
-! ===================
-  do X_J = 1, nlayermx*nqmx
-       IF ( drclo_dpq(X_J) .ne. drclo_dpq(X_J)) THEN 
-            WRITE(*,*) "NAN AT clo", X_J
+! do l = 1, nlayermx*nqmx
+!     if ( ABS(drclo_dpq(l)-1.) == ABS(drclo_dpq(l)) ) then 
+!         do iq = 1, nqmx 
 
+!             x_i = (iq-1)*nlayermx + lyr_m 
 
-            DO iq = 1, nqmx
-                x_i = (iq-1)*nlayermx + lyr_m
+!             write(*,"(A15,3E15.7)") TRIM(NOMS(IQ)), drclo_dpq(x_i), &
+!                                     dccn_dpq( (t_cl-1)*nlayermx + lyr_m, x_i)*pclo, & 
+!                                     dccn_dpq( (t_clo-1)*nlayermx + lyr_m, x_i)*pcl
 
-                write(*,"(A15, 8E15.7, 2I15)") TRIM(NOMS(IQ)), drclo_dpq(X_I), dLcl_dPQ(X_I),  dPclo_dPQ(X_I), &
-                                                        dccn_dpq( (t_cl-1)*nlayermx + lyr_m, X_I ), &
-                                                        dLclo_dPQ(X_I), dPcl_dPQ(X_I), dccn_dpq( (t_clo-1)*nlayermx + lyr_m,X_I ), &
-                                                        Avmr(lyr_m,iq), lyr_m, ITER
-            ENDDO 
-
-
-            STOP 
-       ENDIF 
-  enddo 
+!         enddo 
+!         stop 
+!     endif 
+! enddo 
 
 
 
@@ -585,13 +581,6 @@ dClO_dPQ = rclo_cl*dCl_dPQ &
          + cc(i_cl)*drclo_dpq 
 
 
-
-
-
-
-
-
-
 ! ==================================================== !
 ! Stage Three : Insertion into Arrays
 ! ==================================================== !
@@ -599,21 +588,53 @@ dClO_dPQ = rclo_cl*dCl_dPQ &
 ! Cl
 x_j = (t_cl-1)*nlayermx + lyr_m 
 dccn_dpq( x_j, : ) = dCl_dPQ 
+
+! do l = 1, nlayermx*nqmx
+!     if ( ABS(dccn_dpq(x_j,l)-1.) == ABS(dccn_dpq(x_j,l)) ) then 
+!         write(*,*) "CL"
+!         do iq = 1, nqmx 
+
+!             x_i = (iq-1)*nlayermx + lyr_m 
+
+!             write(*,"(A15,9E15.7,2I15)") TRIM(NOMS(IQ)),dccn_dpq(x_j, x_i ), dClOx_dPQ(lyr_m, x_i ), &
+!                         drclo_dpq(x_i), &
+!                         dLcl_dPQ(x_i), dPclo_dPQ(x_i), dLclo_dPQ(x_i), dPcl_dPQ(x_i), &
+!                         cc_prev(i_cl), cc_prev(i_clo), &
+!                         iter, lyr_m 
+
+
+!         enddo 
+!         stop 
+!     endif 
+! enddo 
+
+
+
+
 ! ClO 
 x_j = (t_clo-1)*nlayermx + lyr_m 
 dccn_dpq( x_j, : ) = dClO_dPQ 
 
 
 
+! do l = 1, nlayermx*nqmx
+!     if ( ABS(dccn_dpq(x_j,l)-1.) == ABS(dccn_dpq(x_j,l)) ) then 
+!         write(*,*) "CLO"
+!         do iq = 1, nqmx 
+
+!             x_i = (iq-1)*nlayermx + lyr_m 
+
+!             write(*,"(A15,3E15.7,2I15)") TRIM(NOMS(IQ)),dccn_dpq(x_j, x_i ), dClOx_dPQ(lyr_m, x_i ), &
+!                         drclo_dpq(x_i), iter, lyr_m 
+
+
+!         enddo 
+!         stop 
+!     endif 
+! enddo 
 
 
 
-  ! do X_J = 1, nlayermx*nqmx
-  !      IF ( dCl_dPQ(X_J) .ne. dCl_dPQ(X_J)) THEN 
-  !           WRITE(*,*) "NAN AT cl", X_J
-  !           stop
-  !      ENDIF 
-  ! enddo 
 
 
 RETURN
