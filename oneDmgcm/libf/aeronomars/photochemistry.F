@@ -1519,7 +1519,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       DO l = 1, lswitch-1
 
 c     Cl Production and Loss 
-        pcl = (cl002(l)*cc(l,i_clo)*cc(l,i_o)
+        pcl = cl002(l)*cc(l,i_clo)*cc(l,i_o)
      $      + 2.*cl004(l)*cc(l,i_clo)*cc(l,i_clo)
      $      + cl005(l)*cc(l,i_clo)*cc(l,i_clo)
      $      + 0.94*cl012(l)*cc(l,i_oh)*cc(l,i_clo)
@@ -1538,8 +1538,7 @@ c     Cl Production and Loss
      $      + j(l,j_clo)*cc(l,i_clo)
      $      + 2.*j(l,j_cl2)*cc(l,i_cl2)    
      $      + j(l,j_cl2o2)*cc(l,i_cl2o2)
-     $      )/MAX( cc(l,i_clo), dens(l)*1.e-30 )
-C         pcl = 0.
+
 
         lcl = cl001(l)*cc(l,i_o3) 
      $      + cl008(l)*cc(l,i_h2)
@@ -1561,7 +1560,7 @@ C         pcl = 0.
      $      + cl053(l)*cc(l,i_clo4)
 
 c     ClO Production and Loss 
-        pclo = ( cl001(l)*cc(l,i_cl)*cc(l,i_o3)
+        pclo = cl001(l)*cc(l,i_cl)*cc(l,i_o3)
      $       + 2.*cl007(l)*cc(l,i_cl2o2)
      $       + cl010(l)*cc(l,i_ho2)*cc(l,i_cl)
      $       + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
@@ -1573,8 +1572,6 @@ c     ClO Production and Loss
      $       + j(l,j_cloo)*cc(l,i_cloo)
      $       + j(l,j_oclo)*cc(l,i_oclo)
      $       + cl053(l)*cc(l,i_clo4)*cc(l,i_cl)
-     $       )/MAX( cc(l,i_cl), dens(l)*1.e-30 )
-C         pclo = 0.
 
         lclo = cl002(l)*cc(l,i_o)
      $       + cl003(l)*cc(l,i_clo)
@@ -1591,8 +1588,21 @@ C         pclo = 0.
      $       + cl047(l)*cc(l,i_clo3)
      $       + j(l,j_clo)
 
-c 	  Partition Function
-        rclo_cl(l) = (pclo+lcl)/(pcl+lclo)
+C     Atmospheric state prior to timestep advancement
+c     neeeded for TLM 
+      IF ( tlm_on ) THEN 
+            cc_prev = cc(l,:)
+      ENDIF 
+
+C     ------------------------------------------
+c     Daylight Chlorine : Grouped Steady-State 
+c     Partition Function
+C     -----------------------------------------
+        IF ( sza .le. 95. ) THEN 
+        rclo_cl(l) = ( (pclo/max(1.e-30*dens(l),cc(l,i_cl)))
+     $                 +lcl)
+     $             /( (pcl/max(1.e-30*dens(l),cc(l,i_clo)))
+     $                 +lclo)
 
 c       Cl Number Density
         cc(l,i_cl) = MAX( cc(l,i_clox)/(1.+rclo_cl(l)), 
@@ -1601,16 +1611,44 @@ c       ClO Number Density
         cc(l,i_clo) = MAX( cc(l,i_cl)*rclo_cl(l),
      $                    1.E-30*dens(l) )
 
+c     ----------------------------------
+C     Night-time Chlorine : Steady-State
+c     -----------------------------------
+        ELSE 
+
+c     Cl 
+        IF ( 1./Lcl .gt. dt ) THEN 
+          cc(l,i_cl) = (cc0(l,i_cl) + pcl*dt)/(1. + lcl*dt) 
+        ELSE
+          cc(l,i_cl) = pcl/lcl 
+        ENDIF 
+
+c     ClO 
+        IF ( 1./Lclo .gt. dt ) THEN 
+          cc(l,i_clo) = (cc0(l,i_clo) + pclo*dt)/(1. + lclo*dt) 
+        ELSE
+          cc(l,i_clo) = pclo/lclo 
+        ENDIF 
+
+        ENDIF 
+
 
 
 c     ==============
 C     Tangent Linear 
 c     ==============
+
       IF ( tlm_on ) THEN 
 
+c 	  Normalise the Production rates to s^-1 units
+c 	  for the Tangent Linear Model calculations 
+c     during daylight conditions
+        IF ( sza .le. 95. ) THEN 
+      pcl = pcl/max(1.e-30*dens(l),cc_prev(i_clo))
+      pclo = pclo/max(1.e-30*dens(l),cc_prev(i_clo))
+        ENDIF ! sza .le. 95. 
 
-
-      call tlm_clox(l, rclo_cl(l), iter, dens(l),
+      call tlm_clox(l, rclo_cl(l), iter, sza, dt,
      $             pcl, lcl, pclo, lclo,
      $             cc(l,:), cc_prev(:),
      $             nesp,
@@ -1678,12 +1716,12 @@ c     ==============
      $            ,cl049(l), cl050(l), cl051(l)
      $            ,cl052(l), cl053(l), cl054(l) )
 
-      ENDIF 
+      ENDIF ! tlm_on 
 
 
-      ENDDO 
+      ENDDO ! do l = 1, lswitch - 1  
          
-      ENDIF 
+      ENDIF ! igcm_cl .ne. 0 
 
 
 

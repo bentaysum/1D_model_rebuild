@@ -337,25 +337,6 @@ j_oclo         = 45      ! oclo + hv -> clo + o
 j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo 
 
 
-! Notes on Chlorine:
-! 
-! SIBEM : 
-!       ClOx 
-!       HCl
-!       HOCl 
-!       CH3OCl 
-!       HClO4 
-!       ClO3 
-!       ClO4
-!       Cl2 [SZA > 95.]
-!       Cl2O2 [SZA > 95.]
-!       OClO [SZA > 95.]
-!
-! Steady State : 
-!       Cl2 [SZA .le. 95.]
-!       Cl2O2 [SZA .le. 95.]
-!       OClO [SZA .le. 95.]
-!  
     
 ! 0.0 : Initialisation of Array 
 ! -----------------------------
