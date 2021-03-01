@@ -915,7 +915,7 @@ C            ENDIF
 C         ENDIF 
 
 !       increment tracers
-        write(*,"(13A15)") ( trim(noms(iq)), iq = 28,40 )
+C         write(*,"(13A15)") ( trim(noms(iq)), iq = 28,40 )
         DO iq = 1, nqmx
 
           DO ilayer=1,nlayer
@@ -927,7 +927,7 @@ C         ENDIF
           ENDDO    
           
         ENDDO
-        write(*,"(13E15.7)") ( q(1,iq), iq = 28, 40 )
+C         write(*,"(13E15.7)") ( q(1,iq), iq = 28, 40 )
 
       IF ( pertloop ) THEN 
         IF ( idt == ndt_plume-1 ) THEN 

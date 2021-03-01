@@ -52,10 +52,10 @@ t_forecast=992
 ## Handled by bash script
 ## perturbation_cycle.sh 
 pertloop= .false.
-PERTGAS=cl2o2
-SCALAR=1.E-2
-L_1=18
-L_2=19
+PERTGAS=clo3
+SCALAR=1.E1
+L_1=7
+L_2=10
 
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
