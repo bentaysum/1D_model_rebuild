@@ -1,4 +1,4 @@
-SUBROUTINE tlm_clox(lyr_m, rclo_cl, iter, sza, dt, &
+SUBROUTINE tlm_clox(lyr_m, rclo_cl, iter, dt, &
 				pcl, lcl, pclo, lclo, &
 				cc, cc_prev, &
 				nesp, &
@@ -69,7 +69,6 @@ IMPLICIT NONE
 INTEGER lyr_m
 REAL rclo_cl ! Chlorine Partition function 
 integer iter
-REAL sza ! Solar Zenith Angle 
 REAL dt ! chemistry timestep
 REAL pcl, lcl, pclo, lclo ! Cl and ClO Production and loss
 REAL cc(nesp), cc_prev(nesp)
@@ -502,10 +501,6 @@ dLcl_dPQ(:) = 0.
 dPclo_dPQ(:) = 0. 
 dLclo_dPQ(:) = 0. 
 
-
-
-
-
 DO iq = 1,nqmx
 
       x_j = (iq-1)*nlayermx + lyr_m
@@ -535,7 +530,7 @@ ENDDO
 
 ! 1.5 : Calculation of the Linearised Partition Function 
 ! ------------------------------------------------------
-IF ( sza .le. 95. ) THEN 
+! IF ( sza .le. 95. ) THEN 
     A(1) = 1./( pcl + lclo )
     A(2) = A(1)*rclo_cl
 
@@ -546,86 +541,30 @@ IF ( sza .le. 95. ) THEN
                      + dPcl_dPQ/cc_prev(i_clo) &
                      - dccn_dpq( (t_clo-1)*nlayermx + lyr_m, : )*pcl/cc_prev(i_clo) )
 
-    ! do l = 1, nlayermx*nqmx
-    !     if ( ABS(drclo_dpq(l)-1.) == ABS(drclo_dpq(l)) ) then 
-    !         do iq = 1, nqmx 
-
-    !             x_i = (iq-1)*nlayermx + lyr_m 
-
-    !             write(*,"(A15,3E15.7)") TRIM(NOMS(IQ)), drclo_dpq(x_i), &
-    !                                     dccn_dpq( (t_cl-1)*nlayermx + lyr_m, x_i)*pclo, & 
-    !                                     dccn_dpq( (t_clo-1)*nlayermx + lyr_m, x_i)*pcl
-
-    !         enddo 
-    !         stop 
-    !     endif 
-    ! enddo 
 
 
 
-    ! ==================================================== !
-    ! Stage Two : Linearised [Cl] and [ClO] number density
-    ! ==================================================== !
-    !
-    ! [Cl]^t = [ClOx]^t/( 1 + rclo_cl )
-    !
-    ! [ClO]^t = [Cl]^t * rclo_cl 
-    !
-    ! ---------------------------------
-    !
-    ! [Cl]^t ' = (1. + rclo_cl)^-1 * [ClOx]^t ' 
-    !          - [ClOx]^t/(1. + rclo_cl)^2 * rclo_cl ' 
-    !
-    ! [ClO]^t ' = rclo_cl * [Cl]^t ' 
-    !           + [Cl]^t * rclo_cl ' 
-
-    dCl_dPQ = dClOx_dPQ(lyr_m,:)/( 1. + rclo_cl ) &
-            - drclo_dpq*cc(i_cl)/( 1. + rclo_cl )
-
-    dClO_dPQ = rclo_cl*dCl_dPQ &
-             + cc(i_cl)*drclo_dpq 
-
-ELSE 
-! =================================
-! Night-Time Chemistry
-! ----------------------------------
+! ==================================================== !
+! Stage Two : Linearised [Cl] and [ClO] number density
+! ==================================================== !
 !
-! CONDITIONAL
+! [Cl]^t = [ClOx]^t/( 1 + rclo_cl )
 !
-! If lifetime ( L^-1 ) is below chemistry 
-! subtimestep, steady-state approximation
-! employed.
+! [ClO]^t = [Cl]^t * rclo_cl 
 !
-! If lifetime ( L^-1 ) > chemistry subtimestep,
-! SIBEM employed.
-! --------------------------------------
+! ---------------------------------
+!
+! [Cl]^t ' = (1. + rclo_cl)^-1 * [ClOx]^t ' 
+!          - [ClOx]^t/(1. + rclo_cl)^2 * rclo_cl ' 
+!
+! [ClO]^t ' = rclo_cl * [Cl]^t ' 
+!           + [Cl]^t * rclo_cl ' 
 
-    ! Chlorine [Cl]
-    ! -------------
-    IF ( 1./Lcl < dt ) THEN 
-        dCl_dPQ = (1./Lcl)*dPcl_dPQ &
-                         - (pcl/(lcl**2))*dLcl_dPQ 
-    ELSE 
-        dCl_dPQ= 1./(1.+lcl*dt) &
-                         *( dcc0_dpq( (t_cl-1)*nlayermx + lyr_m,:) + dPcl_dPQ*dt ) &
-                         - (cc(i_cl)/(1. + lcl*dt))*dt*dLcl_dPQ
-    ENDIF 
+dCl_dPQ = dClOx_dPQ(lyr_m,:)/( 1. + rclo_cl ) &
+        - drclo_dpq*cc(i_cl)/( 1. + rclo_cl )
 
-    ! [ClO]
-    ! -------------
-    IF ( 1./Lclo < dt ) THEN 
-        dClO_dPQ = (1./Lclo)*dPclo_dPQ &
-                         - (pclo/(lclo**2))*dLclo_dPQ 
-    ELSE 
-        dClO_dPQ= 1./(1.+lclo*dt) &
-                         *( dcc0_dpq( (t_clo-1)*nlayermx + lyr_m,:) + dPclo_dPQ*dt ) &
-                         - (cc(i_clo)/(1. + lclo*dt))*dt*dLclo_dPQ
-    ENDIF 
-
-
-ENDIF ! sza .le. 95. 
-
-
+dClO_dPQ = rclo_cl*dCl_dPQ &
+         + cc(i_cl)*drclo_dpq 
 
 ! Cl
 x_j = (t_cl-1)*nlayermx + lyr_m 
@@ -636,33 +575,6 @@ x_j = (t_clo-1)*nlayermx + lyr_m
 dccn_dpq( x_j, : ) = dClO_dPQ 
 
 
-! do l = 1, nlayermx*nqmx
-!     if ( ABS(dccn_dpq(x_j,l)-1.) == ABS(dccn_dpq(x_j,l)) ) then 
-!             write(*,*) l 
-!         do iq = 1, nqmx 
-
-!             x_i = (iq-1)*nlayermx + lyr_m 
-
-!             write(*,"(A15,9E15.7,2I15)") TRIM(NOMS(IQ)),dccn_dpq(x_j, x_i ), dClOx_dPQ(lyr_m, x_i ), &
-!                         drclo_dpq(x_i), &
-!                         dLcl_dPQ(x_i), dPclo_dPQ(x_i), dLclo_dPQ(x_i), dPcl_dPQ(x_i), &
-!                         cc_prev(i_cl), cc_prev(i_clo), &
-!                         iter, lyr_m 
-
-
-!         enddo 
-!         stop 
-!     endif 
-! enddo 
-
-
-
-
-
-
 RETURN
-! cc^t+1 ' = 1/(1 + L*dt)  * [ cc0' + dt*P' ]
-!          - (cc0 + P*dt)/(1 + L*dt)^2 * dt * L'
-
 
 END SUBROUTINE

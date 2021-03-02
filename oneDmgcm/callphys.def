@@ -39,7 +39,7 @@ mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call_tlm=.true.
+call_tlm=.false.
 tlm_day=10
 tlm_lt=0.
 
@@ -51,16 +51,16 @@ t_forecast=992
 
 ## Handled by bash script
 ## perturbation_cycle.sh 
-pertloop= .false.
+pertloop= .true.
 PERTGAS=clo3
-SCALAR=1.E1
-L_1=7
-L_2=10
+SCALAR=1.E-5
+L_1=1
+L_2=2
 
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Introducing an instantaneous plume?
-plume=.false.
+plume=.true.
 
 #Days after day0 to release plume?
 plume_day=10
@@ -85,7 +85,7 @@ p_high = 5
 iaervar = 1
 
 # Dust opacity at 610 Pa (when constant, i.0e. for the iaervar=1 case)
-tauvis=0.4719
+tauvis=1.0063
  
 
 # Dust vertical distribution: 

@@ -969,10 +969,81 @@ IF (igcm_cl .ne.0) THEN
     dP_coeff(t_clo4,t_oh) = cl027*cc(i_hclo4) 
     dP_dPQ(t_clo4,t_hclo4) = cl027*cc(i_oh)
 
+
+    ! Night time
+    IF ( sza .gt. 95. ) THEN 
+        ! Cl 
+            dP_coeff(t_cl,t_o) = cl002*cc(i_clo) &
+                           + cl040*cc(i_hcl)
+            dP_coeff(t_cl,t_o1d) = cl035*cc(i_cl2) &
+                             + 0.66*cl039*cc(i_hcl)
+            dP_coeff(t_cl,t_h) = cl037*cc(i_cl2) &
+                           + cl041*cc(i_hcl)
+            dP_coeff(t_cl,t_oh) = 0.94*cl012*cc(i_clo) &
+                            + cl014*cc(i_hcl) &
+                            + cl036*cc(i_cl2)
+
+            dP_coeff(t_cl,t_clo) = cl002*cc(i_o) &
+                             + 4.*cl004*cc(i_clo) &
+                             + 2.*cl005*cc(i_clo) &
+                             + 0.94*cl012*cc(i_oh) &
+                             + j(j_clo)
+            dP_coeff(t_cl,t_cloo) = cl026
+            dP_coeff(t_cl,t_clco) = cl033
+            dP_coeff(t_cl,t_hcl) = cl014*cc(i_oh) &
+                             + 0.66*cl039*cc(i_o1d) &
+                             + cl040*cc(i_o) &
+                             + cl041*cc(i_h) &
+                             + j(j_hcl)
+            dP_coeff(t_cl,t_hocl) = j(j_hocl)
+            dP_coeff(t_cl,t_cl2) = cl035*cc(i_o1d) &
+                             + cl036*cc(i_oh) &
+                             + cl037*cc(i_h) &
+                             + cl038*cc(i_ch3) &
+                             + j(j_cl2)
+            dP_coeff(t_cl,t_cl2o2) = j(j_cl2o2)
+
+            IF (igcm_ch3 .ne. 0 ) dP_coeff(t_cl,t_ch3) = cl038*cc(i_cl2)
+
+        ! ClO 
+            dP_coeff(t_clo,t_o1d)= cl035*cc(i_cl2) &
+                             + 0.22*cl039*cc(i_hcl)
+
+            dP_coeff(t_clo,t_o) = cl042*cc(i_hocl)
+
+            dP_coeff(t_clo,t_oh) = cl015*cc(i_hocl)
+
+            dP_coeff(t_clo,t_ho2) = cl010*cc(i_cl)
+
+            dP_coeff(t_clo,t_o3) = cl001*cc(i_cl)
+
+            dP_coeff(t_clo,t_cl) = cl001*cc(i_o3) &
+                             + cl010*cc(i_ho2) &
+                             + 0.5*cl022*cc(i_ch3o2) &
+                             + 2.*cl024*cc(i_cloo) &
+                             + cl053*cc(i_clo4)
+
+            dP_coeff(t_clo,t_cloo) = 2.*cl024*cc(i_cl) &
+                               + j(j_cloo)
+
+            dP_coeff(t_clo,t_hcl) = 0.22*cl039*cc(i_o1d)
+
+            dP_coeff(t_clo,t_hocl) = cl015*cc(i_oh) &
+                               + cl042*cc(i_o)
+
+            dP_coeff(t_clo,t_oclo) = j(j_oclo)
+
+            dP_coeff(t_clo,t_cl2o2) = 2.*cl007
+
+            dP_coeff(t_clo,t_cl2) = cl035*cc(i_o1d)
+
+            dP_coeff(t_clo,t_clo4) = cl053*cc(i_cl)
+
+            IF (igcm_ch3o2 .ne. 0) dP_coeff(t_clo,t_ch3o2) = 0.5*cl022*cc(i_cl)
+    ENDIF 
+
+
 ENDIF 
-
-
-
 
 !   2.0: Construct the Linearised Production Array
 !   ----------------------------------------------
@@ -1278,6 +1349,44 @@ IF ( igcm_cl .ne. 0 ) THEN
     ! ClO4 
     dL_coeff(t_clo4,t_cl) = cl053
     dL_coeff(t_clo4,t_hocl) = cl054 
+
+    ! Night Time 
+    IF (sza .gt. 95. ) THEN 
+        ! Cl 
+        dL_coeff(t_cl,t_co) = cl023 
+        dL_coeff(t_cl,t_o2) = cl028
+        dL_coeff(t_cl,t_o3) = cl001 + cl044
+        dL_coeff(t_cl,t_h2) = cl008
+        dL_coeff(t_cl,t_h2o2) = cl011
+        dL_coeff(t_cl,t_ho2) = cl009 + cl010
+        dL_coeff(t_cl,t_ch4) = cl016
+
+        dL_coeff(t_cl,t_cloo) = cl024 + cl025
+        dL_coeff(t_cl,t_ch3ocl) = cl029 + cl031 
+        dL_coeff(t_cl,t_cl2o2) = cl030 
+        dL_coeff(t_cl,t_clo4) = cl053
+
+        IF (igcm_hcho .ne. 0) dL_coeff(t_cl,t_hcho) = cl017 
+        IF (igcm_ch3ooh .ne. 0) dL_coeff(t_cl,t_ch3ooh) = cl018
+        IF (igcm_ch3o2 .ne. 0) dL_coeff(t_cl,t_ch3o2) = cl022
+
+        ! ClO 
+        dL_coeff(t_clo,t_o) = cl002 
+
+        dL_coeff(t_clo,t_oh) = cl012 
+
+        dL_coeff(t_clo,t_ho2) = cl013 
+
+        dL_coeff(t_clo,t_clo) = cl003 + cl004 + cl005 + cl006
+
+        dL_coeff(t_clo,t_clo3) = cl045 + cl046 + cl047
+
+        IF (igcm_ch3o2 .ne. 0) dL_coeff(t_clo,t_ch3o2) = cl019 + cl020 + cl021
+
+
+    ENDIF 
+
+
 ENDIF 
 
 !   2.3: Create Linearised loss array 
@@ -1427,6 +1536,8 @@ ENDIF
             A(t_oclo,1) = 1./( 1. + loss(t_oclo)*dt_c)
         ENDIF 
 
+
+
     ENDIF 
 
     A(:,2) = A(:,1)*dt_c 
@@ -1480,6 +1591,28 @@ ENDIF
             A(t_cl2o2,3) = (cc0(i_cl2o2) + production(i_cl2o2)*dt_c)*(A(t_cl2o2,1)**2)*dt_c
             A(t_oclo,3) = (cc0(i_oclo) + production(i_oclo)*dt_c)*(A(t_oclo,1)**2)*dt_c
 
+
+            ! Night Cl handling is dependent on lifetime 
+            IF ( 1./loss(i_cl) > dt_c ) THEN 
+                A(t_cl,1) =  1./( 1. + loss(t_cl)*dt_c)
+                A(t_cl,2) =  A(t_cl,1)*dt_c 
+                A(t_cl,3) = (cc0(i_cl) + production(i_cl)*dt_c)*(A(t_cl,1)**2)*dt_c
+            ELSE 
+                A(t_cl,1) = 1./loss(i_cl)
+                A(t_cl,2) = production(i_cl)*(A(t_cl,1)**2.)
+            ENDIF 
+
+            ! Night ClO handling is dependent on lifetime
+            IF ( 1./loss(i_clo) > dt_c ) THEN 
+                A(t_clo,1) =  1./( 1. + loss(t_clo)*dt_c)
+                A(t_clo,2) =  A(t_clo,1)*dt_c 
+                A(t_clo,3) = (cc0(i_clo) + production(i_clo)*dt_c)*(A(t_clo,1)**2)*dt_c
+            ELSE 
+                A(t_clo,1) = 1./loss(i_clo)
+                A(t_clo,2) = production(i_clo)*(A(t_clo,1)**2.)
+            ENDIF 
+
+
         ELSE 
             A(t_cl2,1) = 1./loss(i_cl2)
             A(t_cl2,2) = production(i_cl2)*(A(t_cl2,1)**2.)
@@ -1498,6 +1631,7 @@ ENDIF
 
         A(t_cloo,1) = 1./loss(i_cloo)
         A(t_cloo,2) = production(i_cloo)*(A(t_cloo,1)**2.)
+
 
 
     ENDIF 
@@ -1946,6 +2080,26 @@ IF (igcm_cl.ne.0) THEN
         x_j = (t_oclo-1)*nlayermx + lyr_m 
         dccn_dpq( x_j, : ) = A(t_oclo,1)*dcc0_dpq( x_j , : ) + A(t_oclo,2)*dP_dPQ(t_oclo,:) &
                       - A(t_oclo,3)*dL_dPQ( t_oclo, :)
+
+        ! Cl 
+        x_j = (t_cl-1)*nlayermx + lyr_m 
+        IF ( 1./loss(i_cl) > dt_c ) THEN 
+             dccn_dpq( x_j, : ) = A(t_cl,1)*dcc0_dpq( x_j , : ) + A(t_cl,2)*dP_dPQ(t_cl,:) &
+                        - A(t_cl,3)*dL_dPQ( t_cl, :)
+        ELSE 
+             dccn_dpq( x_j, : ) = A(t_cl,1)*dP_dPQ(t_cl,:) - A(t_cl,2)*dL_dPQ(t_cl,:)
+        ENDIF 
+
+        ! ClO 
+        x_j = (t_clo-1)*nlayermx + lyr_m 
+        IF ( 1./loss(i_clo) > dt_c ) THEN 
+             dccn_dpq( x_j, : ) = A(t_clo,1)*dcc0_dpq( x_j , : ) + A(t_clo,2)*dP_dPQ(t_clo,:) &
+                        - A(t_clo,3)*dL_dPQ( t_clo, :)
+        ELSE 
+             dccn_dpq( x_j, : ) = A(t_clo,1)*dP_dPQ(t_clo,:) - A(t_clo,2)*dL_dPQ(t_clo,:)
+        ENDIF 
+
+
     ELSE 
         ! Cl2
         x_j = (t_cl2-1)*nlayermx + lyr_m 
