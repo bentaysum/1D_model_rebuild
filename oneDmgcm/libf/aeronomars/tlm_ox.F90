@@ -50,7 +50,9 @@ SUBROUTINE tlm_ox(iter, lyr_m, dens,&
                     ,cl043, cl044, cl045 &
                     ,cl046, cl047, cl048 &
                     ,cl049, cl050, cl051 &
-                    ,cl052, cl053, cl054, & 
+                    ,cl052, cl053, cl054 &
+                    ,cl055, cl056, cl057 &
+                    ,cl058, cl059, & 
 					no, no2, &
 					dccn_dpq, dcc0_dpq,&
 					dOX_dPQ, dOX0_dPQ)
@@ -159,7 +161,9 @@ real cl001, cl002, cl003 &
  ,cl043, cl044, cl045 &
  ,cl046, cl047, cl048 &
  ,cl049, cl050, cl051 &
- ,cl052, cl053, cl054
+ ,cl052, cl053, cl054 &
+ ,cl055, cl056, cl057 &
+ ,cl058, cl059
 
 ! ====================================================================================
 !									Local Variables
@@ -592,7 +596,8 @@ ENDIF
 					+ cab017*cc(i_ch3o) + cab020*cc(i_hcho) &
 					+ cab021*cc(i_hco) + cab037*cc(i_c2h6) &
 					+ cl002*cc(i_clo) + cl040*cc(i_hcl) &
-					+ cl042*cc(i_hocl) + cl051*cc(i_oclo)
+					+ cl042*cc(i_hocl) + cl051*cc(i_oclo) &
+					+ cl057*cc(i_oclo)
 	dLox_coef(t_o3) = 2.*a003*cc(i_o) + c003*cc(i_h) &
 					+ c014*cc(i_oh) + c015*cc(i_ho2) &
 					+ cab004*cc(i_ch3) + cab010*cc(i_ch3o2) &
@@ -617,7 +622,8 @@ IF (igcm_cl .ne. 0) THEN
 	dLox_coef(t_hcl) = cl040*cc(i_o)
 	dLox_coef(t_hocl) = cl042*cc(i_o)
 	dLox_coef(t_oclo) = cl051*cc(i_o) &
-					  + cl052*cc(i_o3)
+					  + cl052*cc(i_o3) &
+					  + cl057*cc(i_o)
 ENDIF 
 
 

@@ -85,7 +85,7 @@ p_high = 5
 iaervar = 1
 
 # Dust opacity at 610 Pa (when constant, i.0e. for the iaervar=1 case)
-tauvis=1.0063
+tauvis=0.4719
  
 
 # Dust vertical distribution: 

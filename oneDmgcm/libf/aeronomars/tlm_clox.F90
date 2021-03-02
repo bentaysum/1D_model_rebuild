@@ -50,7 +50,9 @@ SUBROUTINE tlm_clox(lyr_m, rclo_cl, iter, dt, dens, &
                     ,cl043, cl044, cl045 &
                     ,cl046, cl047, cl048 &
                     ,cl049, cl050, cl051 &
-                    ,cl052, cl053, cl054)
+                    ,cl052, cl053, cl054 &
+                    ,cl055, cl056, cl057 &
+                    ,cl058, cl059)
 
 USE TLMvars
 
@@ -168,7 +170,9 @@ real cl001, cl002, cl003 &
  ,cl043, cl044, cl045 &
  ,cl046, cl047, cl048 &
  ,cl049, cl050, cl051 &
- ,cl052, cl053, cl054
+ ,cl052, cl053, cl054 &
+ ,cl055, cl056, cl057 &
+ ,cl058, cl059 
 
 
 ! Photolysis indexing 
@@ -404,7 +408,6 @@ pcl_coeff(t_cl2) = cl035*cc(i_o1d) &
 
 pcl_coeff(t_cl2o2) = j(j_cl2o2)
 
-
 IF (igcm_ch3 .ne. 0 ) pcl_coeff(t_ch3) = cl038*cc(i_cl2)
 
 ! Production of ClO [Pclo]
@@ -414,7 +417,8 @@ pclo_coeff(:) = 0.
 pclo_coeff(t_o1d)= cl035*cc(i_cl2) &
                  + 0.22*cl039*cc(i_hcl)
 
-pclo_coeff(t_o) = cl042*cc(i_hocl)
+pclo_coeff(t_o) = cl042*cc(i_hocl) &
+                + cl057*cc(i_oclo)
 
 pclo_coeff(t_oh) = cl015*cc(i_hocl)
 
@@ -426,7 +430,9 @@ pclo_coeff(t_cl) = cl001*cc(i_o3) &
                  + cl010*cc(i_ho2) &
                  + 0.5*cl022*cc(i_ch3o2) &
                  + 2.*cl024*cc(i_cloo) &
-                 + cl053*cc(i_clo4)
+                 + cl053*cc(i_clo4) &
+                 + cl056*cc(i_hocl) &
+                 + 2.*cl059*cc(i_oclo)
 
 pclo_coeff(t_cloo) = 2.*cl024*cc_prev(i_cl) &
                    + j(j_cloo)
@@ -434,15 +440,20 @@ pclo_coeff(t_cloo) = 2.*cl024*cc_prev(i_cl) &
 pclo_coeff(t_hcl) = 0.22*cl039*cc(i_o1d)
 
 pclo_coeff(t_hocl) = cl015*cc(i_oh) &
-                   + cl042*cc(i_o)
+                   + cl042*cc(i_o) &
+                   + cl056*cc_prev(i_cl)
 
-pclo_coeff(t_oclo) = j(j_oclo)
+pclo_coeff(t_oclo) = j(j_oclo) &
+                   + cl057*cc(i_o) &
+                   + 2.*cl059*cc_prev(i_cl)
 
 pclo_coeff(t_cl2o2) = 2.*cl007
 
 pclo_coeff(t_cl2) = cl035*cc(i_o1d)
 
 pclo_coeff(t_clo4) = cl053*cc_prev(i_cl)
+
+
 
 IF (igcm_ch3o2 .ne. 0) pclo_coeff(t_ch3o2) = 0.5*cl022*cc_prev(i_cl)
 
@@ -474,6 +485,10 @@ lcl_coeff(t_ch3ocl) = cl029 + cl031
 lcl_coeff(t_cl2o2) = cl030 
 
 lcl_coeff(t_clo4) = cl053
+
+lcl_coeff(t_hocl) = cl055 + cl056 
+
+lcl_coeff(t_oclo) = cl059 
 
 IF (igcm_hcho .ne. 0) lcl_coeff(t_hcho) = cl017 
 

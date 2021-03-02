@@ -1282,6 +1282,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  cl046(l), cl047(l), cl048(l),
      $  cl049(l), cl050(l), cl051(l),
      $  cl052(l), cl053(l), cl054(l), 
+     $  cl055(l), cl056(l), cl057(l),
+     $  cl058(l), cl059(l),
      $  dccn_dpq, dcc0_dpq,
      $  dHOX_dPQ, dHOX0_dPQ,
      $  k_pseudo(l))
@@ -1472,6 +1474,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  cab097(l), cab098(l), cab099(l),
      $  cab100(l), cab101(l), cab102(l),
      $  cab103(l), cab104(l), cab105(l),
+     $  cab106(l), cab107(L),
      $  cl001(l), cl002(l), cl003(l), 
      $  cl004(l), cl005(l), cl006(l), 
      $  cl007(l), cl008(l), cl009(l), 
@@ -1490,7 +1493,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $  cl046(l), cl047(l), cl048(l),
      $  cl049(l), cl050(l), cl051(l),
      $  cl052(l), cl053(l), cl054(l), 
-     $  cab106(l), cab107(L),
+     $  cl055(l), cl056(l), cl057(l),
+     $  cl058(l), cl059(l),
      $  no(l), no2(l),
      $  dccn_dpq, dcc0_dpq,
      $  dOX_dPQ, dOX0_dPQ)
@@ -1772,7 +1776,9 @@ c     ==============
      $            ,cl043(l), cl044(l), cl045(l)
      $            ,cl046(l), cl047(l), cl048(l)
      $            ,cl049(l), cl050(l), cl051(l)
-     $            ,cl052(l), cl053(l), cl054(l) )
+     $            ,cl052(l), cl053(l), cl054(l)
+     $            ,cl055(l), cl056(l), cl057(l)
+     $            ,cl058(l), cl059(l) )
 
       ENDIF ! tlm_on 
 
@@ -2913,7 +2919,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                     + j(l,j_hcl)*cc(l,i_hcl)
      $                     + j(l,j_hocl)*cc(l,i_hocl)
      $                     + cl057(l)*cc(l,i_o)*cc(l,i_oclo)
-     $                     + 2.*cl059(l)*cc(l,i_cl)*cc(l,i_oclo)
+     $                     + cl059(l)*cc(l,i_cl)*cc(l,i_oclo)
 
 C       IF ( l == 1 ) THEN 
 C           production(l,i_clox) = production(l,i_clox) 
@@ -3015,7 +3021,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $         cl043(l), cl044(l), cl045(l),
      $         cl046(l), cl047(l), cl048(l),
      $         cl049(l), cl050(l), cl051(l),
-     $         cl052(l), cl053(l), cl054(l),
+     $         cl052(l), cl053(l), cl054(l), 
+     $         cl055(l), cl056(l), cl057(l),
+     $         cl058(l), cl059(l),
      $         dccn_dpq, dcc0_dpq,
      $         ro2(l), no(l), no2(l),
      $         dHOX_dPQ, dHOX0_dPQ, k_pseudo)          

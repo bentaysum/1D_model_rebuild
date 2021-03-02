@@ -49,7 +49,9 @@ SUBROUTINE tlm_hox(iter, lyr_m, dens,sza,&
                     ,cl043, cl044, cl045 &
                     ,cl046, cl047, cl048 &
                     ,cl049, cl050, cl051 &
-                    ,cl052, cl053, cl054, &
+                    ,cl052, cl053, cl054 &
+                    ,cl055, cl056, cl057 &
+                    ,cl058,cl059, &
                     dccn_dpq, dcc0_dpq, &
                     dHOX_dPQ, dHOX0_dPQ, &
                     k_pseudo)
@@ -166,7 +168,9 @@ real cl001, cl002, cl003 &
  ,cl043, cl044, cl045 &
  ,cl046, cl047, cl048 &
  ,cl049, cl050, cl051 &
- ,cl052, cl053, cl054
+ ,cl052, cl053, cl054 &
+ ,cl055, cl056, cl057 &
+ ,cl058, cl059 
 
 ! Tracer indexing as in photochemistry.F 
 ! ======================================
@@ -671,7 +675,8 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
                  + cl039*cc(i_hcl)*cc(i_o1d)*0.66 &
                  + cl040*cc(i_hcl)*cc(i_o) &
                  + cl042*cc(i_hocl)*cc(i_o) &
-                 + cl054*cc(i_clo4)*cc(i_hocl)
+                 + cl054*cc(i_clo4)*cc(i_hocl) &
+                 + cl055*cc(i_hocl)*cc(i_cl)
 
 !   Loss of [OH]
 !   -----------
@@ -700,8 +705,8 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
             + cl048*cc(i_clo3) &
             + cl049*cc(i_clo3) &
             + cl050*cc(i_clo3) &
-            + cl027*cc(i_hclo4) 
-
+            + cl027*cc(i_hclo4) &
+            + cl058*cc(i_oclo)
 
     roh_ho2_denominator = Pho2/MAX( 1.e-30*dens, cc_prev(i_oh) ) &
                        + Lx 
@@ -720,7 +725,6 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
 ! ----------------------------------
 ! 1.7: Linearised Production of OH 
 ! ----------------------------------
-!
         B_OH(2,t_o) = c001*cc_prev(i_ho2) &
                     + c012*cc(i_h2o2) &
                     + cab020*cc(i_hcho) &
@@ -769,11 +773,13 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
 
         IF ( igcm_cl .ne. 0 ) THEN 
             B_OH(2,t_cl) = cl010*cc_prev(i_ho2) &
-                         + cl018*cc(i_ch3ooh) 
+                         + cl018*cc(i_ch3ooh) &
+                         + cl055*cc(i_hocl)
 
             B_OH(2,t_hocl) = j(j_hocl) &
                            + cl042*cc(i_o) &
-                           + cl054*cc(i_clo4)
+                           + cl054*cc(i_clo4) &
+                           + cl055*cc(i_cl)
 
             B_OH(2,t_hcl) = 0.66*cl039*cc(i_o1d) &
                           + cl040*cc(i_o)
@@ -818,6 +824,7 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
             B_OH(3,t_cl2) = cl036
             B_OH(3,t_clo3) = cl048 + cl049 + cl050 
             B_OH(3,t_hclo4) = cl027 
+            B_OH(3,t_oclo) = cl058
         ENDIF 
 ! -------------------------------------
 ! 1.9: Construct the Linearised Partition 
