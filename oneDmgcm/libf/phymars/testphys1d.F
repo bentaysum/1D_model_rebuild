@@ -917,7 +917,7 @@ C         ENDIF
 !       increment tracers
 C         write(*,"(13A15)") ( trim(noms(iq)), iq = 28,40 )
         DO iq = 1, nqmx
-
+          if ( trim(noms(iq)) == 'hcl' ) cycle
           DO ilayer=1,nlayer
 
 

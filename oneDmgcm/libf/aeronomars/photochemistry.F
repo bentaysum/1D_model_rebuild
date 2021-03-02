@@ -405,7 +405,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
        call WRITEDIAGFI(1,"loss_clox","loss_clox", "s",
      $                  1,lifetime(:,3))
 
-
+       call WRITEDIAGFI(1,"prod_cl","prod_cl", "s",
+     $                  1,lifetime(:,4))
+       call WRITEDIAGFI(1,"loss_cl","loss_cl", "s",
+     $                  1,lifetime(:,5))
+       call WRITEDIAGFI(1,"prod_clo","prod_clo", "s",
+     $                  1,lifetime(:,6))
+       call WRITEDIAGFI(1,"loss_clo","loss_clo", "s",
+     $                  1,lifetime(:,7))
 
 
 C        call WRITEDIAGFI(1,"o=o_loss_rate","o=o_loss", "cm-3 s-1",
@@ -1663,17 +1670,43 @@ c     -----------------------------------------------
             cc_prev = cc(l,:)
       ENDIF ! tlm_on 
 
+         IF ( (1./loss(l,i_cl) < dt ) .and.
+     $      (1./loss(l,i_clo) < dt ) ) THEN 
         cc(l,i_cl) = cc(l,i_clox)/(1. + rclo_cl(l))
 
         cc(l,i_clo) = cc(l,i_cl)*rclo_cl(l)
+  
+         ELSE
+
+
+        ! Cl 
+          IF ( 1./loss(l,i_cl) < dt ) THEN
+            cc(l,i_cl) = production(l,i_cl)/loss(l,i_cl)
+          ELSE 
+            cc(l,i_cl) = (cc0(l,i_cl) + production(l,i_cl)*dt)
+     $                  /(1. + loss(l,i_cl)*dt)
+          ENDIF 
+        ! ClO 
+          IF ( 1./loss(l,i_clo) < dt ) THEN
+            cc(l,i_clo) = production(l,i_clo)/loss(l,i_clo)
+          ELSE 
+            cc(l,i_clo) = (cc0(l,i_clo) + production(l,i_clo)*dt)
+     $                  /(1. + loss(l,i_clo)*dt)
+          ENDIF 
+
+
+         ENDIF 
+
+
+
 
 c     ==============
 C     Tangent Linear 
 c     ==============
       IF ( tlm_on ) THEN 
 
-      pcl = 0.! production(l,i_cl)/MAX(cc_prev(i_clo),1.e-30*dens(l)) 
-      pclo =0.! production(l,i_clo)/MAX(cc_prev(i_cl),1.e-30*dens(l))
+      pcl =  production(l,i_cl)/MAX(cc_prev(i_clo),1.e-30*dens(l)) 
+      pclo = production(l,i_clo)/MAX(cc_prev(i_cl),1.e-30*dens(l))
       lcl = loss(l,i_cl)
       lclo = loss(l,i_clo) 
 
@@ -3346,6 +3379,11 @@ C       lifetime(1,10) = cc(1,i_dust)*clox_prod
       lifetime(:,1) = rclo_cl 
       lifetime(:,2) = production(:,i_clox)
       lifetime(:,3) = loss(:,i_clox)
+
+      lifetime(:,4) = production(:,i_cl)
+      lifetime(:,5) = loss(:,i_cl)
+      lifetime(:,6) = production(:,i_clo)
+      lifetime(:,7) = loss(:,i_clo) 
 
 C       lifetime(:,i_hcl) = 1./loss(:,i_hcl)
 C       lifetime(:,i_cl2) = 1./loss(:,i_cl2)
