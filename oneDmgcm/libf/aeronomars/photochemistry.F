@@ -1678,7 +1678,6 @@ c     -----------------------------------------------
   
          ELSE
 
-
         ! Cl 
           IF ( 1./loss(l,i_cl) < dt ) THEN
             cc(l,i_cl) = production(l,i_cl)/loss(l,i_cl)
@@ -1697,9 +1696,6 @@ c     -----------------------------------------------
 
          ENDIF 
 
-
-
-
 c     ==============
 C     Tangent Linear 
 c     ==============
@@ -1710,7 +1706,7 @@ c     ==============
       lcl = loss(l,i_cl)
       lclo = loss(l,i_clo) 
 
-      call tlm_clox(l, rclo_cl(l), iter,  dt,
+      call tlm_clox(l, rclo_cl(l), iter,  dt, dens(l),
      $             pcl, lcl, pclo, lclo,
      $             cc(l,:), cc_prev(:),
      $             nesp,

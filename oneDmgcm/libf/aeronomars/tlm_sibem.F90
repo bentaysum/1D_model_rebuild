@@ -1593,7 +1593,7 @@ ENDIF
 
 
             ! Night Cl handling is dependent on lifetime 
-            IF ( 1./loss(i_cl) > dt_c ) THEN 
+            IF ( 1./loss(i_cl) >= dt_c ) THEN 
                 A(t_cl,1) =  1./( 1. + loss(t_cl)*dt_c)
                 A(t_cl,2) =  A(t_cl,1)*dt_c 
                 A(t_cl,3) = (cc0(i_cl) + production(i_cl)*dt_c)*(A(t_cl,1)**2)*dt_c
@@ -1603,7 +1603,7 @@ ENDIF
             ENDIF 
 
             ! Night ClO handling is dependent on lifetime
-            IF ( 1./loss(i_clo) > dt_c ) THEN 
+            IF ( 1./loss(i_clo) >= dt_c ) THEN 
                 A(t_clo,1) =  1./( 1. + loss(t_clo)*dt_c)
                 A(t_clo,2) =  A(t_clo,1)*dt_c 
                 A(t_clo,3) = (cc0(i_clo) + production(i_clo)*dt_c)*(A(t_clo,1)**2)*dt_c

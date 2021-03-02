@@ -1,4 +1,4 @@
-SUBROUTINE tlm_clox(lyr_m, rclo_cl, iter, dt, &
+SUBROUTINE tlm_clox(lyr_m, rclo_cl, iter, dt, dens, &
 				pcl, lcl, pclo, lclo, &
 				cc, cc_prev, &
 				nesp, &
@@ -70,6 +70,7 @@ INTEGER lyr_m
 REAL rclo_cl ! Chlorine Partition function 
 integer iter
 REAL dt ! chemistry timestep
+REAL dens ! Atmospheric Number Density 
 REAL pcl, lcl, pclo, lclo ! Cl and ClO Production and loss
 REAL cc(nesp), cc_prev(nesp)
 INTEGER nesp
@@ -79,6 +80,8 @@ REAL, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 ! Local Variables 
 ! ===============
 REAL A(6) ! Partition Function Linearising Coefficients
+
+REAL Acl(3), Aclo(3) 
 
 REAL dPcl_dPQ(nqmx*nlayermx), dPclo_dPQ(nqmx*nlayermx) ! Linearised Production 
 REAL dLcl_dPQ(nqmx*nlayermx), dLclo_dPQ(nqmx*nlayermx) ! Linearised Loss
@@ -559,6 +562,7 @@ ENDDO
 !
 ! [ClO]^t ' = rclo_cl * [Cl]^t ' 
 !           + [Cl]^t * rclo_cl ' 
+IF ( ( 1./lcl < dt ) .and. (1./lclo < dt) ) THEN 
 
 dCl_dPQ = dClOx_dPQ(lyr_m,:)/( 1. + rclo_cl ) &
         - drclo_dpq*cc(i_cl)/( 1. + rclo_cl )
@@ -573,6 +577,48 @@ dccn_dpq( x_j, : ) = dCl_dPQ
 ! ClO 
 x_j = (t_clo-1)*nlayermx + lyr_m 
 dccn_dpq( x_j, : ) = dClO_dPQ 
+
+ELSE 
+    ! Cl 
+    x_j = (t_cl-1)*nlayermx + lyr_m 
+    IF ( 1./lcl < dt ) THEN 
+        Acl(1) = 1./lcl
+        Acl(2) = pcl*MAX(1.e-30*dens,cc_prev(i_clo))*(Acl(1)**2.)
+        dccn_dpq( x_j, : ) = Acl(1)*dPcl_dPQ - Acl(2)*dLcl_dPQ 
+    ELSE 
+        Acl(1) = 1./(1. + lcl*dt)
+        Acl(2) = Acl(2)*dt
+        Acl(3) = cc(i_cl)*Acl(1)*dt
+
+        dccn_dpq( x_j, : ) = Acl(1)*dcc0_dpq( x_j , : ) + Acl(2)*dPcl_dPQ &
+                    - Acl(3)*dLcl_dPQ
+    ENDIF 
+
+    ! clo 
+    x_j = (t_clo-1)*nlayermx + lyr_m 
+    IF ( 1./lclo < dt ) THEN 
+        Aclo(1) = 1./lclo
+        Aclo(2) = pclo*MAX(1.e-30*dens,cc_prev(i_cl))*(Aclo(1)**2.)
+        dccn_dpq( x_j, : ) = Aclo(1)*dPclo_dPQ - Aclo(2)*dLclo_dPQ 
+    ELSE 
+        Aclo(1) = 1./(1. + lclo*dt)
+        Aclo(2) = Aclo(2)*dt
+        Aclo(3) = cc(i_clo)*Aclo(1)*dt
+
+        dccn_dpq( x_j, : ) = Aclo(1)*dcc0_dpq( x_j , : ) + Aclo(2)*dPclo_dPQ &
+                    - Aclo(3)*dLcl_dPQ
+    ENDIF 
+
+ENDIF 
+
+
+
+
+
+
+
+
+
 
 
 RETURN

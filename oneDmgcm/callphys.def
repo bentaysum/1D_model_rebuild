@@ -39,7 +39,7 @@ mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call_tlm=.false.
+call_tlm=.True.
 tlm_day=10
 tlm_lt=0.
 
@@ -51,7 +51,7 @@ t_forecast=992
 
 ## Handled by bash script
 ## perturbation_cycle.sh 
-pertloop= .true.
+pertloop= .false.
 PERTGAS=clo3
 SCALAR=1.E-5
 L_1=1
@@ -60,7 +60,7 @@ L_2=2
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Introducing an instantaneous plume?
-plume=.true.
+plume=.false.
 
 #Days after day0 to release plume?
 plume_day=10
