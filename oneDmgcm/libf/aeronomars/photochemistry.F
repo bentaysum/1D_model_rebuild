@@ -3225,8 +3225,12 @@ cccccc Chlorine Chemistry
 ccccccccccccccccccccccccc
       IF ( igcm_cl .ne. 0 ) THEN 
 
+        IF ( 1./loss(l,i_hcl) > dt ) THEN 
         cc(l,i_hcl) = (cc0(l,i_hcl) + production(l,i_hcl)*dt)
      $              /(1. + loss(l,i_hcl)*dt)
+        ELSE 
+        cc(l,i_hcl) = production(l,i_hcl)/loss(l,i_hcl)
+        ENDIF 
 
         cc(l,i_hocl) = (cc0(l,i_hocl) + production(l,i_hocl)*dt)
      $              /(1. + loss(l,i_hocl)*dt)
