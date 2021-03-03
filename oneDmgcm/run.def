@@ -12,7 +12,7 @@ time=0.
 # Number of time steps per sol
 day_step=48
 # Number of sols to run 
-ndt=100
+ndt=13
 
 #### Physical parameters
 #

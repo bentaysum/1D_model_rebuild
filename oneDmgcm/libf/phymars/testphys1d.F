@@ -918,11 +918,11 @@ C         ENDIF
 C         write(*,"(13A15)") ( trim(noms(iq)), iq = 28,40 )
         DO iq = 1, nqmx
 
-C           if ( ( trim(noms(iq)) == 'hcl' ) .and.
-C      $       ( .not. tlm_on ) )cycle
+          if ( ( trim(noms(iq)) == 'hcl' ) .and.
+     $       ( .not. tlm_on ) )cycle
 
-C           if ( ( trim(noms(iq)) == 'ch4' ) .and.
-C      $       ( .not. tlm_on ) )cycle
+          if ( ( trim(noms(iq)) == 'ch4' ) .and.
+     $       ( .not. tlm_on ) )cycle
 
 
           DO ilayer=1,nlayer
