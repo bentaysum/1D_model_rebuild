@@ -1672,6 +1672,11 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                     + cl042(l)*cc(l,i_hocl)*cc(l,i_o)
      $                     + cl057(l)*cc(l,i_oclo)*cc(l,i_o)
      $                     + cl059(l)*cc(l,i_oclo)*cc(l,i_cl)
+     $                     + j(l,j_hcl)*cc(l,i_hcl)
+     $                     + j(l,j_cloo)*cc(l,i_cloo)
+     $                     + j(l,j_oclo)*cc(l,i_oclo)
+     $                     + 2.*j(l,j_cl2)*cc(l,i_cl2)
+     $                     + j(l,j_cl2o2)*cc(l,i_cl2o2)
 
       loss(l,i_clox) = 2.*cl003(l)*cc(l,i_clo)*cc(l,i_clo)
      $               + cl005(l)*cc(l,i_clo)*cc(l,i_clo)
@@ -1700,6 +1705,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $               + cl046(l)*cc(l,i_clo)*cc(l,i_clo3)
      $               + cl047(l)*cc(l,i_clo)*cc(l,i_clo3)
      $               + cl055(l)*cc(l,i_cl)*cc(l,i_hocl)
+     $               + j(l,j_clo)*cc(l,i_clo)
 
       loss(l,i_clox) = loss(l,i_clox)/cc(l,i_clox) 
       
@@ -3277,13 +3283,19 @@ ccccccccccccccccccccccccc
         cc(l,i_clco) = production(l,i_clco)/loss(l,i_clco)
         ENDIF 
 
+        ! Cl2 
+        IF ( 1./loss(l,i_cl2) > dt ) THEN 
+        cc(l,i_cl2) = (cc0(l,i_cl2) + production(l,i_cl2)*dt)
+     $              /(1. + loss(l,i_cl2)*dt)
+        ELSE 
+        cc(l,i_cl2) = production(l,i_cl2)/loss(l,i_cl2)
+        ENDIF 
+
         cc(l,i_ch3ocl) = (cc0(l,i_ch3ocl) + production(l,i_ch3ocl)*dt)
      $              /(1. + loss(l,i_ch3ocl)*dt)
 
         cc(l,i_hclo4) = (cc0(l,i_hclo4) + production(l,i_hclo4)*dt)
      $              /(1. + loss(l,i_hclo4)*dt)
-
-
 
         cc(l,i_cloo) = production(l,i_cloo)/loss(l,i_cloo)
 
@@ -3295,7 +3307,6 @@ cccccccccccccc
         cc(l,i_clox) = (cc0(l,i_clox) + production(l,i_clox)*dt)
      $                /(1. + loss(l,i_clox)*dt)
 
-        cc(l,i_cl2) = production(l,i_cl2)/loss(l,i_cl2)
 
         cc(l,i_cl2o2) = production(l,i_cl2o2)/loss(l,i_cl2o2)
 
@@ -3305,9 +3316,6 @@ cccccccccccccc
      $              /(1. + loss(l,i_clox)*dt)
 
       ELSE
-        cc(l,i_cl2) = (cc0(l,i_cl2) + production(l,i_cl2)*dt)
-     $              /(1. + loss(l,i_cl2)*dt)
-
         cc(l,i_cl2o2) = (cc0(l,i_cl2o2) + production(l,i_cl2o2)*dt)
      $              /(1. + loss(l,i_cl2o2)*dt)
 
