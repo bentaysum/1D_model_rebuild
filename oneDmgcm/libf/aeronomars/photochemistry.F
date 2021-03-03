@@ -2768,7 +2768,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                    + cl056(l)*cc(l,i_cl)*cc(l,i_hocl)
 
       loss(l,i_hcl) = cl014(l)*cc(l,i_oh)
-     $              + cl039(l)*cc(l,i_o1d)*0.88
+     $              + cl039(l)*cc(l,i_o1d)
      $              + cl040(l)*cc(l,i_o)
      $              + cl041(l)*cc(l,i_h)
      $              + j(l,j_hcl)
@@ -3224,9 +3224,6 @@ ccccccccccccccccccccccccc
 cccccc Chlorine Chemistry
 ccccccccccccccccccccccccc
       IF ( igcm_cl .ne. 0 ) THEN 
-
-      cc(l,i_clox) = ( cc0(l,i_clox) + production(l,i_clox)*dt) 
-     $             /( 1. + loss(l,i_clox)*dt )
 
         cc(l,i_hcl) = (cc0(l,i_hcl) + production(l,i_hcl)*dt)
      $              /(1. + loss(l,i_hcl)*dt)

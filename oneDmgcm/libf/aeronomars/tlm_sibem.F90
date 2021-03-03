@@ -2074,7 +2074,8 @@ IF (igcm_cl.ne.0) THEN
     ! HCl
     x_j = (t_hcl-1)*nlayermx + lyr_m 
     dccn_dpq( x_j, : ) = A(t_hcl,1)*dcc0_dpq( x_j , : ) + A(t_hcl,2)*dP_dPQ(t_hcl,:) &
-                    - A(t_hcl,3)*dL_dPQ( t_hcl, :)
+                - A(t_hcl,3)*dL_dPQ( t_hcl, :)
+
     ! HOCl
     x_j = (t_hocl-1)*nlayermx + lyr_m 
     dccn_dpq( x_j, : ) = A(t_hocl,1)*dcc0_dpq( x_j , : ) + A(t_hocl,2)*dP_dPQ(t_hocl,:) &
@@ -2103,7 +2104,7 @@ IF (igcm_cl.ne.0) THEN
     dccn_dpq( x_j, : ) = A(t_cloo,1)*dP_dPQ(t_cloo,:) - A(t_cloo,2)*dL_dPQ(t_cloo,:)
 
 
-    ! Daylight 
+    ! Night 
     ! --------
     IF ( sza > 95. ) THEN 
         ! Cl2

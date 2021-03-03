@@ -553,11 +553,11 @@ ENDDO
     A(2) = A(1)*rclo_cl
 
     drclo_dpq = A(1)*( dLcl_dPQ  &
-                     + dPclo_dPQ/cc_prev(i_cl) &
-                     - dccn_dpq( (t_cl-1)*nlayermx + lyr_m, : )*pclo/cc_prev(i_cl)   ) &
+                     + dPclo_dPQ/MAX(cc_prev(i_cl),1.e-30*dens) &
+                     - dccn_dpq( (t_cl-1)*nlayermx + lyr_m, : )*pclo/MAX(cc_prev(i_cl),1.e-30*dens) )&
               - A(2)*( dLclo_dPQ &
-                     + dPcl_dPQ/cc_prev(i_clo) &
-                     - dccn_dpq( (t_clo-1)*nlayermx + lyr_m, : )*pcl/cc_prev(i_clo) )
+                     + dPcl_dPQ/MAX(cc_prev(i_clo),1.e-30*dens) &
+                     - dccn_dpq( (t_clo-1)*nlayermx + lyr_m, : )*pcl/MAX(cc_prev(i_clo),1.e-30*dens ))
 
 
 
@@ -577,6 +577,13 @@ ENDDO
 !
 ! [ClO]^t ' = rclo_cl * [Cl]^t ' 
 !           + [Cl]^t * rclo_cl ' 
+
+! Option One:
+!   ClOx Handling
+!   Lifetimes of Cl and ClO both below 
+!   chemistry timestep, and their summed
+!   concentrations are handled via the 
+!   partition function method 
 IF ( ( 1./lcl < dt ) .and. (1./lclo < dt) ) THEN 
 
 dCl_dPQ = dClOx_dPQ(lyr_m,:)/( 1. + rclo_cl ) &
@@ -593,6 +600,14 @@ dccn_dpq( x_j, : ) = dCl_dPQ
 x_j = (t_clo-1)*nlayermx + lyr_m 
 dccn_dpq( x_j, : ) = dClO_dPQ 
 
+
+! Option Two:
+!   Steady State and SIBEM 
+!   If the lifetime of one 
+!   or both Cl and ClO 
+!   exceeds the chemistry timestep
+!   use the Steady-State and
+!   SIBEM formulas.
 ELSE 
     ! Cl 
     x_j = (t_cl-1)*nlayermx + lyr_m 
@@ -608,7 +623,6 @@ ELSE
         dccn_dpq( x_j, : ) = Acl(1)*dcc0_dpq( x_j , : ) + Acl(2)*dPcl_dPQ &
                     - Acl(3)*dLcl_dPQ
     ENDIF 
-
     ! clo 
     x_j = (t_clo-1)*nlayermx + lyr_m 
     IF ( 1./lclo < dt ) THEN 
