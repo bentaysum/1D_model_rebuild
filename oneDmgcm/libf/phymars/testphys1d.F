@@ -938,7 +938,7 @@ C         write(*,"(13E15.7)") ( q(1,iq), iq = 28, 40 )
 
       IF ( pertloop ) THEN 
         IF ( idt == ndt_plume-1 ) THEN 
-          cALL scalar_perturbation(q)
+C           cALL scalar_perturbation(q)
           plume = .false.
           pertloop = .false.
         ENDIF 

@@ -131,7 +131,7 @@
         ! RETURN
       ! ENDIF
 
-      if ( mcd_profiles ) RETURN
+C       if ( mcd_profiles ) RETURN
 C       if ( call_tlm ) RETURN
 C       if ( pertloop ) RETURN
       
