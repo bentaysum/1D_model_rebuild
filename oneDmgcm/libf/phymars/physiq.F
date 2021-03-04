@@ -381,43 +381,43 @@ c=======================================================================
 
 c 0.0: Conditional activation of TLM routines
 c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-C        IF ( idt == ndt_tlm
-C      $      .and. call_tlm ) THEN 
+       IF ( idt == ndt_tlm
+     $      .and. call_tlm ) THEN 
             
-C             call_tlm = .False.     ! Prevents multiple initialisations.
+            call_tlm = .False.     ! Prevents multiple initialisations.
             
-C             tlm_on = .True.        ! Routines will now engage.
+            tlm_on = .True.        ! Routines will now engage.
             
-C             mcd_profiles = .False. ! Interpolation routines will 
-C                                    ! invalidate TLM results.
+            mcd_profiles = .False. ! Interpolation routines will 
+                                   ! invalidate TLM results.
             
-C             calladj = .False. ! Convective adjustments require a 
-C                                ! conditional that the TLM will not
-C                                ! be capable of performing.
-C             callcond = .False. ! Again, conditionals activate this 
-C                                ! module.
-C             call TLM_initialise
+            calladj = .False. ! Convective adjustments require a 
+                               ! conditional that the TLM will not
+                               ! be capable of performing.
+            callcond = .False. ! Again, conditionals activate this 
+                               ! module.
+            call TLM_initialise
 
-C        ELSEIF ( idt == ndt_tlm 
-C      $      .and. pertloop ) THEN 
-
-
-C C            CALL scalar_perturbation(pq(1,:,:))
+       ELSEIF ( idt == ndt_tlm 
+     $      .and. pertloop ) THEN 
 
 
-C             mcd_profiles = .False. ! Interpolation routines will 
-C                                    ! invalidate TLM results.
+C            CALL scalar_perturbation(pq(1,:,:))
+
+
+            mcd_profiles = .False. ! Interpolation routines will 
+                                   ! invalidate TLM results.
             
-C             ! calladj = .False. ! Convective adjustments require a 
-C                                ! ! conditional that the TLM will not
-C                                ! ! be capable of performing.
-C             ! callcond = .False. ! Again, conditionals activate this 
-C                                ! ! module.
+            ! calladj = .False. ! Convective adjustments require a 
+                               ! ! conditional that the TLM will not
+                               ! ! be capable of performing.
+            ! callcond = .False. ! Again, conditionals activate this 
+                               ! ! module.
                                
-C C             pertloop = .False.
+C             pertloop = .False.
            
 
-C        ENDIF 
+       ENDIF 
 
 
        IF ( tlm_on ) THEN 

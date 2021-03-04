@@ -1008,7 +1008,7 @@
       if (igcm_ch4 /= 0) then
 
 
-ch4vmr=10.e-9
+ch4vmr=0.!10.e-9
 
           do i = 1,iip1
             do j = 1,jjp1
@@ -1719,7 +1719,7 @@ ch4vmr=10.e-9
 ! Chlrorine species 22/04/2020
       ! Cl
       if (igcm_cl /= 0) then
-         vmr = 0.
+         vmr = 0.!1.-18
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
@@ -1732,7 +1732,7 @@ ch4vmr=10.e-9
       end if 
       ! ClO
       if (igcm_clo /= 0) then
-         vmr =  0.   
+         vmr =  0.!1.e-18   
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
@@ -1758,7 +1758,7 @@ ch4vmr=10.e-9
       end if 
       ! Cl2
       if (igcm_cl2 /= 0) then
-         vmr = 0.       
+         vmr = 0.!5.e-12     
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
@@ -1784,7 +1784,7 @@ ch4vmr=10.e-9
       end if 
       ! HCl
       if (igcm_hcl /= 0) then
-         vmr = 1.e-9
+         vmr =  10.e-9
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm               
@@ -1810,7 +1810,7 @@ ch4vmr=10.e-9
       end if 
       ! ClOO
       if (igcm_cloo /= 0) then
-         vmr =  1.e-30
+         vmr =  0.
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm
