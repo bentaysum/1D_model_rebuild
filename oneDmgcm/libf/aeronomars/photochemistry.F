@@ -4509,9 +4509,9 @@ c
 
          rm(l,i_clox) = rm(l,i_cl) + rm(l,i_clo) 
 
-         IF ( rm(l,i_clox) .le. 1.e-28 ) THEN 
-            rm(l,i_clox) = 1.e-30 
-         ENDIF 
+C          IF ( rm(l,i_clox) .le. 1.e-28 ) THEN 
+C             rm(l,i_clox) = 1.e-30 
+C          ENDIF 
 
       end do
 c

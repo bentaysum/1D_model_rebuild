@@ -11,7 +11,7 @@ datadir=/home/s1215319/mgcm/mgcm-datafile
 diurnal=.true.
 
 #Seasonal cycle ? if season=False, Ls stays constant, to value set in "start"
-season = .false. 
+season = .true. 
 
 #write some more output on the screen ?
 lwrite = .false.    
@@ -34,13 +34,13 @@ long_mean= .True.
 longitude=137.4
 
 ## Tracer interpolation shutdown parameters 
-mcd_dayfin = 100.
+mcd_dayfin = 669.
 mcd_ltfin = 0.
 
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 call_tlm=.False.
-tlm_day=10
+tlm_day=1000000000
 tlm_lt=0.
 
 ## L-BFGS-B Routines 
@@ -51,7 +51,7 @@ t_forecast=992
 
 ## Handled by bash script
 ## perturbation_cycle.sh 
-pertloop= .true.
+pertloop= .false.
 PERTGAS=clo3
 SCALAR=1.E-5
 L_1=1
@@ -60,10 +60,10 @@ L_2=2
 ## Plume routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Introducing an instantaneous plume?
-plume=.true.
+plume=.false.
 
 #Days after day0 to release plume?
-plume_day=10
+plume_day=1000000
 
 #Local time to release plume?
 plume_lt=0.
@@ -82,11 +82,10 @@ p_high = 5
 #  =6 "cold" (low dust) scenario ; =7 "warm" (high dust) scenario
 #  =24 Mars Year 24  ; =25 Mars Year 25 (year with a global dust storm) ; ...
 #  =30 Mars Year 30 
-iaervar = 1
+iaervar = 24
 
 # Dust opacity at 610 Pa (when constant, i.0e. for the iaervar=1 case)
-tauvis=0.4719
- 
+tauvis=1.0063 
 
 # Dust vertical distribution: 
 # (=0: old distrib. (Pollack90), =1: top set by "topdustref",
