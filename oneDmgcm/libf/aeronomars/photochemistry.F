@@ -1561,7 +1561,7 @@ c     ccccccccccccccccccc
       lcl = cl001(l)*cc(l,i_o3)
      $    + cl010(l)*cc(l,i_ho2)
      $    + cl022(l)*cc(l,i_ch3o2)*0.5
-     $    + cl034(l)*cc(l,i_cloo) 
+     $    + cl024(l)*cc(l,i_cloo) 
      $    + cl053(l)*cc(l,i_clo4)
      $    + cl056(l)*cc(l,i_hocl)
      $    + cl059(l)*cc(l,i_oclo)
@@ -1576,7 +1576,8 @@ c     ccccccccccccccccccc
      $     + cl059(l)*cc(l,i_oclo)*2.
 
       ! Loss of ClO
-      lclo = cl002(l)*cc(l,i_o)
+      lclo = j(l,j_clo)
+     $     + cl002(l)*cc(l,i_o)
      $     + cl004(l)*cc(l,i_clo)
      $     + cl005(l)*cc(l,i_clo)
      $     + cl012(l)*cc(l,i_oh)

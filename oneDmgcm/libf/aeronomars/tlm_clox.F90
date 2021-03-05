@@ -83,7 +83,7 @@ REAL, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 ! ===============
 REAL A(6) ! Partition Function Linearising Coefficients
 
-REAL Acl(3), Aclo(3) 
+REAL Acl(2), Aclo(2) 
 
 REAL dPcl_dPQ(nqmx*nlayermx), dPclo_dPQ(nqmx*nlayermx) ! Linearised Production 
 REAL dLcl_dPQ(nqmx*nlayermx), dLclo_dPQ(nqmx*nlayermx) ! Linearised Loss
@@ -328,328 +328,154 @@ j_oclo         = 45      ! oclo + hv -> clo + o
 j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo 
 
 
-! =================================================== !
-! Stage One : Linearised Partition Function
-! =================================================== !
-!
-! rclo_cl = ( Pclo/[Cl]^t + Lcl ) / ( Pcl/[ClO]^t + Lclo )
-!
-! For loss and production rates of Cl and ClO.
-!
-! Partial differentiation with respect to tracer mixing
-! ratios [PQ] leads to the equation:
-!
-! rclo_cl' = A1 * d[Lcl]/dPQ 
-!		   + A2 * d[Pclo]/dPQ
-!		   - A3 * d[Cl]^t/dPQ
-!		   - A4 * d[Lclo]/dPQ 
-!		   - A5 * d[Pcl]/dPQ
-!		   + A6 * d[ClO]^t/dPQ
-!
-! A1 = 1. / ( Pcl/[ClO]^t + Lclo )
-! A2 = A1 / [Cl]^t 
-! A3 = (A2 * Pclo) / [Cl]^t 
+! ===================================================
+! Tangent Linear Model : ClOx species
+! ---------------------------------------------------
 ! 
-! A4 = rclo_cl * A1 
-! A5 = A4  / [ClO]^t 
-! A6 = (A5 * Pcl) / [ClO]^t
+! Main Equations:
 !
-! NOTE : Pcl and Pclo are already normalised by the 
-!		 other species' number density prior to 
-!	     entering this submodule, i.e.:
+!   [Cl] = [ClOx]/(1. + rclo_cl)
 !
-!		 Pcl == Pcl/[ClO]^t and Pclo == Pclo/[Cl]^t
-! =================================================== !
-
-! 1.2 : Linearised Production Terms 
-! ---------------------------------
-
-! Production of Cl [Pcl]
-! ----------------------
-pcl_coeff(:) = 0.
-
-pcl_coeff(t_o) = cl002*cc_prev(i_clo) &
-               + cl040*cc(i_hcl)
-
-pcl_coeff(t_o1d) = cl035*cc(i_cl2) &
-                 + 0.66*cl039*cc(i_hcl)
-
-pcl_coeff(t_h) = cl037*cc(i_cl2) &
-               + cl041*cc(i_hcl)
-
-pcl_coeff(t_oh) = 0.94*cl012*cc_prev(i_clo) &
-                + cl014*cc(i_hcl) &
-                + cl036*cc(i_cl2)
-
-
-pcl_coeff(t_clo) = cl002*cc(i_o) &
-                 + 4.*cl004*cc_prev(i_clo) &
-                 + 2.*cl005*cc_prev(i_clo) &
-                 + 0.94*cl012*cc(i_oh) &
-                 + j(j_clo)
-
-pcl_coeff(t_cloo) = cl026
-
-pcl_coeff(t_clco) = cl033
-
-pcl_coeff(t_hcl) = cl014*cc(i_oh) &
-                 + 0.66*cl039*cc(i_o1d) &
-                 + cl040*cc(i_o) &
-                 + cl041*cc(i_h) &
-                 + j(j_hcl)
-
-pcl_coeff(t_hocl) = j(j_hocl)
-
-pcl_coeff(t_cl2) = cl035*cc(i_o1d) &
-                 + cl036*cc(i_oh) &
-                 + cl037*cc(i_h) &
-                 + cl038*cc(i_ch3) &
-                 + j(j_cl2)
-
-pcl_coeff(t_cl2o2) = j(j_cl2o2)
-
-IF (igcm_ch3 .ne. 0 ) pcl_coeff(t_ch3) = cl038*cc(i_cl2)
-
-! Production of ClO [Pclo]
-! ------------------------
-pclo_coeff(:) = 0. 
-
-pclo_coeff(t_o1d)= cl035*cc(i_cl2) &
-                 + 0.22*cl039*cc(i_hcl)
-
-pclo_coeff(t_o) = cl042*cc(i_hocl) &
-                + cl057*cc(i_oclo)
-
-pclo_coeff(t_oh) = cl015*cc(i_hocl)
-
-pclo_coeff(t_ho2) = cl010*cc_prev(i_cl)
-
-pclo_coeff(t_o3) = cl001*cc_prev(i_cl)
-
-pclo_coeff(t_cl) = cl001*cc(i_o3) &
-                 + cl010*cc(i_ho2) &
-                 + 0.5*cl022*cc(i_ch3o2) &
-                 + 2.*cl024*cc(i_cloo) &
-                 + cl053*cc(i_clo4) &
-                 + cl056*cc(i_hocl) &
-                 + 2.*cl059*cc(i_oclo)
-
-pclo_coeff(t_cloo) = 2.*cl024*cc_prev(i_cl) &
-                   + j(j_cloo)
-
-pclo_coeff(t_hcl) = 0.22*cl039*cc(i_o1d)
-
-pclo_coeff(t_hocl) = cl015*cc(i_oh) &
-                   + cl042*cc(i_o) &
-                   + cl056*cc_prev(i_cl)
-
-pclo_coeff(t_oclo) = j(j_oclo) &
-                   + cl057*cc(i_o) &
-                   + 2.*cl059*cc_prev(i_cl)
-
-pclo_coeff(t_cl2o2) = 2.*cl007
-
-pclo_coeff(t_cl2) = cl035*cc(i_o1d)
-
-pclo_coeff(t_clo4) = cl053*cc_prev(i_cl)
-
-
-
-IF (igcm_ch3o2 .ne. 0) pclo_coeff(t_ch3o2) = 0.5*cl022*cc_prev(i_cl)
-
-! 1.3 : Linearised Production Terms 
-! ---------------------------------
-
-! Loss of Cl [Pcl]
-! ----------------------
-lcl_coeff(:) = 0. 
-
-lcl_coeff(t_co) = cl023 
-
-lcl_coeff(t_o2) = cl028
-
-lcl_coeff(t_o3) = cl001 + cl044
-
-lcl_coeff(t_h2) = cl008
-
-lcl_coeff(t_h2o2) = cl011
-
-lcl_coeff(t_ho2) = cl009 + cl010
-
-lcl_coeff(t_ch4) = cl016
-
-lcl_coeff(t_cloo) = cl024 + cl025
-
-lcl_coeff(t_ch3ocl) = cl029 + cl031 
-
-lcl_coeff(t_cl2o2) = cl030 
-
-lcl_coeff(t_clo4) = cl053
-
-lcl_coeff(t_hocl) = cl055 + cl056 
-
-lcl_coeff(t_oclo) = cl059 
-
-IF (igcm_hcho .ne. 0) lcl_coeff(t_hcho) = cl017 
-
-IF (igcm_ch3ooh .ne. 0) lcl_coeff(t_ch3ooh) = cl018
-
-IF (igcm_ch3o2 .ne. 0) lcl_coeff(t_ch3o2) = cl022
-
-! Loss of ClO [Pcl]
-! ----------------------
-lclo_coeff(:) = 0.
-
-lclo_coeff(t_o) = cl002 
-
-lclo_coeff(t_oh) = cl012 
-
-lclo_coeff(t_ho2) = cl013 
-
-lclo_coeff(t_clo) = cl003 + cl004 + cl005 + cl006
-
-lclo_coeff(t_clo3) = cl045 + cl046 + cl047
-
-IF (igcm_ch3o2 .ne. 0) lclo_coeff(t_ch3o2) = cl019 + cl020 + cl021
-
-! 1.4 : Matrix Calculations 
-! -------------------------
-dPcl_dPQ(:) = 0.
-dLcl_dPQ(:) = 0.
-dPclo_dPQ(:) = 0. 
-dLclo_dPQ(:) = 0. 
-
-DO iq = 1,nqmx
-
-      x_j = (iq-1)*nlayermx + lyr_m
-
-      ! Cl 
-      dPcl_dPQ = dPcl_dPQ + pcl_coeff(iq)*dccn_dpq(x_j,:)
-      dLcl_dPQ = dLcl_dPQ + lcl_coeff(iq)*dccn_dpq(x_j,:)
-      ! ClO
-      dPclo_dPQ = dPclo_dPQ + pclo_coeff(iq)*dccn_dpq(x_j,:) 
-      dLclo_dPQ = dLclo_dPQ + lclo_coeff(iq)*dccn_dpq(x_j,:) 
-
-ENDDO
-
-
-! ====================================
-! DAYLIGHT ROUTINE:
-!   [ClOx] = [Cl] + [ClO]
+!   [ClO] = [Cl] x rclo_cl
 !
-!   [Cl] = [ClOx]/( 1. + [ClO]/[Cl])
+! where ClOx, the sum total of Cl and ClO, is handled
+! via the SIBEM equation, calculated in the TLM_sibem
+! file.
 !
-!   [ClO] = [Cl] * [ClO]/[Cl]
-! ====================================
-! Equation:
+!=====================================================
+! 1.0 : Linearising Partition Function rclo_cl
+! ----------------------------------------------------
 !
-! d(rclo_cl)/d(PQ)
-!		= A  )
-
-! 1.5 : Calculation of the Linearised Partition Function 
+! rclo_cl = (pclo + lcl)/(pcl + lclo)
+!
+! where p and l terms are the loss and production rates,
+! both in units of s^-1, of Cl and ClO within the rapid
+! Cl <--> ClO conversion network.
+!
+! Linearised equation:
+!
+! rclo_cl ' =  (pcl + lclo)^-1 x ( pclo' + lcl' )
+!           -  (pclo + lcl)x(pcl + lclo)^-2 x ( pcl' + lclo')
+! 
 ! ------------------------------------------------------
-! IF ( sza .le. 95. ) THEN 
-    A(1) = 1./( pcl + lclo )
+! 1.1 : Coefficients
+! ------------------------------------------------------
+    A(1) = 1./(pcl + lclo)
     A(2) = A(1)*rclo_cl
 
-    drclo_dpq = A(1)*( dLcl_dPQ  &
-                     + dPclo_dPQ/MAX(cc_prev(i_cl),1.e-30*dens) &
-                     - dccn_dpq( (t_cl-1)*nlayermx + lyr_m, : )*pclo/MAX(cc_prev(i_cl),1.e-30*dens) )&
-              - A(2)*( dLclo_dPQ &
-                     + dPcl_dPQ/MAX(cc_prev(i_clo),1.e-30*dens) &
-                     - dccn_dpq( (t_clo-1)*nlayermx + lyr_m, : )*pcl/MAX(cc_prev(i_clo),1.e-30*dens ))
+! ------------------------------------------------------
+! 1.2: Linearised Production Rates 
+! ------------------------------------------------------
+    pcl_coeff(:) = 0.
+    pclo_coeff(:) = 0. 
 
+    ! 1.2.1 : Cl 
+    ! ----------
+    pcl_coeff(t_o) = cl002 
+    pcl_coeff(t_clo) = 2.*cl004 + cl005 
+    pcl_coeff(t_oh) = 0.94*cl012 
 
+    ! 1.2.2 : ClO 
+    ! -----------
+    pclo_coeff(t_o3) = cl001 
+    pclo_coeff(t_ho2) = cl010
+    pclo_coeff(t_ch3o2) = cl022*0.5
+    pclo_coeff(t_cloo) = cl024*2. 
+    pclo_coeff(t_clo4) = cl053
+    pclo_coeff(t_hocl) = cl056
+    pclo_coeff(t_oclo) = 2.*cl059 
 
+! ------------------------------------------------------
+! 1.3: Linearised Loss Rate Coefficients
+! ------------------------------------------------------
+    lcl_coeff(:) = 0.
+    lclo_coeff(:) = 0. 
 
-! ==================================================== !
-! Stage Two : Linearised [Cl] and [ClO] number density
-! ==================================================== !
+    ! 1.3.1 : Cl  
+    ! ----------
+    lcl_coeff(t_o3) = cl001 
+    lcl_coeff(t_ho2) = cl010 
+    lcl_coeff(t_ch3o2) = 0.5*cl022 
+    lcl_coeff(t_cloo) = cl024
+    lcl_coeff(t_clo4) = cl053 
+    lcl_coeff(t_hocl) = cl056
+    lcl_coeff(t_oclo) = cl059
+
+    ! 1.3.2 : ClO
+    lclo_coeff(t_o) = cl002 
+    lclo_coeff(t_clo) = cl004 + cl005 
+    lclo_coeff(t_oh) = cl012 
+
+! ------------------------------------------------------
+! 1.4 : Calculating the Linearised P and L terms 
+! ------------------------------------------------------
+    dPcl_dPQ(:) = 0.
+    dLcl_dPQ(:) = 0.
+    dPclo_dPQ(:) = 0. 
+    dLclo_dPQ(:) = 0. 
+
+    DO iq = 1,nqmx
+
+          x_j = (iq-1)*nlayermx + lyr_m
+
+          ! Cl 
+          dPcl_dPQ = dPcl_dPQ + pcl_coeff(iq)*dccn_dpq(x_j,:)
+          dLcl_dPQ = dLcl_dPQ + lcl_coeff(iq)*dccn_dpq(x_j,:)
+          ! ClO
+          dPclo_dPQ = dPclo_dPQ + pclo_coeff(iq)*dccn_dpq(x_j,:) 
+          dLclo_dPQ = dLclo_dPQ + lclo_coeff(iq)*dccn_dpq(x_j,:) 
+
+    ENDDO
+
+! ------------------------------------------------------
+! 1.5 : Calculating the Linearised Partition Function 
+! ------------------------------------------------------
+    drclo_dpq = A(1)*( dPclo_dPQ + dLcl_dPQ ) &
+              - A(2)*( dLclo_dPQ + dPcl_dPQ )
+
+! =======================================================
+! 2.0 : Linearised Cl and ClO Number Densities
+! -------------------------------------------------------
 !
-! [Cl]^t = [ClOx]^t/( 1 + rclo_cl )
+! [Cl] ' = (1. + rclo_cl)^-1 x [ClOx]' 
+!        - [ClOx] x (1. + rclo_cl)^-2 x [rclo_cl]'
 !
-! [ClO]^t = [Cl]^t * rclo_cl 
-!
-! ---------------------------------
-!
-! [Cl]^t ' = (1. + rclo_cl)^-1 * [ClOx]^t ' 
-!          - [ClOx]^t/(1. + rclo_cl)^2 * rclo_cl ' 
-!
-! [ClO]^t ' = rclo_cl * [Cl]^t ' 
-!           + [Cl]^t * rclo_cl ' 
+! [ClO]' = rclo_cl x [Cl]' 
+!        + [Cl] x [rclo_cl]'
+! --------------------------------------------------------
+! 2.1 : Coefficients
+! --------------------------------------------------------
+    Acl(1) = 1./(1.+rclo_cl)
+    Acl(2) = cc(i_clox)*(Acl(1)**2.) 
 
-! Option One:
-!   ClOx Handling
-!   Lifetimes of Cl and ClO both below 
-!   chemistry timestep, and their summed
-!   concentrations are handled via the 
-!   partition function method 
-IF ( ( 1./lcl < dt ) .and. (1./lclo < dt) ) THEN 
+    Aclo(1) = rclo_cl
+    Aclo(2) = cc(i_cl)
 
-dCl_dPQ = dClOx_dPQ(lyr_m,:)/( 1. + rclo_cl ) &
-        - drclo_dpq*cc(i_cl)/( 1. + rclo_cl )
+! --------------------------------------------------------
+! 2.2 : Calculations
+! --------------------------------------------------------
+    
+    ! 2.2.1 : Cl 
+    ! ----------
+    dCl_dPQ = Acl(1)*dClOx_dPQ( lyr_m, : ) &
+            - Acl(2)*drclo_dpq 
 
-dClO_dPQ = rclo_cl*dCl_dPQ &
-         + cc(i_cl)*drclo_dpq 
+    ! 2.2.2 : ClO 
+    ! -----------
+    dClO_dPQ = Aclo(1)*dCl_dPQ &
+             + Aclo(2)*drclo_dpq
 
-! Cl
-x_j = (t_cl-1)*nlayermx + lyr_m 
-dccn_dpq( x_j, : ) = dCl_dPQ 
-
-! ClO 
-x_j = (t_clo-1)*nlayermx + lyr_m 
-dccn_dpq( x_j, : ) = dClO_dPQ 
-
-
-! Option Two:
-!   Steady State and SIBEM 
-!   If the lifetime of one 
-!   or both Cl and ClO 
-!   exceeds the chemistry timestep
-!   use the Steady-State and
-!   SIBEM formulas.
-ELSE 
-    ! Cl 
+! --------------------------------------------------------
+! 2.3 : Insertion into Linearised NUmber Density Array
+! --------------------------------------------------------
+    ! 2.3.1: Cl 
     x_j = (t_cl-1)*nlayermx + lyr_m 
-    IF ( 1./lcl < dt ) THEN 
-        Acl(1) = 1./lcl
-        Acl(2) = pcl*MAX(1.e-30*dens,cc_prev(i_clo))*(Acl(1)**2.)
-        dccn_dpq( x_j, : ) = Acl(1)*dPcl_dPQ - Acl(2)*dLcl_dPQ 
-    ELSE 
-        Acl(1) = 1./(1. + lcl*dt)
-        Acl(2) = Acl(2)*dt
-        Acl(3) = cc(i_cl)*Acl(1)*dt
+    dccn_dpq( x_j, : ) = dCl_dPQ 
 
-        dccn_dpq( x_j, : ) = Acl(1)*dcc0_dpq( x_j , : ) + Acl(2)*dPcl_dPQ &
-                    - Acl(3)*dLcl_dPQ
-    ENDIF 
-    ! clo 
+    ! 2.3.2: ClO 
     x_j = (t_clo-1)*nlayermx + lyr_m 
-    IF ( 1./lclo < dt ) THEN 
-        Aclo(1) = 1./lclo
-        Aclo(2) = pclo*MAX(1.e-30*dens,cc_prev(i_cl))*(Aclo(1)**2.)
-        dccn_dpq( x_j, : ) = Aclo(1)*dPclo_dPQ - Aclo(2)*dLclo_dPQ 
-    ELSE 
-        Aclo(1) = 1./(1. + lclo*dt)
-        Aclo(2) = Aclo(2)*dt
-        Aclo(3) = cc(i_clo)*Aclo(1)*dt
+    dccn_dpq( x_j, : ) = dClO_dPQ 
 
-        dccn_dpq( x_j, : ) = Aclo(1)*dcc0_dpq( x_j , : ) + Aclo(2)*dPclo_dPQ &
-                    - Aclo(3)*dLcl_dPQ
-    ENDIF 
-
-ENDIF 
-
-
-
-
-
-
-
-
-
-
-
-RETURN
+    RETURN 
 
 END SUBROUTINE
