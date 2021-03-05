@@ -1546,151 +1546,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       DO l = 1, lswitch-1
 
-      production(l,i_cl) = cl002(l)*cc(l,i_o)*cc(l,i_clo) 
-     $                   + 2.*cl004(l)*cc(l,i_clo)*cc(l,i_clo)
-     $                   + cl005(l)*cc(l,i_clo)*cc(l,i_clo)
-     $                   + 0.94*cl012(l)*cc(l,i_clo)*cc(l,i_oh)
-     $                   + cl014(l)*cc(l,i_hcl)*cc(l,i_oh)
-     $                   + cl026(l)*cc(l,i_cloo) 
-     $                   + cl033(l)*cc(l,i_clco)
-     $                   + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
-     $                   + cl036(l)*cc(l,i_cl2)*cc(l,i_oh)
-     $                   + cl037(l)*cc(l,i_cl2)*cc(l,i_h)
-     $                   + cl038(l)*cc(l,i_cl2)*cc(l,i_ch3)
-     $                   + cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)*0.66 
-     $                   + cl040(l)*cc(l,i_hcl)*cc(l,i_o)
-     $                   + cl041(l)*cc(l,i_hcl)*cc(l,i_h)
-     $                   + j(l,j_cl2)*cc(l,i_cl2)*2.
-     $                   + j(l,j_cl2o2)*cc(l,i_cl2o2)
-     $                   + j(l,j_hcl)*cc(l,i_hcl)
-     $                   + j(l,j_hocl)*cc(l,i_hocl)
-     $                   + j(l,j_clo)*cc(l,i_clo)
-
-      loss(l,i_cl) = cl001(l)*cc(l,i_o3)
-     $             + cl008(l)*cc(l,i_h2)
-     $             + cl009(l)*cc(l,i_ho2)
-     $             + cl010(l)*cc(l,i_ho2)
-     $             + cl011(L)*cc(l,i_h2o2)
-     $             + cl016(l)*cc(l,i_ch4)
-     $             + cl017(l)*cc(l,i_hcho)
-     $             + cl018(l)*cc(l,i_ch3ooh)
-     $             + cl022(l)*cc(l,i_ch3o2)
-     $             + cl023(l)*cc(l,i_co)
-     $             + cl024(l)*cc(l,i_cloo)
-     $             + cl025(l)*cc(L,i_cloo)
-     $             + cl028(l)*cc(l,i_o2) 
-     $             + cl029(l)*cc(l,i_ch3ocl)
-     $             + cl030(l)*cc(l,i_cl2o2)
-     $             + cl031(l)*cc(l,i_ch3ocl)
-     $             + cl043(l)*cc(l,i_hcooh)
-     $             + cl044(l)*cc(l,i_o3)
-     $             + cl053(l)*cc(l,i_clo4)
-     $             + cl055(l)*cc(l,i_hocl)
-     $             + cl056(l)*cc(l,i_hocl)
-     $             + cl059(l)*cc(l,i_oclo)
-
-c 	  --------------------------------------------------
-
-      production(l,i_clo) = cl001(l)*cc(l,i_o3)*cc(l,i_cl)
-     $                    + 2.*cl007(l)*cc(L,i_cl2o2)
-     $                    + cl010(l)*cc(l,i_cl)*cc(l,i_ho2)
-     $                    + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
-     $                    + 0.5*cl022(l)*cc(l,i_ch3o2)*cc(l,i_cl)
-     $                    + 2.*cl024(l)*cc(l,i_cloo)*cc(l,i_cl)
-     $                    + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
-     $                    + cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)*0.22 
-     $                    + cl041(l)*cc(l,i_hocl)*cc(l,i_o)
-     $                    + cl053(l)*cc(l,i_clo4)*cc(l,i_cl)
-     $                    + cl056(l)*cc(l,i_cl)*Cc(l,i_hocl)
-     $                    + cl057(l)*cc(l,i_oclo)*cc(l,i_o)
-     $                    + 2.*cl059(L)*cc(l,i_oclo)*cc(l,i_cl)
-     $                    + j(l,j_cloo)*cc(l,i_cloo)
-     $                    + j(l,j_oclo)*cc(l,i_oclo)
-
-      loss(l,i_clo) = cl002(l)*cc(l,i_o) 
-     $              + cl003(l)*cc(l,i_clo)
-     $              + cl004(l)*cc(l,i_clo)
-     $              + cl005(l)*cc(l,i_clo)
-     $              + cl006(l)*cc(l,i_clo)
-     $              + cl012(l)*cc(l,i_oh)
-     $              + cl013(l)*cc(l,i_ho2)
-     $              + cl019(l)*cc(l,i_ch3o2)
-     $              + cl020(l)*cc(l,i_ch3o2)
-     $              + cl021(l)*cc(L,i_ch3o2)
-     $              + cl045(l)*cc(l,i_clo3)
-     $              + cl046(l)*cc(l,i_clo3)
-     $              + cl047(l)*cc(l,i_clo3)
-     $              + j(l,j_clo)
-
-
-Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     ClOx = Cl + ClO 
-Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      production(l,i_clox) = cl007(l)*cc(l,i_cl2o2)
-     $                     + cl014(l)*cc(l,i_hcl)*cc(l,i_oh)
-     $                     + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
-     $                     + cl024(l)*cc(l,i_cloo)*cc(l,i_cl)
-     $                     + cl026(l)*cc(l,i_cloo)
-     $                     + cl033(l)*cc(l,i_clco)
-     $                     + cl035(l)*cc(l,i_o1d)*cc(l,i_cl2)*2.
-     $                     + cl036(l)*cc(l,i_cl2)*cc(L,i_oh)
-     $                     + cl037(l)*cc(l,i_cl2)*cc(L,i_h)
-     $                     + cl038(l)*cc(l,i_cl2)*cc(L,i_ch3)
-     $                     + 0.88*cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)
-     $                     + cl040(l)*cc(l,i_hcl)*cc(l,i_o)
-     $                     + cl041(l)*cc(l,i_hcl)*cc(l,i_h)
-     $                     + cl042(l)*cc(l,i_hocl)*cc(l,i_o)
-     $                     + cl057(l)*cc(l,i_oclo)*cc(l,i_o)
-     $                     + cl059(l)*cc(l,i_oclo)*cc(l,i_cl)
-     $                     + j(l,j_cl2)*cc(l,i_cl2)*2.
-     $                     + j(l,j_cloo)*cc(l,i_cloo)
-     $                     + j(l,j_oclo)*cc(l,i_oclo)
-     $                     + j(l,j_cl2o2)*cc(l,i_cl2o2)
-     $                     + j(l,j_hcl)*cc(l,i_hcl)
-     $                     + j(l,j_hocl)*cc(l,i_hocl)
-
-      loss(l,i_clox) = 2.*cl003(l)*cc(l,i_clo)*cc(l,i_clo)
-     $               + cl005(l)*cc(l,i_clo)*cc(l,i_clo)
-     $               + 2.*cl006(l)*cc(l,i_clo)*cc(l,i_clo)
-     $               + cl008(l)*cc(l,i_cl)*cc(l,i_h2) 
-     $               + cl009(l)*cc(l,i_cl)*cc(l,i_ho2)
-     $               + cl011(l)*cc(l,i_cl)*cc(l,i_h2o2)
-     $               + 0.06*cl012(l)*cc(l,i_cl)*cc(l,i_oh)
-     $               + cl013(l)*cc(l,i_clo)*cc(l,i_ho2)
-     $               + cl016(l)*cc(l,i_cl)*cc(l,i_ch4)
-     $               + cl017(l)*cc(l,i_cl)*cc(l,i_hcho)
-     $               + cl018(l)*cc(l,i_cl)*cc(l,i_ch3ooh)
-     $               + cl019(l)*cc(l,i_clo)*cc(l,i_ch3o2)
-     $               + cl020(l)*cc(l,i_clo)*cc(l,i_ch3o2)
-     $               + cl021(l)*cc(l,i_clo)*cc(l,i_ch3o2)
-     $               + 0.5*cl022(l)*cc(l,i_cl)*cc(l,i_ch3o2)
-     $               + cl023(l)*Cc(l,i_co)*cc(l,i_cl)
-     $               + cl025(l)*cc(l,i_cloo)*cc(l,i_cl)
-     $               + cl028(l)*cc(l,i_cl)*Cc(l,i_o2)
-     $               + cl029(l)*cc(l,i_cl)*cc(l,i_ch3ocl)
-     $               + cl030(l)*cc(l,i_cl)*cc(l,i_cl2o2)
-     $               + cl031(l)*cc(l,i_cl)*cc(l,i_ch3ocl)
-     $               + cl043(l)*cc(l,i_cl)*cc(l,i_hcooh)
-     $               + cl044(l)*cc(l,i_cl)*cc(l,i_o3)
-     $               + cl045(l)*cc(l,i_clo)*cc(l,i_clo3)
-     $               + cl046(l)*cc(l,i_clo)*cc(l,i_clo3)
-     $               + cl047(l)*cc(l,i_clo)*cc(l,i_clo3)
-     $               + cl055(l)*cc(l,i_hocl)*cc(l,i_cl)
-
-      loss(l,i_clox) = loss(l,i_clox)/MAX(cc(l,i_clox),1.e-30*dens(l)) 
-      
-
-
-
 c     ccccccccccccccccccc
 c     Daylight : SZA < 95
 c     ccccccccccccccccccc
       IF ( sza .le. 95. ) THEN 
 
-C         pcl = production(l,i_cl)/MAX( 1.e-30*dens(l), cc(l,i_clo) )
-C         pclo = production(l,i_clo)/MAX( 1.e-30*dens(l), cc(l,i_cl) )
-C         lcl = loss(l,i_cl)
-C         lclo = loss(l,i_clo)
       ! Production of Cl via ClO 
       pcl = j(l,j_clo) 
      $    + cl002(l)*cc(l,i_o)
@@ -1731,41 +1591,16 @@ c     -----------------------------------------------
             cc_prev = cc(l,:)
       ENDIF ! tlm_on 
 
-         IF ( (1./loss(l,i_cl) < dt ) .and.
-     $      (1./loss(l,i_clo) < dt ) ) THEN 
+        ! Cl
         cc(l,i_cl) = cc(l,i_clox)/(1. + rclo_cl(l))
 
+        ! ClO
         cc(l,i_clo) = cc(l,i_cl)*rclo_cl(l)
   
-         ELSE
-
-        ! Cl 
-          IF ( 1./loss(l,i_cl) < dt ) THEN
-            cc(l,i_cl) = production(l,i_cl)/loss(l,i_cl)
-          ELSE 
-            cc(l,i_cl) = (cc0(l,i_cl) + production(l,i_cl)*dt)
-     $                  /(1. + loss(l,i_cl)*dt)
-          ENDIF 
-        ! ClO 
-          IF ( 1./loss(l,i_clo) < dt ) THEN
-            cc(l,i_clo) = production(l,i_clo)/loss(l,i_clo)
-          ELSE 
-            cc(l,i_clo) = (cc0(l,i_clo) + production(l,i_clo)*dt)
-     $                  /(1. + loss(l,i_clo)*dt)
-          ENDIF 
-
-
-         ENDIF 
-
 c     ==============
 C     Tangent Linear 
 c     ==============
       IF ( tlm_on ) THEN 
-
-      pcl =  production(l,i_cl)/MAX(cc_prev(i_clo),1.e-30*dens(l)) 
-      pclo = production(l,i_clo)/MAX(cc_prev(i_cl),1.e-30*dens(l))
-      lcl = loss(l,i_cl)
-      lclo = loss(l,i_clo) 
 
       call tlm_clox(l, rclo_cl(l), iter,  dt, dens(l),
      $             pcl, lcl, pclo, lclo,
@@ -1840,7 +1675,6 @@ c     ==============
       ENDIF ! tlm_on 
 
       ENDIF ! SZA < 95. 
-
 
       ENDDO ! l = 1, lswitch-1
 
@@ -2808,9 +2642,150 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Chlorine Chemistry
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     Cl 
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c
+      production(l,i_cl) = cl002(l)*cc(l,i_o)*cc(l,i_clo) 
+     $                   + 2.*cl004(l)*cc(l,i_clo)*cc(l,i_clo)
+     $                   + cl005(l)*cc(l,i_clo)*cc(l,i_clo)
+     $                   + 0.94*cl012(l)*cc(l,i_clo)*cc(l,i_oh)
+     $                   + cl014(l)*cc(l,i_hcl)*cc(l,i_oh)
+     $                   + cl026(l)*cc(l,i_cloo) 
+     $                   + cl033(l)*cc(l,i_clco)
+     $                   + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
+     $                   + cl036(l)*cc(l,i_cl2)*cc(l,i_oh)
+     $                   + cl037(l)*cc(l,i_cl2)*cc(l,i_h)
+     $                   + cl038(l)*cc(l,i_cl2)*cc(l,i_ch3)
+     $                   + cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)*0.66 
+     $                   + cl040(l)*cc(l,i_hcl)*cc(l,i_o)
+     $                   + cl041(l)*cc(l,i_hcl)*cc(l,i_h)
+     $                   + j(l,j_cl2)*cc(l,i_cl2)*2.
+     $                   + j(l,j_cl2o2)*cc(l,i_cl2o2)
+     $                   + j(l,j_hcl)*cc(l,i_hcl)
+     $                   + j(l,j_hocl)*cc(l,i_hocl)
+     $                   + j(l,j_clo)*cc(l,i_clo)
+
+      loss(l,i_cl) = cl001(l)*cc(l,i_o3)
+     $             + cl008(l)*cc(l,i_h2)
+     $             + cl009(l)*cc(l,i_ho2)
+     $             + cl010(l)*cc(l,i_ho2)
+     $             + cl011(L)*cc(l,i_h2o2)
+     $             + cl016(l)*cc(l,i_ch4)
+     $             + cl017(l)*cc(l,i_hcho)
+     $             + cl018(l)*cc(l,i_ch3ooh)
+     $             + cl022(l)*cc(l,i_ch3o2)
+     $             + cl023(l)*cc(l,i_co)
+     $             + cl024(l)*cc(l,i_cloo)
+     $             + cl025(l)*cc(L,i_cloo)
+     $             + cl028(l)*cc(l,i_o2) 
+     $             + cl029(l)*cc(l,i_ch3ocl)
+     $             + cl030(l)*cc(l,i_cl2o2)
+     $             + cl031(l)*cc(l,i_ch3ocl)
+     $             + cl043(l)*cc(l,i_hcooh)
+     $             + cl044(l)*cc(l,i_o3)
+     $             + cl053(l)*cc(l,i_clo4)
+     $             + cl055(l)*cc(l,i_hocl)
+     $             + cl056(l)*cc(l,i_hocl)
+     $             + cl059(l)*cc(l,i_oclo)
+
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     ClO
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      production(l,i_clo) = cl001(l)*cc(l,i_o3)*cc(l,i_cl)
+     $                    + 2.*cl007(l)*cc(L,i_cl2o2)
+     $                    + cl010(l)*cc(l,i_cl)*cc(l,i_ho2)
+     $                    + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
+     $                    + 0.5*cl022(l)*cc(l,i_ch3o2)*cc(l,i_cl)
+     $                    + 2.*cl024(l)*cc(l,i_cloo)*cc(l,i_cl)
+     $                    + cl035(l)*cc(l,i_cl2)*cc(l,i_o1d)
+     $                    + cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)*0.22 
+     $                    + cl041(l)*cc(l,i_hocl)*cc(l,i_o)
+     $                    + cl053(l)*cc(l,i_clo4)*cc(l,i_cl)
+     $                    + cl056(l)*cc(l,i_cl)*Cc(l,i_hocl)
+     $                    + cl057(l)*cc(l,i_oclo)*cc(l,i_o)
+     $                    + 2.*cl059(L)*cc(l,i_oclo)*cc(l,i_cl)
+     $                    + j(l,j_cloo)*cc(l,i_cloo)
+     $                    + j(l,j_oclo)*cc(l,i_oclo)
+
+      loss(l,i_clo) = cl002(l)*cc(l,i_o) 
+     $              + cl003(l)*cc(l,i_clo)
+     $              + cl004(l)*cc(l,i_clo)
+     $              + cl005(l)*cc(l,i_clo)
+     $              + cl006(l)*cc(l,i_clo)
+     $              + cl012(l)*cc(l,i_oh)
+     $              + cl013(l)*cc(l,i_ho2)
+     $              + cl019(l)*cc(l,i_ch3o2)
+     $              + cl020(l)*cc(l,i_ch3o2)
+     $              + cl021(l)*cc(L,i_ch3o2)
+     $              + cl045(l)*cc(l,i_clo3)
+     $              + cl046(l)*cc(l,i_clo3)
+     $              + cl047(l)*cc(l,i_clo3)
+     $              + j(l,j_clo)
+
+
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     ClOx = Cl + ClO 
+Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      production(l,i_clox) = cl007(l)*cc(l,i_cl2o2)
+     $                     + cl014(l)*cc(l,i_hcl)*cc(l,i_oh)
+     $                     + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
+     $                     + cl024(l)*cc(l,i_cloo)*cc(l,i_cl)
+     $                     + cl026(l)*cc(l,i_cloo)
+     $                     + cl033(l)*cc(l,i_clco)
+     $                     + cl035(l)*cc(l,i_o1d)*cc(l,i_cl2)*2.
+     $                     + cl036(l)*cc(l,i_cl2)*cc(L,i_oh)
+     $                     + cl037(l)*cc(l,i_cl2)*cc(L,i_h)
+     $                     + cl038(l)*cc(l,i_cl2)*cc(L,i_ch3)
+     $                     + 0.88*cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)
+     $                     + cl040(l)*cc(l,i_hcl)*cc(l,i_o)
+     $                     + cl041(l)*cc(l,i_hcl)*cc(l,i_h)
+     $                     + cl042(l)*cc(l,i_hocl)*cc(l,i_o)
+     $                     + cl057(l)*cc(l,i_oclo)*cc(l,i_o)
+     $                     + cl059(l)*cc(l,i_oclo)*cc(l,i_cl)
+     $                     + j(l,j_cl2)*cc(l,i_cl2)*2.
+     $                     + j(l,j_cloo)*cc(l,i_cloo)
+     $                     + j(l,j_oclo)*cc(l,i_oclo)
+     $                     + j(l,j_cl2o2)*cc(l,i_cl2o2)
+     $                     + j(l,j_hcl)*cc(l,i_hcl)
+     $                     + j(l,j_hocl)*cc(l,i_hocl)
+
+      loss(l,i_clox) = 2.*cl003(l)*cc(l,i_clo)*cc(l,i_clo)
+     $               + cl005(l)*cc(l,i_clo)*cc(l,i_clo)
+     $               + 2.*cl006(l)*cc(l,i_clo)*cc(l,i_clo)
+     $               + cl008(l)*cc(l,i_cl)*cc(l,i_h2) 
+     $               + cl009(l)*cc(l,i_cl)*cc(l,i_ho2)
+     $               + cl011(l)*cc(l,i_cl)*cc(l,i_h2o2)
+     $               + 0.06*cl012(l)*cc(l,i_cl)*cc(l,i_oh)
+     $               + cl013(l)*cc(l,i_clo)*cc(l,i_ho2)
+     $               + cl016(l)*cc(l,i_cl)*cc(l,i_ch4)
+     $               + cl017(l)*cc(l,i_cl)*cc(l,i_hcho)
+     $               + cl018(l)*cc(l,i_cl)*cc(l,i_ch3ooh)
+     $               + cl019(l)*cc(l,i_clo)*cc(l,i_ch3o2)
+     $               + cl020(l)*cc(l,i_clo)*cc(l,i_ch3o2)
+     $               + cl021(l)*cc(l,i_clo)*cc(l,i_ch3o2)
+     $               + 0.5*cl022(l)*cc(l,i_cl)*cc(l,i_ch3o2)
+     $               + cl023(l)*Cc(l,i_co)*cc(l,i_cl)
+     $               + cl025(l)*cc(l,i_cloo)*cc(l,i_cl)
+     $               + cl028(l)*cc(l,i_cl)*Cc(l,i_o2)
+     $               + cl029(l)*cc(l,i_cl)*cc(l,i_ch3ocl)
+     $               + cl030(l)*cc(l,i_cl)*cc(l,i_cl2o2)
+     $               + cl031(l)*cc(l,i_cl)*cc(l,i_ch3ocl)
+     $               + cl043(l)*cc(l,i_cl)*cc(l,i_hcooh)
+     $               + cl044(l)*cc(l,i_cl)*cc(l,i_o3)
+     $               + cl045(l)*cc(l,i_clo)*cc(l,i_clo3)
+     $               + cl046(l)*cc(l,i_clo)*cc(l,i_clo3)
+     $               + cl047(l)*cc(l,i_clo)*cc(l,i_clo3)
+     $               + cl055(l)*cc(l,i_hocl)*cc(l,i_cl)
+
+      loss(l,i_clox) = loss(l,i_clox)/MAX(cc(l,i_clox),1.e-30*dens(l)) 
+
       ! Suppression Attempt
-        IF ( cc(l,i_cl) < 1.e-25*dens(l) ) cc(l,i_cl) = 0.
-        IF ( cc(l,i_clo) < 1.e-25*dens(l) ) cc(l,i_clo) = 0.
+        IF ( cc(l,i_cl) <= 1.e-30*dens(l) ) cc(l,i_cl) = 0.
+        IF ( cc(l,i_clo) <= 1.e-30*dens(l) ) cc(l,i_clo) = 0.
+
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     HCl 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2964,10 +2939,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       cc_hox_next = (cc0(l,i_hox) + production(l,i_hox)*dt)
      $            /(1. + loss(l,i_hox)*dt)
 
-
-
-
-
                call tlm_sibem(iter,niter, l, dens(l), sza,
      $         dt, ptimestep,  
      $         nesp, cc(l,:), cc0(l,:), cc_hox_next,
@@ -3026,9 +2997,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $         dccn_dpq, dcc0_dpq,
      $         ro2(l), no(l), no2(l),
      $         dHOX_dPQ, dHOX0_dPQ, k_pseudo)          
-
-
-
 
           ENDIF 
   
@@ -3223,7 +3191,6 @@ ccccccccccccccccccccccccc
 cccccc Chlorine Chemistry
 ccccccccccccccccccccccccc
       IF ( igcm_cl .ne. 0 ) THEN 
-
         ! HCl
         IF ( 1./loss(l,i_hcl) > dt ) THEN 
         cc(l,i_hcl) = (cc0(l,i_hcl) + production(l,i_hcl)*dt)
@@ -3289,9 +3256,9 @@ ccccccccccccccccccccccccc
         cc(l,i_cloo) = production(l,i_cloo)/loss(l,i_cloo)
 
 
-cccccccccccccc
-c     Daylight 
-cccccccccccccc
+ccccccccccccccccccccccccccc
+c     Daylight Conditionals
+ccccccccccccccccccccccccccc
       IF (sza .le. 95.) THEN 
 
         cc(l,i_clox) = (cc0(l,i_clox) + production(l,i_clox)*dt)
@@ -3300,9 +3267,11 @@ cccccccccccccc
         cc(l,i_oclo) = production(l,i_oclo)/loss(l,i_oclo)
 
       ELSE
+        ! OClO
         cc(l,i_oclo) = (cc0(l,i_oclo) + production(l,i_oclo)*dt)
      $              /(1. + loss(l,i_oclo)*dt)
 
+        ! Cl
         IF ( 1./loss(l,i_cl) .gt. dt ) THEN 
             cc(l,i_cl) = (cc0(l,i_cl) + production(l,i_cl)*dt) 
      $                 /(1. + loss(l,i_cl)*dt)
@@ -3310,6 +3279,7 @@ cccccccccccccc
             cc(l,i_cl) = production(l,i_cl)/loss(l,i_cl)
         ENDIF 
  
+        ! ClO 
         IF ( 1./loss(l,i_clo) .gt. dt ) THEN 
             cc(l,i_clo) = (cc0(l,i_clo) + production(l,i_clo)*dt) 
      $                 /(1. + loss(l,i_clo)*dt)
@@ -3317,6 +3287,7 @@ cccccccccccccc
             cc(l,i_clo) = production(l,i_clo)/loss(l,i_clo)
         ENDIF 
  
+        ! ClOx = ClO + Cl
         cc(l,i_clox) = cc(l,i_cl) + cc(l,i_clo)
 
 

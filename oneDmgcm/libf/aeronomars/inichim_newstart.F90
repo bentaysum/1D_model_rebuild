@@ -1008,7 +1008,7 @@
       if (igcm_ch4 /= 0) then
 
 
-ch4vmr=0.!10.e-9
+ch4vmr=10.e-9
 
           do i = 1,iip1
             do j = 1,jjp1

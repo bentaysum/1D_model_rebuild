@@ -1474,7 +1474,6 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
           DO ig=1,ngrid
 
             IF ( trim(noms(iq)) == 'co2' ) pdq(ig,l,iq) = 0. 
-            IF ( trim(noms(iq)) == 'h2o_vap' ) pdq(ig,l,iq) = 0. 
             
             zq(ig,l,iq)=pq(ig,l,iq) +pdq(ig,l,iq)*ptimestep
 
