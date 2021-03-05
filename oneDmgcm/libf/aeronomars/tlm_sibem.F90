@@ -609,6 +609,40 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
 
         dLclox_coeff(t_cloo) = cl025*cc(i_cl)
 
+        ! HCl 
+        dL_coeff(t_hcl,t_oh) = cl014 
+        dL_coeff(t_hcl,t_o1d) = 0.88*cl039 
+        dL_coeff(t_hcl,t_o) = cl040 
+        dL_coeff(t_hcl,t_h) = cl041 
+        ! Cl2 
+        dL_coeff(t_cl2,t_o1d) = cl035 
+        dL_coeff(t_cl2,t_oh) = cl036 
+        dL_coeff(t_cl2,t_h) = cl037 
+        ! ClOO 
+        dL_coeff(t_cloo,t_cl) = cl024 + cl025 
+        ! HOCl 
+        dL_coeff(t_hocl,t_oh) = cl015 
+        dL_coeff(t_hocl,t_o) = cl042 
+        dL_coeff(t_hocl,t_clo4) = cl054 
+        dL_coeff(t_hocl,t_cl) = cl055 + cl056
+        ! Cl2O2 
+        dL_coeff(t_cl2o2,t_cl) = cl030 
+        ! OClO 
+        dL_coeff(t_oclo,t_o) = cl051 + cl057 
+        dL_coeff(t_oclo,t_o3) = cl052
+        dL_coeff(t_oclo,t_oh) = cl058 
+        dL_coeff(t_oclo,t_cl) = cl059
+        ! CH3OCl 
+        dL_coeff(t_ch3ocl,t_cl) = cl029 + cl031 
+        dL_coeff(t_ch3ocl,t_oh) = cl032 
+        ! ClO3 
+        dL_coeff(t_clo3,t_clo) = cl045 + cl046 + cl047 
+        dL_coeff(t_clo3,t_oh) = cl048 + cl049 + cl050
+        ! HClO4 
+        dL_coeff(t_hclo4,t_oh) = cl027 
+        ! ClO4 
+        dL_coeff(t_clo4,t_cl) = cl053 
+        dL_coeff(t_clo4,t_hocl) = cl054
 
         ! Chlorine and Organic Interactions 
         IF ( igcm_ch3 .ne. 0 ) THEN
@@ -627,7 +661,12 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
                                   + cl021*cc(i_clo) &
                                   + cl022*cc(i_cl)*0.5
             dLclox_coeff(t_hcooh) = cl043*cc(i_cl) 
+            ! Cl2 
+            dL_coeff(t_cl2,t_ch3) = cl038 
+
+
         ENDIF 
+
 
     ENDIF 
 
