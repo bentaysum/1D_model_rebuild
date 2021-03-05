@@ -470,12 +470,13 @@ ENDIF
 	IF ( igcm_ch3o2 .ne. 0 ) dN_coef(t_ch3o2) = cab010   
 	IF ( igcm_ch3o .ne. 0 ) dN_coef(t_ch3o) = cab016  
 
-    IF ( igcm_cl .ne. 0 ) dN_coef(t_cl) = cl001 + cl044
+    IF ( igcm_oclo .ne. 0 ) dN_coef(t_oclo) = cl052
 
 !	2.3: Linearised Denominator Coefficients
 !	----------------------------------------
 	dD_coef(:) = 0. 
 	dD_coef(t_o2) = a001   
+    IF ( igcm_oclo .ne. 0 ) dD_coef(t_oclo) = cl051
 
 !	2.4: Construct Linearised N and D
 !	---------------------------------
@@ -596,7 +597,7 @@ ENDIF
 					+ cab017*cc(i_ch3o) + cab020*cc(i_hcho) &
 					+ cab021*cc(i_hco) + cab037*cc(i_c2h6) &
 					+ cl002*cc(i_clo) + cl040*cc(i_hcl) &
-					+ cl042*cc(i_hocl) + cl051*cc(i_oclo) &
+					+ cl041*cc(i_hocl) + cl051*cc(i_oclo) &
 					+ cl057*cc(i_oclo)
 	dLox_coef(t_o3) = 2.*a003*cc(i_o) + c003*cc(i_h) &
 					+ c014*cc(i_oh) + c015*cc(i_ho2) &
@@ -620,7 +621,7 @@ IF (igcm_cl .ne. 0) THEN
 					+ cl044*cc(i_o3)
 	dLox_coef(t_clo) = cl002*cc(i_o)
 	dLox_coef(t_hcl) = cl040*cc(i_o)
-	dLox_coef(t_hocl) = cl042*cc(i_o)
+	dLox_coef(t_hocl) = cl041*cc(i_o)
 	dLox_coef(t_oclo) = cl051*cc(i_o) &
 					  + cl052*cc(i_o3) &
 					  + cl057*cc(i_o)

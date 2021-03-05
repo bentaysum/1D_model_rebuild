@@ -1034,6 +1034,7 @@ C            CCCCCCCCCCCCCCCCCCCCC
      $         + cab032(l)*cc(l,i_hcooh)*cc(l,i_oh)
      $         + cab035(l)*cc(l,i_hoch2oh)*cc(l,i_oh)
      $         + j(l,j_hoch2ooh)*cc(l,i_hoch2ooh)
+     $         + cl011(l)*cc(l,i_cl)*cc(l,i_h2o2)
      $         + cl012(l)*cc(l,i_clo)*cc(l,i_oh)*0.94
      $         + cl050(l)*cc(l,i_clo3)*cc(l,i_oh)
      $         )/MAX(cc(l,i_h),dens(l)*1.e-30)

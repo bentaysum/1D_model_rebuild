@@ -270,6 +270,8 @@ integer, parameter :: i_hclo4 = 71
 integer, parameter :: i_clo4 = 72
 integer, parameter :: i_clox = 73
 
+logical :: exist
+
 ! =================================================== !
 !     numbering of photolysis rates
 ! =================================================== !
