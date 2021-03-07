@@ -2126,7 +2126,6 @@ C C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                        + j(l,j_ch3coooh)*cc(l,i_ch3coooh)
      $                        + 0.75*cab017(l)*cc(l,i_o)*cc(l,i_ch3o) 
      $                        + cl016(l)*cc(l,i_cl)*cc(l,i_ch4)
-     $                        + cl038(l)*cc(l,i_cl2)
 
           loss(l,i_ch3) = cab003(l)*cc(l,i_o2)
      $                  + cab004(l)*cc(l,i_o3)

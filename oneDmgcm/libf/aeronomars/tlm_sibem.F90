@@ -346,6 +346,7 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
 ! ====================================================
     dL_coeff(:,:) = 0. 
     dLhox_coeff(:) = 0.
+    dLclox_coeff(:) = 0. 
 ! 1.1 : Inorganic Species [and methane]
 ! -------------------------------------
     ! 1.1.1: CO 
@@ -670,11 +671,587 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
 
     ENDIF 
 
+! ====================================================
+! 2.0 : Linearised Production Rates 
+! ====================================================
+dP_coeff(:,:) = 0.
+dPhox_coeff(:) = 0. 
+! -----------------------
+! 2.1 : Inorganic Species 
+! -----------------------
+!   2.1.1: CO2 
+    dP_coeff(t_co2,t_co) = e001*cc(i_oh) + e002*cc(i_o) 
+    dP_coeff(t_co2,t_o) = e002*cc(i_co)  
+    dP_coeff(t_co2,t_o2) = cab084*cc(i_hcoco) + cab092*cc(i_hoch2co)
+    dP_coeff(t_co2,t_oh) = e001*cc(i_co) + cab032*cc(i_hcooh) &
+                         + cab067*cc(i_ch3cooh) + 0.91*cab098*cc(i_hoch2co2h) &
+                         + cab099*cc(i_hcoco2h) + cab103*cc(i_hcoco3h)
+    dP_coeff(t_co2,t_ho2) = cab072*cc(i_ch3cooo) + cab095*cc(i_hoch2co3) &  
+                          + cab106*cc(i_hcoco3)
+!   2.1.2: CO
+    dP_coeff(t_co,t_co2) = j(j_co2_o1d) + j(j_co2_o) 
 
-! 1.2 : Organic Species
+    dP_coeff(t_co,t_o) = 0.17*cab005*cc(i_ch3) &
+                       + cab021*cc(i_hco) 
+
+    dP_coeff(t_co,t_o2) = cab026*cc(i_hco)
+
+    dP_coeff(t_co,t_h) = cab027*cc(i_hco)
+
+    dP_coeff(t_co,t_oh) = cab025*cc(i_hco)
+
+!   2.1.3: O2 
+    dP_coeff(t_o2,t_o3) = j(j_o3_o) + j(j_o3_o1d) &
+                        + 2.*a003*cc(i_o) &
+                        + 2.*b005*cc(i_o1d) &
+                        + b006*cc(i_o1d) &
+                        + c003*cc(i_h) &
+                        + c014*cc(i_oh) &
+                        + 2.*c015*cc(i_ho2) &
+                        + cab004*cc(i_ch3) &
+                        + 2.*cab010*cc(i_ch3o2) &
+                        + cab016*cc(i_ch3o) &
+                        + cl001*cc(i_cl) &
+                        + cl052*cc(i_oclo)
+
+    dP_coeff(t_o2,t_o) = 2.*a002*cc(i_o) &
+                       + 2.*a003*cc(i_o3) & 
+                       + c001*cc(i_ho2) &
+                       + c002*cc(i_oh) &
+                       + d001*no2 &
+                       + cab012*cc(i_ch3o2) &
+                       + 0.75*cab017*cc(i_ch3o) &
+                       + cl002*cc(i_clo) &
+                       + cl057*cc(i_oclo) 
+
+    dP_coeff(t_o2,t_h) = c003*cc(i_o3) &
+                        + c005*cc(i_ho2)
+
+    dP_coeff(t_o2,t_oh) = c002*cc(i_o) &
+                        + c007*cc(i_ho2) &
+                        + c014*cc(i_o3) &
+                        + 0.06*cl012*cc(i_clo) &
+                        + cl058*cc(i_oclo)
+
+    dP_coeff(t_o2,t_ho2) = c001*cc(i_o) &
+                         + c005*cc(i_h) &
+                         + c007*cc(i_oh) &
+                         + 2.*c008*cc(i_ho2) &
+                         + 2.*c015*cc(i_o3) &
+                         + 2.*c016*cc(i_ho2) &
+                         + cab006*cc(i_ch3o2) &
+                         + cab007*cc(i_ch3o2) &
+                         + 0.8*cab029*cc(i_ho2) &
+                         + cl009*cc(i_cl) &
+                         + cl013*cc(i_clo)
+
+    dP_coeff(t_o2,t_o1d) = 2.*b005*cc(i_o3) &
+                         + b006*cc(i_o3) 
+
+!   2.1.4: H2 
+    dP_coeff(t_h2,t_o) = 0.17*cab005*cc(i_ch3)
+
+    dP_coeff(t_h2,t_h) = c005*cc(i_ho2) & 
+                       + 2.*c008*cc(i_h) &
+                       + cab027*cc(i_hco) &
+                       + cl041*cc(i_hcl)
+
+    dP_coeff(t_h2,t_ho2) = c005*cc(i_h) 
+
+    dP_coeff(t_h2,t_o1d) = b009*cc(i_ch4)
+
+    dP_coeff(t_h2,t_ch4) = b009*cc(i_o1d)  &
+                         + j(j_ch4_1ch2_h2) + j(j_ch4_ch_h2_h) 
+!   2.1.5: H2O 
+    dP_coeff(t_h2ovap,t_h2) = c010*cc(i_oh)
+
+    dP_coeff(t_h2ovap,t_h) = c006*cc(i_ho2) 
+
+    dP_coeff(t_h2ovap,t_oh) = c007*cc(i_ho2) &
+                            + c009*cc(i_h2o2) &
+                            + c010*cc(i_h2) &
+                            + 2.*c013*cc(i_oh) &
+                            + cab001*cc(i_ch4) &
+                            + cab013*cc(i_ch3oh) &
+                            + cab014*cc(i_ch3ooh) &
+                            + cab018*cc(i_hcho) &
+                            + cab025*cc(i_hco) &
+                            + cab032*cc(i_hcooh) &
+                            + cab034*cc(i_hoch2ooh) &
+                            + cl014*cc(i_hcl) &
+                            + cl015*cc(i_hocl) &
+                            + cl027*cc(i_hclo4) 
+
+    dP_coeff(t_h2ovap,t_ho2) = c006*cc(i_h) &
+                             + c007*cc(i_oh) &
+                             + cab007*cc(i_ch3o2) &
+                             + 0.3*cab009*cc(i_hoch2o2)
+
+    dP_coeff(t_h2ovap,t_h2o2) = c009*cc(i_oh)
+
+    dP_coeff(t_h2ovap,t_ch4) = cab001*cc(i_oh)
+!   2.1.6: H2O2 
+    dP_coeff(t_h2o2,t_oh) = c017*cc(i_oh)
+
+    dP_coeff(t_h2o2,t_ho2) = c008*cc(i_ho2) + c016*cc(i_ho2) 
+!   2.1.7: HOx 
+    dPhox_coeff(t_o1d) = 2.*b002*cc(i_h2o) &
+                       + 2.*b003*cc(i_h2) &
+                       + b007*cc(I_ch4) &
+                       + b008*cc(i_ch4) &
+                       + 0.88*cl039*cc(i_hcl)
+
+    dPhox_coeff(t_o) = 2.*c012*cc(i_h2o2) &
+                     + cab002*cc(i_ch4) &
+                     + cab005*cc(i_ch3) &
+                     + 0.25*cab017*cc(i_ch3o) &
+                     + cab020*cc(i_hcho) &
+                     + cab021*cc(i_hco) &
+                     + cl040*cc(i_hcl) &
+                     + cl042*cc(i_hocl)
+
+    dPhox_coeff(t_o2) = cab015*cc(i_ch3o) &
+                      + cab026*cc(i_hco)
+
+    dPhox_coeff(t_o3) = 0.956*cab004*cc(i_ch3)
+
+    dPhox_coeff(t_h2ovap) = 2.*j(j_h2o) &
+                          + 2.*b002*cc(i_o1d)
+
+    dPhox_coeff(t_h2) = 2.*b003*cc(i_o1d) &
+                      + cl008*cc(i_cl)
+
+    dPhox_coeff(t_h2o2) = 2.*j(j_h2o2) &
+                        + 2.*c012*cc(i_o) &
+                        + cl011*cc(i_cl)
+
+    dPhox_coeff(t_ch4) = cab002*cc(i_o) &
+                       + b007*cc(i_o1d) &
+                       + b008*cc(i_o1d) &
+                       + j(j_ch4_ch3_h) &
+                       + j(j_ch4_3ch2_h_h)*2. &
+                       + j(j_ch4_ch_h2_h)
+
 ! ---------------------
-    
+! 2.2 : Organic Species 
+! ---------------------
+    IF ( igcm_ch3 .ne. 0 ) THEN 
+        ! CO2 
+        dP_coeff(t_co2,t_hcooh) = cab032*cc(i_oh)
+        ! CO 
+        dP_coeff(t_co,t_ch3) = 0.17*cab005*cc(i_o) &
+                                               + 2.*cab022*cc(i_hco) 
 
+        dP_coeff(t_co,t_hcho) = j(j_ch2o_co)
+
+        dP_coeff(t_co,t_hco) = cab021*cc(i_o) &
+                             + cab022*cc(i_ch3) &
+                             + cab024*cc(i_hco) & 
+                             + cab025*cc(i_oh) &
+                             + cab026*cc(i_o2) &
+                             + cab027*cc(i_h) 
+        ! O2 
+        dP_coeff(t_o2,t_ch3) = cab004*cc(i_o3)
+
+        dP_coeff(t_o2,t_ch3o2) = cab006*cc(i_ho2) &
+                                                   + cab007*cc(i_ho2) &
+                                                   + 0.5*cab008*ro2 &
+                                                   + 0.5*cab008*cc(i_ch3o2) &
+                                                   + 0.5*cab009*ro2 &
+                                                   + 0.5*cab009*cc(i_ch3o2) &
+                                                   + 2.*cab010*cc(i_o3) &
+                                                   + cab012*cc(i_o) &
+                                                   + 0.5*cab031*cc(i_hoch2o2) &
+                                                   + cl020*cc(i_clo)
+
+        dP_coeff(t_o2,t_ch3o) = cab016*cc(i_o3) &
+                                                 + 0.75*cab017*cc(i_o)
+
+        dP_coeff(t_o2,t_hoch2o2) = 0.8*cab029*cc(i_ho2) &
+                                                       + 0.5*cab008*cc(i_ch3o2) &
+                                                       + 0.5*cab009*cc(i_ch3o2) &
+                                                       + 0.5*cab031*cc(i_hoch2o2) &
+                                                       + 0.5*cab031*ro2
+        ! H2 
+        dP_coeff(t_h2,t_ch3) = 0.17*cab005*cc(i_o)
+
+        dP_coeff(t_h2,t_hcho) = j(j_ch2o_co)
+        ! H2O 
+        dP_coeff(t_h2ovap,t_ch3o2) = cab007*cc(i_oh)
+
+        dP_coeff(t_h2ovap,t_ch3oh) = cab013*cc(i_oh)
+
+        dP_coeff(t_h2ovap,t_ch3ooh) = cab015*cc(i_oh)
+
+        dP_coeff(t_h2ovap,t_hcho) = cab018*cc(i_oh)
+
+        dP_coeff(t_h2ovap,t_hco) = cab025*cc(i_oh)
+
+        dP_coeff(t_h2ovap,t_hoch2o2) = 0.3*cab009*cc(i_ho2)
+
+        dP_coeff(t_h2ovap,t_hcooh) = cab032*cc(i_oh)
+
+        dP_coeff(t_h2ovap,t_hoch2ooh) = cab034*cc(i_oh) 
+
+        dP_coeff(t_h2ovap,t_hoch2oh) = cab035*cc(i_oh) 
+        ! CH4 
+        dP_coeff(t_ch4,t_ch3) = cab022*cc(i_hco)
+        dP_coeff(t_ch4,t_hco) = cab022*cc(i_ch3)
+
+        ! HOx 
+        dPhox_coeff(t_ch3) = 0.956*cab004*cc(i_o3) &
+                                          + cab005*cc(i_o)     
+
+        dPhox_coeff(t_ch3o) = cab015*cc(i_o2) &
+                                            + 0.25*cab017*cc(i_o)  
+
+        dPhox_coeff(t_hcho) = cab020*cc(i_o) &
+                                            + 2.*j(j_ch2o_hco)
+
+        dPhox_coeff(t_ch3ooh) = j(j_ch3o2h) &
+                                                + cl018*cc(i_cl)
+
+        dPhox_coeff(t_ch3oh) = j(j_ch3oh)
+
+        dPhox_coeff(t_hco) = cab021*cc(i_o) &
+                           + cab026*cc(i_o2)
+
+        dPhox_coeff(t_hoch2o2) = cab028 &
+                               + cab030*( cc(i_hoch2o2) + ro2 )
+
+        dPhox_coeff(t_ch3o2) = cab030*cc(i_hoch2o2)
+
+        ! 2.2.1: CH3 
+        dP_coeff( t_ch3, t_o1d ) = b007*cc(i_ch4) 
+
+        dP_coeff( t_ch3, t_o ) = 0.51*cab002*cc(i_ch4) &
+                               + 0.75*cab017*cc(i_ch3o)
+
+        dP_coeff( t_ch3, t_oh ) = cab001*cc(i_ch4)
+
+        dP_coeff( t_ch3, t_ch4 ) = b007*cc(i_o1d) &
+                                 + cab001*cc(i_oh) &
+                                 + 0.51*cab002*cc(i_o) &
+                                 + j(j_ch4_ch3_h) &
+                                 + cl016*cc(i_cl)
+
+        dP_coeff(t_ch3,t_ch3o) = 0.75*cab017*cc(i_o)
+
+        ! 2.2.2: CH3O2 
+        dP_coeff( t_ch3o2, t_ch3) = cab003*cc(i_o2)
+        dP_coeff( t_ch3o2, t_o2) = cab003*cc(i_ch3)
+        dP_coeff( t_ch3o2, t_o3) = cab016*cc(i_ch3o)
+        dP_coeff( t_ch3o2, t_oh) = 0.6*cab014*cc(i_ch3ooh)
+        dP_coeff( t_ch3o2, t_ch3ooh) = 0.6*cab014*cc(i_oh)
+        dP_coeff( t_ch3o2, t_ch3o) = cab016*cc(i_o3) 
+        ! 2.2.3: CH3OOH 
+        dP_coeff(t_ch3ooh,t_ho2) = cab006*cc(i_ch3o2)
+        dP_coeff(t_ch3ooh,t_ch3o2) = cab006*cc(i_ho2)
+        ! 2.2.4: CH3OH 
+        dP_coeff(t_ch3oh,t_ch3o2) = 0.5*cab009*(cc(i_ch3o2) + ro2) 
+        dP_coeff(t_ch3oh,t_hoch2o2) = 0.5*cab009*cc(i_ch3o2) 
+        dP_coeff(t_ch3oh,t_oh) =  cab107*cc(i_ch3)
+        dP_coeff(t_ch3oh,t_ch3) = cab107*cc(i_oh)
+        ! 2.2.5 CH3O 
+        dP_coeff(t_ch3o,t_ch4) = 0.49*cab002*cc(i_o) &
+                               + b008*cc(i_o1d) 
+
+        dP_coeff(t_ch3o,t_oh) = cab011*cc(i_ch3o2) &
+                              + 0.15*cab013*cc(i_ch3oh) &
+                              + cl032*cc(i_ch3ocl)
+
+        dP_coeff(t_ch3o,t_o1d) = b008*cc(i_ch4) 
+
+        dP_coeff(t_ch3o,t_o) = 0.49*cab002*cc(i_ch4) &
+                             + cab012*cc(i_ch3o2)
+
+        dP_coeff(t_ch3o,t_o3) = 0.044*cab004*cc(i_ch3) &
+                              + cab010*cc(i_ch3o2) 
+
+        dP_coeff(t_ch3o,t_ch3) = 0.044*cab004*cc(i_o3) 
+
+        dP_coeff(t_ch3o,t_ch3oh) = 0.15*cab013*cc(i_oh) &
+                                 + j(j_ch3oh) 
+
+        dP_coeff(t_ch3o,t_ch3o2) = cab008*(cc(i_ch3o2)+ro2) &
+                                 + cab010*cc(i_o3) &
+                                 + cab011*cc(i_oh) &
+                                 + cab012*cc(i_o) &
+                                 + cl019*cc(i_clo) &
+                                 + cl021*cc(i_clo) &
+                                 + 0.5*cl022*cc(i_cl)
+
+        dP_coeff(t_ch3o,t_ch3ooh) = j(j_ch3o2h)   
+
+        dP_coeff(t_ch3o,t_hoch2o2) = cab008*cc(i_ch3o2) 
+
+        ! 2.2.6: HCHO 
+        dP_coeff(t_hcho, t_o1d) = b009*cc(i_ch4)
+
+        dP_coeff(t_hcho, t_o) = 0.83*cab005*cc(i_ch3) &
+                              + 0.25*cab017*cc(i_ch3o)
+
+        dP_coeff(t_hcho, t_o2) = cab015*cc(i_ch3o)
+
+        dP_coeff(t_hcho, t_o3) = 0.956*cab005*cc(i_ch3) 
+
+        dP_coeff(t_hcho, t_oh) = 0.85*cab013*cc(i_ch3oh) &
+                               + 0.4*cab014*cc(i_ch3ooh)
+
+        dP_coeff(t_hcho, t_ho2) = cab007*cc(i_ch3o2)
+
+        dP_coeff(t_hcho, t_ch4) = b009*cc(i_o1d)
+
+        dP_coeff(t_hcho, t_ch3) = 0.956*cab004*cc(i_o3) &
+                                + 0.83*cab005*cc(i_o) 
+
+        dP_coeff(t_hcho, t_ch3o2) = cab007*cc(i_ho2) &
+                                  + 0.5*cab009*(cc(i_ch3o2)+ro2)
+
+        dP_coeff(t_hcho, t_hoch2o2) = 0.5*cab009*cc(i_ch3o2) &
+                                    + cab028
+
+        dP_coeff(t_hcho, t_ch3oh) = 0.85*cab013*cc(i_oh)
+
+        dP_coeff(t_hcho, t_ch3ooh) = 0.4*cab014*cc(i_oh) &
+                                   + cl018*cc(i_cl)
+
+        dP_coeff(t_hcho, t_ch3o) = cab015*cc(i_o2) &
+                                 + 0.25*cab017*cc(i_o)
+
+        dP_coeff(t_hcho, t_hco) = cab024*cc(i_hco)*2. 
+        ! 2.2.7: HCO 
+        dP_coeff(t_hco,t_oh) = cab018*cc(i_hcho) 
+        dP_coeff(t_hco,t_o) = cab020*cc(i_hcho) 
+        dP_coeff(t_hco,t_hcho) = cab018*cc(i_oh) + cab020*cc(i_o) &
+                               + j(j_ch2o_co) + cl017*cc(i_cl)
+        ! 2.2.8: HOCH2O2 
+        dP_coeff(t_hoch2o2,t_hcho) = cab019*cc(i_ho2)
+        dP_coeff(t_hoch2o2,t_ho2) = cab019*cc(i_hcho) 
+        dP_coeff(t_hoch2o2,t_hoch2ooh) = cab033*cc(i_oh)
+        dP_coeff(t_hoch2o2,t_oh) = cab033*cc(i_hoch2ooh) 
+        ! 2.2.9: HCOOH 
+        dP_coeff(t_hcooh,t_oh) = cab034*cc(i_hoch2ooh) &
+                               + cab035*cc(i_hoch2oh) 
+
+        dP_coeff(t_hcooh,t_ho2) = 0.5*cab029*cc(i_hoch2o2)
+ 
+        dP_coeff(t_hcooh,t_ch3o2) = cab030*cc(i_hoch2o2) &
+                                  + cab031*0.5*cc(i_hoch2o2) 
+
+        dP_coeff(t_hcooh,t_hoch2o2) = 0.5*cab029*cc(i_ho2) &
+                                    + cab030*(cc(i_hoch2o2) + ro2 ) &
+                                    + cab031*0.5*(cc(i_hoch2o2) + ro2 ) 
+
+        dP_coeff(t_hcooh,t_hoch2ooh) = cab034*cc(i_oh)
+
+        dP_coeff(t_hcooh,t_hoch2oh) = cab035*cc(i_oh)
+        ! 2.2.10: HOCH2OH 
+        dP_coeff(t_hoch2oh,t_ch3o2) = 0.5*cab031*cc(i_hoch2o2) 
+        dP_coeff(t_hoch2oh,t_hoch2o2) = 0.5*cab031*( cc(i_hoch2o2) + ro2 )
+        ! 2.2.11 : HOCH2OOH 
+        dP_coeff(t_hoch2ooh,t_ho2) = cab029*0.5*cc(i_hoch2o2)
+        dP_coeff(t_hoch2ooh,t_hoch2o2) = cab029*0.5*cc(i_ho2)
+
+        ! Chlorine and Organic Chemistry 
+        IF ( igcm_cl .ne. 0 ) THEN 
+            ! CH3 
+            dP_coeff(t_ch3,t_cl) = cl016*cc(i_ch4) 
+            ! CH3O 
+            dP_coeff(t_ch3o,t_clo) = cl019*cc(i_ch3o2) &
+                                   + cl021*cc(i_ch3o2) 
+            dP_coeff(t_ch3o,t_cl) = 0.5*cl022*cc(i_ch3o2) &
+                                  + cl029*cc(i_ch3ocl)
+            dP_coeff(t_ch3o,t_ch3ocl) = cl029*cc(i_cl) &
+                                      + cl032*cc(i_oh)
+            ! HCHO
+            dP_coeff(t_hcho,t_cl) = cl018*cc(i_ch3ooh)
+            ! HCO 
+            dP_coeff(t_hco,t_cl) = cl017*cc(i_hcho)
+        ENDIF 
+
+
+    ENDIF 
+
+
+! 2.3 : Chlorine Chemistry 
+    IF ( igcm_cl .ne. 0 ) THEN 
+        ! CO 
+        dP_coeff(t_co,t_clco) = cl033
+        ! O2 
+        dP_coeff(t_o2,t_cl) = cl001*cc(i_o3) &
+                            + cl009*cc(i_ho2) &
+                            + cl025*cc(i_cloo) 
+
+
+        dP_coeff(t_o2,t_clo) = cl002*cc(i_o) &
+                             + 2.*cl003*cc(i_clo) &
+                             + 2.*cl004*cc(i_clo) & 
+                             + 0.06*cl012*cc(i_oh) &
+                             + cl013*cc(i_ho2) &
+                             + cl020*cc(i_ch3o2) 
+                             
+        dP_coeff(t_o2,t_cloo) = cl025*cc(i_cl) &
+                              + cl026
+
+        dP_coeff(t_o2,t_oclo) = cl052*cc(i_o3) &
+                              + cl057*cc(i_o) &
+                              + cl058*cc(i_oh)
+        ! H2 
+        dP_coeff(t_h2,t_hcl) = cl041*cc(i_h)
+        ! H2O 
+        dP_coeff(t_h2ovap,t_hcl) = cl014*cc(i_oh) 
+        dP_coeff(t_h2ovap,t_hocl) = cl015*cc(i_oh)
+        dP_coeff(t_h2ovap,t_hclo4) = cl027*cc(i_oh) 
+        ! HOx 
+        dPhox_coeff(t_cl) = cl008*cc(i_h2) &
+                          + cl011*cc(i_h2o2) &
+                          + cl018*cc(i_ch3ooh) &
+                          + cl055*cc(i_hocl)  
+        dPhox_coeff(t_hcl) = j(j_hcl) &
+                           + 0.88*cl039*cc(i_o1d) &
+                           + cl040*cc(i_o) 
+        dPhox_coeff(t_hocl) = j(j_hocl) &
+                            + cl042*cc(i_o) &
+                            + cl054*cc(i_clo4)
+        dPhox_coeff(t_clo4) = cl054*cc(i_hocl) 
+
+        dPhox_coeff(t_hocl) = cl055*cc(i_cl)
+
+        ! 2.3.1 : HCL 
+        dP_coeff(t_hcl,t_h) = cl037*cc(i_cl2)
+
+        dP_coeff(t_hcl,t_oh) = 0.06*cl012*cc(i_clo)
+
+        dP_coeff(t_hcl,t_ho2) = cl009*cc(i_cl)
+
+        dP_coeff(t_hcl,t_h2) = cl008*cc(i_cl)
+
+        dP_coeff(t_hcl,t_h2o2) = cl011*cc(i_cl)
+
+        dP_coeff(t_hcl,t_ch4) = cl016*cc(i_cl)
+
+        dP_coeff(t_hcl,t_cl) = cl008*cc(i_h2) &
+                             + cl009*cc(i_ho2) &
+                             + cl011*cc(i_h2o2) &
+                             + cl016*cc(i_ch4) &
+                             + cl017*cc(i_hcho) &
+                             + cl018*cc(i_ch3ooh) &
+                             + cl022*cc(i_ch3o2)*0.5 &
+                             + cl031*cc(i_ch3ocl) &
+                             + cl043*cc(i_hcooh) &
+                             + cl056*cc(i_hocl)
+
+        dP_coeff(t_hcl,t_clo) = 0.06*cl012*cc(i_oh)
+
+        dP_coeff(t_hcl,t_hocl) = cl056*cc(i_cl)
+
+        dP_coeff(t_hcl,t_cl2) = cl037*cc(i_h)
+
+        dP_coeff(t_hcl,t_ch3ocl) = cl031*cc(i_cl)
+        ! 2.3.2 : Cl2 
+        dP_coeff(t_cl2,t_clo) = 2.*cl003*cc(i_clo)
+
+        dP_coeff(t_cl2,t_cl) = cl025*cc(i_cloo) &
+                             + cl029*cc(i_ch3ocl) &
+                             + cl030*cc(i_cl2o2) &
+                             + cl055*cc(i_hocl) 
+
+        dP_coeff(t_cl2,t_hocl) = cl055*cc(i_cl)
+
+        dP_coeff(t_cl2,t_cl2o2) = cl030*cc(i_cl)
+
+        dP_coeff(t_cl2,t_cloo) = cl025*cc(i_cl)
+
+        dP_coeff(t_cl2,t_ch3ocl) = cl029*cc(i_cl)
+        ! 2.3.3: ClOO 
+        dP_coeff(t_cloo,t_o2) = cl028*cc(i_cl) 
+
+        dP_coeff(t_cloo,t_cl) = cl028*cc(i_o2) &
+                              + cl030*cc(i_cl2o2) 
+
+        dP_coeff(t_cloo,t_clo) = cl019*cc(i_ch3o2) &
+                               + cl045*cc(i_clo3) 
+
+        dP_coeff(t_cloo,t_clo3) = cl045*cc(i_clo)
+
+        dP_coeff(t_cloo,t_cl2o2) = cl030*cc(i_cl) &
+                                 + j(j_cl2o2)
+        ! 2.3.4: HOCl 
+        dP_coeff(t_hocl,t_oh) = cl032*cc(i_ch3ocl) &
+                              + cl036*cc(i_cl2) &
+                              + cl058*cc(i_oclo)
+
+        dP_coeff(t_hocl,t_ho2) = cl013*cc(i_clo)
+
+        dP_coeff(t_hocl,t_clo) = cl013*cc(i_ho2) 
+
+        dP_coeff(t_hocl,t_cl2) = cl036*cc(i_oh)
+
+        dP_coeff(t_hocl,t_oclo) = cl058*cc(i_oh)
+
+        dP_coeff(t_hocl,t_ch3ocl) = cl032*cc(i_oh)
+        ! 2.3.5: Cl2O2 
+        dP_coeff(t_cl2o2,t_clo) = 2.*cl006*cc(i_clo) 
+        ! 2.3.6: OClO 
+        dP_coeff(t_oclo,t_oh) = cl050*cc(i_clo3) 
+
+        dP_coeff(t_oclo,t_clo) = 2.*cl005*cc(i_clo) &
+                               + cl021*cc(i_ch3o2) &
+                               + cl045*cc(i_clo3) &
+                               + 2.*cl046*cc(i_clo3) 
+
+        dP_coeff(t_oclo,t_clo3) = cl045*cc(i_clo) &
+                                + 2.*cl046*cc(i_clo) &
+                                + cl050*cc(i_oh)
+        ! 2.3.7: CH3OCl 
+        dP_coeff(t_ch3ocl,t_clo) = cl020*cc(i_ch3o2)
+        ! 2.3.8: ClCO 
+        dP_coeff(t_clco,t_co) = cl023*cc(i_cl)
+        dP_coeff(t_clco,t_cl) = cl023*cc(i_co)
+        ! 2.3.9: ClO3 
+        dP_coeff(t_clo3,t_o) = cl051*cc(i_oclo)
+        dP_coeff(t_clo3,t_o3) = cl044*cc(i_cl) &
+                              + cl052*cc(i_oclo)
+
+        dP_coeff(t_clo3,t_cl) = cl044*cc(i_o3) & 
+                              + cl053*cc(i_clo4) 
+
+        dP_coeff(t_clo3,t_oclo) = cl051*cc(i_o) &
+                                + cl052*cc(i_o3)
+
+        dP_coeff(t_clo3,t_clo4) = cl053*cc(i_cl)
+        ! 2.3.10: HClO4 
+        dP_coeff(t_hclo4,t_oh) = cl048*cc(i_clo3) &
+                               + cl049*cc(i_clo3)
+
+        dP_coeff(t_hclo4,t_clo3) = cl048*cc(i_oh) &
+                                 + cl049*cc(i_oh) 
+
+        dP_coeff(t_hclo4,t_hocl) = cl054*cc(i_clo4) 
+        dP_coeff(t_hclo4,t_clo4) = cl054*cc(i_hocl) 
+        ! 2.3.11: ClO4 
+        dP_coeff(t_clo4,t_oh) = cl027*cc(i_hclo4)
+        dP_coeff(t_clo4,t_hclo4) = cl027*cc(i_oh)
+
+        ! Chlorine and Organic Chemistry 
+        IF ( igcm_ch3 .ne. 0 ) THEN 
+            ! HCL 
+            dP_coeff(t_hcl,t_hcho) = cl017*cc(i_cl) 
+            dP_coeff(t_hcl,t_ch3ooh) = cl018*cc(i_cl)
+            dP_coeff(t_hcl,t_ch3o2) = cl022*cc(i_cl)*0.5
+            dP_coeff(t_hcl,t_hcooh) = cl043*cc(i_hcooh)
+            ! ClOO 
+            dP_coeff(t_cloo,t_ch3o2) = cl019*cc(i_clo)
+            ! OClO 
+            dP_coeff(t_oclo,t_ch3o2) = cl021*cc(i_clo) 
+            ! CH3OCl 
+            dP_coeff(t_ch3ocl,t_ch3o2) = cl020*cc(i_clo)
+        ENDIF 
+
+
+
+    ENDIF 
 
 
 
