@@ -363,7 +363,6 @@ C        ===
 
           h2o(y)  = h2o(y)*mmol(15)/mmean(1,y) 
 
-
 C         O2 
 C         ===
             call interp_line(mcdv5_lt, zo2(:,y), N_LT,
@@ -396,7 +395,7 @@ c         ===
       if ( mcd_profiles ) then
          WRITE(*,*) "mcd [CO2, CO, O2, H2, H2O_vap]"
       else
-         WRITE(*,*) "mcd [CO2]"
+         WRITE(*,*) "mcd [CO2, H2O]"
       endif 
   
      
