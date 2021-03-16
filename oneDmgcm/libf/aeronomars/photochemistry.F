@@ -2695,8 +2695,8 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C       loss(l,i_clox) = loss(l,i_clox)/cc(l,i_clox)
 
       ! Suppression Attempt
-        IF ( cc(l,i_cl) <= 1.e-30*dens(l) ) cc(l,i_cl) = 0.
-        IF ( cc(l,i_clo) <= 1.e-30*dens(l) ) cc(l,i_clo) = 0.
+C         IF ( cc(l,i_cl) <= 1.e-30*dens(l) ) cc(l,i_cl) = 0.
+C         IF ( cc(l,i_clo) <= 1.e-30*dens(l) ) cc(l,i_clo) = 0.
 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     HCl 
