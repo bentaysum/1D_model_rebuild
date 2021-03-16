@@ -21,7 +21,7 @@ c   -------
 c   
 c   update: 12/06/2003 including chemistry (S. Lebonnois) 
 c                            and water ice (F. Montmessin)
-c 
+c s
 c=======================================================================
 
 #include "dimensions.h"
@@ -916,10 +916,20 @@ C         ENDIF
 
 !       increment tracers
 C         write(*,"(13A15)") ( trim(noms(iq)), iq = 28,40 )
+
+      IF ( pertloop ) THEN 
+        IF ( idt == ndt_plume-1 ) THEN 
+          cALL scalar_perturbation(q)
+          plume = .false.
+          pertloop = .false.
+        ENDIF 
+      ENDIF      
+
+
         DO iq = 1, nqmx
 
           if (  ( trim(noms(iq)) == 'hcl' )
-     $       .and. (call_tlm) ) then
+     $       .and. (pertloop) ) then
             write(*,*) "STATIC HCL"
            cycle
           endif 
@@ -935,13 +945,7 @@ C         write(*,"(13A15)") ( trim(noms(iq)), iq = 28,40 )
         ENDDO
 C         write(*,"(13E15.7)") ( q(1,iq), iq = 28, 40 )
 
-      IF ( pertloop ) THEN 
-        IF ( idt == ndt_plume-1 ) THEN 
-C           cALL scalar_perturbation(q)
-          plume = .false.
-          pertloop = .false.
-        ENDIF 
-      ENDIF        
+  
 
 c     Tangent Linear Matrix 
 c    ~~~~~~~~~~~~~~~~~~~~~~

@@ -402,11 +402,12 @@ c ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      $      .and. pertloop ) THEN 
 
 
-C            ALL scalar_perturbation(pq(1,:,:))
+C            cALL scalar_perturbation(pq(1,:,:))
 
 
             mcd_profiles = .False. ! Interpolation routines will 
                                    ! invalidate TLM results.
+            call_tlm = .False.     ! Prevents multiple initialisations.
             
             ! calladj = .False. ! Convective adjustments require a 
                                ! ! conditional that the TLM will not
@@ -414,7 +415,7 @@ C            ALL scalar_perturbation(pq(1,:,:))
             ! callcond = .False. ! Again, conditionals activate this 
                                ! ! module.
                                
-C             pertloop = .False.
+            pertloop = .False.
            
 
        ENDIF 
