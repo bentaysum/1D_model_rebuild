@@ -354,7 +354,6 @@ C         ===
      
           co2(y) = co2(y)*mmol(1)/43.34!mmean(1,y)
           
-         IF ( mcd_profiles  ) THEN 
 
 c        H2O 
 C        ===
@@ -362,6 +361,9 @@ C        ===
      &                     local_time, h2o(y), 1)
 
           h2o(y)  = h2o(y)*mmol(15)/mmean(1,y) 
+
+
+         IF ( mcd_profiles  ) THEN 
 
 C         O2 
 C         ===

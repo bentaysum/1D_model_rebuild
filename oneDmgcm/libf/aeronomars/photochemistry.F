@@ -2781,7 +2781,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $               + cl047(l)*cc(l,i_clo)*cc(l,i_clo3)
      $               + cl055(l)*cc(l,i_hocl)*cc(l,i_cl)
 
-      loss(l,i_clox) = loss(l,i_clox)/MAX(cc(l,i_clox),1.e-30*dens(l)) 
+      loss(l,i_clox) = loss(l,i_clox)/cc(l,i_clox)
 
       ! Suppression Attempt
         IF ( cc(l,i_cl) <= 1.e-30*dens(l) ) cc(l,i_cl) = 0.

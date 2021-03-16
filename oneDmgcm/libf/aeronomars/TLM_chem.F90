@@ -169,7 +169,7 @@ TLM = tlm_ident + TLM*ptimestep
 ! Non-Variable Tracers 
 ! --------------------
 tlm( (t_co2-1)*nlayermx + 1 : t_co2*nlayermx, : ) = 0. 
-! tlm( (t_h2ovap-1)*nlayermx + 1 : t_h2ovap*nlayermx, : ) = 0. 
+tlm( (t_h2ovap-1)*nlayermx + 1 : t_h2ovap*nlayermx, : ) = 0. 
 
 ! ===================
 ! STAGE 3 : NAN CHECK 

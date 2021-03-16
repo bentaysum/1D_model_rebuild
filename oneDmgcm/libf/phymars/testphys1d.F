@@ -918,8 +918,11 @@ C         ENDIF
 C         write(*,"(13A15)") ( trim(noms(iq)), iq = 28,40 )
         DO iq = 1, nqmx
 
-C           if  ( trim(noms(iq)) == 'hcl' ) cycle
-
+          if (  ( trim(noms(iq)) == 'hcl' )
+     $       .and. (call_tlm) ) then
+            write(*,*) "STATIC HCL"
+           cycle
+          endif 
 
 
           DO ilayer=1,nlayer
