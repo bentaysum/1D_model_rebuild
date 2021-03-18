@@ -928,18 +928,10 @@ C         write(*,"(13A15)") ( trim(noms(iq)), iq = 28,40 )
 
         DO iq = 1, nqmx
 
-          if (  ( trim(noms(iq)) == 'hcl' )
-     $       .and. (pertloop) ) then
-            write(*,*) "STATIC HCL"
-           cycle
-          endif 
-
+          IF ( trim(noms(iq)) == "hcl" ) CYCLE
 
           DO ilayer=1,nlayer
-
              q(ilayer,iq)=q(ilayer,iq)+dtphys*dq(ilayer,iq)
-         
-
           ENDDO    
           
         ENDDO

@@ -1476,8 +1476,6 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
 
             IF ( trim(noms(iq)) == 'co2' ) pdq(ig,l,iq) = 0. 
             
-      IF( (.not. tlm_on) .and. trim(noms(iq)) == 'hcl' ) pdq(ig,l,iq)=0.
-
             zq(ig,l,iq)=pq(ig,l,iq) +pdq(ig,l,iq)*ptimestep
 
             if ( zq(ig,l,iq) .ne. zq(ig,l,iq) ) goto 405
