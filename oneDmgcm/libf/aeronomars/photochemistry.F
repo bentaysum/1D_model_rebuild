@@ -371,6 +371,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       call chimtogcm(zycol, lswitch, nesp, rm) 
 
 
+      ! Chlorine Species Lifetimes 
        call WRITEDIAGFI(1,"cl_tau","cl_tau", "s",
      $                  1,lifetime(:,60))
        call WRITEDIAGFI(1,"clo_tau","clo_tau", "s",
@@ -399,41 +400,133 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                  1,lifetime(:,72))
 
 
-       call WRITEDIAGFI(1,"cl008","cl008", "s",
-     $                  1,lifetime(:,8))
-       call WRITEDIAGFI(1,"cl009","cl009", "s",
-     $                  1,lifetime(:,9))
-       call WRITEDIAGFI(1,"cl011","cl011", "s",
-     $                  1,lifetime(:,10))
-       call WRITEDIAGFI(1,"cl012","cl012", "s",
-     $                  1,lifetime(:,11))
-       call WRITEDIAGFI(1,"cl016","cl016", "s",
-     $                  1,lifetime(:,12))
-       call WRITEDIAGFI(1,"cl017","cl017", "s",
-     $                  1,lifetime(:,13))
-       call WRITEDIAGFI(1,"cl018","cl018", "s",
-     $                  1,lifetime(:,14))
-       call WRITEDIAGFI(1,"cl022","cl022", "s",
-     $                  1,lifetime(:,15))
-       call WRITEDIAGFI(1,"cl031","cl031", "s",
-     $                  1,lifetime(:,16))
-       call WRITEDIAGFI(1,"cl037","cl037", "s",
-     $                  1,lifetime(:,17))
-       call WRITEDIAGFI(1,"cl043","cl043", "s",
-     $                  1,lifetime(:,18))
-       call WRITEDIAGFI(1,"cl056","cl056", "s",
+      ! HCl Chemical Reactions
+      ! ----------------------
+      ! Production Rates 
+       call WRITEDIAGFI(1,"hcl_P","hcl_P", "cm-3 s-1",
+     $                  1,lifetime(:,1))
+
+       call WRITEDIAGFI(1, "hcl_p1",
+     $                  "$Cl + H_2 \longrightarrow HCl + H$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,2))
+
+       call WRITEDIAGFI(1, "hcl_p2",
+     $                  "$Cl + HO_2 \longrightarrow HCl + O_2$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,3))
+
+       call WRITEDIAGFI(1, "hcl_p3",
+     $                  "$Cl + H_2O_2 \longrightarrow HCl + HO_2$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,4))
+
+       call WRITEDIAGFI(1, "hcl_p4",
+     $                  "$ClO + OH \longrightarrow HCl + O_2$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,5))
+
+       call WRITEDIAGFI(1, "hcl_p5",
+     $                  "$Cl + CH_4 \longrightarrow HCl + CH_3$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,6))
+
+       call WRITEDIAGFI(1, "hcl_p6",
+     $                  "$Cl + HCHO \longrightarrow HCl + HCO$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,7))
+
+       call WRITEDIAGFI(1, "hcl_p7",
+     $                  "$Cl + CH_3OOH \longrightarrow HCl + HCHO + OH$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,8))
+
+       call WRITEDIAGFI(1, "hcl_p8",
+     $                  "$Cl + CH_3O_2 \longrightarrow HCl + CH_2OO"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,9))
+
+       call WRITEDIAGFI(1, "hcl_p9",
+     $                  "$Cl + CH_3OCl \longrightarrow HCl + CH_2OCl$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,10))
+
+       call WRITEDIAGFI(1, "hcl_p10",
+     $                  "$Cl_2 + H \longrightarrow HCl + Cl$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,11))
+
+       call WRITEDIAGFI(1, "hcl_p11",
+     $            "$Cl + HCOOH \longrightarrow HCl + \textrm{Products}$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,12))
+
+       call WRITEDIAGFI(1, "hcl_p12",
+     $                  "$Cl + HOCl \longrightarrow HCl + ClO$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,13))
+
+       ! Loss Rates
+       call WRITEDIAGFI(1, "hcl_l1",
+     $                  "$HCl + h\mu \longrightarrow H + Cl$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,14))
+
+       call WRITEDIAGFI(1, "hcl_l2",
+     $                  "$HCl + OH \longrightarrow H_2O + Cl$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,15))
+
+       call WRITEDIAGFI(1, "hcl_l3",
+     $  "$HCl + O(^1D) \longrightarrow 0.33*H + 0.33*ClO +"
+     $  // " 0.66*Cl + 0.66*OH$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,16))
+
+       call WRITEDIAGFI(1, "hcl_l4",
+     $                  "$HCl + O(^3P) \longrightarrow OH + Cl$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,17))
+
+       call WRITEDIAGFI(1, "hcl_l5",
+     $                  "$HCl + H \longrightarrow H_2 + Cl$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,18))
+
+      ! -----------------------------
+      ! Organic Compound Lifeitmes 
+      ! -----------------------------
+       call WRITEDIAGFI(1,"ch4_tau","ch4_tau", "s",
      $                  1,lifetime(:,19))
 
-       call WRITEDIAGFI(1,"j_hcl","j_hcl", "s",
+       call WRITEDIAGFI(1,"hcho_tau","hcho_tau", "s",
      $                  1,lifetime(:,20))
-       call WRITEDIAGFI(1,"cl014","cl014", "s",
+
+       call WRITEDIAGFI(1,"hcooh_tau","hcooh_tau", "s",
      $                  1,lifetime(:,21))
-       call WRITEDIAGFI(1,"cl039","cl039", "s",
+
+       call WRITEDIAGFI(1,"ch3ooh_tau","ch3ooh_tau", "s",
      $                  1,lifetime(:,22))
-       call WRITEDIAGFI(1,"cl040","cl040", "s",
+
+
+      ! Perchlorate Production
+       call WRITEDIAGFI(1,"hclo4_P","hclo4_P", "cm-3 s-1",
      $                  1,lifetime(:,23))
-       call WRITEDIAGFI(1,"cl041","cl041", "s",
-     $                  1,lifetime(:,24))
+
+       call WRITEDIAGFI(1, "hclo4_p1",
+     $                  "$ClO_3 + OH \longrightarrow HClO_4$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,24))
+
+       call WRITEDIAGFI(1, "hclo4_p2",
+     $                  "$ClO_3 + OH + M\longrightarrow HClO_4 + M$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,25))
+
+       call WRITEDIAGFI(1, "hclo4_p3",
+     $                  "$ClO_4 + HOCl \longrightarrow HClO_4 + OH$"
+     $                  , "cm-3 s-1",
+     $                  1, lifetime(:,26))
 
 
 
@@ -3104,12 +3197,12 @@ cccccc Chlorine Chemistry
 ccccccccccccccccccccccccc
       IF ( igcm_cl .ne. 0 ) THEN 
         ! HCl
-        IF ( 1./loss(l,i_hcl) > dt ) THEN 
+C         IF ( 1./loss(l,i_hcl) > dt ) THEN 
         cc(l,i_hcl) = (cc0(l,i_hcl) + production(l,i_hcl)*dt)
      $              /(1. + loss(l,i_hcl)*dt)
-        ELSE 
-        cc(l,i_hcl) = production(l,i_hcl)/loss(l,i_hcl)
-        ENDIF 
+C         ELSE 
+C         cc(l,i_hcl) = production(l,i_hcl)/loss(l,i_hcl)
+C         ENDIF 
 
         ! HOCl
         IF ( 1./loss(l,i_hocl) > dt ) THEN 
@@ -3220,9 +3313,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       end do
   
 
-
+      ! ================
       ! Loss Rate of O2:
-      !
+      ! ================
       o2_loss_rate =  j(:,j_o2_o)*cc(:,i_o2)
      &             +  j(:,j_o2_o1d)*cc(:,i_o2)
      &             +  j(:,j_ho2)*cc(:,i_ho2)
@@ -3247,59 +3340,45 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $             + j(:,j_cloo)*cc(:,i_cloo) 
      $             + j(:,j_oclo)*cc(:,i_oclo)
 
-      ! Output Array 
-
-C       ! O=O Bond Loss Rate (molec. cm-3 s-1)
-C       lifetime(:,1) = o2_loss_rate
-
-C       ! CH4 Lifetime
-C       lifetime(:,6) = 1./loss(:,i_ch4)
-
-C       ! O2 Steady-State
-C       lifetime(:,7) = (production(:,i_o2)/loss(:,i_o2))/dens
-
-C       ! Partition Functions
-C       lifetime(:,8) = rclo_cl
-
-C       ! Dust Number Density
-C       lifetime(:,9) = cc0(:,i_dust)
-
-C       ! Surfaec ClOx Rate
-C       lifetime(1,10) = cc(1,i_dust)*clox_prod
-
-
-      ! Cl Lifetimes
+      ! ---------------------------------------------
+      ! Atmospheric Lifetimes [Inverse loss rate = s]
+      ! ---------------------------------------------
       lifetime = 1./loss
-      lifetime(:,1) = rclo_cl 
-      lifetime(:,2) = production(:,i_clox)
-      lifetime(:,3) = loss(:,i_clox)
 
-      lifetime(:,4) = production(:,i_cl)
-      lifetime(:,5) = loss(:,i_cl)
-      lifetime(:,6) = production(:,i_clo)
-      lifetime(:,7) = loss(:,i_clo) 
+      ! -----------------------------
+      ! HCl Production and Loss Rates
+      ! -----------------------------
+      lifetime(:,1) = production(:,i_hcl)
+      lifetime(:,2) = cl008*cc(:,i_cl)*cc(:,i_h2)
+      lifetime(:,3) = cl009(:)*cc(:,i_cl)*cc(:,i_ho2)
+      lifetime(:,4) = cl011(:)*cc(:,i_cl)*cc(:,i_h2o2)
+      lifetime(:,5) = cl012(:)*cc(:,i_clo)*cc(:,i_oh)*0.06
+      lifetime(:,6) = cl016(:)*cc(:,i_cl)*cc(:,i_ch4)
+      lifetime(:,7) = cl017(:)*cc(:,i_cl)*cc(:,i_hcho) 
+      lifetime(:,8) = cl018(:)*cc(:,i_cl)*cc(:,i_ch3ooh)
+      lifetime(:,9) = cl022(:)*cc(:,i_cl)*cc(:,i_ch3o2)*0.5
+      lifetime(:,10) = cl031(:)*cc(:,i_cl)*cc(:,i_ch3ocl)
+      lifetime(:,11) = cl037(:)*cc(:,i_cl2)*cc(:,i_h)
+      lifetime(:,12) = cl043(:)*cc(:,i_cl)*cc(:,i_hcooh)
+      lifetime(:,13) = cl056(:)*cc(:,i_cl)*Cc(:,i_hocl)
 
-      ! HCl Over Production
-      lifetime(:,8) = cl008*cc(:,i_cl)*cc(:,i_h2)
+      lifetime(:,14) = j(:,j_hcl) 
+      lifetime(:,15) = cl014(:)*cc(:,i_oh)
+      lifetime(:,16) = cl039(:)*cc(:,i_o1d)*0.88
+      lifetime(:,17) = cl040(:)*cc(:,i_o) 
+      lifetime(:,18) = cl041(:)*cc(:,i_h) 
 
-        lifetime(:,9) =  cl009*cc(:,i_cl)*cc(:,i_ho2)
-        lifetime(:,10) =  cl011*cc(:,i_cl)*cc(:,i_h2o2)
-        lifetime(:,11) =  cl012*cc(:,i_clo)*cc(:,i_oh)*0.06
-        lifetime(:,12) =  cl016*cc(:,i_cl)*cc(:,i_ch4)
-        lifetime(:,13) =  cl017*cc(:,i_cl)*cc(:,i_hcho)
-        lifetime(:,14) =  cl018*cc(:,i_cl)*cc(:,i_ch3ooh)
-        lifetime(:,15) =  cl022*cc(:,i_cl)*cc(:,i_ch3o2)*0.5
-        lifetime(:,16) =  cl031*cc(:,i_cl)*cc(:,i_ch3ocl)
-        lifetime(:,17) =  cl037*cc(:,i_cl2)*cc(:,i_h)
-        lifetime(:,18) =  cl043*cc(:,i_cl)*cc(:,i_hcooh)
-        lifetime(:,19) =  cl056*cc(:,i_cl)*Cc(:,i_hocl)
+      ! Primary Organic Lifetimes
+      lifetime(:,19) = 1./loss(:,i_ch4)
+      lifetime(:,20) = 1./loss(:,i_hcho)
+      lifetime(:,21) = 1./loss(:,i_hcooh)
+      lifetime(:,22) = 1./loss(:,i_ch3ooh)
 
-        lifetime(:,20) = j(:,j_hcl) 
-        lifetime(:,21) = cl014*cc(:,i_oh)
-        lifetime(:,22) =  cl039*cc(:,i_o1d)*0.88
-        lifetime(:,23) =  cl040*cc(:,i_o) 
-        lifetime(:,24) =  cl041*cc(:,i_h) 
-
+      ! HClO4 Production Rates
+      lifetime(:,23) = production(:,i_hclo4) 
+      lifetime(:,24) = cl048(:)*cc(:,i_clo3)*cc(:,i_oh)
+      lifetime(:,25) = cl049(:)*cc(:,i_clo3)*cc(:,i_oh)
+      lifetime(:,26) = cl054(:)*cc(:,i_clo4)*cc(:,i_hocl)
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc

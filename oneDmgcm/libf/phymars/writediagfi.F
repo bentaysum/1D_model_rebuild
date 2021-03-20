@@ -131,9 +131,9 @@
         ! RETURN
       ! ENDIF
 
-C       if ( mcd_profiles ) RETURN
-      if ( call_tlm ) RETURN
-      if ( pertloop ) RETURN
+      if ( mcd_profiles ) RETURN
+C       if ( call_tlm ) RETURN
+C       if ( pertloop ) RETURN
       
 ! At very first call, check if there is a "diagfi.def" to use and read it
 ! -----------------------------------------------------------------------
