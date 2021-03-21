@@ -2220,7 +2220,6 @@ C C cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                  + cab023(L)*cc(l,i_hco)
      $                  + cab038(l)*cc(l,i_ch3)
      $                  + cab107(l)*cc(l,i_oh)
-     $                  + cl038(l)*cc(l,i_cl2)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        ch3o2
@@ -2743,7 +2742,6 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                     + cl035(l)*cc(l,i_o1d)*cc(l,i_cl2)*2.
      $                     + cl036(l)*cc(l,i_cl2)*cc(L,i_oh)
      $                     + cl037(l)*cc(l,i_cl2)*cc(L,i_h)
-     $                     + cl038(l)*cc(l,i_cl2)*cc(L,i_ch3)
      $                     + 0.88*cl039(l)*cc(l,i_hcl)*cc(l,i_o1d)
      $                     + cl040(l)*cc(l,i_hcl)*cc(l,i_o)
      $                     + cl041(l)*cc(l,i_hcl)*cc(l,i_h)
@@ -2827,7 +2825,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       loss(l,i_cl2) = cl035(l)*cc(l,i_o1d)
      $              + cl036(l)*cc(l,i_oh)
      $              + cl037(l)*cc(l,i_h)
-     $              + cl038(l)*cc(l,i_ch3)
+
      $              + j(l,j_cl2)
 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -6260,7 +6258,8 @@ c     UV Absorption Spectrum and Self-Reaction Kinetics of the Cyclohexadienyl R
 
 c     cl038 : cl2 + ch3 -> ch3cl + cl 
 c     Rate constants and hydrogen isotope substitution effects in the CH3+HCl and CH3+Cl2 reaction
-      cl038(l) = exp(5520./(8.314*t(l)))*1.67e-13*(T(l)/298.)**(2.52)
+c      cl038(l) = exp(5520./(8.314*t(l)))*1.67e-13*(T(l)/298.)**(2.52)
+      cl038(l) = 0. ! OFFLINE
 
 c     cl039 : hcl + o1d -> 0.12*o + 0.12*hcl + 0.22*h + 0.22*clo + 0.66*cl + 0.66*oh 
 c     JPL 2015

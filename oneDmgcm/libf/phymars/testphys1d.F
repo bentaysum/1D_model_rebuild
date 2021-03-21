@@ -928,12 +928,9 @@ C         write(*,"(13A15)") ( trim(noms(iq)), iq = 28,40 )
 
         DO iq = 1, nqmx
 
-          IF ( trim(noms(iq)) == "hcl" ) THEN
-              write(*,"(A12,E15.7)") "HCl MIN: ", 
-     $        MINVAL( q(:,iq)+dtphys*dq(:,iq))
-          cycle
-          ENDIF 
-
+          IF ( trim(noms(iq)) == "hcl" ) cycle
+          IF ( trim(noms(iq)) == "ch4" ) cycle 
+          
           DO ilayer=1,nlayer
              q(ilayer,iq)=q(ilayer,iq)+dtphys*dq(ilayer,iq)
           ENDDO    
