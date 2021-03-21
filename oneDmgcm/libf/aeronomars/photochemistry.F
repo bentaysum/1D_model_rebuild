@@ -529,6 +529,22 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                  1, lifetime(:,26))
 
 
+       ! ClOX 
+       call WRITEDIAGFI(1,"clox_P","clox_P", "s",
+     $                  1,lifetime(:,27))
+       call WRITEDIAGFI(1,"clox_L","clox_L", "s",
+     $                  1,lifetime(:,28))
+       call WRITEDIAGFI(1,"pcl","pcl", "s",
+     $                  1,lifetime(:,29))
+       call WRITEDIAGFI(1,"lcl","lcl", "s",
+     $                  1,lifetime(:,30))
+       call WRITEDIAGFI(1,"pclo","pclo", "s",
+     $                  1,lifetime(:,31))
+       call WRITEDIAGFI(1,"lclo","lclo", "s",
+     $                  1,lifetime(:,32))
+
+
+
 
       return
       end
@@ -771,8 +787,8 @@ c     ===============================================
 c     Chlorine Routine
 c     ================
       real rclo_cl(nlayermx)
-      real pcl, pclo
-      real lcl, lclo
+      real pcl(nlayermx), pclo(nlayermx)
+      real lcl(nlayermx), lclo(nlayermx)
 
 c     Dust Parameters
 c     ===============
@@ -785,6 +801,9 @@ c     ===============
 
 c     Chlorine Production Parameters
 c     ==============================
+      REAL Chlorine_QSSA
+
+
       real clox_prod
       parameter( clox_prod = 1.E9)
 
@@ -1641,13 +1660,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       DO l = 1, lswitch-1
 
       ! Production of Cl via ClO 
-      pcl = j(l,j_clo) 
+      pcl(l) = j(l,j_clo) 
      $    + cl002(l)*cc(l,i_o)
      $    + cl004(l)*cc(l,i_clo)*2.
      $    + cl005(l)*cc(l,i_clo)
      $    + cl012(l)*cc(l,i_oh)*0.94
       ! Loss of Cl 
-      lcl = cl001(l)*cc(l,i_o3)
+      lcl(l) = cl001(l)*cc(l,i_o3)
      $    + cl010(l)*cc(l,i_ho2)
      $    + cl022(l)*cc(l,i_ch3o2)*0.5
      $    + cl024(l)*cc(l,i_cloo) 
@@ -1656,7 +1675,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $    + cl059(l)*cc(l,i_oclo)
 
       ! Production of ClO via Cl
-      pclo = cl001(l)*cc(l,i_o3)
+      pclo(l) = cl001(l)*cc(l,i_o3)
      $     + cl010(l)*cc(l,i_ho2)
      $     + cl022(l)*cc(l,i_ch3o2)*0.5
      $     + cl024(l)*cc(l,i_cloo)*2.
@@ -1665,13 +1684,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $     + cl059(l)*cc(l,i_oclo)*2.
 
       ! Loss of ClO
-      lclo = j(l,j_clo)
+      lclo(l) = j(l,j_clo)
      $     + cl002(l)*cc(l,i_o)
      $     + cl004(l)*cc(l,i_clo)
      $     + cl005(l)*cc(l,i_clo)
      $     + cl012(l)*cc(l,i_oh)
 
-      rclo_cl(l) = (pclo + lcl)/(pcl + lclo)
+      rclo_cl(l) = (pclo(l) + lcl(l))/(pcl(l) + lclo(l))
 
 c     -----------------------------------------------
 C     Atmospheric state prior to timestep advancement
@@ -2825,7 +2844,6 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       loss(l,i_cl2) = cl035(l)*cc(l,i_o1d)
      $              + cl036(l)*cc(l,i_oh)
      $              + cl037(l)*cc(l,i_h)
-
      $              + j(l,j_cl2)
 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -3234,13 +3252,19 @@ C         ENDIF
         cc(l,i_clco) = production(l,i_clco)/loss(l,i_clco)
         ENDIF 
 
+        ! Cl2
+         cc(l,i_cl2) = Chlorine_QSSA(cc0(l,i_cl2),
+     $                               production(l,i_cl2),
+     $                               loss(l,i_cl2),
+     $                               dt)
+
         ! Cl2 
-        IF ( 1./loss(l,i_cl2) > dt ) THEN 
-        cc(l,i_cl2) = (cc0(l,i_cl2) + production(l,i_cl2)*dt)
-     $              /(1. + loss(l,i_cl2)*dt)
-        ELSE 
-        cc(l,i_cl2) = production(l,i_cl2)/loss(l,i_cl2)
-        ENDIF 
+C         IF ( 1./loss(l,i_cl2) > dt ) THEN 
+C         cc(l,i_cl2) = (cc0(l,i_cl2) + production(l,i_cl2)*dt)
+C      $              /(1. + loss(l,i_cl2)*dt)
+C         ELSE 
+C         cc(l,i_cl2) = production(l,i_cl2)/loss(l,i_cl2)
+C         ENDIF 
 
         ! Cl2O2 
         IF ( 1./loss(l,i_cl2o2) > dt ) THEN 
@@ -3377,6 +3401,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       lifetime(:,24) = cl048(:)*cc(:,i_clo3)*cc(:,i_oh)
       lifetime(:,25) = cl049(:)*cc(:,i_clo3)*cc(:,i_oh)
       lifetime(:,26) = cl054(:)*cc(:,i_clo4)*cc(:,i_hocl)
+
+      ! ClOx
+      lifetime(:,27) = production(:,i_clox)
+      lifetime(:,28) = loss(:,i_clox)
+      lifetime(:,29) = pcl
+      lifetime(:,30) = lcl 
+      lifetime(:,31) = pclo
+      lifetime(:,32) = lclo 
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -6503,3 +6535,34 @@ ccccccccccccccccccccccccccccccccccccc
       END 
 
       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+CC Quasi-Steady-State Approximation 
+cc for Cl- species in the 1-D model 
+cccccccccccccccccccccccccccccccccccccc
+      REAL FUNCTION Chlorine_QSSA(cc0,P,L,h)
+
+
+      IMPLICIT NONE 
+
+      REAL cc0 ! Initial number density 
+      REAL P, L ! Production and Loss Rates
+      REAL h ! Timestep 
+
+      REAL cc ! Final number density
+
+      IF ( h*L < 0.01 ) THEN 
+!     1.0 : SIBEM 
+        Chlorine_QSSA = (cc0 + P*h)/(1. + L*h)
+
+      ELSEIF ( h*L .le. 10. ) THEN 
+!     2.0 : qssa
+        Chlorine_QSSA = cc0*exp(-h*L) + (P/L)*(1. - exp(-h*L) )
+
+      ELSE
+!     3.0 : Steady-State
+        Chlorine_QSSA = P/L 
+      ENDIF 
+
+
+      RETURN
+      END 
