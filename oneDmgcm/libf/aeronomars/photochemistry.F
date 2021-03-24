@@ -6689,8 +6689,8 @@ cccccccccccccccccccccccccccccccccccccc
       REAL cc ! Final number density
 
       IF ( h*L < 0.01 ) THEN 
-!     1.0 : SIBEM 
-        Chlorine_QSSA = (cc0 + P*h)/(1. + L*h)
+!     1.0 : Forward Euler 
+        Chlorine_QSSA = cc0 + h*(P - L)
 
       ELSEIF ( h*L .le. 10. ) THEN 
 !     2.0 : qssa
