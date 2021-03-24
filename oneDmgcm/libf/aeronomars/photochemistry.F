@@ -529,20 +529,24 @@ C        ! Loss Rates
      $                  , "cm-3 s-1",
      $                  1, lifetime(:,26))
 
+       ! O=O Lifetime
+       call WRITEDIAGFI(1,"o=o_tau","o=o_tau", "s",
+     $                  1,lifetime(:,60))
+
 
        ! ClOX 
-       call WRITEDIAGFI(1,"clox_P","clox_P", "s",
-     $                  1,lifetime(:,27))
-       call WRITEDIAGFI(1,"clox_L","clox_L", "s",
-     $                  1,lifetime(:,28))
-       call WRITEDIAGFI(1,"pcl","pcl", "s",
-     $                  1,lifetime(:,29))
-       call WRITEDIAGFI(1,"lcl","lcl", "s",
-     $                  1,lifetime(:,30))
-       call WRITEDIAGFI(1,"pclo","pclo", "s",
-     $                  1,lifetime(:,31))
-       call WRITEDIAGFI(1,"lclo","lclo", "s",
-     $                  1,lifetime(:,32))
+C        call WRITEDIAGFI(1,"clox_P","clox_P", "s",
+C      $                  1,lifetime(:,27))
+C        call WRITEDIAGFI(1,"clox_L","clox_L", "s",
+C      $                  1,lifetime(:,28))
+C        call WRITEDIAGFI(1,"pcl","pcl", "s",
+C      $                  1,lifetime(:,29))
+C        call WRITEDIAGFI(1,"lcl","lcl", "s",
+C      $                  1,lifetime(:,30))
+C        call WRITEDIAGFI(1,"pclo","pclo", "s",
+C      $                  1,lifetime(:,31))
+C        call WRITEDIAGFI(1,"lclo","lclo", "s",
+C      $                  1,lifetime(:,32))
 
        ! PLACE IN WRITEDIAGFI FUNCTION 
 C        call WRITEDIAGFI(1,"clox_l1","cl003", "s",
@@ -3436,13 +3440,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &             +  cab034*cc(:,i_hoch2ooh)*cc(:,i_hoch2ooh)
      $             + cl010*cc(:,i_cl)*cc(:,i_ho2)
      $             + cl018*cc(:,i_cl)*cc(:,i_ch3ooh)
+     $             + cl021*cc(:,i_clo)*cc(:,i_ch3o2)
      $             + cl022*cc(:,i_cl)*Cc(:,i_ch3o2)*0.5
      $             + cl024*cc(:,i_cloo)*cc(:,i_cl)
+     $             + cl046*cc(:,i_clo)*cc(:,i_clo3)
      $             + cl047*cc(:,i_clo)*cc(:,i_clo3)
      $             + cl048*cc(:,i_clo3)*cc(:,i_oh)
      $             + cl049*cc(:,i_clo3)*cc(:,i_oh)
+     $             + cl054*cc(:,i_clo4)*cc(:,i_hocl)
      $             + j(:,j_cloo)*cc(:,i_cloo) 
-     $             + j(:,j_oclo)*cc(:,i_oclo)
 
       ! ---------------------------------------------
       ! Atmospheric Lifetimes [Inverse loss rate = s]
@@ -3521,7 +3527,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       lifetime(:,58) =  cl047(:)*cc(:,i_clo3)
       lifetime(:,59) =  cl055(:)*cc(:,i_hocl)
 
-
+      ! O=O Loss Rate
+      lifetime(:,60) = o2_loss_rate
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -6411,7 +6418,7 @@ c     JPL 2015
 
 c     cl040 : hcl + o -> oh + cl 
 c     JPL 2015
-      cl040(l) = 1.1e-11*exp(-3300./(8.314*t(l)))
+      cl040(l) = 1.1e-11*exp(-3300./(t(l)))
 
 c     cl041 : hcl + h -> h2 + cl 
 c     Kinetic studies of reactions of hydrogen atoms with HCl, Cl2 and NOCl, and chlorine atoms with H2 and NOCl
