@@ -1,6 +1,6 @@
 SUBROUTINE tlm_clox(lyr_m, rclo_cl, iter, dt, dens, &
 				pcl, lcl, pclo, lclo, &
-				cc, cc_prev, &
+				cc, cc_prev, no,&
 				nesp, &
                     dccn_dpq, dcc0_dpq, &
                     j, &
@@ -10,6 +10,7 @@ SUBROUTINE tlm_clox(lyr_m, rclo_cl, iter, dt, dens, &
                     c001, c002, c003, c004, c005, c006, &
                     c007, c008, c009, c010, c011, c012, &
                     c013, c014, c015, c016, c017, c018, &
+                    d004, &
                     e001, e002, e003, &
                     cab001, cab002, cab003, cab004, cab005, &
                     cab006, cab007, cab008, cab009, cab010, &
@@ -75,6 +76,7 @@ REAL dt ! chemistry timestep
 REAL dens ! Atmospheric Number Density 
 REAL pcl, lcl, pclo, lclo ! Cl and ClO Production and loss
 REAL cc(nesp), cc_prev(nesp)
+REAL no ! NO number density
 INTEGER nesp
 REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
 REAL, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
@@ -113,6 +115,8 @@ real c001, c002, c003, &
      c010, c011, c012, &
      c013, c014, c015, &
      c016, c017, c018
+! Nitrogen Reaction Rates
+real d004 
 ! Carbon Reaction Rates 
 real e001, e002, e003
 ! Organic Reaction Rates 
@@ -428,6 +432,10 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
           dLclo_dPQ = dLclo_dPQ + lclo_coeff(iq)*dccn_dpq(x_j,:) 
 
     ENDDO
+
+! 1.4.1 : Nitrogen Contributions
+dPcl_dPQ = dPcl_dPQ + d004*dNO_dPQ(lyr_m,:)
+dLclo_dPQ = dLclo_dPQ + d004*dNO_dPQ(lyr_m,:)
 
 ! ------------------------------------------------------
 ! 1.5 : Calculating the Linearised Partition Function 

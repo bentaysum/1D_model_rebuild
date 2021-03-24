@@ -1782,7 +1782,7 @@ c     ==============
 
       call tlm_clox(l, rclo_cl(l), iter,  dt, dens(l),
      $             pcl, lcl, pclo, lclo,
-     $             cc(l,:), cc_prev(:),
+     $             cc(l,:), cc_prev(:), no(l),
      $             nesp,
      $             dccn_dpq, dcc0_dpq,
      $             j(l,:),
@@ -1792,6 +1792,7 @@ c     ==============
      $             c001(l), c002(l), c003(l), c004(l), c005(l), c006(l), 
      $             c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),
      $             c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),
+     $             d004(l),
      $             e001(l), e002(l), e003(l),
      $             cab001(l), cab002(l), cab003(l),
      $             cab004(l), cab005(l), cab006(l),
