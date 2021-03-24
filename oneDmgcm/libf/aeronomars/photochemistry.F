@@ -82,7 +82,8 @@ c
      $     c010(nlayermx), c011(nlayermx), c012(nlayermx),
      $     c013(nlayermx), c014(nlayermx), c015(nlayermx), 
      $     c016(nlayermx), c017(nlayermx), c018(nlayermx)
-      real d001(nlayermx), d002(nlayermx), d003(nlayermx)
+      real d001(nlayermx), d002(nlayermx), d003(nlayermx),
+     $     d004(nlayermx), d005(nlayermx)
       real e001(nlayermx), e002(nlayermx), e003(nlayermx)
       real h001(nlayermx), h002(nlayermx), h003(nlayermx),
      $     h004(nlayermx), h005(nlayermx)
@@ -203,7 +204,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $               c001, c002, c003, c004, c005, c006,
      $               c007, c008, c009, c010, c011, c012,
      $               c013, c014, c015, c016, c017, c018,
-     $               d001, d002, d003,
+     $               d001, d002, d003, d004, d005,
      $               e001, e002, e003,
      $               h001, h002, h003, h004, h005,
      $               t001, t002, t003, tau,
@@ -301,7 +302,7 @@ c =================================================================
      $               c001, c002, c003, c004, c005, c006,
      $               c007, c008, c009, c010, c011, c012,
      $               c013, c014, c015, c016, c017, c018,
-     $               d001, d002, d003,
+     $               d001, d002, d003, d004, d005,
      $               e001, e002, e003,
      $               h001, h002, h003, h004, h005,
      $               t001, t002, t003,
@@ -623,7 +624,7 @@ c
      $                  c001, c002, c003, c004, c005, c006,
      $                  c007, c008, c009, c010, c011, c012,
      $                  c013, c014, c015, c016, c017, c018,
-     $                  d001, d002, d003,
+     $                  d001, d002, d003, d004, d005,
      $                  e001, e002, e003,
      $                  h001, h002, h003, h004, h005,
      $                  t001, t002, t003,
@@ -720,7 +721,8 @@ c
      $     c010(nlayermx), c011(nlayermx), c012(nlayermx),
      $     c013(nlayermx), c014(nlayermx), c015(nlayermx), 
      $     c016(nlayermx), c017(nlayermx), c018(nlayermx)
-      real d001(nlayermx), d002(nlayermx), d003(nlayermx)
+      real d001(nlayermx), d002(nlayermx), d003(nlayermx),
+     $     d004(nlayermx), d005(nlayermx)
       real e001(nlayermx), e002(nlayermx), e003(nlayermx)
       real h001(nlayermx), h002(nlayermx), h003(nlayermx),
      $     h004(nlayermx), h005(nlayermx)
@@ -1107,7 +1109,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       do l = 1,lswitch-1
 c
-         rno2_no = (d002(l)*cc(l,i_o3) + d003(l)*cc(l,i_ho2))
+         rno2_no = (d002(l)*cc(l,i_o3) + d003(l)*cc(l,i_ho2)
+     $            + d004(l)*cc(l,i_clo) + d005(l)*cc(l,i_oclo) )
      $            /(j(l,j_no2) +
      $              d001(l)*max(cc(l,i_o),1.e-30*dens(l)))
 c
@@ -1728,6 +1731,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $    + cl004(l)*cc(l,i_clo)*2.
      $    + cl005(l)*cc(l,i_clo)
      $    + cl012(l)*cc(l,i_oh)*0.94
+     $    + d004(l)*no(l) 
+
       ! Loss of Cl 
       lcl(l) = cl001(l)*cc(l,i_o3)
      $    + cl010(l)*cc(l,i_ho2)
@@ -1752,6 +1757,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $     + cl004(l)*cc(l,i_clo)
      $     + cl005(l)*cc(l,i_clo)
      $     + cl012(l)*cc(l,i_oh)
+     $     + d004(l)*no(l) 
 
       rclo_cl(l) = (pclo(l) + lcl(l))/(pcl(l) + lclo(l))
 
@@ -2815,7 +2821,8 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     ClOx = Cl + ClO 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      production(l,i_clox) = cl007(l)*cc(l,i_cl2o2)
+      production(l,i_clox) = d005(l)*cc(l,i_oclo)*no(l)
+     $                     + cl007(l)*cc(l,i_cl2o2)
      $                     + cl014(l)*cc(l,i_hcl)*cc(l,i_oh)
      $                     + cl015(l)*cc(l,i_hocl)*cc(l,i_oh)
      $                     + cl024(l)*cc(l,i_cloo)*cc(l,i_cl)
@@ -5032,7 +5039,7 @@ c
      $                     c001, c002, c003, c004, c005, c006,
      $                     c007, c008, c009, c010, c011, c012,
      $                     c013, c014, c015, c016, c017, c018,
-     $                     d001, d002, d003,
+     $                     d001, d002, d003, d004, d005,
      $                     e001, e002, e003,
      $                     h001, h002, h003, h004, h005,
      $                     t001, t002, t003, tau,
@@ -5114,7 +5121,8 @@ c
      $     c010(nlayermx), c011(nlayermx), c012(nlayermx),
      $     c013(nlayermx), c014(nlayermx), c015(nlayermx), 
      $     c016(nlayermx), c017(nlayermx), c018(nlayermx)
-      real d001(nlayermx), d002(nlayermx), d003(nlayermx)
+      real d001(nlayermx), d002(nlayermx), d003(nlayermx),
+     $     d004(nlayermx), d005(nlayermx)
       real e001(nlayermx), e002(nlayermx), e003(nlayermx)
       real h001(nlayermx), h002(nlayermx), h003(nlayermx),
      $     h004(nlayermx), h005(nlayermx)
