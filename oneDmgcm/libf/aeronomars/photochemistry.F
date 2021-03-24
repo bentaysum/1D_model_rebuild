@@ -5579,7 +5579,16 @@ c
 c        jpl 2011
 c
          d003(l) = 3.3e-12*exp(270./t(l))
-c
+
+ccc      d004: no + clo -> no2 + cl
+c        jpl 2018
+         
+         d004(l) = 6.4e-12*exp(-290./t(l))
+
+ccc      d005: no + oclo -> no2 + clo 
+c        jpl 2018 
+         
+         d005(l) = 2.5e-12*exp(600./t(l))
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        carbon compounds
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
