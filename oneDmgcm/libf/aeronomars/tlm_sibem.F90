@@ -1559,8 +1559,9 @@ A_hox(4) = cc_hox_next*A_hox(1)*dt_c*loss(i_Hox)/(cc(i_Hox))
 ! 4.5 : Odd-Chlorine Coefficients [in daylight]
 IF ( ( igcm_cl .ne. 0 ) .and. ( sza .le. 95. ) ) THEN 
     A_clox(1) = 1./( 1. + loss(i_clox)*dt_c )
-    A_clox(2) = A_clox(1)*dt_c 
-    A_clox(3) =  (cc0(i_clox) + production(i_clox)*dt_c)*(A_clox(1)**2)*dt_c
+    A_clox(2) = A_clox(1)*dt_c
+    A_clox(3) = (cc0(i_clox) + production(i_clox)*dt_c)*(A_clox(1)**2)*dt_c/cc(i_clox)
+    A_clox(4) = (cc0(i_clox) + production(i_clox)*dt_c)*(A_clox(1)**2)*dt_c*loss(i_clox)/cc(i_clox)
 ENDIF 
 
 
@@ -1681,7 +1682,9 @@ IF ( igcm_cl .ne. 0 ) THEN
     ! ClOx 
     dclox_dPQ(lyr_m,:) = A_clox(1)*dclox0_dPQ(lyr_m,:) &
                       + A_clox(2)*dPclox_dPQ &
-                      - A_clox(3)*dLclox_dPQ 
+                      - A_clox(3)*dLclox_dPQ &
+                      + A_clox(4)*dclox_dPQ(lyr_m,:)
+
 
     ! 5.3.1 : Daylight OClO 
     IF ( sza .le. 95. ) THEN 
