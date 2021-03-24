@@ -1,6 +1,7 @@
 SUBROUTINE tlm_nox(iter, lyr_m, dens, nesp, &
                     nox, no, no2, rno2_no, &
-                    cc, d001, d002, d003, & 
+                    cc, d001, d002, d003, &
+                    d004, d005, & 
                     j_no2, &
                     dccn_dpq)
 
@@ -28,7 +29,7 @@ real no, no2 ! NO, NO2 number density
 real rno2_no ! Partition Function 
 
 real cc(nesp) ! tracer number density
-real d001, d002, d003 ! Chemical rate coefficients
+real d001, d002, d003, d004, d005 ! Chemical rate coefficients
 real j_no2 ! Photolysis rate of NO2
 
 real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
@@ -38,7 +39,7 @@ real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
 !                                   Output Variables 
 ! ====================================================================================
 real drno2_no(nqmx*nlayermx) ! Linearised Partition function 
-real A, B(2), C(3) ! coefficients
+real A, B(2), C(5) ! coefficients
 
 ! Tracer indexing as in photochemistry.F 
 ! ======================================
@@ -142,16 +143,22 @@ B(2) = no
 !
 ! d[rno2_no]/d[PQ] = C1 * [O3]' 
 !                  + C2 * [HO2]'
+!				   + C3 * [ClO]'
+!				   + C4 * [OClO]'
 !                  - C3 * [O] ' 
 
 C(1) =  d002/(j_no2 + d001*cc(i_o))
 C(2) =  d003/(j_no2 + d001*cc(i_o))
+C(3) = d004/(j_no2 + d001*cc(i_o))
+C(4) = d005/(j_no2 + d001*cc(i_o))
 
-C(3) = d001*rno2_no/(j_no2 + d001*cc(i_o))
+C(5) = d001*rno2_no/(j_no2 + d001*cc(i_o))
 
 drno2_no = C(1)*dccn_dpq( (t_o3-1)*nlayermx + lyr_m, : ) &
          + C(2)*dccn_dpq( (t_ho2-1)*nlayermx + lyr_m, : ) &
-         - C(3)*dccn_dpq( (t_o-1)*nlayermx + lyr_m, : ) 
+         + C(3)*dccn_dpq( (t_clo-1)*nlayermx + lyr_m, : ) &
+         + C(4)*dccn_dpq( (t_oclo-1)*nlayermx + lyr_m, : ) &
+         - C(5)*dccn_dpq( (t_o-1)*nlayermx + lyr_m, : ) 
 
 ! 1.1 Linearised NO 
 ! -----------------

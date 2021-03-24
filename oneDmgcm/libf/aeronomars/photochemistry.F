@@ -1137,8 +1137,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
           call tlm_nox(iter, l, dens(l), nesp, 
      $               nox(l), no(l), no2(l), rno2_no, 
      $               cc(l,:), d001(l), d002(l), d003(l), 
+     $               d004(l), d005(l),
      $               j(l,j_no2), 
-     $              dccn_dpq)
+     $               dccn_dpq)
 
       ENDIF 
 
