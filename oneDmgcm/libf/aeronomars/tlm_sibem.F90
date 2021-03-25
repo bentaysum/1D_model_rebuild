@@ -180,6 +180,7 @@ REAL dPhox_dPQ(nqmx*nlayermx), dLhox_dPQ(nqmx*nlayermx)
 REAL A_clox(4)
 REAL dPclox_coeff(nqmx), dLclox_coeff(nqmx)
 REAL dPclox_dPQ(nqmx*nlayermx), dLclox_dPQ(nqmx*nlayermx) 
+REAL cc_clox_next 
 
 integer iq_j,iq_i, iq
 integer x_i, x_j
@@ -347,6 +348,7 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
 dL_coeff(:,:) = 0. 
 dLhox_coeff(:) = 0.
 dLclox_coeff(:) = 0. 
+
 ! 1.1 : Inorganic Species [and methane]
 ! -------------------------------------
     ! 1.1.1: CO 
@@ -535,25 +537,6 @@ dLclox_coeff(:) = 0.
         dLhox_coeff(t_cl2) = cl036*cc(i_oh) &
                            + cl037*cc(i_h) 
 
-        ! ClOx 
-        dLclox_coeff(t_co) = cl023 
-        dLclox_coeff(t_o2) = cl028
-        dLclox_coeff(t_o3) = cl044 
-        dLclox_coeff(t_h2) = cl008
-        dLclox_coeff(t_h2o2) = cl011 
-
-        dLclox_coeff(t_oh) = cl012*0.06
-        dLclox_coeff(t_ho2) = cl009 + cl013
-
-        dLclox_coeff(t_ch4) = cl016
-
-        dLclox_coeff(t_clo) = 2.*cl003 + cl005 + 2.*cl006 
-        dLclox_coeff(t_cloo) = cl025
-        dLclox_coeff(t_ch3ocl) = cl029 + cl031
-        dLclox_coeff(t_cl2o2) = cl030 
-        dLclox_coeff(t_clo3) = cl045 + cl046 + cl047
-        dLclox_coeff(t_hocl) = cl055 
-
         ! HCl 
         dL_coeff(t_hcl,t_oh) = cl014 
         dL_coeff(t_hcl,t_o1d) = 0.88*cl039 
@@ -589,16 +572,85 @@ dLclox_coeff(:) = 0.
         dL_coeff(t_clo4,t_cl) = cl053 
         dL_coeff(t_clo4,t_hocl) = cl054
 
+        ! ClOx Summed 
+        dLclox_coeff(t_clo) = 4.*cl003*cc(i_clo) &
+                           + 2.*cl005*cc(i_clo) &
+                           + 4.*cl006*cc(i_clo) &
+                         + 0.06*cl012*cc(i_oh) &
+                              + cl013*cc(i_ho2) &
+                              + cl019*cc(i_ch3o2) &
+                              + cl020*cc(i_ch3o2) &
+                              + cl021*cc(i_ch3o2) &
+                              + 0.5*cl022*cc(i_ch3o2) &
+                              + cl045*cc(i_clo3) &
+                              + cl046*cc(i_clo3) &
+                              + cl047*cc(i_clo3)
+
+
+        dLclox_coeff(t_cl) = cl008*cc(i_h2) &
+                          + cl009*cc(i_ho2) &
+                          + cl011*cc(i_h2o2) &
+                          + cl016*cc(i_ch4) &
+                          + cl017*cc(i_hcho) &
+                          + cl018*cc(i_ch3ooh) &
+                          + cl023*cc(i_co) &
+                          + cl025*cc(i_cloo) &
+                          + cl028*cc(i_o2) &
+                          + cl029*cc(i_ch3ocl) &
+                          + cl030*cc(i_cl2o2) &
+                          + cl031*cc(i_ch3ocl) &
+                          + cl043*cc(i_hcooh) &
+                          + cl044*cc(i_o3) &
+                          + cl055*cc(i_hocl) 
+
+        dLclox_coeff(t_clo3) = cl045*cc(i_clo) &
+                            + cl046*cc(i_clo) &
+                            + cl047*cc(i_clo)
+
+        dLclox_coeff(t_cl2o2) = cl030*cc(i_cl)
+
+        dLclox_coeff(t_cloo) = cl025*cc(i_cl)
+
+        dLclox_coeff(t_ch3ocl) = cl029*cc(i_cl) &
+                              + cl031*cc(i_cl)
+
+        dLclox_coeff(t_hocl) = cl055*cc(i_cl)
+
+        dLclox_coeff(t_co) = cl023*cc(i_cl)
+
+        dLclox_coeff(t_o2) = cl028*cc(i_cl)
+
+        dLclox_coeff(t_o3) = cl044*cc(i_cl)
+
+        dLclox_coeff(t_oh) = 0.06*cl012*cc(i_clo)
+
+        dLclox_coeff(t_h2) = cl008*cc(i_cl) 
+
+        dLclox_coeff(t_ho2) = cl009*cc(i_cl) &
+                           + cl013*cc(i_clo)
+
+        dLclox_coeff(t_h2o2) = cl011*cc(i_cl)
+
+        dLclox_coeff(t_ch4) = cl016*cc(i_cl)
+
         ! Chlorine and Organic Interactions 
         IF ( igcm_ch3 .ne. 0 ) THEN
-           ! ClOX 
-           dLclox_coeff(t_hcho) = cl017 
-           dLclox_coeff(t_ch3ooh) = cl018 
-           dLclox_coeff(t_ch3o2) = cl019 + cl020 + cl021 + 0.5*cl022
-           dLclox_coeff(t_hcooh) = cl043 
             ! Cl2 
             dL_coeff(t_cl2,t_ch3) = cl038 
-        ENDIF 
+
+            ! ClOx 
+            dLclox_coeff(t_hcho) = cl017*cc(i_cl)
+
+            dLclox_coeff(t_ch3ooh) = cl018*cc(i_cl)
+
+            dLclox_coeff(t_ch3o2) = cl019*cc(i_clo) &
+                               + cl020*cc(i_clo) &
+                               + cl021*cc(i_clo) &
+                               + 0.5*cl022*cc(i_clo)
+
+            dLclox_coeff(t_hcooh) = cl043*cc(i_cl)
+
+         ENDIF 
 
 
     ENDIF 
@@ -1215,58 +1267,52 @@ dPclox_coeff(:) = 0.
         dP_coeff(t_clo4,t_oh) = cl027*cc(i_hclo4)
         dP_coeff(t_clo4,t_hclo4) = cl027*cc(i_oh)
         
-        ! 2.3.12: ClOx
-          dPclox_coeff(t_o1d) = 2.*cl035*cc(i_cl2) &
-                              + 0.88*cl039*cc(i_hcl)
+        ! 2.3.12: ClOx 
+        dPclox_coeff(t_cl2o2) = cl007 &
+                              + j(j_cl2o2)
 
-          dPclox_coeff(t_o) = cl040*cc(I_hcl) &
-                            + cl042*cc(i_hocl) &
-                            + cl057*cc(i_oclo)
+        dPclox_coeff(t_cl) = cl024*cc(i_cloo) &
+                           + cl059*cc(i_oclo)
 
-          dPclox_coeff(t_h) = cl037*cc(i_cl2) &
-                            + cl041*cc(i_hcl)
+        dPclox_coeff(t_cloo) = cl024*cc(i_cl) &
+                             + cl026 &
+                             + j(j_cloo)
 
-          dPclox_coeff(t_oh) = cl014*cc(i_hcl) &
-                             + cl015*cc(i_hocl) &
-                             + cl036*cc(i_cl2)
+        dPclox_coeff(t_clco) = cl033 
 
-          dPclox_coeff(t_cl) = cl024*cc(i_cloo) &
-                             + cl059*cc(i_oclo)
+        dPclox_coeff(t_oclo) = cl057*cc(i_o) &
+                             + cl059*cc(i_cl) &
+                             + j(j_oclo)
 
-          dPclox_coeff(t_cloo) = cl024*cc(i_cl) &
-                               + cl026 &
-                               + j(j_cloo)
+        dPclox_coeff(t_hcl) = cl014*cc(i_oh) &
+                            + 0.88*cl039*cc(i_o1d) &
+                            + cl040*cc(i_o) &
+                            + cl041*cc(i_h) &
+                            + j(j_hcl)
 
-          dPclox_coeff(t_cl2) = 2.*cl035*cc(i_o1d) &
-                              + cl036*cc(i_oh) &
-                              + cl037*cc(i_h) &
-                              + cl038*cc(i_ch3) &
-                              + 2.*j(j_cl2)
+        dPclox_coeff(t_hocl) = cl015*cc(i_oh) &
+                             + cl042*cc(i_o) &
+                             + j(j_hocl)
 
-          dPclox_coeff(t_hcl) = cl014*cc(i_oh) &
-                              + 0.88*cl039*cc(i_o1d) &
-                              + cl040*cc(i_o) &
-                              + cl041*cc(i_h) &
-                              + j(j_hcl)
+        dPclox_coeff(t_cl2) = 2.*cl035*cc(i_o1d) &
+                            + cl036*cc(i_oh) &
+                            + cl037*cc(i_h) &
+                            + cl038*cc(i_ch3) &
+                            + 2.*j(j_cl2)
 
-          dPclox_coeff(t_hocl) = cl015*cc(i_oh) &
-                               + cl042*cc(I_o) &
-                               + j(j_hocl)
+        dPclox_coeff(t_o) = cl040*cc(i_hcl) &
+                          + cl042*cc(i_hocl) &
+                          + cl057*cc(i_oclo)
 
-          dPclox_coeff(t_oclo) = cl057*cc(I_o) &
-                               + cl059*cc(i_cl) &
-                               + j(j_oclo)
+        dPclox_coeff(t_o1d) = 2.*cl035*cc(i_cl2) &
+                            + 0.88*cl039*cc(i_hcl)
 
-          dPclox_coeff(t_cl2o2) = cl007 &
-                                + j(j_cl2o2)
+        dPclox_coeff(t_h) = cl037*cc(I_cl2) &
+                          + cl041*cc(i_hcl)
 
-          dPclox_coeff(t_clco) = cl033
-          
-          ! Organic Interactions
-          IF ( igcm_ch3 .ne. 0 ) THEN 
-              dPclox_coeff(t_ch3) = cl038*cc(i_cl2)
-          ENDIF 
-
+        dPclox_coeff(t_oh) = cl014*cc(i_hcl) &
+                           + cl015*cc(i_hocl) &
+                           + cl036*cc(i_cl2)
 
         ! Chlorine and Organic Chemistry 
         IF ( igcm_ch3 .ne. 0 ) THEN 
@@ -1281,6 +1327,8 @@ dPclox_coeff(:) = 0.
             dP_coeff(t_oclo,t_ch3o2) = cl021*cc(i_clo) 
             ! CH3OCl 
             dP_coeff(t_ch3ocl,t_ch3o2) = cl020*cc(i_clo)
+            ! ClOX 
+            dPclox_coeff(t_ch3) = cl038*cc(i_cl2)
         ENDIF 
 
 
@@ -1309,10 +1357,8 @@ dL_dPQ(:,:) = 0.
 dPhox_dPQ(:) = 0. 
 dLhox_dPQ(:) = 0. 
 
-IF (  igcm_cl .ne. 0   )THEN 
-    dPclox_dPQ(:) = 0.
-    dLclox_dPQ(:) = 0. 
-ENDIF 
+dLclox_dPQ(:) = 0.
+dPclox_dPQ(:) = 0. 
 
 DO iq_j = 1, nqmx
     
@@ -1336,12 +1382,10 @@ DO iq_j = 1, nqmx
     dphox_dPQ = dphox_dPQ + dphox_coeff(iq_j)*dccn_dpq( x_j, : )
     dlhox_dPQ = dLhox_dPQ + dLhox_coeff(iq_j)*dccn_dpq( x_j, : )
 
-    ! Odd-Chlorine [ClOx] 
-    ! -------------------------------
-    IF ( igcm_cl .ne. 0 )  THEN 
-        dPclox_dPQ = dpclox_dPQ + dpclox_coeff(iq_j)*dccn_dpq( x_j, : )
-        dLclox_dPQ = dLclox_dPQ + dLclox_coeff(iq_j)*dccn_dpq( x_j, : ) 
-    ENDIF
+    if ( igcm_cl .ne. 0 ) then 
+      dPclox_dPQ = dPclox_dPQ + dPclox_coeff(iq_j)*dccn_dpq(x_j,:)
+      dLclox_dPQ = dLclox_dPQ + dLclox_coeff(iq_j)*dccn_dpq(x_j,:)
+    endif 
 
 ENDDO
 
@@ -1448,107 +1492,6 @@ IF ( igcm_ch3 .ne. 0 ) THEN
     A(t_hoch2ooh,3) = (cc0(i_hoch2ooh) + production(i_hoch2ooh)*dt_c)*(A(t_hoch2ooh,1)**2)*dt_c
 ENDIF 
 
-! 4.3 : Chlorine
-! ===========================
-IF ( igcm_cl .ne. 0 ) THEN 
-
-    ! 4.3.1 : HCl
-    IF ( 1./loss(i_hcl) < dt_c ) THEN 
-        A(t_hcl,1) = 1./loss(i_hcl)
-        A(t_hcl,2) = production(i_hcl)*(A(t_hcl,1)**2.)
-    ELSE 
-        A(t_hcl,1) = 1./( 1. + loss(i_hcl)*dt_c)
-        A(t_hcl,2) = A(t_hcl,1)*dt_c 
-        A(t_hcl,3) = (cc0(i_hcl) + production(i_hcl)*dt_c)*(A(t_hcl,1)**2)*dt_c
-    ENDIF
-
-    ! 4.3.2 : HOCl
-    IF ( 1./loss(i_hocl) < dt_c ) THEN 
-        A(t_hocl,1) = 1./loss(i_hocl)
-        A(t_hocl,2) = production(i_hocl)*(A(t_hocl,1)**2.)
-    ELSE 
-        A(t_hocl,1) = 1./( 1. + loss(i_hocl)*dt_c)
-        A(t_hocl,2) = A(t_hocl,1)*dt_c 
-        A(t_hocl,3) = (cc0(i_hocl) + production(i_hocl)*dt_c)*(A(t_hocl,1)**2)*dt_c
-    ENDIF
-
-    ! 4.3.3 : ClO3
-    IF ( 1./loss(i_clo3) < dt_c ) THEN 
-        A(t_clo3,1) = 1./loss(i_clo3)
-        A(t_clo3,2) = production(i_clo3)*(A(t_clo3,1)**2.)
-    ELSE 
-        A(t_clo3,1) = 1./( 1. + loss(i_clo3)*dt_c)
-        A(t_clo3,2) = A(t_clo3,1)*dt_c 
-        A(t_clo3,3) = (cc0(i_clo3) + production(i_clo3)*dt_c)*(A(t_clo3,1)**2)*dt_c
-    ENDIF
-
-    ! 4.3.4 : ClO4
-    IF ( 1./loss(i_clo4) < dt_c ) THEN 
-        A(t_clo4,1) = 1./loss(i_clo4)
-        A(t_clo4,2) = production(i_clo4)*(A(t_clo4,1)**2.)
-    ELSE 
-        A(t_clo4,1) = 1./( 1. + loss(i_clo4)*dt_c)
-        A(t_clo4,2) = A(t_clo4,1)*dt_c 
-        A(t_clo4,3) = (cc0(i_clo4) + production(i_clo4)*dt_c)*(A(t_clo4,1)**2)*dt_c
-    ENDIF
-
-    ! 4.3.5 : ClCO
-    IF ( 1./loss(i_clco) < dt_c ) THEN 
-        A(t_clco,1) = 1./loss(i_clco)
-        A(t_clco,2) = production(i_clco)*(A(t_clco,1)**2.)
-    ELSE 
-        A(t_clco,1) = 1./( 1. + loss(i_clco)*dt_c)
-        A(t_clco,2) = A(t_clco,1)*dt_c 
-        A(t_clco,3) = (cc0(i_clco) + production(i_clco)*dt_c)*(A(t_clco,1)**2)*dt_c
-    ENDIF
-
-    ! 4.3.6 : Cl2
-    IF ( 1./loss(i_cl2) < dt_c ) THEN 
-        A(t_cl2,1) = 1./loss(i_cl2)
-        A(t_cl2,2) = production(i_cl2)*(A(t_cl2,1)**2.)
-    ELSE 
-        A(t_cl2,1) = 1./( 1. + loss(i_cl2)*dt_c)
-        A(t_cl2,2) = A(t_cl2,1)*dt_c 
-        A(t_cl2,3) = (cc0(i_cl2) + production(i_cl2)*dt_c)*(A(t_cl2,1)**2)*dt_c
-    ENDIF
-
-    ! 4.3.7 : Cl2O2
-    IF ( 1./loss(i_cl2o2) < dt_c ) THEN 
-        A(t_cl2o2,1) = 1./loss(i_cl2o2)
-        A(t_cl2o2,2) = production(i_cl2o2)*(A(t_cl2o2,1)**2.)
-    ELSE 
-        A(t_cl2o2,1) = 1./( 1. + loss(i_cl2o2)*dt_c)
-        A(t_cl2o2,2) = A(t_cl2o2,1)*dt_c 
-        A(t_cl2o2,3) = (cc0(i_cl2o2) + production(i_cl2o2)*dt_c)*(A(t_cl2o2,1)**2)*dt_c
-    ENDIF
-
-    ! 4.3.8 : CH3OCl 
-    A(t_ch3ocl,1) = 1./( 1. + loss(i_ch3ocl)*dt_c)
-    A(t_ch3ocl,2) = A(t_ch3ocl,1)*dt_c 
-    A(t_ch3ocl,3) = (cc0(i_ch3ocl) + production(i_ch3ocl)*dt_c)*(A(t_ch3ocl,1)**2)*dt_c
-
-    ! 4.3.9 : HClO4  
-    A(t_hclo4,1) = 1./( 1. + loss(i_hclo4)*dt_c)
-    A(t_hclo4,2) = A(t_hclo4,1)*dt_c 
-    A(t_hclo4,3) = (cc0(i_hclo4) + production(i_hclo4)*dt_c)*(A(t_hclo4,1)**2)*dt_c
-
-    ! 4.3.10 : ClOO 
-    A(t_cloo,1) = 1./loss(i_cloo)
-    A(t_cloo,2) = production(i_cloo)*(A(t_cloo,1)**2.)
-
-    IF ( sza .le. 95. ) THEN 
-    ! 4.3.11 : OClO 
-        A(t_oclo,1) = 1./loss(i_oclo)
-        A(t_oclo,2) = production(i_oclo)*(A(t_oclo,1)**2.)    
-    ELSE
-    ! 4.3.13 : OClO 
-        A(t_oclo,1) = 1./( 1. + loss(i_oclo)*dt_c)
-        A(t_oclo,2) = A(t_oclo,1)*dt_c 
-        A(t_oclo,3) = (cc0(i_oclo) + production(i_oclo)*dt_c)*(A(t_oclo,1)**2)*dt_c
-    ENDIF ! SZA 
-
-ENDIF ! igcm_cl .ne. 0 
-
 ! 4.4 : Odd-Hydrogen Coefficients
 ! ===============================
 A_hox(1) = 1./( 1. + loss(i_hox)*dt_c )
@@ -1556,12 +1499,16 @@ A_hox(2) = A_hox(1)*dt_c
 A_hox(3) = cc_hox_next*A_hox(1)*dt_c/cc(i_Hox)
 A_hox(4) = cc_hox_next*A_hox(1)*dt_c*loss(i_Hox)/(cc(i_Hox))
 
-! 4.5 : Odd-Chlorine Coefficients [in daylight]
-IF ( ( igcm_cl .ne. 0 ) .and. ( sza .le. 95. ) ) THEN 
-    A_clox(1) = 1./( 1. + loss(i_clox)*dt_c )
-    A_clox(2) = A_clox(1)*dt_c 
-    A_clox(3) =  (cc0(i_clox) + production(i_clox)*dt_c)*(A_clox(1)**2)*dt_c
-ENDIF 
+! 4.5 : Odd-Chlorine Coefficients
+! ===============================
+
+IF (igcm_cl.ne.0) THEN 
+  cc_clox_next = (cc0(i_clox) + production(i_clox)*dt_c)/(1. + loss(i_clox)*dt_c)
+  A_clox(1) = 1./( 1. + loss(i_clox)*dt_c )
+  A_clox(2) = A_clox(1)*dt_c
+  A_clox(3) = cc_clox_next*A_clox(2)/cc(i_clox)
+  A_clox(4) = A_clox(3)*loss(i_clox)
+ENDIF
 
 
 ! =====================================================
@@ -1618,7 +1565,8 @@ dHOX_dPQ(lyr_m,:) = A_hox(1)*dHOX0_dPQ(lyr_m,:) &
                   - A_hox(3)*dLhox_dPQ &
                   + A_hox(4)*dHOX_dPQ(lyr_m,:)
 
-    
+  
+
 ! 5.2 : Organic Chemistry 
 ! -----------------------
 IF ( igcm_ch3 .ne. 0 ) THEN 
@@ -1679,23 +1627,11 @@ ENDIF ! igcm_ch3 .ne. 0
 IF ( igcm_cl .ne. 0 ) THEN 
 
     ! ClOx 
-    ! dclox_dPQ(lyr_m,:) = A_clox(1)*dclox0_dPQ(lyr_m,:) &
-                      ! + A_clox(2)*dPclox_dPQ &
-                      ! - A_clox(3)*dLclox_dPQ 
-
-    ! 5.3.1 : Daylight OClO 
-    ! IF ( sza .le. 95. ) THEN 
-    !     x_j = (t_oclo-1)*nlayermx + lyr_m 
-    !     dccn_dpq( x_j, : ) = A(t_oclo,1)*dP_dPQ(t_oclo,:) - A(t_oclo,2)*dL_dPQ(t_oclo,:)
-    ! ! 5.3.2 : Night Time OClO
-    ! ELSE  
-    !     ! OClO 
-    !     x_j = (t_oclo-1)*nlayermx + lyr_m 
-    !     dccn_dpq( x_j, : ) = A(t_oclo,1)*dcc0_dpq( x_j , : ) + A(t_oclo,2)*dP_dPQ(t_oclo,:) &
-    !                 - A(t_oclo,3)*dL_dPQ( t_oclo, :)
-    ! ENDIF 
-
-
+    ! -----
+    dClOx_dPQ(lyr_m,:) = A_clox(1)*dClOx0_dPQ(lyr_m,:) &
+                       + A_clox(2)*dPclox_dPQ &
+                       - A_clox(3)*dLclox_dPQ &
+                       + A_clox(4)*dClOx_dPQ(lyr_m,:)
 
     ! ! 5.3.3: HCl 
     x_j = (t_hcl-1)*nlayermx + lyr_m 
@@ -1751,26 +1687,6 @@ IF ( igcm_cl .ne. 0 ) THEN
     x_j = (t_cloo-1)*nlayermx + lyr_m 
     dccn_dpq(x_j,:) = linearised_qssa(dt_c, production(i_cloo), loss(i_cloo), cc0(i_cloo), &
                                   dP_dPQ(t_cloo,:), dL_dPQ(t_cloo,:), dcc0_dpq( x_j, : ))
-
-
-
-    IF ( lyr_m == 1 ) THEN 
-      write(*,*) "------------------"
-    ENDIF 
-
-    WRITE(*,"(3E15.7)") MAXVAL( dccn_dpq(x_j,:)  ), MINVAL( dccn_dpq(x_j,:) )
-
-    IF ( ( iter == niter ) .and. ( lyr_m == 25 ) ) STOP
-
-
-
-
-
-
-
-
-
-
 
 
 

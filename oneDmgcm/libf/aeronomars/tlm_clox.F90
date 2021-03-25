@@ -478,6 +478,17 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
     x_j = (t_clo-1)*nlayermx + lyr_m 
     dccn_dpq( x_j, : ) = dClO_dPQ 
 
+
+    IF ( lyr_m == 1 ) THEN 
+      write(*,*) "------------------"
+    ENDIF 
+
+    WRITE(*,"(2E15.7)") MAXVAL( dCl_dPQ  ), MINVAL( dCl_dPQ )
+
+    IF ( ( iter == 5 ) .and. ( lyr_m == 25 ) ) STOP
+
+
+
     RETURN 
 
 END SUBROUTINE
