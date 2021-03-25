@@ -1,4 +1,4 @@
-40
+29
 co2
 co
 o
@@ -15,17 +15,6 @@ ar
 h2o_ice
 h2o_vap
 ch4
-ch3
-ch3o2 
-ch3ooh 
-ch3oh 
-ch3o
-hcho
-hcooh 
-hoch2o2 
-hoch2oh
-hoch2ooh 
-hco
 cl
 clo
 cl2
@@ -39,6 +28,19 @@ clco
 clo3
 hclo4
 clo4
+
+ch3
+ch3o2 
+ch3ooh 
+ch3oh 
+ch3o
+hcho
+hcooh 
+hoch2o2 
+hoch2oh
+hoch2ooh 
+hco
+
 dust_mass
 dust_number
 

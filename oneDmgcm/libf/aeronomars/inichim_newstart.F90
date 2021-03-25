@@ -1781,7 +1781,7 @@
       end if 
       ! HCl
       if (igcm_hcl /= 0) then
-         vmr =  10.e-9
+         vmr =  1.e-9
          do i = 1,iip1
             do j = 1,jjp1
                do l = 1,llm 

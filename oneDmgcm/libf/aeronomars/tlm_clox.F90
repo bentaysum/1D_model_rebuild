@@ -381,11 +381,14 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
     ! -----------
     pclo_coeff(t_o3) = cl001 
     pclo_coeff(t_ho2) = cl010
-    pclo_coeff(t_ch3o2) = cl022*0.5
     pclo_coeff(t_cloo) = cl024*2. 
     pclo_coeff(t_clo4) = cl053
     pclo_coeff(t_hocl) = cl056
     pclo_coeff(t_oclo) = 2.*cl059 
+
+    IF ( igcm_ch3 .ne. 0 ) THEN 
+        pclo_coeff(t_ch3o2) = cl022*0.5
+    ENDIF
 
 ! ------------------------------------------------------
 ! 1.3: Linearised Loss Rate Coefficients
@@ -397,7 +400,6 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
     ! ----------
     lcl_coeff(t_o3) = cl001 
     lcl_coeff(t_ho2) = cl010 
-    lcl_coeff(t_ch3o2) = 0.5*cl022 
     lcl_coeff(t_cloo) = cl024
     lcl_coeff(t_clo4) = cl053 
     lcl_coeff(t_hocl) = cl056
@@ -407,6 +409,11 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
     lclo_coeff(t_o) = cl002 
     lclo_coeff(t_clo) = cl004 + cl005 
     lclo_coeff(t_oh) = cl012 
+
+
+    IF ( igcm_ch3 .ne. 0 ) THEN 
+        lcl_coeff(t_ch3o2) = 0.5*cl022 
+    ENDIF
 
 ! ------------------------------------------------------
 ! 1.4 : Calculating the Linearised P and L terms 
@@ -477,16 +484,6 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
     ! 2.3.2: ClO 
     x_j = (t_clo-1)*nlayermx + lyr_m 
     dccn_dpq( x_j, : ) = dClO_dPQ 
-
-
-    IF ( lyr_m == 1 ) THEN 
-      write(*,*) "------------------"
-    ENDIF 
-
-    WRITE(*,"(2E15.7)") MAXVAL( dCl_dPQ  ), MINVAL( dCl_dPQ )
-
-    IF ( ( iter == 5 ) .and. ( lyr_m == 25 ) ) STOP
-
 
 
     RETURN 
