@@ -76,8 +76,76 @@ ENDIF
 
 END 
 
+! ===============================================================
+! Linearisation of Chlorine species that engage the QSSA function
+! within photochemistry.F 
+! ===============================================================
+FUNCTION linearised_qssa(h,P,L,cc0,&
+						dP, dl, dcc0)
+
+IMPLICIT NONE 
+
+#include "dimensions.h"
+#include "dimphys.h"
+#include "chimiedata.h"
+#include "tracer.h"
+#include "comcstfi.h"
+#include "callkeys.h"
+#include "conc.h"
+
+! Input 
+REAL h ! chemistry time-step 
+REAL P, L ! Production and Loss rates
+REAL cc0 ! Initial dust number density 
+REAL dP(nqmx*nlayermx), dL(nqmx*nlayermx) ! Linearised Production and Loss array
+REAL dcc0(nqmx*nlayermx)
+
+! Local values
+REAL A(3) ! Coefficents for the linearisation equation 
+
+! Return value 
+REAL linearised_qssa(nqmx*nlayermx)
 
 
 
+IF ( h*L < 0.01 ) THEN 
+! -----------------------------
+! 1.0: SIBEM for Stable Species 
+! -----------------------------
+    A(1) = 1./(1. + l*h)
+    A(2) = A(1)*h 
+    A(3) = (cc0 + p*h)*(A(1)**2)*h
+
+
+ELSEIF ( h*L .le. 10. ) THEN 
+! ----------------------------------
+! 1.1 : QSSA for Semi-Stable Species 
+! ----------------------------------
+    A(1) = EXP(-L*h)
+    A(2) = (1. - A(1))/L 
+    A(3) = cc0*h*A(1) &
+         + P*A(2)/L &
+         - P*h*A(1)/L
+ELSE 
+! -----------------------------------------
+! 1.2 : steady-state for non-stable species
+! -----------------------------------------
+    A(1) = 0.
+    A(2) = 1./L 
+    A(3) = P/(L**2)
+
+ENDIF  
+
+! ----------------
+! 2.0: Calculation 
+! ----------------
+
+linearised_qssa = A(1)*dcc0 + A(2)*dP - A(3)*dL 
+
+
+
+RETURN 
+
+END 
 
 END MODULE 

@@ -1774,6 +1774,11 @@ IF ( igcm_cl .ne. 0 ) THEN
 
 
 
+
+! TEST 
+dccn_dpq(x_j,:) = linearised_qssa(dt_c, production(i_cloo), loss(i_cloo), cc0(i_cloo), &
+                                  dP_dPQ(t_cloo,:), dL_dPQ(t_cloo,:), dcc0_dpq( x_j, : ))
+
 ENDIF
 
 
