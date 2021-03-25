@@ -1774,7 +1774,7 @@ C     Tangent Linear
 c     ==============
       IF ( tlm_on ) THEN 
 
-C       call tlm_clox(l, rclo_cl(l), iter,  dt, dens(l),
+c      call tlm_clox(l, rclo_cl(l), iter,  dt, dens(l),
 C      $             pcl, lcl, pclo, lclo,
 C      $             cc(l,:), cc_prev(:),
 C      $             nesp,
@@ -3354,6 +3354,23 @@ ccccccccccccccccccccccccc
      $                               loss(l,i_cloo),
      $                               dt)
 
+        ! OClO
+         cc(l,i_oclo) = Chlorine_QSSA(cc0(l,i_oclo),
+     $                               production(l,i_oclo),
+     $                               loss(l,i_oclo),
+     $                               dt)
+
+        ! CH3OCl
+         cc(l,i_ch3ocl) = Chlorine_QSSA(cc0(l,i_ch3ocl),
+     $                               production(l,i_ch3ocl),
+     $                               loss(l,i_ch3ocl),
+     $                               dt)
+
+        ! HClO4
+         cc(l,i_hclo4) = Chlorine_QSSA(cc0(l,i_hclo4),
+     $                               production(l,i_hclo4),
+     $                               loss(l,i_hclo4),
+     $                               dt)
 C         ! ClOX
 C          cc(l,i_clox) = Chlorine_QSSA(cc0(l,i_clox),
 C      $                               production(l,i_clox),
@@ -3361,11 +3378,11 @@ C      $                               loss(l,i_clox),
 C      $                               dt)
 
 
-        cc(l,i_ch3ocl) = (cc0(l,i_ch3ocl) + production(l,i_ch3ocl)*dt)
-     $              /(1. + loss(l,i_ch3ocl)*dt)
+C         cc(l,i_ch3ocl) = (cc0(l,i_ch3ocl) + production(l,i_ch3ocl)*dt)
+C      $              /(1. + loss(l,i_ch3ocl)*dt)
 
-        cc(l,i_hclo4) = (cc0(l,i_hclo4) + production(l,i_hclo4)*dt)
-     $              /(1. + loss(l,i_hclo4)*dt)
+C         cc(l,i_hclo4) = (cc0(l,i_hclo4) + production(l,i_hclo4)*dt)
+C      $              /(1. + loss(l,i_hclo4)*dt)
 
 
         cc(l,i_clox) = (cc0(l,i_clox) + production(l,i_clox)*dt)
@@ -3375,14 +3392,14 @@ C      $                               dt)
 ccccccccccccccccccccccccccc
 c     Daylight Conditionals
 ccccccccccccccccccccccccccc
-      IF (sza .le. 95.) THEN 
-        cc(l,i_oclo) = production(l,i_oclo)/loss(l,i_oclo)
+C       IF (sza .le. 95.) THEN 
+C         cc(l,i_oclo) = production(l,i_oclo)/loss(l,i_oclo)
 
-      ELSE
-        cc(l,i_oclo) = (cc0(l,i_oclo) + production(l,i_oclo)*dt)
-     $              /(1. + loss(l,i_oclo)*dt)
+C       ELSE
+C         cc(l,i_oclo) = (cc0(l,i_oclo) + production(l,i_oclo)*dt)
+C      $              /(1. + loss(l,i_oclo)*dt)
 
-      ENDIF 
+C       ENDIF 
 
 
       ENDIF 
