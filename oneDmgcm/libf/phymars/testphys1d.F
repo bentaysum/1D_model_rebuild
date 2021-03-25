@@ -736,7 +736,7 @@ c     -1 ensures the model saves the perturbed initial
 c     state, as opposed to saving it -after- it enters
 c     the chemistry routine.
           ndt_tlm = (tlm_day*day_step) 
-     $            + NINT((tlm_lt/24.)*day_step) - 1
+     $            + NINT((tlm_lt/24.)*day_step) + 1
       endif 
 
 
@@ -928,7 +928,7 @@ C         write(*,"(13A15)") ( trim(noms(iq)), iq = 28,40 )
 
         DO iq = 1, nqmx
           
-            if ( trim(noms(iq)) == 'hcl' ) cycle
+C             if ( trim(noms(iq)) == 'hcl' ) cycle
 C           IF ( trim(noms(iq)) == "ch4" ) cycle 
           
           DO ilayer=1,nlayer

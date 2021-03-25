@@ -170,7 +170,7 @@ TLM = tlm_ident + TLM*ptimestep
 tlm( (t_co2-1)*nlayermx + 1 : t_co2*nlayermx, : ) = 0. 
 tlm( (t_h2ovap-1)*nlayermx + 1 : t_h2ovap*nlayermx, : ) = 0. 
 
-tlm( (t_hcl-1)*nlayermx + 1 : t_hcl*nlayermx, : ) = 0. 
+! tlm( (t_hcl-1)*nlayermx + 1 : t_hcl*nlayermx, : ) = 0. 
 
 
 ! ===================

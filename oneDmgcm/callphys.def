@@ -40,7 +40,7 @@ mcd_ltfin = 0.
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 call_tlm=.true.
-tlm_day=100
+tlm_day=0
 tlm_lt=0.
 
 ## L-BFGS-B Routines 
