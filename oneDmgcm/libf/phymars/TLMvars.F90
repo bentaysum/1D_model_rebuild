@@ -81,7 +81,7 @@ END
 ! within photochemistry.F 
 ! ===============================================================
 FUNCTION linearised_qssa(h,P,L,cc0,&
-						dP, dl, dcc0)
+						dP, dl, dcc0, iter, niter, lyr_m)
 
 IMPLICIT NONE 
 
@@ -99,9 +99,11 @@ REAL P, L ! Production and Loss rates
 REAL cc0 ! Initial dust number density 
 REAL dP(nqmx*nlayermx), dL(nqmx*nlayermx) ! Linearised Production and Loss array
 REAL dcc0(nqmx*nlayermx)
+INTEGER iter, niter 
 
 ! Local values
 REAL A(3) ! Coefficents for the linearisation equation 
+INTEGER iq, x, lyr_m
 
 ! Return value 
 REAL linearised_qssa(nqmx*nlayermx)
@@ -141,6 +143,11 @@ ENDIF
 ! ----------------
 
 linearised_qssa = A(1)*dcc0 + A(2)*dP - A(3)*dL 
+
+IF ( lyr_m == 1) THEN 
+    write(*,*) "------------------------"
+ENDIF 
+    write(*,*) h*L, (1./L)/(60.*60.), MAXVAL(linearised_qssa), MINVAL(linearised_qssa)
 
 
 

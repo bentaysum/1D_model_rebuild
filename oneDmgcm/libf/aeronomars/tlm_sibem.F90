@@ -1679,105 +1679,117 @@ ENDIF ! igcm_ch3 .ne. 0
 IF ( igcm_cl .ne. 0 ) THEN 
 
     ! ClOx 
-    dclox_dPQ(lyr_m,:) = A_clox(1)*dclox0_dPQ(lyr_m,:) &
-                      + A_clox(2)*dPclox_dPQ &
-                      - A_clox(3)*dLclox_dPQ 
+    ! dclox_dPQ(lyr_m,:) = A_clox(1)*dclox0_dPQ(lyr_m,:) &
+                      ! + A_clox(2)*dPclox_dPQ &
+                      ! - A_clox(3)*dLclox_dPQ 
 
     ! 5.3.1 : Daylight OClO 
-    IF ( sza .le. 95. ) THEN 
-        x_j = (t_oclo-1)*nlayermx + lyr_m 
-        dccn_dpq( x_j, : ) = A(t_oclo,1)*dP_dPQ(t_oclo,:) - A(t_oclo,2)*dL_dPQ(t_oclo,:)
-    ! 5.3.2 : Night Time OClO
-    ELSE  
-        ! OClO 
-        x_j = (t_oclo-1)*nlayermx + lyr_m 
-        dccn_dpq( x_j, : ) = A(t_oclo,1)*dcc0_dpq( x_j , : ) + A(t_oclo,2)*dP_dPQ(t_oclo,:) &
-                    - A(t_oclo,3)*dL_dPQ( t_oclo, :)
-    ENDIF 
+    ! IF ( sza .le. 95. ) THEN 
+    !     x_j = (t_oclo-1)*nlayermx + lyr_m 
+    !     dccn_dpq( x_j, : ) = A(t_oclo,1)*dP_dPQ(t_oclo,:) - A(t_oclo,2)*dL_dPQ(t_oclo,:)
+    ! ! 5.3.2 : Night Time OClO
+    ! ELSE  
+    !     ! OClO 
+    !     x_j = (t_oclo-1)*nlayermx + lyr_m 
+    !     dccn_dpq( x_j, : ) = A(t_oclo,1)*dcc0_dpq( x_j , : ) + A(t_oclo,2)*dP_dPQ(t_oclo,:) &
+    !                 - A(t_oclo,3)*dL_dPQ( t_oclo, :)
+    ! ENDIF 
 
-    ! 5.3.3: HCl 
+
+
+
+    ! TESTING HCL 
     x_j = (t_hcl-1)*nlayermx + lyr_m 
-    IF ( 1./loss(i_hcl) < dt_c ) THEN 
-        dccn_dpq( x_j, : ) = A(t_hcl,1)*dP_dPQ(t_hcl,:) - A(t_hcl,2)*dL_dPQ(t_hcl,:)
-    ELSE 
-        dccn_dpq( x_j, : ) = A(t_hcl,1)*dcc0_dpq( x_j , : ) + A(t_hcl,2)*dP_dPQ(t_hcl,:) &
-                    - A(t_hcl,3)*dL_dPQ( t_hcl, :)
-    ENDIF 
+    dccn_dpq(x_j,:) = linearised_qssa(dt_c, production(i_hcl), loss(i_hcl), cc0(i_hcl), &
+                                  dP_dPQ(t_hcl,:), dL_dPQ(t_hcl,:), dcc0_dpq( x_j, : ), iter, niter, lyr_m)
 
-    ! 5.3.4: HOCl 
-    x_j = (t_hocl-1)*nlayermx + lyr_m 
-    IF ( 1./loss(i_hocl) < dt_c ) THEN 
-        dccn_dpq( x_j, : ) = A(t_hocl,1)*dP_dPQ(t_hocl,:) - A(t_hocl,2)*dL_dPQ(t_hocl,:)
-    ELSE 
-        dccn_dpq( x_j, : ) = A(t_hocl,1)*dcc0_dpq( x_j , : ) + A(t_hocl,2)*dP_dPQ(t_hocl,:) &
-                    - A(t_hocl,3)*dL_dPQ( t_hocl, :)
-    ENDIF 
+    IF ( ( iter == niter ) .and. ( lyr_m == 25 ) ) stop
 
-    ! 5.3.5: ClO3 
-    x_j = (t_clo3-1)*nlayermx + lyr_m 
-    IF ( 1./loss(i_clo3) < dt_c ) THEN 
-        dccn_dpq( x_j, : ) = A(t_clo3,1)*dP_dPQ(t_clo3,:) - A(t_clo3,2)*dL_dPQ(t_clo3,:)
-    ELSE 
-        dccn_dpq( x_j, : ) = A(t_clo3,1)*dcc0_dpq( x_j , : ) + A(t_clo3,2)*dP_dPQ(t_clo3,:) &
-                    - A(t_clo3,3)*dL_dPQ( t_clo3, :)
-    ENDIF 
-
-    ! 5.3.6: ClO4 
-    x_j = (t_clo4-1)*nlayermx + lyr_m 
-    IF ( 1./loss(i_clo4) < dt_c ) THEN 
-        dccn_dpq( x_j, : ) = A(t_clo4,1)*dP_dPQ(t_clo4,:) - A(t_clo4,2)*dL_dPQ(t_clo4,:)
-    ELSE 
-        dccn_dpq( x_j, : ) = A(t_clo4,1)*dcc0_dpq( x_j , : ) + A(t_clo4,2)*dP_dPQ(t_clo4,:) &
-                    - A(t_clo4,3)*dL_dPQ( t_clo4, :)
-    ENDIF 
-
-    ! 5.3.7: ClCO 
-    x_j = (t_clco-1)*nlayermx + lyr_m 
-    IF ( 1./loss(i_clco) < dt_c ) THEN 
-        dccn_dpq( x_j, : ) = A(t_clco,1)*dP_dPQ(t_clco,:) - A(t_clco,2)*dL_dPQ(t_clco,:)
-    ELSE 
-        dccn_dpq( x_j, : ) = A(t_clco,1)*dcc0_dpq( x_j , : ) + A(t_clco,2)*dP_dPQ(t_clco,:) &
-                    - A(t_clco,3)*dL_dPQ( t_clco, :)
-    ENDIF 
-
-    ! 5.3.8: Cl2 
-    x_j = (t_cl2-1)*nlayermx + lyr_m 
-    IF ( 1./loss(i_cl2) < dt_c ) THEN 
-        dccn_dpq( x_j, : ) = A(t_cl2,1)*dP_dPQ(t_cl2,:) - A(t_cl2,2)*dL_dPQ(t_cl2,:)
-    ELSE 
-        dccn_dpq( x_j, : ) = A(t_cl2,1)*dcc0_dpq( x_j , : ) + A(t_cl2,2)*dP_dPQ(t_cl2,:) &
-                    - A(t_cl2,3)*dL_dPQ( t_cl2, :)
-    ENDIF 
-
-    ! 5.3.9: Cl2O2 
-    x_j = (t_cl2o2-1)*nlayermx + lyr_m 
-    IF ( 1./loss(i_cl2o2) < dt_c ) THEN 
-        dccn_dpq( x_j, : ) = A(t_cl2o2,1)*dP_dPQ(t_cl2o2,:) - A(t_cl2o2,2)*dL_dPQ(t_cl2o2,:)
-    ELSE 
-        dccn_dpq( x_j, : ) = A(t_cl2o2,1)*dcc0_dpq( x_j , : ) + A(t_cl2o2,2)*dP_dPQ(t_cl2o2,:) &
-                    - A(t_cl2o2,3)*dL_dPQ( t_cl2o2, :)
-    ENDIF 
-
-    ! 5.3.10 : CH3OCl
-    x_j = (t_ch3ocl-1)*nlayermx + lyr_m 
-    dccn_dpq( x_j, : ) = A(t_ch3ocl,1)*dcc0_dpq( x_j , : ) + A(t_ch3ocl,2)*dP_dPQ(t_ch3ocl,:) &
-                - A(t_ch3ocl,3)*dL_dPQ( t_ch3ocl, :)
-
-    ! 5.3.11 : HClO4
-    x_j = (t_hclo4-1)*nlayermx + lyr_m 
-    dccn_dpq( x_j, : ) = A(t_hclo4,1)*dcc0_dpq( x_j , : ) + A(t_hclo4,2)*dP_dPQ(t_hclo4,:) &
-                - A(t_hclo4,3)*dL_dPQ( t_hclo4, :)
-
-    ! 5.3.12 : ClOO
-    x_j = (t_cloo-1)*nlayermx + lyr_m 
-    dccn_dpq( x_j, : ) = A(t_cloo,1)*dP_dPQ(t_cloo,:) - A(t_cloo,2)*dL_dPQ(t_cloo,:)
+    ! ! 5.3.3: HCl 
+    ! IF ( 1./loss(i_hcl) < dt_c ) THEN 
+    !     dccn_dpq( x_j, : ) = A(t_hcl,1)*dP_dPQ(t_hcl,:) - A(t_hcl,2)*dL_dPQ(t_hcl,:)
+    ! ELSE 
+    !     dccn_dpq( x_j, : ) = A(t_hcl,1)*dcc0_dpq( x_j , : ) + A(t_hcl,2)*dP_dPQ(t_hcl,:) &
+    !                 - A(t_hcl,3)*dL_dPQ( t_hcl, :)
+    ! ENDIF 
 
 
 
 
-! TEST 
-dccn_dpq(x_j,:) = linearised_qssa(dt_c, production(i_cloo), loss(i_cloo), cc0(i_cloo), &
-                                  dP_dPQ(t_cloo,:), dL_dPQ(t_cloo,:), dcc0_dpq( x_j, : ))
+
+
+    ! ! 5.3.4: HOCl 
+    ! x_j = (t_hocl-1)*nlayermx + lyr_m 
+    ! IF ( 1./loss(i_hocl) < dt_c ) THEN 
+    !     dccn_dpq( x_j, : ) = A(t_hocl,1)*dP_dPQ(t_hocl,:) - A(t_hocl,2)*dL_dPQ(t_hocl,:)
+    ! ELSE 
+    !     dccn_dpq( x_j, : ) = A(t_hocl,1)*dcc0_dpq( x_j , : ) + A(t_hocl,2)*dP_dPQ(t_hocl,:) &
+    !                 - A(t_hocl,3)*dL_dPQ( t_hocl, :)
+    ! ENDIF 
+
+    ! ! 5.3.5: ClO3 
+    ! x_j = (t_clo3-1)*nlayermx + lyr_m 
+    ! IF ( 1./loss(i_clo3) < dt_c ) THEN 
+    !     dccn_dpq( x_j, : ) = A(t_clo3,1)*dP_dPQ(t_clo3,:) - A(t_clo3,2)*dL_dPQ(t_clo3,:)
+    ! ELSE 
+    !     dccn_dpq( x_j, : ) = A(t_clo3,1)*dcc0_dpq( x_j , : ) + A(t_clo3,2)*dP_dPQ(t_clo3,:) &
+    !                 - A(t_clo3,3)*dL_dPQ( t_clo3, :)
+    ! ENDIF 
+
+    ! ! 5.3.6: ClO4 
+    ! x_j = (t_clo4-1)*nlayermx + lyr_m 
+    ! IF ( 1./loss(i_clo4) < dt_c ) THEN 
+    !     dccn_dpq( x_j, : ) = A(t_clo4,1)*dP_dPQ(t_clo4,:) - A(t_clo4,2)*dL_dPQ(t_clo4,:)
+    ! ELSE 
+    !     dccn_dpq( x_j, : ) = A(t_clo4,1)*dcc0_dpq( x_j , : ) + A(t_clo4,2)*dP_dPQ(t_clo4,:) &
+    !                 - A(t_clo4,3)*dL_dPQ( t_clo4, :)
+    ! ENDIF 
+
+    ! ! 5.3.7: ClCO 
+    ! x_j = (t_clco-1)*nlayermx + lyr_m 
+    ! IF ( 1./loss(i_clco) < dt_c ) THEN 
+    !     dccn_dpq( x_j, : ) = A(t_clco,1)*dP_dPQ(t_clco,:) - A(t_clco,2)*dL_dPQ(t_clco,:)
+    ! ELSE 
+    !     dccn_dpq( x_j, : ) = A(t_clco,1)*dcc0_dpq( x_j , : ) + A(t_clco,2)*dP_dPQ(t_clco,:) &
+    !                 - A(t_clco,3)*dL_dPQ( t_clco, :)
+    ! ENDIF 
+
+    ! ! 5.3.8: Cl2 
+    ! x_j = (t_cl2-1)*nlayermx + lyr_m 
+    ! IF ( 1./loss(i_cl2) < dt_c ) THEN 
+    !     dccn_dpq( x_j, : ) = A(t_cl2,1)*dP_dPQ(t_cl2,:) - A(t_cl2,2)*dL_dPQ(t_cl2,:)
+    ! ELSE 
+    !     dccn_dpq( x_j, : ) = A(t_cl2,1)*dcc0_dpq( x_j , : ) + A(t_cl2,2)*dP_dPQ(t_cl2,:) &
+    !                 - A(t_cl2,3)*dL_dPQ( t_cl2, :)
+    ! ENDIF 
+
+    ! ! 5.3.9: Cl2O2 
+    ! x_j = (t_cl2o2-1)*nlayermx + lyr_m 
+    ! IF ( 1./loss(i_cl2o2) < dt_c ) THEN 
+    !     dccn_dpq( x_j, : ) = A(t_cl2o2,1)*dP_dPQ(t_cl2o2,:) - A(t_cl2o2,2)*dL_dPQ(t_cl2o2,:)
+    ! ELSE 
+    !     dccn_dpq( x_j, : ) = A(t_cl2o2,1)*dcc0_dpq( x_j , : ) + A(t_cl2o2,2)*dP_dPQ(t_cl2o2,:) &
+    !                 - A(t_cl2o2,3)*dL_dPQ( t_cl2o2, :)
+    ! ENDIF 
+
+    ! ! 5.3.10 : CH3OCl
+    ! x_j = (t_ch3ocl-1)*nlayermx + lyr_m 
+    ! dccn_dpq( x_j, : ) = A(t_ch3ocl,1)*dcc0_dpq( x_j , : ) + A(t_ch3ocl,2)*dP_dPQ(t_ch3ocl,:) &
+    !             - A(t_ch3ocl,3)*dL_dPQ( t_ch3ocl, :)
+
+    ! ! 5.3.11 : HClO4
+    ! x_j = (t_hclo4-1)*nlayermx + lyr_m 
+    ! dccn_dpq( x_j, : ) = A(t_hclo4,1)*dcc0_dpq( x_j , : ) + A(t_hclo4,2)*dP_dPQ(t_hclo4,:) &
+    !             - A(t_hclo4,3)*dL_dPQ( t_hclo4, :)
+
+    ! ! 5.3.12 : ClOO
+    ! x_j = (t_cloo-1)*nlayermx + lyr_m 
+    ! dccn_dpq( x_j, : ) = A(t_cloo,1)*dP_dPQ(t_cloo,:) - A(t_cloo,2)*dL_dPQ(t_cloo,:)
+
+
+
+
+
 
 ENDIF
 
