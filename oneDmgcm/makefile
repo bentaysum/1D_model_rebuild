@@ -2610,8 +2610,6 @@ $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(tabfi.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(TLM_initialise.o)
 
-$(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(tracer_release.o)
-
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(updatereffrad.o)
 
 $(LIBO)/libphymars.a :  $(LIBO)/libphymars.a(vdif_cd.o)
@@ -3660,13 +3658,6 @@ $(LIBO)/libphymars.a(TLM_initialise.o) : $(LIBF)/phymars/TLM_initialise.F
 	$(AR) d $(LIBO)/libphymars.a TLM_initialise.o ; \
 	$(COMPILE90) $(LIBF)/phymars/TLM_initialise.F ; \
 	$(AR) r $(LIBO)/libphymars.a TLM_initialise.o ; $(RM) TLM_initialise.o ; \
-	cd $(GCM)
-
-$(LIBO)/libphymars.a(tracer_release.o) : $(LIBF)/phymars/tracer_release.F
-	cd $(LOCAL_DIR); \
-	$(AR) d $(LIBO)/libphymars.a tracer_release.o ; \
-	$(COMPILE) $(LIBF)/phymars/tracer_release.F ; \
-	$(AR) r $(LIBO)/libphymars.a tracer_release.o ; $(RM) tracer_release.o ; \
 	cd $(GCM)
 
 $(LIBO)/libphymars.a(updatereffrad.o) : $(LIBF)/phymars/updatereffrad.F \

@@ -333,7 +333,6 @@ libf/phymars/tabfi.F
 libf/phymars/testphys1d.F
 libf/phymars/TLM_initialise.F
 libf/phymars/tracer.h
-libf/phymars/tracer_release.F
 libf/phymars/updatereffrad.F
 libf/phymars/vdif_cd.F
 libf/phymars/vdifc.F

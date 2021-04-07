@@ -188,12 +188,6 @@ c ------------------------------------------------------
       call getin("tracer",tracer)
       write(*,*) " tracer = ",tracer
 
-! Is this part of a looping procedure to access TLM model
-! validity? 
-      pertloop=.false. ! default value
-      call getin("pertloop",pertloop)
-      write(*,*) "pertloop = ", pertloop
-
 ! while we're at it, check if there is a 'traceur.def' file
 ! and preocess it, if necessary. Otherwise initialize tracer names
       if (tracer) then
@@ -628,9 +622,10 @@ C altitude in km in profile: divide zlay by 1000
         temp(ilayer)=tmp2(ilayer)
       ENDDO
       
-c        
+c     -------------------------------------------------------
 C     Second call to the MCD v5.3 routine will initialise the
 C     temperature, wind, and q2 profiles.
+c 	  -------------------------------------------------------
       call mcd_phys(time*24.,zlay,zls*180./pi,
      &              temp, psurf, u, v, 
      &              q2, day_step)
@@ -699,9 +694,6 @@ c  It is needed to transfert physics variables to "physiq"...
      .              inertiedat,zmea,zstd,zsig,zgam,zthe)
 
      
-      ndt_plume =  (plume_day*day_step) + NINT((plume_lt/24.)*day_step)
-
-
 c =====================================================================
 c L-BFGS-B Optimization Routines [BMT]
 c =====================================================================
@@ -717,9 +709,6 @@ c =====================================================================
 
 
 
-
-
-
 c=======================================================================
 c  1D MODEL TIME STEPPING LOOP
 c=======================================================================
@@ -727,29 +716,6 @@ c
       firstcall=.true.
       lastcall=.false.
 
-      if ( call_tlm .or. pertloop ) then
-c     Plume release activates after this many model steps 
-          ndt_plume =  (plume_day*day_step) 
-     $              +  NINT((plume_lt/24.)*day_step)
-c     TLM activates after this many model steps 
-c     -1 ensures the model saves the perturbed initial 
-c     state, as opposed to saving it -after- it enters
-c     the chemistry routine.
-          ndt_tlm = (tlm_day*day_step) 
-     $            + NINT((tlm_lt/24.)*day_step) + 1
-      endif 
-
-
-
-
-
-!     Check if the MCD v5.3 tracer interpolation routine has reached
-!     the desired shutdown point 
-      IF ( mcd_profiles ) THEN 
-          ndt_mcd = (mcd_dayfin*day_step)
-     $            + NINT((mcd_ltfin/24.)*day_step)
-      ENDIF 
-      
  
       DO idt=1,ndt
       
@@ -822,16 +788,9 @@ c    ~~~~~~~~~~~~~~~~~~~~
       endif
 #endif 
 
-c       MCD interpolation shutdown 
-c       --------------------------
-        if ( mcd_profiles ) then           
-          if ( idt == ndt_mcd ) mcd_profiles = .False.
-        endif 
-      
       
 c       call physics
 c       --------------------
-!      write(*,*) "testphys1d avant q", q(1,:)
       CALL physiq (1,llm,nqmx,
      ,     firstcall,lastcall,
      ,     day,time,dtphys,
@@ -841,12 +800,6 @@ c       --------------------
      ,     w,
 C - outputs
      s     du, dv, dtemp, dq,dpsurf,tracerdyn)
-
-!      write(*,*) "testphys1d apres q", q(1,:)
-
-
-
-
 
 
 c       wind increment : specific for 1D
@@ -900,53 +853,24 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
 
           date = idt*(dtphys/daysec) 
 
-!      Plume/perturbation scenarios engaged here
-C         IF ( plume ) THEN 
-
-C            IF ( idt == ndt_plume ) THEN
-
-           
-C C            call tracer_release(dq)
-           
-C            plume = .False.
-C C            mcd_profiles = .False. 
-           
-C            ENDIF
-C         ENDIF 
-
-!       increment tracers
-C         write(*,"(13A15)") ( trim(noms(iq)), iq = 28,40 )
-
-      IF ( pertloop ) THEN 
-        IF ( idt == ndt_plume-1 ) THEN 
-          cALL scalar_perturbation(q)
-          plume = .false.
-          pertloop = .false.
-        ENDIF 
-      ENDIF      
-
 
         DO iq = 1, nqmx
-          
-C             if ( trim(noms(iq)) == 'hcl' ) cycle
-C           IF ( trim(noms(iq)) == "ch4" ) cycle 
-          
+         
           DO ilayer=1,nlayer
              q(ilayer,iq)=q(ilayer,iq)+dtphys*dq(ilayer,iq)
           ENDDO    
           
         ENDDO
-C         write(*,"(13E15.7)") ( q(1,iq), iq = 28, 40 )
 
   
 
 c     Tangent Linear Matrix 
 c    ~~~~~~~~~~~~~~~~~~~~~~
-      IF ( tlm_on ) THEN 
+C       IF ( tlm_on ) THEN 
 
-      CALL TLM_ADJ_out(idt,time*24.)
+C       CALL TLM_ADJ_out(idt,time*24.)
 
-      ENDIF 
+C       ENDIF 
       
 
 c    L-BFGS-B Optimization 

@@ -164,74 +164,74 @@
          mcd_profiles=.True. ! default value
          call getin("mcd_profiles",mcd_profiles)
          write(*,*) " mcd_profiles = ",mcd_profiles
-		 
+
          write(*,*) "Longitudinal mean values of MCD v5.3 variables?"
          long_mean=.true. ! default value
          call getin("long_mean",long_mean)
          write(*,*) " long_mean = ",long_mean
-		 
-         IF ( mcd_profiles ) THEN  
-         write(*,*) "Tracer interpolation shutdown parameters"
-         mcd_dayfin=100. ! default value
-         call getin("mcd_dayfin",mcd_dayfin)
-         write(*,*) " mcd_dayfin = ",mcd_dayfin
+
+C          IF ( mcd_profiles ) THEN  
+C          write(*,*) "Tracer interpolation shutdown parameters"
+C          mcd_dayfin=100. ! default value
+C          call getin("mcd_dayfin",mcd_dayfin)
+C          write(*,*) " mcd_dayfin = ",mcd_dayfin
          
-         mcd_ltfin= 0. ! default value
-         call getin("mcd_ltfin",mcd_ltfin)
-         write(*,*) " mcd_ltfin = ",mcd_ltfin
+C          mcd_ltfin= 0. ! default value
+C          call getin("mcd_ltfin",mcd_ltfin)
+C          write(*,*) " mcd_ltfin = ",mcd_ltfin
          
-         IF ( mcd_ltfin > 24. .or. mcd_ltfin < 0. ) THEN 
-          WRITE(*,*) "ERROR: in callphys.def, mcd_ltfin must be",
-     &               " a floating point between 0 and 24 (time ",
-     &               "variable.)"
-          STOP         
-         ENDIF 
+C          IF ( mcd_ltfin > 24. .or. mcd_ltfin < 0. ) THEN 
+C           WRITE(*,*) "ERROR: in callphys.def, mcd_ltfin must be",
+C      &               " a floating point between 0 and 24 (time ",
+C      &               "variable.)"
+C           STOP         
+C          ENDIF 
          
-         ENDIF
+C          ENDIF
          
 !        Tangent Linear Model Parameters 
-         call_tlm = .False. ! default
-         call getin("call_tlm",call_tlm)
-         write(*,*) "call_tlm : ", call_tlm 
+C          call_tlm = .False. ! default
+C          call getin("call_tlm",call_tlm)
+C          write(*,*) "call_tlm : ", call_tlm 
          
-        tlm_day = 10 ! default 
-        call getin("tlm_day",tlm_day)
-        write(*,*) "tlm_day : ", tlm_day 
+C         tlm_day = 10 ! default 
+C         call getin("tlm_day",tlm_day)
+C         write(*,*) "tlm_day : ", tlm_day 
 
-        tlm_lt = 0.  ! default 
-        call getin("tlm_lt",tlm_lt)
-        write(*,*) "tlm_lt : ", tlm_lt 
+C         tlm_lt = 0.  ! default 
+C         call getin("tlm_lt",tlm_lt)
+C         write(*,*) "tlm_lt : ", tlm_lt 
             
 
 !        Plume parameters and keys 
-         write(*,*) "Introducing an instantaneous plume?"
-         plume=.False. ! default value
-         call getin("plume",plume)
-         write(*,*) " plume = ",plume 
+C          write(*,*) "Introducing an instantaneous plume?"
+C          plume=.False. ! default value
+C          call getin("plume",plume)
+C          write(*,*) " plume = ",plume 
          
-         IF ( plume ) THEN 
+C          IF ( plume ) THEN 
          
-         write(*,*) "Days after day0 to release plume?"
-         plume_day= 0 ! default value
-         call getin("plume_day",plume_day)
-         write(*,*) " plume_day = ",plume_day 
+C          write(*,*) "Days after day0 to release plume?"
+C          plume_day= 0 ! default value
+C          call getin("plume_day",plume_day)
+C          write(*,*) " plume_day = ",plume_day 
 
-         write(*,*) "Local time to release plume?"
-         plume_lt= 0. ! default value
-         call getin("plume_lt",plume_lt)
-         write(*,*) " plume_lt = ",plume_lt 
+C          write(*,*) "Local time to release plume?"
+C          plume_lt= 0. ! default value
+C          call getin("plume_lt",plume_lt)
+C          write(*,*) " plume_lt = ",plume_lt 
          
-         write(*,*) "Plume lower cell"
-         p_low= 1 ! default value
-         call getin("p_low",p_low)
-         write(*,*) " p_low = ",p_low 
+C          write(*,*) "Plume lower cell"
+C          p_low= 1 ! default value
+C          call getin("p_low",p_low)
+C          write(*,*) " p_low = ",p_low 
          
-         write(*,*) "Plume upper cell"
-         p_high= 1 ! default value
-         call getin("p_high",p_high)
-         write(*,*) " p_high = ",p_high 
+C          write(*,*) "Plume upper cell"
+C          p_high= 1 ! default value
+C          call getin("p_high",p_high)
+C          write(*,*) " p_high = ",p_high 
          
-         ENDIF 
+C          ENDIF 
 
          
          

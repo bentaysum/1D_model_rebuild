@@ -274,14 +274,14 @@ c
 c     -----------------------------------
 c     Tangent Linear Model Initialisation 
 c     -----------------------------------
-      IF ( tlm_on ) THEN 
+C       IF ( tlm_on ) THEN 
 
-        CALL TLM_chem(dcc0_dpq, dccn_dpq, dHOX_dPQ, dOX_dPQ,
-     $                dHOX0_dPQ, dOX0_dPQ,
-     $                ptimestep, istep, phychemrat,
-     $                dens, sza, .True.)
+C         CALL TLM_chem(dcc0_dpq, dccn_dpq, dHOX_dPQ, dOX_dPQ,
+C      $                dHOX0_dPQ, dOX0_dPQ,
+C      $                ptimestep, istep, phychemrat,
+C      $                dens, sza, .True.)
 
-      ENDIF ! tlm_on 
+C       ENDIF ! tlm_on 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     loop over time within the physical timestep                c
@@ -352,14 +352,14 @@ c =================================================================
 c     --------------------
 c     Tangent Linear Model
 c     --------------------
-      IF ( tlm_on ) THEN 
+C       IF ( tlm_on ) THEN 
 
-        CALL TLM_chem(dcc0_dpq, dccn_dpq, dHOX_dPQ, dOX_dPQ,
-     $                dHOX0_dPQ, dOX0_dPQ,
-     $                ptimestep, istep, phychemrat,
-     $                dens, sza, .False.)
+C         CALL TLM_chem(dcc0_dpq, dccn_dpq, dHOX_dPQ, dOX_dPQ,
+C      $                dHOX0_dPQ, dOX0_dPQ,
+C      $                ptimestep, istep, phychemrat,
+C      $                dens, sza, .False.)
 
-      ENDIF ! tlm_on 
+C       ENDIF ! tlm_on 
       
       end do
       
@@ -1129,15 +1129,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c       Tangent Linear
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      IF ( tlm_on ) THEN 
+C       IF ( tlm_on ) THEN 
 
-          call tlm_nox(iter, l, dens(l), nesp, 
-     $               nox(l), no(l), no2(l), rno2_no, 
-     $               cc(l,:), d001(l), d002(l), d003(l), 
-     $               j(l,j_no2), 
-     $              dccn_dpq)
+C           call tlm_nox(iter, l, dens(l), nesp, 
+C      $               nox(l), no(l), no2(l), rno2_no, 
+C      $               cc(l,:), d001(l), d002(l), d003(l), 
+C      $               j(l,j_no2), 
+C      $              dccn_dpq)
 
-      ENDIF 
+C       ENDIF 
 
 
 
@@ -1325,12 +1325,12 @@ C             CCCCCCCC
      $       + cl058(l)*cc(l,i_oclo)
      $       )
 
-          IF ( tlm_on ) THEN 
+C           IF ( tlm_on ) THEN 
 
-         cc_prev = cc(l,:)
+C          cc_prev = cc(l,:)
 
      
-         ENDIF
+C          ENDIF
          
          
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1357,80 +1357,80 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c      Tangent Linear Model - Odd-Hydrogen
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
 
-      IF ( tlm_on ) THEN
+C       IF ( tlm_on ) THEN
       
-      call tlm_hox(iter, l, dens(l), sza,
-     $  rh_ho2, roh_ho2,
-     $  dt, ptimestep,
-     $  nesp, cc(l,:), cc_prev(:), ro2(l),
-     $  j(l,:),
-     $  a001(l), a002(l), a003(l),
-     $  b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),
-     $  b007(l), b008(l), b009(l),
-     $  c001(l), c002(l), c003(l), c004(l), c005(l), c006(l), 
-     $  c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),
-     $  c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),
-     $  e001(l), e002(l), e003(l),
-     $  cab001(l), cab002(l), cab003(l),
-     $  cab004(l), cab005(l), cab006(l),
-     $  cab007(l), cab008(l), cab009(l),
-     $  cab010(l), cab011(l), cab012(l),
-     $  cab013(l), cab014(l), cab015(l),
-     $  cab016(l), cab017(l), cab018(l), 
-     $  cab019(l), cab020(l), cab021(l), 
-     $  cab022(l), cab023(l), cab024(l), 
-     $  cab025(l), cab026(l), cab027(l), 
-     $  cab028(l), cab029(l), cab030(l),
-     $  cab031(l), cab032(l), cab033(l),
-     $  cab034(l), cab035(l), cab036(l),
-     $  cab037(l), cab038(l), cab039(l),
-     $  cab040(l), cab041(l), cab042(l),
-     $  cab043(l), cab044(l), cab045(l),
-     $  cab046(l), cab047(l), cab048(l),
-     $  cab049(l), cab050(l), cab051(l),
-     $  cab052(l), cab053(l), cab054(l),
-     $  cab055(l), cab056(l), cab057(l),
-     $  cab058(l), cab059(l), cab060(l),
-     $  cab061(l), cab062(l), cab063(l),
-     $  cab064(l), cab065(l), cab066(l),
-     $  cab067(l), cab068(l), cab069(l),
-     $  cab070(l), cab071(l), cab072(l),
-     $  cab073(l), cab074(l), cab075(l),
-     $  cab076(l), cab077(l), cab078(l),
-     $  cab079(l), cab080(l), cab081(l),
-     $  cab082(l), cab083(l), cab084(l),
-     $  cab085(l), cab086(l), cab087(l),
-     $  cab088(l), cab089(l), cab090(l),
-     $  cab091(l), cab092(l), cab093(l),
-     $  cab094(l), cab095(l), cab096(l),
-     $  cab097(l), cab098(l), cab099(l),
-     $  cab100(l), cab101(l), cab102(l),
-     $  cab103(l), cab104(l), cab105(l),
-     $  cab106(l), cab107(l),
-     $  cl001(l), cl002(l), cl003(l), 
-     $  cl004(l), cl005(l), cl006(l), 
-     $  cl007(l), cl008(l), cl009(l), 
-     $  cl010(l), cl011(l), cl012(l),
-     $  cl013(l), cl014(l), cl015(l),
-     $  cl016(l), cl017(l), cl018(l), 
-     $  cl019(l), cl020(l), cl021(l), 
-     $  cl022(l), cl023(l), cl024(l), 
-     $  cl025(l), cl026(l), cl027(l), 
-     $  cl028(l), cl029(l), cl030(l), 
-     $  cl031(l), cl032(l), cl033(l),
-     $  cl034(l), cl035(l), cl036(l),
-     $  cl037(l), cl038(l), cl039(l),
-     $  cl040(l), cl041(l), cl042(l),
-     $  cl043(l), cl044(l), cl045(l),
-     $  cl046(l), cl047(l), cl048(l),
-     $  cl049(l), cl050(l), cl051(l),
-     $  cl052(l), cl053(l), cl054(l), 
-     $  cl055(l), cl056(l), cl057(l),
-     $  cl058(l), cl059(l),
-     $  dccn_dpq, dcc0_dpq,
-     $  dHOX_dPQ, dHOX0_dPQ,
-     $  k_pseudo(l))
-       ENDIF
+C       call tlm_hox(iter, l, dens(l), sza,
+C      $  rh_ho2, roh_ho2,
+C      $  dt, ptimestep,
+C      $  nesp, cc(l,:), cc_prev(:), ro2(l),
+C      $  j(l,:),
+C      $  a001(l), a002(l), a003(l),
+C      $  b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),
+C      $  b007(l), b008(l), b009(l),
+C      $  c001(l), c002(l), c003(l), c004(l), c005(l), c006(l), 
+C      $  c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),
+C      $  c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),
+C      $  e001(l), e002(l), e003(l),
+C      $  cab001(l), cab002(l), cab003(l),
+C      $  cab004(l), cab005(l), cab006(l),
+C      $  cab007(l), cab008(l), cab009(l),
+C      $  cab010(l), cab011(l), cab012(l),
+C      $  cab013(l), cab014(l), cab015(l),
+C      $  cab016(l), cab017(l), cab018(l), 
+C      $  cab019(l), cab020(l), cab021(l), 
+C      $  cab022(l), cab023(l), cab024(l), 
+C      $  cab025(l), cab026(l), cab027(l), 
+C      $  cab028(l), cab029(l), cab030(l),
+C      $  cab031(l), cab032(l), cab033(l),
+C      $  cab034(l), cab035(l), cab036(l),
+C      $  cab037(l), cab038(l), cab039(l),
+C      $  cab040(l), cab041(l), cab042(l),
+C      $  cab043(l), cab044(l), cab045(l),
+C      $  cab046(l), cab047(l), cab048(l),
+C      $  cab049(l), cab050(l), cab051(l),
+C      $  cab052(l), cab053(l), cab054(l),
+C      $  cab055(l), cab056(l), cab057(l),
+C      $  cab058(l), cab059(l), cab060(l),
+C      $  cab061(l), cab062(l), cab063(l),
+C      $  cab064(l), cab065(l), cab066(l),
+C      $  cab067(l), cab068(l), cab069(l),
+C      $  cab070(l), cab071(l), cab072(l),
+C      $  cab073(l), cab074(l), cab075(l),
+C      $  cab076(l), cab077(l), cab078(l),
+C      $  cab079(l), cab080(l), cab081(l),
+C      $  cab082(l), cab083(l), cab084(l),
+C      $  cab085(l), cab086(l), cab087(l),
+C      $  cab088(l), cab089(l), cab090(l),
+C      $  cab091(l), cab092(l), cab093(l),
+C      $  cab094(l), cab095(l), cab096(l),
+C      $  cab097(l), cab098(l), cab099(l),
+C      $  cab100(l), cab101(l), cab102(l),
+C      $  cab103(l), cab104(l), cab105(l),
+C      $  cab106(l), cab107(l),
+C      $  cl001(l), cl002(l), cl003(l), 
+C      $  cl004(l), cl005(l), cl006(l), 
+C      $  cl007(l), cl008(l), cl009(l), 
+C      $  cl010(l), cl011(l), cl012(l),
+C      $  cl013(l), cl014(l), cl015(l),
+C      $  cl016(l), cl017(l), cl018(l), 
+C      $  cl019(l), cl020(l), cl021(l), 
+C      $  cl022(l), cl023(l), cl024(l), 
+C      $  cl025(l), cl026(l), cl027(l), 
+C      $  cl028(l), cl029(l), cl030(l), 
+C      $  cl031(l), cl032(l), cl033(l),
+C      $  cl034(l), cl035(l), cl036(l),
+C      $  cl037(l), cl038(l), cl039(l),
+C      $  cl040(l), cl041(l), cl042(l),
+C      $  cl043(l), cl044(l), cl045(l),
+C      $  cl046(l), cl047(l), cl048(l),
+C      $  cl049(l), cl050(l), cl051(l),
+C      $  cl052(l), cl053(l), cl054(l), 
+C      $  cl055(l), cl056(l), cl057(l),
+C      $  cl058(l), cl059(l),
+C      $  dccn_dpq, dcc0_dpq,
+C      $  dHOX_dPQ, dHOX0_dPQ,
+C      $  k_pseudo(l))
+C        ENDIF
 
       end do
   
@@ -1564,88 +1564,88 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c      Tangent Linear Model - Odd-Oxygen (daytime)
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
             
-      IF ( tlm_on ) THEN
+C       IF ( tlm_on ) THEN
      
       
-       cc_ox_next = (cc0(l,i_ox) + production(l,i_ox)*dt)
-     $            /(1. + loss(l,i_ox)*dt)  
+C        cc_ox_next = (cc0(l,i_ox) + production(l,i_ox)*dt)
+C      $            /(1. + loss(l,i_ox)*dt)  
        
-      call tlm_ox(iter, l, dens(l),
-     $  ro_o3,
-     $  dt, ptimestep,
-     $  nesp, cc(l,:), cc_prev(:),
-     $  j(l,:), loss(l,i_ox), production(l,i_ox), cc_ox_next,
-     $  a001(l), a002(l), a003(l),
-     $  b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),
-     $  b007(l), b008(l), b009(l),
-     $  c001(l), c002(l), c003(l), c004(l), c005(l), c006(l), 
-     $  c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),
-     $  c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),
-     $  d001(l), d002(l), d003(l),
-     $  e001(l), e002(l), e003(l),
-     $  cab001(l), cab002(l), cab003(l),
-     $  cab004(l), cab005(l), cab006(l),
-     $  cab007(l), cab008(l), cab009(l),
-     $  cab010(l), cab011(l), cab012(l),
-     $  cab013(l), cab014(l), cab015(l),
-     $  cab016(l), cab017(l), cab018(l), 
-     $  cab019(l), cab020(l), cab021(l), 
-     $  cab022(l), cab023(l), cab024(l), 
-     $  cab025(l), cab026(l), cab027(l), 
-     $  cab028(l), cab029(l), cab030(l),
-     $  cab031(l), cab032(l), cab033(l),
-     $  cab034(l), cab035(l), cab036(l),
-     $  cab037(l), cab038(l), cab039(l),
-     $  cab040(l), cab041(l), cab042(l),
-     $  cab043(l), cab044(l), cab045(l),
-     $  cab046(l), cab047(l), cab048(l),
-     $  cab049(l), cab050(l), cab051(l),
-     $  cab052(l), cab053(l), cab054(l),
-     $  cab055(l), cab056(l), cab057(l),
-     $  cab058(l), cab059(l), cab060(l),
-     $  cab061(l), cab062(l), cab063(l),
-     $  cab064(l), cab065(l), cab066(l),
-     $  cab067(l), cab068(l), cab069(l),
-     $  cab070(l), cab071(l), cab072(l),
-     $  cab073(l), cab074(l), cab075(l),
-     $  cab076(l), cab077(l), cab078(l),
-     $  cab079(l), cab080(l), cab081(l),
-     $  cab082(l), cab083(l), cab084(l),
-     $  cab085(l), cab086(l), cab087(l),
-     $  cab088(l), cab089(l), cab090(l),
-     $  cab091(l), cab092(l), cab093(l),
-     $  cab094(l), cab095(l), cab096(l),
-     $  cab097(l), cab098(l), cab099(l),
-     $  cab100(l), cab101(l), cab102(l),
-     $  cab103(l), cab104(l), cab105(l),
-     $  cab106(l), cab107(L),
-     $  cl001(l), cl002(l), cl003(l), 
-     $  cl004(l), cl005(l), cl006(l), 
-     $  cl007(l), cl008(l), cl009(l), 
-     $  cl010(l), cl011(l), cl012(l),
-     $  cl013(l), cl014(l), cl015(l),
-     $  cl016(l), cl017(l), cl018(l), 
-     $  cl019(l), cl020(l), cl021(l), 
-     $  cl022(l), cl023(l), cl024(l), 
-     $  cl025(l), cl026(l), cl027(l), 
-     $  cl028(l), cl029(l), cl030(l), 
-     $  cl031(l), cl032(l), cl033(l),
-     $  cl034(l), cl035(l), cl036(l),
-     $  cl037(l), cl038(l), cl039(l),
-     $  cl040(l), cl041(l), cl042(l),
-     $  cl043(l), cl044(l), cl045(l),
-     $  cl046(l), cl047(l), cl048(l),
-     $  cl049(l), cl050(l), cl051(l),
-     $  cl052(l), cl053(l), cl054(l), 
-     $  cl055(l), cl056(l), cl057(l),
-     $  cl058(l), cl059(l),
-     $  no(l), no2(l),
-     $  dccn_dpq, dcc0_dpq,
-     $  dOX_dPQ, dOX0_dPQ)
+C       call tlm_ox(iter, l, dens(l),
+C      $  ro_o3,
+C      $  dt, ptimestep,
+C      $  nesp, cc(l,:), cc_prev(:),
+C      $  j(l,:), loss(l,i_ox), production(l,i_ox), cc_ox_next,
+C      $  a001(l), a002(l), a003(l),
+C      $  b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),
+C      $  b007(l), b008(l), b009(l),
+C      $  c001(l), c002(l), c003(l), c004(l), c005(l), c006(l), 
+C      $  c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),
+C      $  c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),
+C      $  d001(l), d002(l), d003(l),
+C      $  e001(l), e002(l), e003(l),
+C      $  cab001(l), cab002(l), cab003(l),
+C      $  cab004(l), cab005(l), cab006(l),
+C      $  cab007(l), cab008(l), cab009(l),
+C      $  cab010(l), cab011(l), cab012(l),
+C      $  cab013(l), cab014(l), cab015(l),
+C      $  cab016(l), cab017(l), cab018(l), 
+C      $  cab019(l), cab020(l), cab021(l), 
+C      $  cab022(l), cab023(l), cab024(l), 
+C      $  cab025(l), cab026(l), cab027(l), 
+C      $  cab028(l), cab029(l), cab030(l),
+C      $  cab031(l), cab032(l), cab033(l),
+C      $  cab034(l), cab035(l), cab036(l),
+C      $  cab037(l), cab038(l), cab039(l),
+C      $  cab040(l), cab041(l), cab042(l),
+C      $  cab043(l), cab044(l), cab045(l),
+C      $  cab046(l), cab047(l), cab048(l),
+C      $  cab049(l), cab050(l), cab051(l),
+C      $  cab052(l), cab053(l), cab054(l),
+C      $  cab055(l), cab056(l), cab057(l),
+C      $  cab058(l), cab059(l), cab060(l),
+C      $  cab061(l), cab062(l), cab063(l),
+C      $  cab064(l), cab065(l), cab066(l),
+C      $  cab067(l), cab068(l), cab069(l),
+C      $  cab070(l), cab071(l), cab072(l),
+C      $  cab073(l), cab074(l), cab075(l),
+C      $  cab076(l), cab077(l), cab078(l),
+C      $  cab079(l), cab080(l), cab081(l),
+C      $  cab082(l), cab083(l), cab084(l),
+C      $  cab085(l), cab086(l), cab087(l),
+C      $  cab088(l), cab089(l), cab090(l),
+C      $  cab091(l), cab092(l), cab093(l),
+C      $  cab094(l), cab095(l), cab096(l),
+C      $  cab097(l), cab098(l), cab099(l),
+C      $  cab100(l), cab101(l), cab102(l),
+C      $  cab103(l), cab104(l), cab105(l),
+C      $  cab106(l), cab107(L),
+C      $  cl001(l), cl002(l), cl003(l), 
+C      $  cl004(l), cl005(l), cl006(l), 
+C      $  cl007(l), cl008(l), cl009(l), 
+C      $  cl010(l), cl011(l), cl012(l),
+C      $  cl013(l), cl014(l), cl015(l),
+C      $  cl016(l), cl017(l), cl018(l), 
+C      $  cl019(l), cl020(l), cl021(l), 
+C      $  cl022(l), cl023(l), cl024(l), 
+C      $  cl025(l), cl026(l), cl027(l), 
+C      $  cl028(l), cl029(l), cl030(l), 
+C      $  cl031(l), cl032(l), cl033(l),
+C      $  cl034(l), cl035(l), cl036(l),
+C      $  cl037(l), cl038(l), cl039(l),
+C      $  cl040(l), cl041(l), cl042(l),
+C      $  cl043(l), cl044(l), cl045(l),
+C      $  cl046(l), cl047(l), cl048(l),
+C      $  cl049(l), cl050(l), cl051(l),
+C      $  cl052(l), cl053(l), cl054(l), 
+C      $  cl055(l), cl056(l), cl057(l),
+C      $  cl058(l), cl059(l),
+C      $  no(l), no2(l),
+C      $  dccn_dpq, dcc0_dpq,
+C      $  dOX_dPQ, dOX0_dPQ)
 
 
 
-        ENDIF
+C         ENDIF
        
        
          end do
@@ -1759,9 +1759,9 @@ c     -----------------------------------------------
 C     Atmospheric state prior to timestep advancement
 c     neeeded for TLM
 c     ----------------------------------------------- 
-      IF ( tlm_on ) THEN 
-            cc_prev = cc(l,:)
-      ENDIF ! tlm_on 
+C       IF ( tlm_on ) THEN 
+C             cc_prev = cc(l,:)
+C       ENDIF ! tlm_on 
 
         ! Cl
         cc(l,i_cl) = cc(l,i_clox)/(1. + rclo_cl(l))
@@ -1772,79 +1772,79 @@ c     -----------------------------------------------
 c     ==============
 C     Tangent Linear 
 c     ==============
-      IF ( tlm_on ) THEN 
+C       IF ( tlm_on ) THEN 
 
-      call tlm_clox(l, rclo_cl(l), iter,  dt, dens(l),
-     $             pcl(l), lcl(l), pclo(l), lclo(l),
-     $             cc(l,:), cc_prev(:),
-     $             nesp,
-     $             dccn_dpq, dcc0_dpq,
-     $             j(l,:),
-     $             a001(l), a002(l), a003(l),
-     $             b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),
-     $             b007(l), b008(l), b009(l),
-     $             c001(l), c002(l), c003(l), c004(l), c005(l), c006(l), 
-     $             c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),
-     $             c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),
-     $             e001(l), e002(l), e003(l),
-     $             cab001(l), cab002(l), cab003(l),
-     $             cab004(l), cab005(l), cab006(l),
-     $             cab007(l), cab008(l), cab009(l),
-     $             cab010(l), cab011(l), cab012(l),
-     $             cab013(l), cab014(l), cab015(l),
-     $             cab016(l), cab017(l), cab018(l), 
-     $             cab019(l), cab020(l), cab021(l), 
-     $             cab022(l), cab023(l), cab024(l), 
-     $             cab025(l), cab026(l), cab027(l), 
-     $             cab028(l), cab029(l), cab030(l),
-     $             cab031(l), cab032(l), cab033(l),
-     $             cab034(l), cab035(l), cab036(l),
-     $             cab037(l), cab038(l), cab039(l),
-     $             cab040(l), cab041(l), cab042(l),
-     $             cab043(l), cab044(l), cab045(l),
-     $             cab046(l), cab047(l), cab048(l),
-     $             cab049(l), cab050(l), cab051(l),
-     $             cab052(l), cab053(l), cab054(l),
-     $             cab055(l), cab056(l), cab057(l),
-     $             cab058(l), cab059(l), cab060(l),
-     $             cab061(l), cab062(l), cab063(l),
-     $             cab064(l), cab065(l), cab066(l),
-     $             cab067(l), cab068(l), cab069(l),
-     $             cab070(l), cab071(l), cab072(l),
-     $             cab073(l), cab074(l), cab075(l),
-     $             cab076(l), cab077(l), cab078(l),
-     $             cab079(l), cab080(l), cab081(l),
-     $             cab082(l), cab083(l), cab084(l),
-     $             cab085(l), cab086(l), cab087(l),
-     $             cab088(l), cab089(l), cab090(l),
-     $             cab091(l), cab092(l), cab093(l),
-     $             cab094(l), cab095(l), cab096(l),
-     $             cab097(l), cab098(l), cab099(l),
-     $             cab100(l), cab101(l), cab102(l),
-     $             cab103(l), cab104(l), cab105(l),
-     $             cab106(l), cab107(l),
-     $             cl001(l), cl002(l), cl003(l) 
-     $            ,cl004(l), cl005(l), cl006(l) 
-     $            ,cl007(l), cl008(l), cl009(l) 
-     $            ,cl010(l), cl011(l), cl012(l) 
-     $            ,cl013(l), cl014(l), cl015(l) 
-     $            ,cl016(l), cl017(l), cl018(l) 
-     $            ,cl019(l), cl020(l), cl021(l) 
-     $            ,cl022(l), cl023(l), cl024(l) 
-     $            ,cl025(l), cl026(l), cl027(l) 
-     $            ,cl028(l), cl029(l), cl030(l) 
-     $            ,cl031(l), cl032(l), cl033(l)
-     $            ,cl034(l), cl035(l), cl036(l)
-     $            ,cl037(l), cl038(l), cl039(l)
-     $            ,cl040(l), cl041(l), cl042(l)
-     $            ,cl043(l), cl044(l), cl045(l)
-     $            ,cl046(l), cl047(l), cl048(l)
-     $            ,cl049(l), cl050(l), cl051(l)
-     $            ,cl052(l), cl053(l), cl054(l)
-     $            ,cl055(l), cl056(l), cl057(l)
-     $            ,cl058(l), cl059(l) )
+C       call tlm_clox(l, rclo_cl(l), iter,  dt, dens(l),
+C      $             pcl(l), lcl(l), pclo(l), lclo(l),
+C      $             cc(l,:), cc_prev(:),
+C      $             nesp,
+C      $             dccn_dpq, dcc0_dpq,
+C      $             j(l,:),
+C      $             a001(l), a002(l), a003(l),
+C      $             b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),
+C      $             b007(l), b008(l), b009(l),
+C      $             c001(l), c002(l), c003(l), c004(l), c005(l), c006(l), 
+C      $             c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),
+C      $             c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),
+C      $             e001(l), e002(l), e003(l),
+C      $             cab001(l), cab002(l), cab003(l),
+C      $             cab004(l), cab005(l), cab006(l),
+C      $             cab007(l), cab008(l), cab009(l),
+C      $             cab010(l), cab011(l), cab012(l),
+C      $             cab013(l), cab014(l), cab015(l),
+C      $             cab016(l), cab017(l), cab018(l), 
+C      $             cab019(l), cab020(l), cab021(l), 
+C      $             cab022(l), cab023(l), cab024(l), 
+C      $             cab025(l), cab026(l), cab027(l), 
+C      $             cab028(l), cab029(l), cab030(l),
+C      $             cab031(l), cab032(l), cab033(l),
+C      $             cab034(l), cab035(l), cab036(l),
+C      $             cab037(l), cab038(l), cab039(l),
+C      $             cab040(l), cab041(l), cab042(l),
+C      $             cab043(l), cab044(l), cab045(l),
+C      $             cab046(l), cab047(l), cab048(l),
+C      $             cab049(l), cab050(l), cab051(l),
+C      $             cab052(l), cab053(l), cab054(l),
+C      $             cab055(l), cab056(l), cab057(l),
+C      $             cab058(l), cab059(l), cab060(l),
+C      $             cab061(l), cab062(l), cab063(l),
+C      $             cab064(l), cab065(l), cab066(l),
+C      $             cab067(l), cab068(l), cab069(l),
+C      $             cab070(l), cab071(l), cab072(l),
+C      $             cab073(l), cab074(l), cab075(l),
+C      $             cab076(l), cab077(l), cab078(l),
+C      $             cab079(l), cab080(l), cab081(l),
+C      $             cab082(l), cab083(l), cab084(l),
+C      $             cab085(l), cab086(l), cab087(l),
+C      $             cab088(l), cab089(l), cab090(l),
+C      $             cab091(l), cab092(l), cab093(l),
+C      $             cab094(l), cab095(l), cab096(l),
+C      $             cab097(l), cab098(l), cab099(l),
+C      $             cab100(l), cab101(l), cab102(l),
+C      $             cab103(l), cab104(l), cab105(l),
+C      $             cab106(l), cab107(l),
+C      $             cl001(l), cl002(l), cl003(l) 
+C      $            ,cl004(l), cl005(l), cl006(l) 
+C      $            ,cl007(l), cl008(l), cl009(l) 
+C      $            ,cl010(l), cl011(l), cl012(l) 
+C      $            ,cl013(l), cl014(l), cl015(l) 
+C      $            ,cl016(l), cl017(l), cl018(l) 
+C      $            ,cl019(l), cl020(l), cl021(l) 
+C      $            ,cl022(l), cl023(l), cl024(l) 
+C      $            ,cl025(l), cl026(l), cl027(l) 
+C      $            ,cl028(l), cl029(l), cl030(l) 
+C      $            ,cl031(l), cl032(l), cl033(l)
+C      $            ,cl034(l), cl035(l), cl036(l)
+C      $            ,cl037(l), cl038(l), cl039(l)
+C      $            ,cl040(l), cl041(l), cl042(l)
+C      $            ,cl043(l), cl044(l), cl045(l)
+C      $            ,cl046(l), cl047(l), cl048(l)
+C      $            ,cl049(l), cl050(l), cl051(l)
+C      $            ,cl052(l), cl053(l), cl054(l)
+C      $            ,cl055(l), cl056(l), cl057(l)
+C      $            ,cl058(l), cl059(l) )
 
-      ENDIF ! tlm_on 
+C       ENDIF ! tlm_on 
 
       ENDDO ! l = 1, lswitch-1
 
@@ -3048,72 +3048,72 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  
 c      Tangent Linear Model - Inorganic/Long-lived species
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc 
-          IF (tlm_on) THEN 
+C           IF (tlm_on) THEN 
           
           
-      cc_hox_next = (cc0(l,i_hox) + production(l,i_hox)*dt)
-     $            /(1. + loss(l,i_hox)*dt)
+C       cc_hox_next = (cc0(l,i_hox) + production(l,i_hox)*dt)
+C      $            /(1. + loss(l,i_hox)*dt)
 
-               call tlm_sibem(iter,niter, l, dens(l), sza,
-     $         dt, ptimestep,  
-     $         nesp, cc(l,:), cc0(l,:), cc_hox_next,
-     $         j(l,:), production(l,:), loss(l,:),  
-     $         0.,!methane_enhancement,
-     $         a001(l), a002(l), a003(l),  
-     $         b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),  
-     $         b007(l), b008(l), b009(l),  
-     $         c001(l), c002(l), c003(l), c004(l), c005(l), c006(l),  
-     $         c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),  
-     $         c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),  
-     $         d001(l), d002(l), d003(l),
-     $         e001(l), e002(l), e003(l),  
-     $         cab001(l), cab002(l), cab003(l), cab004(l), cab005(l),  
-     $         cab006(l), cab007(l), cab008(l), cab009(l), cab010(l),  
-     $         cab011(l), cab012(l), cab013(l), cab014(l), cab015(l),  
-     $         cab016(l), cab017(l), cab018(l), cab019(l), cab020(l),  
-     $         cab021(l), cab022(l), cab023(l), cab024(l), cab025(l),  
-     $         cab026(l), cab027(l), cab028(l), cab029(l), cab030(l),  
-     $         cab031(l), cab032(l), cab033(l), cab034(l), cab035(l),  
-     $         cab036(l), cab037(l), cab038(l), cab039(l), cab040(l),  
-     $         cab041(l), cab042(l), cab043(l), cab044(l), cab045(l),  
-     $         cab046(l), cab047(l), cab048(l), cab049(l), cab050(l),  
-     $         cab051(l), cab052(l), cab053(l), cab054(l), cab055(l),  
-     $         cab056(l), cab057(l), cab058(l), cab059(l), cab060(l),  
-     $         cab061(l), cab062(l), cab063(l), cab064(l), cab065(l),  
-     $         cab066(l), cab067(l), cab068(l), cab069(l), cab070(l),  
-     $         cab071(l), cab072(l), cab073(l), cab074(l), cab075(l),  
-     $         cab076(l), cab077(l), cab078(l), cab079(l), cab080(l),  
-     $         cab081(l), cab082(l), cab083(l), cab084(l), cab085(l),  
-     $         cab086(l), cab087(l), cab088(l), cab089(l), cab090(l),  
-     $         cab091(l), cab092(l), cab093(l), cab094(l), cab095(l),  
-     $         cab096(l), cab097(l), cab098(l), cab099(l), cab100(l),   
-     $         cab101(l), cab102(l), cab103(l), cab104(l), cab105(l),  
-     $         cab106(l), cab107(l),
-     $         cl001(l), cl002(l), cl003(l),
-     $         cl004(l), cl005(l), cl006(l),
-     $         cl007(l), cl008(l), cl009(l),
-     $         cl010(l), cl011(l), cl012(l), 
-     $         cl013(l), cl014(l), cl015(l),
-     $         cl016(l), cl017(l), cl018(l),
-     $         cl019(l), cl020(l), cl021(l),
-     $         cl022(l), cl023(l), cl024(l),
-     $         cl025(l), cl026(l), cl027(l),
-     $         cl028(l), cl029(l), cl030(l),
-     $         cl031(l), cl032(l), cl033(l),
-     $         cl034(l), cl035(l), cl036(l),
-     $         cl037(l), cl038(l), cl039(l),
-     $         cl040(l), cl041(l), cl042(l),
-     $         cl043(l), cl044(l), cl045(l),
-     $         cl046(l), cl047(l), cl048(l),
-     $         cl049(l), cl050(l), cl051(l),
-     $         cl052(l), cl053(l), cl054(l), 
-     $         cl055(l), cl056(l), cl057(l),
-     $         cl058(l), cl059(l),
-     $         dccn_dpq, dcc0_dpq,
-     $         ro2(l), no(l), no2(l),
-     $         dHOX_dPQ, dHOX0_dPQ, k_pseudo)          
+C                call tlm_sibem(iter,niter, l, dens(l), sza,
+C      $         dt, ptimestep,  
+C      $         nesp, cc(l,:), cc0(l,:), cc_hox_next,
+C      $         j(l,:), production(l,:), loss(l,:),  
+C      $         0.,!methane_enhancement,
+C      $         a001(l), a002(l), a003(l),  
+C      $         b001(l), b002(l), b003(l), b004(l), b005(l), b006(l),  
+C      $         b007(l), b008(l), b009(l),  
+C      $         c001(l), c002(l), c003(l), c004(l), c005(l), c006(l),  
+C      $         c007(l), c008(l), c009(l), c010(l), c011(l), c012(l),  
+C      $         c013(l), c014(l), c015(l), c016(l), c017(l), c018(l),  
+C      $         d001(l), d002(l), d003(l),
+C      $         e001(l), e002(l), e003(l),  
+C      $         cab001(l), cab002(l), cab003(l), cab004(l), cab005(l),  
+C      $         cab006(l), cab007(l), cab008(l), cab009(l), cab010(l),  
+C      $         cab011(l), cab012(l), cab013(l), cab014(l), cab015(l),  
+C      $         cab016(l), cab017(l), cab018(l), cab019(l), cab020(l),  
+C      $         cab021(l), cab022(l), cab023(l), cab024(l), cab025(l),  
+C      $         cab026(l), cab027(l), cab028(l), cab029(l), cab030(l),  
+C      $         cab031(l), cab032(l), cab033(l), cab034(l), cab035(l),  
+C      $         cab036(l), cab037(l), cab038(l), cab039(l), cab040(l),  
+C      $         cab041(l), cab042(l), cab043(l), cab044(l), cab045(l),  
+C      $         cab046(l), cab047(l), cab048(l), cab049(l), cab050(l),  
+C      $         cab051(l), cab052(l), cab053(l), cab054(l), cab055(l),  
+C      $         cab056(l), cab057(l), cab058(l), cab059(l), cab060(l),  
+C      $         cab061(l), cab062(l), cab063(l), cab064(l), cab065(l),  
+C      $         cab066(l), cab067(l), cab068(l), cab069(l), cab070(l),  
+C      $         cab071(l), cab072(l), cab073(l), cab074(l), cab075(l),  
+C      $         cab076(l), cab077(l), cab078(l), cab079(l), cab080(l),  
+C      $         cab081(l), cab082(l), cab083(l), cab084(l), cab085(l),  
+C      $         cab086(l), cab087(l), cab088(l), cab089(l), cab090(l),  
+C      $         cab091(l), cab092(l), cab093(l), cab094(l), cab095(l),  
+C      $         cab096(l), cab097(l), cab098(l), cab099(l), cab100(l),   
+C      $         cab101(l), cab102(l), cab103(l), cab104(l), cab105(l),  
+C      $         cab106(l), cab107(l),
+C      $         cl001(l), cl002(l), cl003(l),
+C      $         cl004(l), cl005(l), cl006(l),
+C      $         cl007(l), cl008(l), cl009(l),
+C      $         cl010(l), cl011(l), cl012(l), 
+C      $         cl013(l), cl014(l), cl015(l),
+C      $         cl016(l), cl017(l), cl018(l),
+C      $         cl019(l), cl020(l), cl021(l),
+C      $         cl022(l), cl023(l), cl024(l),
+C      $         cl025(l), cl026(l), cl027(l),
+C      $         cl028(l), cl029(l), cl030(l),
+C      $         cl031(l), cl032(l), cl033(l),
+C      $         cl034(l), cl035(l), cl036(l),
+C      $         cl037(l), cl038(l), cl039(l),
+C      $         cl040(l), cl041(l), cl042(l),
+C      $         cl043(l), cl044(l), cl045(l),
+C      $         cl046(l), cl047(l), cl048(l),
+C      $         cl049(l), cl050(l), cl051(l),
+C      $         cl052(l), cl053(l), cl054(l), 
+C      $         cl055(l), cl056(l), cl057(l),
+C      $         cl058(l), cl059(l),
+C      $         dccn_dpq, dcc0_dpq,
+C      $         ro2(l), no(l), no2(l),
+C      $         dHOX_dPQ, dHOX0_dPQ, k_pseudo)          
 
-          ENDIF 
+C           ENDIF 
   
       end do
                 

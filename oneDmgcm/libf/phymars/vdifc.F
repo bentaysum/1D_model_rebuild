@@ -854,10 +854,10 @@ c           Starting upward calculations for simple mixing of tracer (dust)
 ! 	      Tangent Linear Model calculations for vertical diffusion of
 !         trace gas species 
 !         -----------------------------------------------------------
-          IF (tlm_on) THEN
-               call TLM_vdif(iq, za(1,:), zb(1,:), zc(1,:),
-     &				zd(1,:),ptimestep)
-          ENDIF
+C           IF (tlm_on) THEN
+C                call TLM_vdif(iq, za(1,:), zb(1,:), zc(1,:),
+C      &				zd(1,:),ptimestep)
+C           ENDIF
 
 
 

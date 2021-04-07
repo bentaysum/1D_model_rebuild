@@ -12,15 +12,15 @@
      &   ,callg2d,linear,rayleigh,tracer,active,doubleq,submicron       &
      &   ,lifting,callddevil,scavenging,sedimentation,activice,water    &
      &   ,tifeedback,microphys,caps,photochem,calltherm,outptherm       &
-     &   ,callrichsl,callslope,tituscap,long_mean,mcd_profiles,plume    &
-     &   ,call_tlm,pertloop,lbfgsb_output
+     &   ,callrichsl,callslope,tituscap,long_mean,mcd_profiles          &
+     &   ,lbfgsb_output
      
       COMMON/callkeys_i/iradia,iaervar,iddist,ilwd,ilwb,ilwn,ncouche    &
-     &   ,dustbin,nltemodel,nircorr,solvarmod,solvaryear,plume_day      &
-     &   ,p_low,p_high,tlm_day,t_backtrace,t_forecast 
+     &   ,dustbin,nltemodel,nircorr,solvarmod,solvaryear                &
+     &   ,t_backtrace,t_forecast 
      
       COMMON/callkeys_r/topdustref,solarcondate,semi,alphan,euveff,     &
-     &   tke_heat_flux,mcd_dayfin,mcd_ltfin,plume_lt,tlm_lt 
+     &   tke_heat_flux
      
       LOGICAL callrad,calldifv,calladj,callcond,callsoil,               &
      &   season,diurnal,lwrite,calllott                                 &
@@ -36,9 +36,6 @@
 
       logical long_mean
       logical mcd_profiles 
-      logical plume
-      logical call_tlm 
-      logical pertloop 
       
       logical lbfgsb_output 
       
@@ -48,11 +45,6 @@
       real solarcondate
       real euveff
       real tke_heat_flux
-
-      real mcd_dayfin
-      real mcd_ltfin	  
-      real plume_lt 
-      real tlm_lt 
 
       integer iddist
       integer iaervar
@@ -64,10 +56,6 @@
       integer solvarmod   ! model for solar EUV variation
       integer solvaryear  ! mars year for realisticly varying solar EUV 
 
-      integer plume_day 
-      integer p_low 
-      integer p_high 
-      integer tlm_day
 
       integer t_backtrace ! Optimization routine [OPTIONAL] backtrace timestep
       integer t_forecast ! Optimization routine [OPTIONAL] forecast timestep
