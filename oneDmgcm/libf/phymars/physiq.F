@@ -380,14 +380,6 @@ c Variables for PBL
 c=======================================================================
 
 
-
-C        IF ( tlm_on ) THEN 
-C           TLM_photo(:,:) = 0.
-C           TLM_trans(:,:) = 0.
-C           TLM(:,:) = 0.
-C        ENDIF 
-
-
 c 1. Initialisation:
 c -----------------
 c  1.1   Initialisation only at first call
@@ -576,16 +568,17 @@ c    --------------------------------
 
 
 c-----------------------------------------------------------------------
-c    1.2.7: MCDv5.3 Interpolation Routines
+c    1.2.6: MCDv5.3 Interpolation Routines
 c    --------------------------------------
 c  Begin the tracer interpolation routine for the MCD v5.3 look-up
 c  table for tracers CO2, CO, H2, H2O vapour, and O2.
-          IF ( mcd_profiles ) THEN 
-               call mcd_trac(ptime,zzlay(1,:),zls*180./pi, 
+      IF ( mcd_profiles ) THEN 
+          call mcd_trac(ptime,zzlay(1,:),zls*180./pi, 
      &                          pq(1,:,1), pq(1,:,2), 
      &                          pq(1,:,5), pq(1,:,8),
      &                          pq(1,:,15))
-          ENDIF 
+          WRITE(*,*) "MCD CO2, CO, H2, H2O, O2"
+      ENDIF
 
 c     Interpolate physical variables (temperature, wind,
 c     q2 and surface pressure) 
@@ -594,11 +587,11 @@ c     q2 and surface pressure)
      &              q2(1,:))
      
 c    Dust profiles in kg/kg supplied by MCD dataset 
-         IF ( doubleq ) THEN 
-               call mcd_dust(ptime*24.,zzlay(1,:),zls*180./pi,
+      IF ( doubleq ) THEN 
+           call mcd_dust(ptime*24.,zzlay(1,:),zls*180./pi,
      &                       pq(1,:,:), 
      &                       pplay(1,:), zt(1,:) )
-         ENDIF 
+      ENDIF 
 
 
 c----------------------------------------------------------------------

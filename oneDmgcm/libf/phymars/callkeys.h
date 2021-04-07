@@ -13,14 +13,14 @@
      &   ,lifting,callddevil,scavenging,sedimentation,activice,water    &
      &   ,tifeedback,microphys,caps,photochem,calltherm,outptherm       &
      &   ,callrichsl,callslope,tituscap,long_mean,mcd_profiles          &
-     &   ,lbfgsb_output
+     &   ,lbfgsb_output,call_tlm
      
       COMMON/callkeys_i/iradia,iaervar,iddist,ilwd,ilwb,ilwn,ncouche    &
      &   ,dustbin,nltemodel,nircorr,solvarmod,solvaryear                &
-     &   ,t_backtrace,t_forecast 
+     &   ,t_backtrace,t_forecast,tlm_day 
      
       COMMON/callkeys_r/topdustref,solarcondate,semi,alphan,euveff,     &
-     &   tke_heat_flux
+     &   tke_heat_flux,tlm_lt
      
       LOGICAL callrad,calldifv,calladj,callcond,callsoil,               &
      &   season,diurnal,lwrite,calllott                                 &
@@ -36,6 +36,7 @@
 
       logical long_mean
       logical mcd_profiles 
+      logical call_tlm
       
       logical lbfgsb_output 
       
@@ -45,6 +46,7 @@
       real solarcondate
       real euveff
       real tke_heat_flux
+      real tlm_lt
 
       integer iddist
       integer iaervar
@@ -56,9 +58,10 @@
       integer solvarmod   ! model for solar EUV variation
       integer solvaryear  ! mars year for realisticly varying solar EUV 
 
-
       integer t_backtrace ! Optimization routine [OPTIONAL] backtrace timestep
       integer t_forecast ! Optimization routine [OPTIONAL] forecast timestep
+
+      integer tlm_day
 
       logical rayleigh
       logical tracer

@@ -33,14 +33,10 @@ mcd_profiles = .True.
 long_mean= .True.
 longitude=137.4
 
-## Tracer interpolation shutdown parameters 
-mcd_dayfin = 100.
-mcd_ltfin = 0.
-
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 call_tlm=.true.
-tlm_day=0
+tlm_day=10
 tlm_lt=0.
 
 ## L-BFGS-B Routines 
@@ -48,31 +44,16 @@ tlm_lt=0.
 t_backtrace=888
 t_forecast=992
 
-
-## Handled by bash script
-## perturbation_cycle.sh 
-pertloop=.false.
-PERTGAS=clo3
-SCALAR=1.E1
-L_1=18
-L_2=20
-
-## Plume routines 
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#Introducing an instantaneous plume?
-plume=.False.
-
-#Days after day0 to release plume?
-plume_day=100
-
-#Local time to release plume?
-plume_lt=0.
-
-#Plume lower altitude (model layer index)
-p_low = 1
-
-#Plume upper altitude (model layer index)
-p_high = 5
+###########################
+## OFFLINE FOR NOW
+###########################
+### Handled by bash script
+### perturbation_cycle.sh 
+#pertloop=.false.
+#PERTGAS=clo3
+#SCALAR=1.E1
+#L_1=18
+#L_2=20
 
 
 ## Dust scenario. Used if the dust is prescribed (i.e. if tracer=F or active=F)

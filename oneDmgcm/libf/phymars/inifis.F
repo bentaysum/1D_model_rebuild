@@ -170,37 +170,19 @@
          call getin("long_mean",long_mean)
          write(*,*) " long_mean = ",long_mean
 
-C          IF ( mcd_profiles ) THEN  
-C          write(*,*) "Tracer interpolation shutdown parameters"
-C          mcd_dayfin=100. ! default value
-C          call getin("mcd_dayfin",mcd_dayfin)
-C          write(*,*) " mcd_dayfin = ",mcd_dayfin
-         
-C          mcd_ltfin= 0. ! default value
-C          call getin("mcd_ltfin",mcd_ltfin)
-C          write(*,*) " mcd_ltfin = ",mcd_ltfin
-         
-C          IF ( mcd_ltfin > 24. .or. mcd_ltfin < 0. ) THEN 
-C           WRITE(*,*) "ERROR: in callphys.def, mcd_ltfin must be",
-C      &               " a floating point between 0 and 24 (time ",
-C      &               "variable.)"
-C           STOP         
-C          ENDIF 
-         
-C          ENDIF
          
 !        Tangent Linear Model Parameters 
-C          call_tlm = .False. ! default
-C          call getin("call_tlm",call_tlm)
-C          write(*,*) "call_tlm : ", call_tlm 
+         call_tlm = .False. ! default
+         call getin("call_tlm",call_tlm)
+         write(*,*) "call_tlm : ", call_tlm 
          
-C         tlm_day = 10 ! default 
-C         call getin("tlm_day",tlm_day)
-C         write(*,*) "tlm_day : ", tlm_day 
+        tlm_day = 10 ! default 
+        call getin("tlm_day",tlm_day)
+        write(*,*) "tlm_day : ", tlm_day 
 
-C         tlm_lt = 0.  ! default 
-C         call getin("tlm_lt",tlm_lt)
-C         write(*,*) "tlm_lt : ", tlm_lt 
+        tlm_lt = 0.  ! default 
+        call getin("tlm_lt",tlm_lt)
+        write(*,*) "tlm_lt : ", tlm_lt 
             
 
 !        Plume parameters and keys 

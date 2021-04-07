@@ -26,10 +26,6 @@
 
           ALLOCATE(tlm_ident(nlayermx*nqmx,nlayermx*nqmx))
 
-          ALLOCATE(o2_coefficient_array(nqmx*nlayermx))
-
-          ALLOCATE(dKpseudo_dPQ(nlayermx,nqmx))
-
           ALLOCATE(dNO_dPQ(nlayermx,nqmx*nlayermx))
           
           ALLOCATE(dNO2_dPQ(nlayermx,nqmx*nlayermx))

@@ -529,6 +529,7 @@ c  done above!) and loads parameters set in callphys.def
       CALL inifis(1,llm,day0,daysec,dtphys,
      .            lati,long,area,rad,g,r,cpp)
 
+
 c   Initialization to take into account prescribed winds
 c   ------------------------------------------------------
       ptif=2.E+0*omeg*sinlat(1)
@@ -571,7 +572,6 @@ c  ----------
          IF(lati(1).LT.0) emis=emisice(2) ! southern hemisphere
       ENDIF
 
- 
 
 c  Compute pressures and altitudes of atmospheric levels 
 c  ----------------------------------------------------------------
@@ -707,7 +707,16 @@ c =====================================================================
 c =====================================================================
 
 
-
+c ======================================================================
+c     Tangent Linear Model 
+c ======================================================================
+      IF ( call_tlm ) THEN 
+            ! Time-step to initiate the TLM at, taking the first 1-D
+            ! model timestep to be == 1
+            ndt_tlm = 1 
+     $              + tlm_day*day_step ! Number of sols 
+     $              + INT(tlm_lt/24.)*day_step 
+      ENDIF
 
 c=======================================================================
 c  1D MODEL TIME STEPPING LOOP
@@ -787,6 +796,23 @@ c    ~~~~~~~~~~~~~~~~~~~~
           
       endif
 #endif 
+
+c     Tangent Linear Model activation
+c     -------------------------------
+      IF ( call_tlm ) THEN 
+            IF ( idt == ndt_tlm ) THEN 
+                  tlm_on = .True. ! TLM Model is now active
+                  call_tlm = .False. ! Not calling anymore now that it
+                                     ! _has_ been called [prevents 
+                                     ! multiple initialisations]
+            ! Initialise the TLM
+            call TLM_initialise          
+
+            ENDIF ! idt == ndt_tlm
+
+      ENDIF ! call_tlm
+
+
 
       
 c       call physics
