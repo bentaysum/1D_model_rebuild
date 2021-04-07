@@ -349,39 +349,51 @@ C !=======================================================================
       
 c         CO2 
 C         ===
+          IF ( mcd_co2 ) THEN
+
           call interp_line(mcdv5_lt, zco2(:,y), N_LT, 
      &                     local_time, co2(y), 1)
      
           co2(y) = co2(y)*mmol(1)/43.34!mmean(1,y)
           
+          ENDIF
 
 c        H2O 
 C        ===
+          IF ( mcd_h2o ) THEN
+
           call interp_line(mcdv5_lt, zh2o(:,y), N_LT,
      &                     local_time, h2o(y), 1)
 
           h2o(y)  = h2o(y)*mmol(15)/mmean(1,y) 
 
+          ENDIF
 
 C         O2 
 C         ===
+          IF ( mcd_o2 ) THEN 
             call interp_line(mcdv5_lt, zo2(:,y), N_LT,
      &                    local_time, o2(y), 1)
 
             o2(y) = o2(y)*mmol(5)/mmean(1,y) 
 
+          ENDIF 
+
 C         H2 
 C         ===
+          IF ( mcd_h2 ) THEN 
             call interp_line(mcdv5_lt, zh2(:,y), N_LT,
      &                     local_time, h2(y), 1)
            h2(y)  = h2(y)*mmol(8)/mmean(1,y) 
+          ENDIF
 
 c         CO 
 c         ===
+          IF ( mcd_co ) THEN 
            call interp_line(mcdv5_lt, zco(:,y), N_LT,
      &                     local_time, co(y), 1)
            co(y)  = co(y)*mmol(2)/mmean(1,y) 
-
+          ENDIF 
 
       end do
       

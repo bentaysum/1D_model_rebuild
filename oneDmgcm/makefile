@@ -144,6 +144,8 @@ $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(inichim_newstart.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(moldiff_red.o)
 
+$(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(tgo_profiles.o)
+
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(TLM_chem.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(tlm_clox.o)
@@ -502,6 +504,13 @@ $(LIBF)/grid/dimensions.h
 	$(AR) d $(LIBO)/libaeronomars.a moldiff_red.o ; \
 	$(COMPILE) $(LIBF)/aeronomars/moldiff_red.F90 ; \
 	$(AR) r $(LIBO)/libaeronomars.a moldiff_red.o ; $(RM) moldiff_red.o ; \
+	cd $(GCM)
+
+$(LIBO)/libaeronomars.a(tgo_profiles.o) : $(LIBF)/aeronomars/tgo_profiles.F90
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libaeronomars.a tgo_profiles.o ; \
+	$(COMPILE) $(LIBF)/aeronomars/tgo_profiles.F90 ; \
+	$(AR) r $(LIBO)/libaeronomars.a tgo_profiles.o ; $(RM) tgo_profiles.o ; \
 	cd $(GCM)
 
 $(LIBO)/libaeronomars.a(TLM_chem.o) : $(LIBF)/aeronomars/TLM_chem.F90 \

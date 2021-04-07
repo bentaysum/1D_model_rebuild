@@ -33,6 +33,13 @@ mcd_profiles = .True.
 long_mean= .True.
 longitude=137.4
 
+# Individual Gase
+mcd_co2= .True.
+mcd_co= .True.
+mcd_h2= .True.
+mcd_h2o= .True.
+mcd_o2= .True.
+
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 call_tlm=.true.

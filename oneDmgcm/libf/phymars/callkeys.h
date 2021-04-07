@@ -13,7 +13,8 @@
      &   ,lifting,callddevil,scavenging,sedimentation,activice,water    &
      &   ,tifeedback,microphys,caps,photochem,calltherm,outptherm       &
      &   ,callrichsl,callslope,tituscap,long_mean,mcd_profiles          &
-     &   ,lbfgsb_output,call_tlm
+     &   ,mcd_co2,mcd_co,mcd_h2,mcd_h2o,mcd_o2,lbfgsb_output,call_tlm   &
+     &   ,NOMAD_ACS
      
       COMMON/callkeys_i/iradia,iaervar,iddist,ilwd,ilwb,ilwn,ncouche    &
      &   ,dustbin,nltemodel,nircorr,solvarmod,solvaryear                &
@@ -36,10 +37,18 @@
 
       logical long_mean
       logical mcd_profiles 
+      logical mcd_co2 
+      logical mcd_co 
+      logical mcd_o2 
+      logical mcd_h2
+      logical mcd_h2o 
+
       logical call_tlm
       
       logical lbfgsb_output 
       
+      logical NOMAD_ACS 
+
       real topdustref
       real semi
       real alphan

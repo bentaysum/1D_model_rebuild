@@ -81,6 +81,7 @@
  
       CHARACTER ch1*12
       CHARACTER ch80*80
+      CHARACTER tester*100 
 
 !      logical chem, h2o
 
@@ -165,10 +166,38 @@
          call getin("mcd_profiles",mcd_profiles)
          write(*,*) " mcd_profiles = ",mcd_profiles
 
+         IF ( mcd_profiles ) THEN 
+            mcd_co2 = .False. 
+            mcd_co = .False.
+            mcd_h2 = .False.
+            mcd_h2o = .False.
+            mcd_o2 = .False.
+
+         call getin("mcd_co2",mcd_co2)
+         call getin("mcd_co",mcd_co)
+         call getin("mcd_h2",mcd_h2)
+         call getin("mcd_h2o",mcd_h2o)
+         call getin("mcd_o2",mcd_o2)
+
+         write(*,*) "mcd_co2 = ", mcd_co2
+         write(*,*) "mcd_co = ", mcd_co
+         write(*,*) "mcd_h2 = ", mcd_h2
+         write(*,*) "mcd_h2o = ", mcd_h2o
+         write(*,*) "mcd_o2 = ", mcd_o2
+
+         ENDIF 
+
          write(*,*) "Longitudinal mean values of MCD v5.3 variables?"
          long_mean=.true. ! default value
          call getin("long_mean",long_mean)
          write(*,*) " long_mean = ",long_mean
+
+!       NOMAD/ACS Profiles Used?
+        write(*,*) "Use NOMAD/ACS Tracer Profiles?"
+        NOMAD_ACS = .false. ! default
+        call getin("NOMAD_ACS", NOMAD_ACS)
+        write(*,*)"NOMAD_ACS = ", NOMAD_ACS
+
 
          
 !        Tangent Linear Model Parameters 
