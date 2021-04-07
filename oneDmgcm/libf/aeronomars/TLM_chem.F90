@@ -52,8 +52,7 @@ INTEGER x_j ! TLM Indices
 ! ========================
 IF ( initialisation ) THEN 
 
-    ! Initialise K_Pseudo
-    dKpseudo_dPQ(:,:) = 0.0
+    TLM_photo(:,:) = 0.
 
     ! VMR --> MMR Conversion Factors 
     ! ------------------------------
@@ -167,8 +166,8 @@ TLM = tlm_ident + TLM*ptimestep
 
 ! Non-Variable Tracers 
 ! --------------------
-tlm( (t_co2-1)*nlayermx + 1 : t_co2*nlayermx, : ) = 0. 
-tlm( (t_h2ovap-1)*nlayermx + 1 : t_h2ovap*nlayermx, : ) = 0. 
+! tlm( (t_co2-1)*nlayermx + 1 : t_co2*nlayermx, : ) = 0. 
+! tlm( (t_h2ovap-1)*nlayermx + 1 : t_h2ovap*nlayermx, : ) = 0. 
 
 ! tlm( (t_hcl-1)*nlayermx + 1 : t_hcl*nlayermx, : ) = 0. 
 

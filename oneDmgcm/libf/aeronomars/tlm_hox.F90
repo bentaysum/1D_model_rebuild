@@ -53,8 +53,7 @@ SUBROUTINE tlm_hox(iter, lyr_m, dens,sza,&
                     ,cl055, cl056, cl057 &
                     ,cl058,cl059, &
                     dccn_dpq, dcc0_dpq, &
-                    dHOX_dPQ, dHOX0_dPQ, &
-                    k_pseudo)
+                    dHOX_dPQ, dHOX0_dPQ)
 
 USE TLMvars
 
@@ -94,7 +93,6 @@ real ro2 ! Peroxy-Radical Number Density
 REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
 REAL, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 REAL dHOX_dPQ(nlayermx, nqmx*nlayermx), dHOX0_dPQ(nlayermx,nqmx*nlayermx)
-REAL k_pseudo
 
 real j(nd) ! photolysis values 
 
@@ -410,7 +408,6 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
             +   cab002*cc(i_o)*cc(i_ch4)*0.49 &
             +   cab004*cc(i_ch3)*cc(i_o3)*0.956 &
             +   cab005*cc(i_ch3)*cc(i_o)*0.83  &
-            +   k_pseudo*cc(i_ch4) &
             +   j(j_h2o)*cc(i_h2o) &
             +   j(j_ch2o_hco)*cc(i_hcho) &
             +   j(j_ch4_ch3_h)*cc(i_ch4) &
@@ -535,7 +532,6 @@ j_cl2o2        = 46      ! cl2o2 + hv -> cl + cloo
 
         B_H(2,t_ch4) = b008*cc(i_o1d) & 
                      + cab002*cc(i_o)*0.49 &
-                     + k_pseudo &
                      + j(j_ch4_ch3_h) &
                      + j(j_ch4_3ch2_h_h)*2. &
                      + j(j_ch4_ch_h2_h) 

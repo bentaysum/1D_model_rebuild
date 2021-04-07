@@ -892,11 +892,11 @@ C            psurf=psurf+dtphys*dpsurf   ! surface pressure change
 
 c     Tangent Linear Matrix 
 c    ~~~~~~~~~~~~~~~~~~~~~~
-C       IF ( tlm_on ) THEN 
+      IF ( tlm_on ) THEN 
 
-C       CALL TLM_ADJ_out(idt,time*24.)
+      CALL TLM_ADJ_out(idt,time*24.)
 
-C       ENDIF 
+      ENDIF 
       
 
 c    L-BFGS-B Optimization 

@@ -55,7 +55,7 @@ SUBROUTINE tlm_sibem(iter, niter, lyr_m, dens, sza, &
                     ,cl058, cl059, &
 					dccn_dpq, dcc0_dpq, &
                     ro2, no, no2, &
-					dHOX_dPQ, dHOX0_dPQ, k_pseudo)
+					dHOX_dPQ, dHOX0_dPQ)
 
 USE TLMvars
 
@@ -85,7 +85,6 @@ real ro2 ! Number density of peroxy radical compounds
 real no, no2 ! NO, NO2 number density
 REAL, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 REAL dHOX_dPQ(nlayermx,nqmx*nlayermx), dHOX0_dPQ(nlayermx,nlayermx*nqmx)
-REAL k_pseudo 
 
 real j(nd), production(nesp), loss(nesp) ! photolysis, production and loss values 
 real methane_enhancement ! Methane enhancement factor 
