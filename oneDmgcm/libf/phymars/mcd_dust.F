@@ -76,10 +76,12 @@
       INTEGER retval ! Error handle
       CHARACTER(LEN=100), PARAMETER :: FILE_NAME = 
      $                   "/home/s1215319/mgcm/mcd-datafile/"
-     $                 //"dustprofiles_MY24.nc"
+     $                 //"MCD_subset_DUSTSTORM.nc"
       INTEGER NCID ! File ID 
       INTEGER VARID(7) ! Variable ID's 
 
+
+      write(*,*) "dust"
 
 
       localtime = lt
@@ -100,6 +102,7 @@
           
           retval = nf_open(TRIM(FILE_NAME), NF_NOWRITE, ncid)
           if (retval .ne. nf_noerr) call handle_err(retval)
+
 
           ! Variable ID Extractions 
            retval = nf_inq_varid(ncid, 'Dust MMR', varid(1))

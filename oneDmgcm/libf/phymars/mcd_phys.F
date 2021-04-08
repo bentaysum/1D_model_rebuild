@@ -95,9 +95,10 @@
 ! 			  nal demand.
 !=======================================================================
       
-      FILE_NAME = "/home/s1215319/mgcm/mcd-datafile/"
-     $                 // "mcd_physicals.nc"
+      write(*,*) "phys"
 
+      FILE_NAME = "/home/s1215319/mgcm/mcd-datafile/"
+     $                  // "MCD_subset_DUSTSTORM.nc"
 
       
       IF (first_call) THEN
@@ -114,15 +115,16 @@
 !     Extract the variable ids
       if (long_mean) then ! Longitudinal mean values?
            ! ID's
-           retval = nf_inq_varid(ncid, 'ps_mean', psid)
+           retval = nf_inq_varid(ncid, 'ps_longmean', psid)
            if (retval .ne. nf_noerr) call handle_err(retval)
-           retval = nf_inq_varid(ncid, 'T_mean', Tid)
+
+           retval = nf_inq_varid(ncid, 'temperature_longmean', Tid)
            if (retval .ne. nf_noerr) call handle_err(retval)
-           retval = nf_inq_varid(ncid, 'Q2_mean', Q2id)
+           retval = nf_inq_varid(ncid, 'Q2_longmean', Q2id)
            if (retval .ne. nf_noerr) call handle_err(retval)
-           retval = nf_inq_varid(ncid, 'zon_mean', zonid)
+           retval = nf_inq_varid(ncid, 'u_longmean', zonid)
            if (retval .ne. nf_noerr) call handle_err(retval)
-           retval = nf_inq_varid(ncid, 'mer_mean', merid)
+           retval = nf_inq_varid(ncid, 'v_longmean', merid)
            if (retval .ne. nf_noerr) call handle_err(retval)
           ! Extraction
            retval = nf_get_var_real(ncid, psid, int_long_ps)
@@ -136,27 +138,27 @@
            if (retval .ne. nf_noerr) call handle_err(retval)
            retval = nf_get_var_real(ncid, zonid, int_long_u)
            if (retval .ne. nf_noerr) call handle_err(retval)
-      
-           
+        
+
       else 
           ! Read longitude for MCD parameters
            mcd_longitude=0. ! default value for ndt
-           call getin("longitude",mcd_longitude)
+           call getin("Longitude",mcd_longitude)
       
           ! ID's
            retval = nf_inq_varid(ncid, 'ps', psid)
            if (retval .ne. nf_noerr) call handle_err(retval)
           
-           retval = nf_inq_varid(ncid, 'T', Tid)
+           retval = nf_inq_varid(ncid, 'temperature', Tid)
            if (retval .ne. nf_noerr) call handle_err(retval)
 
            retval = nf_inq_varid(ncid, 'Q2', Q2id)
            if (retval .ne. nf_noerr) call handle_err(retval)
 
-           retval = nf_inq_varid(ncid, 'zon_wind', zonid)
+           retval = nf_inq_varid(ncid, 'u', zonid)
            if (retval .ne. nf_noerr) call handle_err(retval)
 
-           retval = nf_inq_varid(ncid, 'mer_wind', merid)
+           retval = nf_inq_varid(ncid, 'v', merid)
            if (retval .ne. nf_noerr) call handle_err(retval)
       
           ! Extraction
@@ -175,7 +177,7 @@
            retval = nf_get_var_real(ncid, zonid, v5mcd_u)
            if (retval .ne. nf_noerr) call handle_err(retval)
 
-           retval = nf_inq_varid(ncid, 'longitude', longid)
+           retval = nf_inq_varid(ncid, 'Longitude', longid)
            if (retval .ne. nf_noerr) call handle_err(retval)
 
            retval = nf_get_var_real(ncid, longid, v5mcd_long)
@@ -183,13 +185,13 @@
 
       endif ! if long_mean
       
-           retval = nf_inq_varid(ncid, 'solar longitude', zlsid)
+           retval = nf_inq_varid(ncid, 'Solar Longitude', zlsid)
            if (retval .ne. nf_noerr) call handle_err(retval)
 
-           retval = nf_inq_varid(ncid, 'local time', ltid)
+           retval = nf_inq_varid(ncid, 'Local Time', ltid)
            if (retval .ne. nf_noerr) call handle_err(retval)
 
-           retval = nf_inq_varid(ncid, 'latitude', latid)
+           retval = nf_inq_varid(ncid, 'Latitude', latid)
            if (retval .ne. nf_noerr) call handle_err(retval)
 
            retval = nf_get_var_real(ncid, zlsid, v5mcd_ZLS)
@@ -202,7 +204,7 @@
            if (retval .ne. nf_noerr) call handle_err(retval)
 
       
-      retval = nf_inq_varid(ncid, 'altitude', altid)
+      retval = nf_inq_varid(ncid, 'Altitude', altid)
       if (retval .ne. nf_noerr) call handle_err(retval)
       
       retval = nf_get_var_real(ncid, altid, v5mcd_ALT)

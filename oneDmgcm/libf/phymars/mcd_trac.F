@@ -36,7 +36,7 @@
 !     
 !     === netCDF parameters ===
       integer N_LT, N_ALT, N_ZLS, N_LAT, N_LONG
-      parameter (N_LT =4, N_ALT = 30, N_ZLS = 37, 
+      parameter (N_LT =25, N_ALT = 30, N_ZLS = 37, 
      $           N_LAT = 41, N_LONG = 11)
       integer w, x, y, z, t ! loop iterators     
       integer retval            
@@ -96,7 +96,11 @@
 ! 			  nal demand.
 !=======================================================================
       
-      FILE_NAME = "/home/s1215319/mgcm/mcd-datafile/mcd_tracervmrs.nc"
+      write(*,*) "trac"
+
+
+      FILE_NAME = "/home/s1215319/mgcm/mcd-datafile/"
+     $                 //"MCD_subset_DUSTSTORM.nc"
 	
       IF (first_call) THEN
       first_call = .false.
@@ -112,19 +116,19 @@
       ! Are we using longitudinal mean values?
       if ( long_mean ) then 
           ! Get IDs
-           retval = nf_inq_varid(ncid, 'co2_mean', co2id)
+           retval = nf_inq_varid(ncid, 'co2_vmr_longmean', co2id)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
 
-           retval = nf_inq_varid(ncid, 'co_mean', coid)
+           retval = nf_inq_varid(ncid, 'co_vmr_longmean', coid)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
             
-           retval = nf_inq_varid(ncid, 'h2_mean', h2id)
+           retval = nf_inq_varid(ncid, 'h2_vmr_longmean', h2id)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
 
-           retval = nf_inq_varid(ncid, 'o2_mean', o2id)
+           retval = nf_inq_varid(ncid, 'o2_vmr_longmean', o2id)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
             
-           retval = nf_inq_varid(ncid, 'h2o_mean', h2oid)
+           retval = nf_inq_varid(ncid, 'h2ovap_vmr_longmean', h2oid)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
            
           ! Place into the relevant sized arrays for interpolation 
@@ -150,22 +154,22 @@
            call getin("longitude",mcd_longitude) 
      
            ! Get IDs
-           retval = nf_inq_varid(ncid, 'co2', co2id)
+           retval = nf_inq_varid(ncid, 'co2_vmr', co2id)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
 
-           retval = nf_inq_varid(ncid, 'co', coid)
+           retval = nf_inq_varid(ncid, 'co_vmr', coid)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
             
-           retval = nf_inq_varid(ncid, 'h2', h2id)
+           retval = nf_inq_varid(ncid, 'h2_vmr', h2id)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
 
-           retval = nf_inq_varid(ncid, 'o2', o2id)
+           retval = nf_inq_varid(ncid, 'o2_vmr', o2id)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
             
-           retval = nf_inq_varid(ncid, 'h2o', h2oid)
+           retval = nf_inq_varid(ncid, 'h2ovap_vmr', h2oid)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
            
-           retval = nf_inq_varid(ncid, 'longitude', longid)
+           retval = nf_inq_varid(ncid, 'Longitude', longid)
            if (retval .ne. nf_noerr) call get_error_hand(retval)       
 
            ! Extract and place into relevant sized array
@@ -190,16 +194,16 @@
 	
       endif ! long_mean 
        
-      retval = nf_inq_varid(ncid, 'altitude', altid)
+      retval = nf_inq_varid(ncid, 'Altitude', altid)
       if (retval .ne. nf_noerr) call get_error_hand(retval)
      
-      retval = nf_inq_varid(ncid, 'solar longitude', zlsid)
+      retval = nf_inq_varid(ncid, 'Solar Longitude', zlsid)
       if (retval .ne. nf_noerr) call get_error_hand(retval)
 
-      retval = nf_inq_varid(ncid, 'localtime', ltid)
+      retval = nf_inq_varid(ncid, 'Local Time', ltid)
       if (retval .ne. nf_noerr) call get_error_hand(retval)
 
-      retval = nf_inq_varid(ncid, 'latitude', latid)
+      retval = nf_inq_varid(ncid, 'Latitude', latid)
       if (retval .ne. nf_noerr) call get_error_hand(retval)
 
       retval = nf_get_var_real(ncid, altid, mcdv5_ALT)
