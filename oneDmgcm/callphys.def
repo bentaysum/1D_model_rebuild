@@ -33,6 +33,13 @@ mcd_profiles = .True.
 long_mean= .True.
 longitude=137.4
 
+# MCD Data location
+mcd_dir=/geos/d21/downloaded_model_output/MCD_GCM_sets/
+
+# MCD Subset of choice
+#mcd_file=MCD_subset_climatology_SOLAVG.nc
+mcd_file=MCD_subset_DUSTSTORM.nc
+
 # Individual Gase
 mcd_co2= .True.
 mcd_co= .True.

@@ -185,6 +185,9 @@
          write(*,*) "mcd_h2o = ", mcd_h2o
          write(*,*) "mcd_o2 = ", mcd_o2
 
+         call getin("mcd_dir",mcd_dir)
+         call getin("mcd_file",mcd_file)
+
          ENDIF 
 
          write(*,*) "Longitudinal mean values of MCD v5.3 variables?"

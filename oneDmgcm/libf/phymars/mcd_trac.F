@@ -42,7 +42,7 @@
       integer retval            
       integer NCID        
 
-      character(len=100) FILE_NAME
+      character(len=300) FILE_NAME
       integer co2id, coid, h2id, o2id, h2oid
       integer altid, latid, ltid, zlsid, longid
 
@@ -96,11 +96,9 @@
 ! 			  nal demand.
 !=======================================================================
       
-      write(*,*) "trac"
 
+      FILE_NAME = TRIM(mcd_dir) // TRIM(mcd_file)
 
-      FILE_NAME = "/home/s1215319/mgcm/mcd-datafile/"
-     $                 //"MCD_subset_DUSTSTORM.nc"
 	
       IF (first_call) THEN
       first_call = .false.

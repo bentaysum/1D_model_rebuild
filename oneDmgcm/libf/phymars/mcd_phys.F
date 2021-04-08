@@ -44,7 +44,7 @@
       integer NCID        
       parameter (N_LT =25, N_ALT = 30, N_ZLS = 37, N_LAT = 41, 
      $           N_LONG = 11)
-      character(len=100) FILE_NAME
+      character(len=300) FILE_NAME
       integer Tid, psid, merid, zonid, altid, latid, ltid, zlsid, Q2id,
      $        longid
 !     === Mars Climate Database arrays ===
@@ -95,10 +95,8 @@
 ! 			  nal demand.
 !=======================================================================
       
-      write(*,*) "phys"
 
-      FILE_NAME = "/home/s1215319/mgcm/mcd-datafile/"
-     $                  // "MCD_subset_DUSTSTORM.nc"
+      FILE_NAME = TRIM(mcd_dir)// TRIM(mcd_file)
 
       
       IF (first_call) THEN

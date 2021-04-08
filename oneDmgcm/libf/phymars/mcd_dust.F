@@ -74,15 +74,13 @@
 
 !      NETCDF VARIABLES
       INTEGER retval ! Error handle
-      CHARACTER(LEN=100), PARAMETER :: FILE_NAME = 
-     $                   "/home/s1215319/mgcm/mcd-datafile/"
-     $                 //"MCD_subset_DUSTSTORM.nc"
+      CHARACTER(LEN=300) FILE_NAME 
       INTEGER NCID ! File ID 
       INTEGER VARID(7) ! Variable ID's 
 
 
-      write(*,*) "dust"
-
+  
+      FILE_NAME = TRIM(mcd_dir) // TRIM(mcd_file)
 
       localtime = lt
 !     0: IF THE MODEL IS NOT OPERATING VIA DIURNAL CHEMISTRY, LT = 12:00

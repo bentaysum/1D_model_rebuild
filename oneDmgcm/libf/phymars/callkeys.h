@@ -22,6 +22,8 @@
      
       COMMON/callkeys_r/topdustref,solarcondate,semi,alphan,euveff,     &
      &   tke_heat_flux,tlm_lt
+
+      COMMON/callkeys_c/mcd_dir,mcd_file 
      
       LOGICAL callrad,calldifv,calladj,callcond,callsoil,               &
      &   season,diurnal,lwrite,calllott                                 &
@@ -56,6 +58,9 @@
       real euveff
       real tke_heat_flux
       real tlm_lt
+
+      character(len=150) mcd_dir
+      character(len=150) mcd_file
 
       integer iddist
       integer iaervar
