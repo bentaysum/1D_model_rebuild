@@ -1157,7 +1157,6 @@
 !=======================================================================
 !     call chemical subroutines
 !=======================================================================
-
 !        chemistry in lower atmosphere
          if (photochem) then
             call photochemistry(lswitch,zycol,szacol,ptimestep,    &
@@ -1189,6 +1188,13 @@
             call deposition(ig, ig_vl1, pplay, pplev, zzlay, zzlev,& 
                             zu, zv, zt, zycol, ptimestep, co2ice)
          end if
+
+!        Chlorine chemistry from Dust 
+            ! call cl_dust_tendency(N_cldust, q, dq, rdust, &
+            !              play, temp, dtphys)
+
+
+
 
 !        Chlorine deposition [BMT 20/11/2020]
          ! if ( igcm_hcl .ne. 0 ) then

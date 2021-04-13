@@ -75,6 +75,9 @@ c
       REAL zlay(nlayermx)   ! altitude estimee dans les couches (km)
       REAL rdust(nlayermx) ! Dust Geometric Radius
 
+c     Chlorinated Dust Grains
+      REAL N_cldust(nlayermx) ! Chlorine Atoms in dust grains 
+
 c    Physical and dynamical tandencies (e.g.  m.s-2, K/s, Pa/s)
       REAL du(nlayermx),dv(nlayermx),dtemp(nlayermx)
       REAL dudyn(nlayermx),dvdyn(nlayermx),dtempdyn(nlayermx)
@@ -627,13 +630,13 @@ c     -------------------------------------------------------
 C     Second call to the MCD v5.3 routine will initialise the
 C     temperature, wind, and q2 profiles.
 c 	  -------------------------------------------------------
-      call mcd_phys(time*24.,zlay,zls*180./pi,
+      call mcd_phys(time*24.,zlay*1.e3,zls*180./pi,
      &              temp, psurf, u, v, 
      &              q2, day_step)
      
 c     MCD Tracer VMR's
       IF ( mcd_profiles ) THEN 
-          call mcd_trac(time*24.,zlay,zls*180./pi, 
+          call mcd_trac(time*24.,zlay*1.e3,zls*180./pi, 
      &                          q(:,1), q(:,2), 
      &                          q(:,5), q(:,8),
      &                          q(:,15))
@@ -722,6 +725,16 @@ c     =================
      &                       q, rdust,
      &                       play, temp )
       ENDIF 
+
+      call cl_dust_initialise(q, rdust,
+     &                        temp, play,
+     &                        N_cldust)
+
+
+
+C SUBROUTINE cl_dust_tendency(N_cldust,q, reff, &
+C                             press, temp) 
+
 
 
 
@@ -848,6 +861,7 @@ c       --------------------
      ,     w,
 C - outputs
      s     du, dv, dtemp, dq,dpsurf,tracerdyn)
+
 
 
 c       wind increment : specific for 1D

@@ -8,7 +8,7 @@
 day0=450
 
 # Initial local time (in hours, between 0 and 24)
-time=0.
+time=12.
 # Number of time steps per sol
 day_step=48
 # Number of sols to run 
