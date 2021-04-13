@@ -135,11 +135,11 @@ callslope = .false.
 ## Tracer (dust water, ice and/or chemical species) options (used if tracer=T):
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # DUST: Transported dust ? (if >0, use 'dustbin' dust bins)
-dustbin    = 0
+dustbin    = 2
 # DUST: Radiatively active dust ? (matters if dustbin>0)
-active  = .false.
+active  = .true.
 # DUST: use mass and number mixing ratios to predict dust size ?
-doubleq   = .false.
+doubleq   = .true.
 # DUST: lifted by GCM surface winds ?
 lifting = .False.
 # DUST: lifted by dust devils ?

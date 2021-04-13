@@ -73,6 +73,7 @@ c
       REAL emis             ! surface layer
       REAL q2(nlayermx+1)   ! Turbulent Kinetic Energy
       REAL zlay(nlayermx)   ! altitude estimee dans les couches (km)
+      REAL rdust(nlayermx) ! Dust Geometric Radius
 
 c    Physical and dynamical tandencies (e.g.  m.s-2, K/s, Pa/s)
       REAL du(nlayermx),dv(nlayermx),dtemp(nlayermx)
@@ -630,7 +631,14 @@ c 	  -------------------------------------------------------
      &              temp, psurf, u, v, 
      &              q2, day_step)
      
-
+c     MCD Tracer VMR's
+      IF ( mcd_profiles ) THEN 
+          call mcd_trac(time*24.,zlay,zls*180./pi, 
+     &                          q(:,1), q(:,2), 
+     &                          q(:,5), q(:,8),
+     &                          q(:,15))
+          WRITE(*,*) "MCD CO2, CO, H2, H2O, O2"
+      ENDIF
 
 C       tsurf = temp(1)
       
@@ -705,6 +713,17 @@ c =====================================================================
                               ! ional efficiency].
 #endif 
 c =====================================================================
+
+c     ================= 
+c     MCD Dust Profiles
+c     ================= 
+      IF ( doubleq ) THEN 
+           call mcd_dust(time*24.,zlay,zls*180./pi,
+     &                       q, rdust,
+     &                       play, temp )
+      ENDIF 
+
+
 
 
 c ======================================================================

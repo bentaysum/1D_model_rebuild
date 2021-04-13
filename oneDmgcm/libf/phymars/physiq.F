@@ -589,7 +589,7 @@ c     q2 and surface pressure)
 c    Dust profiles in kg/kg supplied by MCD dataset 
       IF ( doubleq ) THEN 
            call mcd_dust(ptime*24.,zzlay(1,:),zls*180./pi,
-     &                       pq(1,:,:), 
+     &                       pq(1,:,:), rdust(1,:), 
      &                       pplay(1,:), zt(1,:) )
       ENDIF 
 
@@ -1271,6 +1271,14 @@ c       ---------------------------------
         ENDDO    ! (iq)
 
       endif !  of if (tracer) 
+
+
+      WRITE(*,*) "-------------------"
+      DO l = 1,nlayermx
+        write(*,*)l, rdust(1,l)
+      ENDDO 
+
+
 
 #ifndef MESOSCALE
 

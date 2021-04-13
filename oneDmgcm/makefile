@@ -138,6 +138,8 @@ $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(calchim.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(chemthermos.o)
 
+$(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(cl_dust.o)
+
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(euvheat.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(inichim_newstart.o)
@@ -453,6 +455,20 @@ $(LIBF)/phymars/tracer.h
 	$(AR) r $(LIBO)/libaeronomars.a chemthermos.o ; $(RM) chemthermos.o ; \
 	cd $(GCM)
 
+$(LIBO)/libaeronomars.a(cl_dust.o) : $(LIBF)/aeronomars/cl_dust.F90 \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h \
+$(LIBF)/aeronomars/chimiedata.h \
+$(LIBF)/phymars/tracer.h \
+$(LIBF)/phymars/comcstfi.h \
+$(LIBF)/phymars/callkeys.h \
+$(LIBF)/aeronomars/conc.h
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libaeronomars.a cl_dust.o ; \
+	$(COMPILE) $(LIBF)/aeronomars/cl_dust.F90 ; \
+	$(AR) r $(LIBO)/libaeronomars.a cl_dust.o ; $(RM) cl_dust.o ; \
+	cd $(GCM)
+
 $(LIBO)/libaeronomars.a(euvheat.o) : $(LIBF)/aeronomars/euvheat.F90 \
 $(LIBF)/grid/dimensions.h \
 $(LIBF)/phymars/dimphys.h \
@@ -506,10 +522,18 @@ $(LIBF)/grid/dimensions.h
 	$(AR) r $(LIBO)/libaeronomars.a moldiff_red.o ; $(RM) moldiff_red.o ; \
 	cd $(GCM)
 
-$(LIBO)/libaeronomars.a(tgo_profiles.o) : $(LIBF)/aeronomars/tgo_profiles.F90
+$(LIBO)/libaeronomars.a(tgo_profiles.o) : $(LIBF)/aeronomars/tgo_profiles.F90 \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h \
+$(LIBF)/aeronomars/chimiedata.h \
+$(LIBF)/phymars/tracer.h \
+$(LIBF)/phymars/comcstfi.h \
+$(LIBF)/phymars/callkeys.h \
+$(LIBF)/aeronomars/conc.h \
+$(LIBF)/phymars/comgeomfi.h
 	cd $(LOCAL_DIR); \
 	$(AR) d $(LIBO)/libaeronomars.a tgo_profiles.o ; \
-	$(COMPILE) $(LIBF)/aeronomars/tgo_profiles.F90 ; \
+	$(COMPTRU90) $(LIBF)/aeronomars/tgo_profiles.F90 ; \
 	$(AR) r $(LIBO)/libaeronomars.a tgo_profiles.o ; $(RM) tgo_profiles.o ; \
 	cd $(GCM)
 
