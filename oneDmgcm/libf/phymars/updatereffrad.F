@@ -107,7 +107,17 @@ c       ------------------
         ELSE
           DO l=1,nlayer
             DO ig=1, ngrid
-              rdust(ig,l) = 0.8E-6
+
+ccccccccccccccc
+c      Original
+ccccccccccccccc
+C               rdust(ig,l) = 0.8E-6
+
+ccccccccccccccc
+c      BMT 
+ccccccccccccccc
+              rdust(ig,l) = rdust(ig,l)
+              
               nueffdust(ig,l) = 0.3
             ENDDO
           ENDDO

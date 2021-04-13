@@ -1273,12 +1273,6 @@ c       ---------------------------------
       endif !  of if (tracer) 
 
 
-      WRITE(*,*) "-------------------"
-      DO l = 1,nlayermx
-        write(*,*)l, rdust(1,l)
-      ENDDO 
-
-
 
 #ifndef MESOSCALE
 

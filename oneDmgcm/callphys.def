@@ -137,7 +137,7 @@ callslope = .false.
 # DUST: Transported dust ? (if >0, use 'dustbin' dust bins)
 dustbin    = 2
 # DUST: Radiatively active dust ? (matters if dustbin>0)
-active  = .true.
+active  = .false.
 # DUST: use mass and number mixing ratios to predict dust size ?
 doubleq   = .true.
 # DUST: lifted by GCM surface winds ?
