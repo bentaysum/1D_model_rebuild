@@ -44,7 +44,8 @@
 !    co2ice(ngridmx)            co2 ice surface layer (kg.m-2)
 !    surfdust(ngridmx,nlayermx) dust surface area (m2/m3)
 !    surfice(ngridmx,nlayermx)  ice surface area (m2/m3)
-!
+!    reff(ngridmnx,nlayermx)    geometric radius of dust 
+
 !  Output:
 !
 !    dqchim(ngridmx,nlayermx,nqmx) ! tendencies on pq due to chemistry
@@ -1079,6 +1080,8 @@
 
          write(*,*) 'calchim: found nbq    = ',nbq,' tracers'
          firstcall = .false.
+
+
       end if ! if (firstcall)
 
 ! Initializations
@@ -1160,9 +1163,14 @@
 !=======================================================================
 !        chemistry in lower atmosphere
          if (photochem) then
+
+            ! BMT - Chlorinated Dust 
+
             call photochemistry(lswitch,zycol,szacol,ptimestep,    &
                                 zpress,ztemp,zdens,dist_sol,       &
                                 surfdust1d,surfice1d,jo3,taucol)
+
+            call cl_dust(zycol, zdens, reff,surfdust1d, ztemp, zpress*100., ptimestep)
 
 !        ozone photolysis, for output
 
@@ -1189,10 +1197,6 @@
             call deposition(ig, ig_vl1, pplay, pplev, zzlay, zzlev,& 
                             zu, zv, zt, zycol, ptimestep, co2ice)
          end if
-
-     !  Chlorine chemistry from Dust 
-            ! call cl_dust_tendency(pplay, zq, dq, rdust, &
-            !              play, temp, dtphys)
 
 
 

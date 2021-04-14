@@ -44,7 +44,7 @@ mcd_file=MCD_subset_DUSTSTORM.nc
 mcd_co2= .True.
 mcd_co= .True.
 mcd_h2= .True.
-mcd_h2o= .False.
+mcd_h2o= .True.
 mcd_o2= .True.
 
 ## Tangent Linear Model Routines

@@ -404,210 +404,134 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       ! HCl Chemical Reactions
       ! ----------------------
       ! Production Rates 
-       call WRITEDIAGFI(1,"hcl_P","hcl_P", "cm-3 s-1",
-     $                  1,lifetime(:,1))
+C        call WRITEDIAGFI(1,"hcl_P","hcl_P", "cm-3 s-1",
+C      $                  1,lifetime(:,1))
 
-       call WRITEDIAGFI(1, "hcl_p1",
-     $                  "$Cl + H_2 \longrightarrow HCl + H$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,2))
+C        call WRITEDIAGFI(1, "hcl_p1",
+C      $                  "$Cl + H_2 \longrightarrow HCl + H$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,2))
 
-       call WRITEDIAGFI(1, "hcl_p2",
-     $                  "$Cl + HO_2 \longrightarrow HCl + O_2$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,3))
+C        call WRITEDIAGFI(1, "hcl_p2",
+C      $                  "$Cl + HO_2 \longrightarrow HCl + O_2$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,3))
 
-       call WRITEDIAGFI(1, "hcl_p3",
-     $                  "$Cl + H_2O_2 \longrightarrow HCl + HO_2$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,4))
+C        call WRITEDIAGFI(1, "hcl_p3",
+C      $                  "$Cl + H_2O_2 \longrightarrow HCl + HO_2$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,4))
 
-       call WRITEDIAGFI(1, "hcl_p4",
-     $                  "$ClO + OH \longrightarrow HCl + O_2$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,5))
+C        call WRITEDIAGFI(1, "hcl_p4",
+C      $                  "$ClO + OH \longrightarrow HCl + O_2$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,5))
 
-       call WRITEDIAGFI(1, "hcl_p5",
-     $                  "$Cl + CH_4 \longrightarrow HCl + CH_3$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,6))
+C        call WRITEDIAGFI(1, "hcl_p5",
+C      $                  "$Cl + CH_4 \longrightarrow HCl + CH_3$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,6))
 
-       call WRITEDIAGFI(1, "hcl_p6",
-     $                  "$Cl + HCHO \longrightarrow HCl + HCO$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,7))
+C        call WRITEDIAGFI(1, "hcl_p6",
+C      $                  "$Cl + HCHO \longrightarrow HCl + HCO$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,7))
 
-       call WRITEDIAGFI(1, "hcl_p7",
-     $                  "$Cl + CH_3OOH \longrightarrow HCl + HCHO + OH$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,8))
+C        call WRITEDIAGFI(1, "hcl_p7",
+C      $                  "$Cl + CH_3OOH \longrightarrow HCl + HCHO + OH$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,8))
 
-       call WRITEDIAGFI(1, "hcl_p8",
-     $                  "$Cl + CH_3O_2 \longrightarrow HCl + CH_2OO"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,9))
+C        call WRITEDIAGFI(1, "hcl_p8",
+C      $                  "$Cl + CH_3O_2 \longrightarrow HCl + CH_2OO"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,9))
 
-       call WRITEDIAGFI(1, "hcl_p9",
-     $                  "$Cl + CH_3OCl \longrightarrow HCl + CH_2OCl$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,10))
+C        call WRITEDIAGFI(1, "hcl_p9",
+C      $                  "$Cl + CH_3OCl \longrightarrow HCl + CH_2OCl$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,10))
 
-       call WRITEDIAGFI(1, "hcl_p10",
-     $                  "$Cl_2 + H \longrightarrow HCl + Cl$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,11))
+C        call WRITEDIAGFI(1, "hcl_p10",
+C      $                  "$Cl_2 + H \longrightarrow HCl + Cl$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,11))
 
-       call WRITEDIAGFI(1, "hcl_p11",
-     $            "$Cl + HCOOH \longrightarrow HCl + \textrm{Products}$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,12))
+C        call WRITEDIAGFI(1, "hcl_p11",
+C      $            "$Cl + HCOOH \longrightarrow HCl + \textrm{Products}$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,12))
 
-       call WRITEDIAGFI(1, "hcl_p12",
-     $                  "$Cl + HOCl \longrightarrow HCl + ClO$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,13))
+C        call WRITEDIAGFI(1, "hcl_p12",
+C      $                  "$Cl + HOCl \longrightarrow HCl + ClO$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,13))
 
-C        ! Loss Rates
-       call WRITEDIAGFI(1, "hcl_l1",
-     $                  "$HCl + h\mu \longrightarrow H + Cl$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,14))
+C C        ! Loss Rates
+C        call WRITEDIAGFI(1, "hcl_l1",
+C      $                  "$HCl + h\mu \longrightarrow H + Cl$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,14))
 
-       call WRITEDIAGFI(1, "hcl_l2",
-     $                  "$HCl + OH \longrightarrow H_2O + Cl$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,15))
+C        call WRITEDIAGFI(1, "hcl_l2",
+C      $                  "$HCl + OH \longrightarrow H_2O + Cl$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,15))
 
-       call WRITEDIAGFI(1, "hcl_l3",
-     $  "$HCl + O(^1D) \longrightarrow 0.33*H + 0.33*ClO +"
-     $  // " 0.66*Cl + 0.66*OH$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,16))
+C        call WRITEDIAGFI(1, "hcl_l3",
+C      $  "$HCl + O(^1D) \longrightarrow 0.33*H + 0.33*ClO +"
+C      $  // " 0.66*Cl + 0.66*OH$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,16))
 
-       call WRITEDIAGFI(1, "hcl_l4",
-     $                  "$HCl + O(^3P) \longrightarrow OH + Cl$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,17))
+C        call WRITEDIAGFI(1, "hcl_l4",
+C      $                  "$HCl + O(^3P) \longrightarrow OH + Cl$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,17))
 
-       call WRITEDIAGFI(1, "hcl_l5",
-     $                  "$HCl + H \longrightarrow H_2 + Cl$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,18))
+C        call WRITEDIAGFI(1, "hcl_l5",
+C      $                  "$HCl + H \longrightarrow H_2 + Cl$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,18))
 
-      ! -----------------------------
-      ! Organic Compound Lifeitmes 
-      ! -----------------------------
-       call WRITEDIAGFI(1,"ch4_tau","ch4_tau", "s",
-     $                  1,lifetime(:,19))
+C       ! -----------------------------
+C       ! Organic Compound Lifeitmes 
+C       ! -----------------------------
+C        call WRITEDIAGFI(1,"ch4_tau","ch4_tau", "s",
+C      $                  1,lifetime(:,19))
 
-       call WRITEDIAGFI(1,"hcho_tau","hcho_tau", "s",
-     $                  1,lifetime(:,20))
+C        call WRITEDIAGFI(1,"hcho_tau","hcho_tau", "s",
+C      $                  1,lifetime(:,20))
 
-       call WRITEDIAGFI(1,"hcooh_tau","hcooh_tau", "s",
-     $                  1,lifetime(:,21))
+C        call WRITEDIAGFI(1,"hcooh_tau","hcooh_tau", "s",
+C      $                  1,lifetime(:,21))
 
-       call WRITEDIAGFI(1,"ch3ooh_tau","ch3ooh_tau", "s",
-     $                  1,lifetime(:,22))
+C        call WRITEDIAGFI(1,"ch3ooh_tau","ch3ooh_tau", "s",
+C      $                  1,lifetime(:,22))
 
 
-      ! Perchlorate Production
-       call WRITEDIAGFI(1,"hclo4_P","hclo4_P", "cm-3 s-1",
-     $                  1,lifetime(:,23))
+C       ! Perchlorate Production
+C        call WRITEDIAGFI(1,"hclo4_P","hclo4_P", "cm-3 s-1",
+C      $                  1,lifetime(:,23))
 
-       call WRITEDIAGFI(1, "hclo4_p1",
-     $                  "$ClO_3 + OH \longrightarrow HClO_4$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,24))
+C        call WRITEDIAGFI(1, "hclo4_p1",
+C      $                  "$ClO_3 + OH \longrightarrow HClO_4$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,24))
 
-       call WRITEDIAGFI(1, "hclo4_p2",
-     $                  "$ClO_3 + OH + M\longrightarrow HClO_4 + M$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,25))
+C        call WRITEDIAGFI(1, "hclo4_p2",
+C      $                  "$ClO_3 + OH + M\longrightarrow HClO_4 + M$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,25))
 
-       call WRITEDIAGFI(1, "hclo4_p3",
-     $                  "$ClO_4 + HOCl \longrightarrow HClO_4 + OH$"
-     $                  , "cm-3 s-1",
-     $                  1, lifetime(:,26))
+C        call WRITEDIAGFI(1, "hclo4_p3",
+C      $                  "$ClO_4 + HOCl \longrightarrow HClO_4 + OH$"
+C      $                  , "cm-3 s-1",
+C      $                  1, lifetime(:,26))
 
        ! O=O Lifetime
        call WRITEDIAGFI(1,"o=o_tau","o=o_tau", "s",
      $                  1,lifetime(:,60))
-
-
-       ! ClOX 
-C        call WRITEDIAGFI(1,"clox_P","clox_P", "s",
-C      $                  1,lifetime(:,27))
-C        call WRITEDIAGFI(1,"clox_L","clox_L", "s",
-C      $                  1,lifetime(:,28))
-C        call WRITEDIAGFI(1,"pcl","pcl", "s",
-C      $                  1,lifetime(:,29))
-C        call WRITEDIAGFI(1,"lcl","lcl", "s",
-C      $                  1,lifetime(:,30))
-C        call WRITEDIAGFI(1,"pclo","pclo", "s",
-C      $                  1,lifetime(:,31))
-C        call WRITEDIAGFI(1,"lclo","lclo", "s",
-C      $                  1,lifetime(:,32))
-
-       ! PLACE IN WRITEDIAGFI FUNCTION 
-C        call WRITEDIAGFI(1,"clox_l1","cl003", "s",
-C      $                  1,lifetime(:,33))
-C        call WRITEDIAGFI(1,"clox_l2","cl005", "s",
-C      $                  1,lifetime(:,34))
-C        call WRITEDIAGFI(1,"clox_l3","cl006", "s",
-C      $                  1,lifetime(:,35))
-C        call WRITEDIAGFI(1,"clox_l4","cl008", "s",
-C      $                  1,lifetime(:,36))
-C        call WRITEDIAGFI(1,"clox_l5","cl009", "s",
-C      $                  1,lifetime(:,37))
-C        call WRITEDIAGFI(1,"clox_l6","cl011", "s",
-C      $                  1,lifetime(:,38))
-C        call WRITEDIAGFI(1,"clox_l7","cl012", "s",
-C      $                  1,lifetime(:,39))
-C        call WRITEDIAGFI(1,"clox_l8","cl013", "s",
-C      $                  1,lifetime(:,40))
-C        call WRITEDIAGFI(1,"clox_l9","cl016", "s",
-C      $                  1,lifetime(:,41))
-C        call WRITEDIAGFI(1,"clox_l10","cl017", "s",
-C      $                  1,lifetime(:,42))
-C        call WRITEDIAGFI(1,"clox_l11","cl018", "s",
-C      $                  1,lifetime(:,43))
-C        call WRITEDIAGFI(1,"clox_l12","cl019", "s",
-C      $                  1,lifetime(:,44))
-C        call WRITEDIAGFI(1,"clox_l13","cl020", "s",
-C      $                  1,lifetime(:,45))
-C        call WRITEDIAGFI(1,"clox_l14","cl021", "s",
-C      $                  1,lifetime(:,46))
-C        call WRITEDIAGFI(1,"clox_l15","cl022", "s",
-C      $                  1,lifetime(:,47))
-C        call WRITEDIAGFI(1,"clox_l16","cl023", "s",
-C      $                  1,lifetime(:,48))
-C        call WRITEDIAGFI(1,"clox_l17","cl025", "s",
-C      $                  1,lifetime(:,49))
-C        call WRITEDIAGFI(1,"clox_l18","cl028", "s",
-C      $                  1,lifetime(:,50))
-C        call WRITEDIAGFI(1,"clox_l19","cl029", "s",
-C      $                  1,lifetime(:,51))
-C        call WRITEDIAGFI(1,"clox_l20","cl030", "s",
-C      $                  1,lifetime(:,52))
-C        call WRITEDIAGFI(1,"clox_l21","cl031", "s",
-C      $                  1,lifetime(:,53))
-C        call WRITEDIAGFI(1,"clox_l22","cl043", "s",
-C      $                  1,lifetime(:,54))
-C        call WRITEDIAGFI(1,"clox_l23","cl044", "s",
-C      $                  1,lifetime(:,55))
-C        call WRITEDIAGFI(1,"clox_l24","cl045", "s",
-C      $                  1,lifetime(:,56))
-C        call WRITEDIAGFI(1,"clox_l25","cl046", "s",
-C      $                  1,lifetime(:,57))
-C        call WRITEDIAGFI(1,"clox_l26","cl047", "s",
-C      $                  1,lifetime(:,58))
-C        call WRITEDIAGFI(1,"clox_l27","cl055", "s",
-C      $                  1,lifetime(:,59))
-
-
-
-
-
 
 
       return

@@ -75,8 +75,6 @@ c
       REAL zlay(nlayermx)   ! altitude estimee dans les couches (km)
       REAL rdust(nlayermx) ! Dust Geometric Radius
 
-c     Chlorinated Dust Grains
-      REAL N_cldust(nlayermx) ! Chlorine Atoms in dust grains 
 
 c    Physical and dynamical tandencies (e.g.  m.s-2, K/s, Pa/s)
       REAL du(nlayermx),dv(nlayermx),dtemp(nlayermx)
@@ -726,9 +724,9 @@ c     =================
      &                       play, temp )
       ENDIF 
 
-      call cl_dust_initialise(q, rdust,
-     &                        temp, play,
-     &                        N_cldust)
+C       call cl_dust_initialise(q, rdust,
+C      &                        temp, play,
+C      &                        N_cldust)
 
 
 
