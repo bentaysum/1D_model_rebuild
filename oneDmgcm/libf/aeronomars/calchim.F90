@@ -1,7 +1,7 @@
       subroutine calchim(ptimestep,pplay,pplev,pt,pdt,dist_sol,mu0,         &
                          zzlev,zzlay,zday,pq,pdq,dqchim,dqschim,dqcloud,    &
                          dqscloud,tauref,co2ice,                            &
-                         pu,pdu,pv,pdv,surfdust,surfice)
+                         pu,pdu,pv,pdv,surfdust,surfice,reff)
 
       implicit none
 
@@ -83,6 +83,7 @@
       real :: surfdust(ngridmx,nlayermx) ! dust surface area (m2/m3)
       real :: surfice(ngridmx,nlayermx)  !  ice surface area (m2/m3)
 
+      real :: reff(nlayermx) ! Dust Radius BMT
 !     output:
 
       real :: dqchim(ngridmx,nlayermx,nqmx) ! tendencies on pq due to chemistry
@@ -1189,8 +1190,8 @@
                             zu, zv, zt, zycol, ptimestep, co2ice)
          end if
 
-!        Chlorine chemistry from Dust 
-            ! call cl_dust_tendency(N_cldust, q, dq, rdust, &
+     !  Chlorine chemistry from Dust 
+            ! call cl_dust_tendency(pplay, zq, dq, rdust, &
             !              play, temp, dtphys)
 
 

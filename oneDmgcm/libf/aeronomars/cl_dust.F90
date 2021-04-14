@@ -96,15 +96,16 @@ REAL q(nlayermx,nqmx), dq(nlayermx,nqmx) ! Tracer Mixing Ratios and tendencies
 REAL reff(nlayermx) ! Dust Geometric radius (m)
 REAL press(nlayermx), temp(nlayermx) ! Pressure and temperature 
 REAL dt ! physical timestep
+
 ! LOCAL 
 REAL, PARAMETER :: release_rate = 1.E1 ! Release rate of Cl atoms from dust [molecules/s]
-
 REAL uptake_coeff(nlayermx) ! Uptake coefficient on HCl on dust 
 REAL S(nlayermx) ! surface area of layer
 REAL v_hcl, v_oh ! Mean thermal speed of HCl
 REAL uptake_hcl ! HCl dust uptake coefficient
-REAL hcl_nd(nlayermx), oh_nd(nlayermx) ! Number densities
-REAL zdens(nlayermx) ! Atmospheric Number Density 
+REAL hcl_nd(nlayermx), oh_nd(nlayermx), cl_nd(nlayermx) ! Number densities
+real hcl_nd0(nlayermx), oh_nd0(nlayermx), cl_nd0(nlayermx), N_cldust0(nlayermx) ! Initial Number Densities
+REAL zdens(nlayermx) ! Atmospheric Number Density  
 
 REAL d_cl(nlayermx), d_hcl(nlayermx), d_oh(nlayermx), d_cldust(nlayermx)
 
@@ -116,15 +117,7 @@ REAL, PARAMETER :: uptake_oh = 1.e0
 INTEGER l
 
 LOGICAL, SAVE :: firstcall = .TRUE. 
-REAL N_cldust0(nlayermx) ! Initial Reservoir (maximum permittable values)
 
-
-IF ( firstcall ) THEN 
-    N_cldust0 = N_cldust
-ENDIF 
-
-! Initialise by updating the mixing ratio with their prior calculated tendencies 
-q = q + dq*dt
 
 DO l =  1, nlayermx
 
@@ -134,14 +127,21 @@ DO l =  1, nlayermx
     ! Tracer Number densities
     ! -----------------------
     ! HCl
-    hcl_nd(l) = zdens(l)*q(l,igcm_hcl)*43.34/mmol(igcm_hcl)
+    hcl_nd0(l) = (q(l,igcm_hcl) + dq(l,igcm_hcl)*dt)*zdens(l)*mmean(1,l)/mmol(igcm_hcl)
     ! OH 
-    oh_nd(l) = zdens(l)*q(l,igcm_oh)*43.34/mmol(igcm_oh) 
+    oh_nd0(l) = (q(l,igcm_oh) + dq(l,igcm_oh)*dt)*zdens(l)*mmean(1,l)/mmol(igcm_oh) 
+    ! Cl
+    cl_nd0(l) =  (q(l,igcm_cl) + dq(l,igcm_cl)*dt)*zdens(l)*mmean(1,l)/mmol(igcm_cl) 
+    ! Cl in dust
+    N_cldust0(l) = N_cldust(l)
+
 
     ! Surface Area of Dust (cm2 per cm-3)
+    ! -----------------------------------
     s(l) = 4.*pi*(reff(l)/1.e-2)**2
 
     ! Mean Molecule Thermal Velocities
+    ! --------------------------------
     v_hcl = SQRT( kb*temp(l)*NA/mmol(igcm_hcl) ) 
     v_oh = SQRT( kb*temp(l)*NA/mmol(igcm_oh) ) 
 
@@ -165,9 +165,36 @@ DO l =  1, nlayermx
 
 
     ! Update the Chlorine Reservoir 
-    N_cldust(l) = N_cldust(l) + d_cldust(l)*1800.
+    ! -----------------------------
+    N_cldust(l) = N_cldust0(l) + d_cldust(l)*dt 
 
-    write(*,*) N_cldust0(l), N_cldust(l), 100.*(N_cldust(l)-N_cldust0(l))/N_cldust0(l)
+    ! Update Cl 
+    cl_nd(l) = cl_nd0(l) + d_cl(l)*dt 
+    ! Update OH
+    oh_nd(l) = oh_nd0(l) + d_oh(l)*dt 
+    ! Update HCl 
+    hcl_nd(l) = hcl_nd0(l) + d_hcl(l)*dt 
+
+    ! Calculation of tendencies for tracer mixing ratios 
+
+    ! Cl 
+    ! --
+    dq(l,igcm_cl) = dq(l,igcm_cl) + (  cl_nd(l) - cl_nd0(l)  )*mmol(igcm_cl) &
+                    /(mmean(1,l)*zdens(l)*dt)
+
+    ! HCl 
+    ! ---
+    dq(l,igcm_hcl) = dq(l,igcm_hcl) + (  hcl_nd(l) - hcl_nd0(l)  )*mmol(igcm_hcl) &
+                    /(mmean(1,l)*zdens(l)*dt)
+
+    ! OH 
+    ! --
+    dq(l,igcm_oh) = dq(l,igcm_oh) + (  oh_nd(l) - oh_nd0(l)  )*mmol(igcm_oh) &
+                    /(mmean(1,l)*zdens(l)*dt)
+
+
+    write(*,*)
+
 ENDDO 
 
 
