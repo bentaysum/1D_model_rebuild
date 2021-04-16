@@ -20,8 +20,6 @@ REAL dens(nlayermx)    ! Atmospheric Number Density [cm-3]
 REAL rdust(nlayermx)   ! Mean Geometric radius of dust particles [m]
 REAL temp(nlayermx)    ! temperature [K]
 REAL press(nlayermx)   ! Pressure [Pa]
-REAL dt                ! timestep
-
 ! Output 
 ! ------
 REAL dust001(nlayermx) ! Rate of OH + dust -> Cl + Products
@@ -182,7 +180,7 @@ DO l = 1, nlayermx
     ! ============================================
     ! 4. : HCl Uptake Coeffient [constant for now]
     ! ============================================
-    uptake_hcl(l) = 1.e-2 
+    uptake_hcl(l) = 1.e-4
 
     ! =======================
     ! 5. : Thermal Velocities 
@@ -206,6 +204,12 @@ DO l = 1, nlayermx
     dust002(l) = 0.25*uptake_hcl(l)*s*v_hcl
 
 ENDDO ! l 
+
+
+! Optional Outputs 
+! ================
+
+
 
 RETURN
 
