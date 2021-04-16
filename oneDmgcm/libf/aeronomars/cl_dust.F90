@@ -1,4 +1,5 @@
-SUBROUTINE cl_dust(vmr, zdens, reff, temp, press, dt)
+SUBROUTINE cl_dust(cc, nesp, dens, rdust, temp, press, &
+                   dust001, dust002)
 
 IMPLICIT NONE
 
@@ -11,222 +12,204 @@ IMPLICIT NONE
 #include "callkeys.h"
 #include "conc.h"
 
-! ===============
-! Input Variables 
-! ===============
-REAL vmr(nlayermx,nqmx)     ! Tracer Number Density
-REAL zdens(nlayermx) 
-REAL reff(nlayermx)         ! Dust geometric radius (m)
-REAL dustsurf(nlayermx)
-REAL temp(nlayermx)
-REAL press(nlayermx)
-REAL dt
+! Input 
+! -----
+REAL cc(nlayermx,nesp) ! Species number densities 
+INTEGER nesp           ! Number of tracers 
+REAL dens(nlayermx)    ! Atmospheric Number Density [cm-3]
+REAL rdust(nlayermx)   ! Mean Geometric radius of dust particles [m]
+REAL temp(nlayermx)    ! temperature [K]
+REAL press(nlayermx)   ! Pressure [Pa]
+REAL dt                ! timestep
 
-! ===============
-! Local Variables 
-! ===============
-INTEGER l, iq
+! Output 
+! ------
+REAL dust001(nlayermx) ! Rate of OH + dust -> Cl + Products
+REAL dust002(nlayermx) ! Rate of HCl adsorption onto dust 
 
-REAL particle_volume(nlayermx) ! Mean volume of a dust particle
-REAL mass_conc                 ! Dust Mass Concentration
-REAL vol_conc                   ! Dust Volume Concentration
-REAL dust_numdens(nlayermx)    ! Dust number density (cm-3)
-REAL dustmass, cl_dustmass
+! Local 
+! =====
+INTEGER l              ! Layer iterator 
+REAL particle_volume   ! Volume of single dust grain 
+REAL mass_conc         ! Dust mass concentration 
+REAL vol_conc          ! Dust volume concentration
+REAL S                 ! Dust Surface Area per Unit volume
+REAL pv                ! Water Vapour Partial Pressure
+REAL pvs_a, pvs_b, pvs ! Water Vapour Saturation Pressure 
+REAL RH                ! Rel. Humidity 
+REAL uptake_oh(nlayermx) ! OH uptake coefficient 
+REAL uptake_hcl(nlayermx) ! HCl uptake coefficient
+REAL v_oh, v_hcl       ! Mean thermal velocities
 
-REAL S(nlayermx) ! Dust Surface are (cm^2 per cm^-3)
-
-REAL v_hcl(nlayermx), v_oh(nlayermx), &
-    v_ho2(nlayermx), v_h2o(nlayermx), &
-    v_cl(nlayermx), v_cl2(nlayermx) 
-
-REAL uptake(nlayermx,6) 
-REAL alpha(6), gamma_rxn(6)
-
-INTEGER, PARAMETER :: g_oh = 1
-INTEGER, PARAMETER :: g_ho2 = 2
-INTEGER, PARAMETER :: g_h2o = 3 
-INTEGER, PARAMETER :: g_hcl = 4
-INTEGER, PARAMETER :: g_cl = 5 
-INTEGER, PARAMETER :: g_cl2 = 6
-
-REAL d_cc(nlayermx,6)
-
-
-REAL, SAVE :: dust_cl(nlayermx), dust_cl0(nlayermx)
-
-LOGICAL, SAVE :: firstcall = .True.
-
-REAL, PARAMETER :: dustdens = 2.5e3 ! Dust Density (kg/m-3)
-REAL, PARAMETER :: cl_wt = 0.5 ! Weight Percentage of Cl of dust 
+! Dust Parameters
+! ---------------
+REAL, PARAMETER :: dust_density = 2.5e3
 REAL, PARAMETER :: NA = 6.022e23 ! Avogadro's constant 
 
-REAL vmr0(nlayermx,nqmx)
-REAL cc(nlayermx,nqmx) 
+! Tracer Indexes in Chemistry
+! ===========================
+integer, parameter :: i_co2  =  1
+integer, parameter :: i_co   =  2
+integer, parameter :: i_o    =  3
+integer, parameter :: i_o1d  =  4
+integer, parameter :: i_o2   =  5
+integer, parameter :: i_o3   =  6
+integer, parameter :: i_h    =  7
+integer, parameter :: i_h2   =  8
+integer, parameter :: i_oh   =  9
+integer, parameter :: i_ho2  = 10
+integer, parameter :: i_h2o2 = 11
+!      Methane Oxidation
+integer, parameter :: i_ch4  = 12
+integer, parameter :: i_ch3  = 13 
+integer, parameter :: i_ch3o2 = 14
+integer, parameter :: i_ch3ooh = 15
+integer, parameter :: i_ch3oh= 16
+integer, parameter :: i_ch3o  = 17
+integer, parameter :: i_hcho = 18
+integer, parameter :: i_hcooh = 19
+integer, parameter :: i_hoch2o2 = 20
+integer, parameter :: i_hoch2oh = 21 
+integer, parameter :: i_hoch2ooh = 22 
+integer, parameter :: i_hco = 23
+!      Alkane Oxidation
+integer, parameter :: i_c2h6 = 24
+integer, parameter :: i_c2h5 = 25
+integer, parameter :: i_c2h5o2 = 26
+integer, parameter :: i_c2h5ooh = 27
+integer, parameter :: i_c2h5oh = 28
+integer, parameter :: i_hoch2ch2o2 = 29
+integer, parameter :: i_hoch2ch2o = 30
+integer, parameter :: i_ethgly = 31
+integer, parameter :: i_hyetho2h = 32
+integer, parameter :: i_ch3cho = 33
+integer, parameter :: i_ch3choho2 = 34
+integer, parameter :: i_ch3cooh = 35
+integer, parameter :: i_ch3chohooh = 36
+integer, parameter :: i_ch3co = 37
+integer, parameter :: i_ch3cooo = 38
+integer, parameter :: i_ch3coooh = 39
+integer, parameter :: i_hcoch2o2 = 40
+integer, parameter :: i_glyox = 41
+integer, parameter :: i_hcoco = 42
+integer, parameter :: i_hooch2cho = 43
+integer, parameter :: i_hoch2cho = 44
+integer, parameter :: i_hochcho = 45
+integer, parameter :: i_hoch2co = 46
+integer, parameter :: i_hoch2co3 = 47
+integer, parameter :: i_hoch2co2h = 48
+integer, parameter :: i_hcoco2h = 49
+integer, parameter :: i_hoch2co3h = 50
+integer, parameter :: i_hcoco3h = 51
+integer, parameter :: i_hcoco3 = 52
+integer, parameter :: i_ch2choh = 53
+!      Water, nitrogen, and Families
+integer, parameter :: i_h2o  = 54
+integer, parameter :: i_n2   = 55
+integer, parameter :: i_hox  = 56
+integer, parameter :: i_ox   = 57
+integer, parameter :: i_RO2  = 58
+integer, parameter :: i_dust = 59
+!      Chlorine Compounds 
+integer, parameter :: i_cl = 60
+integer, parameter :: i_clo = 61
+integer, parameter :: i_cl2 = 62
+integer, parameter :: i_oclo = 63
+integer, parameter :: i_cl2o2 = 64
+integer, parameter :: i_hcl = 65
+integer, parameter :: i_hocl = 66 
+integer, parameter :: i_cloo = 67 
+integer, parameter :: i_ch3ocl = 68
+integer, parameter :: i_clco = 69
+integer, parameter :: i_clo3 = 70
+integer, parameter :: i_hclo4 = 71
+integer, parameter :: i_clo4 = 72
+integer, parameter :: i_clox = 73
 
-REAL delta
-
-REAL pv ! partial pressure of water 
-REAL pvs ! saturation partial pressure of water vapour 
-REAL pvs_a, pvs_b 
-REAL RH ! Relative Humidity 
-
-
-! ============================================
-! Step 1 : Dust Mixing Ratio -> Number Density
-! ============================================
-DO iq = 1, nqmx
-    IF ( trim(noms(iq)) == "dust_mass" ) THEN 
-        
-        DO l = 1, nlayermx  
-            ! Particle Geometric Volume 
-            particle_volume(l) = (4./3.)*pi*(reff(l)*100.)**3
-            ! Mass Concentration
-            mass_conc =  vmr(l,iq)*press(l) & ! vmr for dust is -actually- mmr 
-                      /(8.314*temp(l))
-            ! Volume Concentration
-            vol_conc = mass_conc/dustdens 
-            ! Particle Number Density 
-            dust_numdens(l) = vol_conc/particle_volume(l)
-
-        ENDDO  ! l 
-
-        EXIT 
-    
-    ENDIF ! "dust_mass"
-
-ENDDO ! iq 
-
-
-! ===============================================
-! Step 2: Total Chlorine Available in Dust (cm-3)
-! ===============================================
-IF ( firstcall ) THEN 
-    DO l = 1, nlayermx
-        ! Mass of dust in layer (g) = particle volume * density of grain * number of particles 
-        dustmass = dust_numdens(l)*dustdens*1.e-2*particle_volume(l)
-        ! Mass of Cl in dust in layer 
-        cl_dustmass = dustmass*cl_wt/100.
-        ! Number of Cl atoms in dust in layer = mass of cl in dust * Avogadro's constant / molar mass of Cl
-        ! Save first value as the maximum 
-            dust_cl(l) = cl_dustmass*NA/mmol(igcm_cl)
-            dust_cl0(l) = dust_cl(l)
-
-    ENDDO
-ENDIF 
 
 
 
 
-DO l = 1, nlayermx
+DO l = 1, nlayermx 
 
-    ! VMR -> Number Density
-    cc(l,:) = vmr(l,:)*zdens(l)
-    vmr0(l,:) = vmr(l,:)
+    ! =========================
+    ! 1. : Dust Number Density 
+    ! =========================
 
-    ! HCl Uptake Coefficient on Dust
-    uptake(l,g_hcl) = 5.E-1
+    ! 1.1 : Particle Volume 
+    ! ---------------------
+    particle_volume = (4./3.)*pi*(rdust(l)**3) ! m^3
 
+    ! 1.2 : Mass Concentration 
     ! ------------------------
-    ! OH and Relative Humidity 
-    ! ------------------------
-    pv = cc(l,igcm_h2o_vap)*temp(l)*kb*1.e6
+    !   - cc(:,i_dust) is in MMR units, remainder are number densities 
+    mass_conc = cc(l,i_dust)*press(l)/(8.314*temp(l)) 
 
-    pvs_a = 6816.*( (1./273.15) - (1./temp(l)) ) 
-    pvs_b = 5.1309*LOG(273.15/temp(l))
+    ! 1.3 : Volume Concentration
+    ! --------------------------
+    vol_conc = mass_conc/dust_density
+
+    ! 1.4 : Dust Number Density 
+    ! -------------------------
+    cc(l,i_dust) = 1.e-6*vol_conc/particle_volume
+
+    ! ======================
+    ! 2. : Dust Surface Area 
+    ! ======================
+    s = 4.*pi*(100.*rdust(l))**2
+    s = s*cc(l,i_dust)
+
+    ! =========================
+    ! 3 : OH Uptake Coefficient
+    ! =========================
+    !   - coefficient from https://doi.org/10.1021/jp311235h
+    !
+    ! 3.1 : Partial Pressure of Water Vapour
+    ! --------------------------------------
+    pv = cc(l,i_h2o)*temp(l)*kb*1.e6 
+
+    ! 3.2 : Saturation Pressure
+    ! -------------------------
+    pvs_a =  6816.*( (1./273.15) - (1./temp(l)) ) 
+    pvs_b =  5.1309*LOG(273.15/temp(l))
 
     pvs = 6.112*EXP(pvs_a + pvs_b)
 
-    RH = 100.*(pv/pvs)
+    ! 3.3 : OH Uptake 
+    ! ---------------
+    uptake_oh(l) = 0.2/( 1. + RH**0.36 )
 
-    uptake(l,g_oh) = 0.2/(1. + RH**0.36 )
+    ! ============================================
+    ! 4. : HCl Uptake Coeffient [constant for now]
+    ! ============================================
+    uptake_hcl(l) = 1.e-2 
 
-    ! Calculate available dust surface area (cm^2 cm^-3)
-    s(l) =  dust_numdens(l)*4.*pi*(reff(l)*100.)**2
+    ! =======================
+    ! 5. : Thermal Velocities 
+    ! =======================
+    v_oh = (8./pi)*kb*temp(l)*NA/mmol(igcm_oh)
+    v_oh = SQRT(v_oh)
 
-    ! Thermal Velocity of Adsorbed Species OH and HCl (cm s-1)
-    v_hcl(l) = SQRT( kb*temp(l)*NA/mmol(igcm_hcl) )
-    v_oh(l) = SQRT( kb*temp(l)*NA/mmol(igcm_oh) )
-    v_ho2(l) = SQRT( kb*temp(l)*NA/mmol(igcm_ho2) )
-    v_h2o(l) = SQRT( kb*temp(l)*NA/mmol(igcm_h2o_vap) )
-    v_cl(l) = SQRT( kb*temp(l)*NA/mmol(igcm_cl) )
-    v_cl2(l) = SQRT( kb*temp(l)*NA/mmol(igcm_cl2) )
+    v_hcl = (8./pi)*kb*temp(l)*NA/mmol(igcm_hcl)
+    v_hcl = SQRT(v_hcl) 
 
-    ! Tendency Calculations 
-    ! =====================
-    ! 
-    ! OH 
-    ! --
-    d_cc(l,g_oh) = -0.25*uptake(l,g_oh)*s(l)*v_oh(l)!*cc(l,igcm_oh)*dt 
+    ! =========================
+    ! 6. Loss/Production Fluxes 
+    ! =========================
 
-    cc(l,igcm_oh) = cc(l,igcm_oh)/( 1. + d_cc(l,g_oh)*dt )
+    ! 6.1: OH Reactions with dust 
+    ! ---------------------------
+    dust001(l) = 0.25*uptake_oh(l)*s*v_oh
 
-    ! HCl 
-    ! ---
-    d_cc(l,g_hcl) = -0.25*uptake(l,g_hcl)*s(l)*v_hcl(l)!*cc(l,igcm_hcl)*dt 
+    ! 6.2: HCl Uptake 
+    ! ----------------
+    dust002(l) = 0.25*uptake_hcl(l)*s*v_hcl
 
-    cc(l,igcm_hcl) = cc(l,igcm_hcl)/( 1. + d_cc(l,g_hcl)*dt )
+ENDDO ! l 
 
-    ! Cl 
-    ! --
-    d_cc(l,g_cl) = -d_cc(l,g_oh) 
-
-    cc(l,igcm_cl) = cc(l,igcm_cl) + d_cc(l,g_cl)*dt 
+RETURN
 
 
-    dust_cl(l) = dust_cl(l) &
-               -d_cc(l,g_hcl) + d_cc(l,g_cl) 
-
-
-
-    ! Suppression of chlorine build up in dust
-    !   - assume that initial value is the saturation point 
-    !     after which cl is not capable of developing.
-    ! if ( dust_cl(l) > dust_cl0(l) ) then 
-        
-    !     delta = dust_cl(l) - dust_cl0(l) 
-
-
-    !     dust_cl(l) = dust_cl0(l) 
-
-    ! endif 
-
-    ! Update Tracer VMR's
-
-    ! OH 
-    ! --
-    vmr(l,igcm_oh) =  cc(l,igcm_oh)/zdens(l)
-   
-    ! HCl 
-    ! --
-    vmr(l,igcm_hcl) = cc(l,igcm_hcl)/zdens(l)
-
-    ! Cl 
-    ! --
-    vmr(l,igcm_cl) = cc(l,igcm_cl)/zdens(l)
-
-
-
-
-ENDDO 
-
-
-
-! Optional Saved Output 
-
-call WRITEDIAGFI(1,"cl_in_dust","cl_in_dust", "s", &
-                  1,dust_cl)
-
-call WRITEDIAGFI(1,"dcl_dust","dcl_dust", "s", &
-                  1,d_cc(:,g_cl))
-
-call WRITEDIAGFI(1,"dhcl_dust","dhcl_dust", "s", &
-                  1,d_cc(:,g_hcl))
-
-call WRITEDIAGFI(1,"doh_dust","doh_dust", "s", &
-                  1,d_cc(:,g_oh))
-
-call WRITEDIAGFI(1,"oh_uptake","oh_uptake", "s", &
-                  1,uptake(:,g_oh))
 
 END SUBROUTINE cl_dust
 

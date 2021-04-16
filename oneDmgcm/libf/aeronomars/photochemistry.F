@@ -11,7 +11,7 @@ c*****************************************************************
 c
       subroutine photochemistry(lswitch, zycol, sza, ptimestep, 
      $                  press,temp, dens, dist_sol, surfdust1d,
-     $                  surfice1d, jo3, tau,pq,pdq)
+     $                  surfice1d, jo3, tau, rdust)
           
       USE TLMvars 
       implicit none
@@ -42,8 +42,7 @@ c
       real surfdust1d(nlayermx)  ! dust surface area (cm2/cm3)
       real surfice1d(nlayermx)   ! ice surface area (cm2/cm3)
       real tau                   ! optical depth at 7 hpa
-      real pq(nlayermx,nqmx)   ! mixing ratios (mmrs)
-      real pdq(nlayermx,nqmx)  ! tracer tendency prior to photochem routine
+      real rdust(nlayermx)       ! dust geometric radius
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     output:
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -294,7 +293,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c =================================================================
 
          call chimie(lswitch,nesp, rm, j, dens, ctimestep, ptimestep,
-     $               press, temp, sza, dist_sol, surfdust1d,
+     $               press, temp, sza, dist_sol, surfdust1d, rdust,
      $               a001, a002, a003,
      $               b001, b002, b003, b004, b005, b006,
      $               b007, b008, b009,
@@ -540,7 +539,7 @@ c
 c*****************************************************************
 c
       subroutine chimie(lswitch, nesp, rm, j, dens, dt, ptimestep,
-     $                  press, t, sza, dist_sol, surfdust,
+     $                  press, t, sza, dist_sol, surfdust, rdust,
      $                  a001, a002, a003,
      $                  b001, b002, b003, b004, b005, b006,
      $                  b007, b008, b009,
@@ -630,8 +629,8 @@ c
       real sza                ! solar zenith angle (deg)
       real dist_sol           ! sun distance (au) 
       real surfdust(nlayermx) ! Dust surface area cm2 / cm3 of air
-      real pq(nlayermx,nqmx)  ! mixing ratios (mmr)
-      real pdq(nlayermx,nqmx) ! tracer tendency prior to photochem routine
+      real rdust(nlayermx)    ! Mean geometric radius of dust
+
 c     reaction rates
 c
       real a001(nlayermx), a002(nlayermx), a003(nlayermx)
@@ -776,6 +775,9 @@ c     ================
       real rclo_cl(nlayermx)
       real pcl(nlayermx), pclo(nlayermx)
       real lcl(nlayermx), lclo(nlayermx)
+
+      real dust001(nlayermx) ! OH + dust -> Cl + product 
+      real dust002(nlayermx) ! HCl + dust -> dust
 
 c     Dust Parameters
 c     ===============
@@ -959,20 +961,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
       do iesp = 1,nesp
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     Dust Number Density [BMT 02/2021]
+c     Dust handled in cl_dust call
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-         if ( iesp == i_dust ) then 
-            do l = 1, lswitch-1
-c     Mass Mixing Ratio -> Mass Concentration
-            cc0(l,i_dust) = rm(l,i_dust)*(press(l)*100.)
-     $                 /(Rnew(1,l)*t(l))
-c     Mass Concentration -> Volume Concentration
-            cc0(l,i_dust) = cc0(l,i_dust)/dustdens
-c     Volume Concentration -> Number Density (cm-3)
-            cc0(l,i_dust) = cc0(l,i_dust)/
-     $                ( 1.333333*dustradius**3)*1.e-6
-            cc(l,i_dust) = cc0(l,i_dust)
-            enddo
+         if ( iesp == i_dust ) then  
+            cc(:,iesp) = rm(:,iesp)
+            cc0(:,iesp) = cc(:,iesp) 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Gas-phase number density
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -983,6 +976,28 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
              end do
          endif 
       end do
+
+
+
+ccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     Chlorine Release from Dust Interactions
+ccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      IF ( (igcm_cl .ne. 0) .and. (doubleq) ) THEN 
+        call cl_dust(cc, nesp, dens, rdust, t, press*100.,
+     $               dust001, dust002)
+      ELSE 
+        dust001(:) = 0.
+        dust002(:) = 0.
+      ENDIF 
+
+
+
+
+
+
+
+
+
 c      
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     co2 and nox number densities (cm-3)    
@@ -2163,7 +2178,7 @@ c
      $                 + cl048(l)*cc(l,i_clo3)*cc(l,i_oh)
      $                 + cl049(l)*cc(l,i_clo3)*cc(l,i_oh)
      $                 + cl058(l)*cc(l,i_oclo)*cc(l,i_oh)
-
+     $                 + dust001(l)*cc(l,i_oh) 
 
       loss(l,i_hox) = loss(l,i_hox)/cc(l,i_hox)
 c
@@ -2735,6 +2750,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                     + j(l,j_cl2o2)*cc(l,i_cl2o2)
      $                     + j(l,j_hcl)*cc(l,i_hcl)
      $                     + j(l,j_hocl)*cc(l,i_hocl)
+     $                     + dust001(l)*cc(l,i_oh)
 
 C       loss(l,i_clox) = 2.*cl003(l)*cc(l,i_clo) 
 C      $               + cl005(l)*cc(l,i_clo)
@@ -2821,6 +2837,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                + cl039(l)*cc(l,i_o1d)*0.88
      $                + cl040(l)*cc(l,i_o) 
      $                + cl041(l)*cc(l,i_h) 
+     $                + dust002(l)
 
 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -3014,6 +3031,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
           ENDIF 
   
       end do
+
                 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     update number densities
@@ -3269,35 +3287,11 @@ ccccccccccccccccccccccccc
      $                               production(l,i_hclo4),
      $                               loss(l,i_hclo4),
      $                               dt)
-C         ! ClOX
-C          cc(l,i_clox) = Chlorine_QSSA(cc0(l,i_clox),
-C      $                               production(l,i_clox),
-C      $                               loss(l,i_clox),
-C      $                               dt)
-
-
-C         cc(l,i_ch3ocl) = (cc0(l,i_ch3ocl) + production(l,i_ch3ocl)*dt)
-C      $              /(1. + loss(l,i_ch3ocl)*dt)
-
-C         cc(l,i_hclo4) = (cc0(l,i_hclo4) + production(l,i_hclo4)*dt)
-C      $              /(1. + loss(l,i_hclo4)*dt)
-
 
         cc(l,i_clox) = (cc0(l,i_clox) + production(l,i_clox)*dt)
      $                /(1. + loss(l,i_clox)*dt)
 
 
-ccccccccccccccccccccccccccc
-c     Daylight Conditionals
-ccccccccccccccccccccccccccc
-C       IF (sza .le. 95.) THEN 
-C         cc(l,i_oclo) = production(l,i_oclo)/loss(l,i_oclo)
-
-C       ELSE
-C         cc(l,i_oclo) = (cc0(l,i_oclo) + production(l,i_oclo)*dt)
-C      $              /(1. + loss(l,i_oclo)*dt)
-
-C       ENDIF 
 
 
       ENDIF 
