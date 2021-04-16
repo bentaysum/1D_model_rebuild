@@ -49,7 +49,7 @@ INTEGER, PARAMETER :: g_hcl = 4
 INTEGER, PARAMETER :: g_cl = 5 
 INTEGER, PARAMETER :: g_cl2 = 6
 
-REAL d_cc(6)
+REAL d_cc(nlayermx,6)
 
 
 REAL, SAVE :: dust_cl(nlayermx), dust_cl0(nlayermx)
@@ -64,6 +64,12 @@ REAL vmr0(nlayermx,nqmx)
 REAL cc(nlayermx,nqmx) 
 
 REAL delta
+
+REAL pv ! partial pressure of water 
+REAL pvs ! saturation partial pressure of water vapour 
+REAL pvs_a, pvs_b 
+REAL RH ! Relative Humidity 
+
 
 IF ( firstcall ) THEN 
     ! ============================================
@@ -149,6 +155,10 @@ gamma_rxn(g_cl2) = 0.2
 
 DO l = 1, nlayermx
 
+    ! VMR -> Number Density
+    cc(l,:) = vmr(l,:)*zdens(l)
+    vmr0(l,:) = vmr(l,:)
+
     ! Uptake Coefficients 
     uptake(g_oh) = (1./alpha(g_oh)) + (1./gamma_rxn(g_oh))
         uptake(g_oh) = 1./uptake(g_oh)
@@ -164,9 +174,19 @@ DO l = 1, nlayermx
 
     uptake(g_cl2) = gamma_rxn(g_cl2) 
 
-    ! VMR -> Number Density
-    cc(l,:) = vmr(l,:)*zdens(l)
-    vmr0(l,:) = vmr(l,:)
+    ! ------------------------
+    ! OH and Relative Humidity 
+    ! ------------------------
+    pv = cc(l,igcm_h2o_vap)*temp(l)*kb*1.e6
+
+    pvs_a = 6816.*( (1./273.15) - (1./temp(l)) ) 
+    pvs_b = 5.1309*LOG(273.15/temp(l))
+
+    pvs = 6.112*EXP(pvs_a + pvs_b)
+
+    RH = 100.*(pv/pvs)
+
+    uptake(g_oh) = 0.2/(1. + RH**0.36 )
 
     ! Calculate available dust surface area (cm^2 cm^-3)
     s(l) =  dust_numdens(l)*4.*pi*(reff(l)*100.)**2
@@ -180,21 +200,21 @@ DO l = 1, nlayermx
     v_cl2(l) = SQRT( kb*temp(l)*NA/mmol(igcm_cl2) )*100.
 
     ! Tendency 
-    d_cc(g_oh) = -0.25*uptake(g_oh)*s(l)*v_oh(l)*cc(l,igcm_oh)*dt 
+    d_cc(l,g_oh) = -0.25*uptake(g_oh)*s(l)*v_oh(l)*cc(l,igcm_oh)*dt 
 
-    d_cc(g_ho2) = -0.25*uptake(g_ho2)*s(l)*v_ho2(l)*cc(l,igcm_ho2)*dt 
+    d_cc(l,g_ho2) = -0.25*uptake(g_ho2)*s(l)*v_ho2(l)*cc(l,igcm_ho2)*dt 
 
-    d_cc(g_h2o) = -0.25*uptake(g_h2o)*s(l)*v_h2o(l)*cc(l,igcm_h2o_vap)*dt 
+    d_cc(l,g_h2o) = -0.25*uptake(g_h2o)*s(l)*v_h2o(l)*cc(l,igcm_h2o_vap)*dt 
 
-    d_cc(g_cl2) = -0.25*uptake(g_cl2)*s(l)*v_cl2(l)*cc(l,igcm_cl2)*dt 
+    d_cc(l,g_cl2) = -0.25*uptake(g_cl2)*s(l)*v_cl2(l)*cc(l,igcm_cl2)*dt 
 
-    d_cc(g_hcl) = -0.25*uptake(g_hcl)*s(l)*v_hcl(l)*cc(l,igcm_hcl)*dt 
+    d_cc(l,g_hcl) = -0.25*uptake(g_hcl)*s(l)*v_hcl(l)*cc(l,igcm_hcl)*dt 
 
-    d_cc(g_cl) = -d_cc(g_oh) - d_cc(g_ho2) - d_cc(g_h2o)
+    d_cc(l,g_cl) = -d_cc(l,g_oh) - d_cc(l,g_ho2) - d_cc(l,g_h2o)
 
     dust_cl(l) = dust_cl(l) &
-               - ( d_cc(g_cl2) + d_cc(g_hcl) + d_cc(g_cl) ) &
-               + ( d_cc(g_oh) + d_cc(g_h2o) + d_cc(g_ho2) )
+               - ( d_cc(l,g_cl2) + d_cc(l,g_hcl) + d_cc(l,g_cl) ) &
+               + ( d_cc(l,g_oh) + d_cc(l,g_h2o) + d_cc(l,g_ho2) )
 
     ! Suppression of chlorine build up in dust
     !   - assume that initial value is the saturation point 
@@ -212,55 +232,49 @@ DO l = 1, nlayermx
 
     ! OH 
     ! --
-    vmr(l,igcm_oh) = ( cc(l,igcm_oh) + d_cc(g_oh) )/zdens(l)
+    vmr(l,igcm_oh) = ( cc(l,igcm_oh) + d_cc(l,g_oh) )/zdens(l)
 
     ! HO2 
     ! --
-    vmr(l,igcm_ho2) = ( cc(l,igcm_ho2) + d_cc(g_ho2) )/zdens(l)
+    vmr(l,igcm_ho2) = ( cc(l,igcm_ho2) + d_cc(l,g_ho2) )/zdens(l)
 
     ! H2O 
     ! ---
-    vmr(l,igcm_h2o_vap) = ( cc(l,igcm_h2o_vap) + d_cc(g_h2o) )/zdens(l)
+    vmr(l,igcm_h2o_vap) = ( cc(l,igcm_h2o_vap) + d_cc(l,g_h2o) )/zdens(l)
 
     ! HCl 
     ! --
-    vmr(l,igcm_hcl) = ( cc(l,igcm_hcl) + d_cc(g_hcl) )/zdens(l)
+    vmr(l,igcm_hcl) = ( cc(l,igcm_hcl) + d_cc(l,g_hcl) )/zdens(l)
 
     ! Cl2
     ! ---
-    vmr(l,igcm_cl2) = ( cc(l,igcm_cl2) + d_cc(g_cl2) )/zdens(l)
+    vmr(l,igcm_cl2) = ( cc(l,igcm_cl2) + d_cc(l,g_cl2) )/zdens(l)
 
     ! OH 
     ! --
-    vmr(l,igcm_cl) = ( cc(l,igcm_cl) + d_cc(g_cl) )/zdens(l)
+    vmr(l,igcm_cl) = ( cc(l,igcm_cl) + d_cc(l,g_cl) )/zdens(l)
 
-
-
-    !  ! Tendency of Cl released from dust [molec. s-1 cm-3]
-    !  d_cl =  0.25*gamma_oh(l)*s(l)*v_oh(l)*cc(l,igcm_oh)*dt
-
-    !  ! Tendency of HCl [molec. s-1 cm-3] 
-    !  d_hcl = - 0.25*gamma_hcl(l)*s(l)*v_hcl(l)*cc(l,igcm_hcl)*dt
-
-
-    ! ! Tendency of OH [molec. s-1 cm-3]
-    !  d_oh =  -d_cl*dt
-
-    !  ! Chlorine in Dust 
-    !  dust_cl(l) = dust_cl(l) - d_cl - d_hcl
-    !  ! Check if the dust is saturated 
-    !  IF ( dust_cl0(l) - dust_cl(l) < 0. ) THEN 
-    !     d_hcl = d_hcl - ( dust_cl0(l) - dust_cl(l) )
-    !     dust_cl(l) = dust_cl0(l)
-    ! ENDIF 
-
-    !  vmr(l,igcm_oh) = (cc(l,igcm_oh) + d_oh)/zdens(l)
-    !  vmr(l,igcm_hcl) = (cc(l,igcm_hcl) + d_hcl)/zdens(l)
-    !  vmr(l,igcm_cl) = (cc(l,igcm_cl) + d_cl)/zdens(l)
 
 
 ENDDO 
 
+stop
+
+! Optional Saved Output 
+call WRITEDIAGFI(1,"dcl_dust","dcl_dust", "s", &
+                  1,d_cc(:,g_cl))
+
+call WRITEDIAGFI(1,"dhcl_dust","dhcl_dust", "s", &
+                  1,d_cc(:,g_hcl))
+
+call WRITEDIAGFI(1,"doh_dust","doh_dust", "s", &
+                  1,d_cc(:,g_oh))
+
+call WRITEDIAGFI(1,"dho2_dust","dho2_dust", "s", &
+                  1,d_cc(:,g_ho2))
+
+call WRITEDIAGFI(1,"dcl2_dust","dcl2_dust", "s", &
+                  1,d_cc(:,g_cl2))
 
 END SUBROUTINE cl_dust
 
