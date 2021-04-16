@@ -724,18 +724,6 @@ c     =================
      &                       play, temp )
       ENDIF 
 
-C       call cl_dust_initialise(q, rdust,
-C      &                        temp, play,
-C      &                        N_cldust)
-
-
-
-C SUBROUTINE cl_dust_tendency(N_cldust,q, reff, &
-C                             press, temp) 
-
-
-
-
 
 c ======================================================================
 c     Tangent Linear Model 

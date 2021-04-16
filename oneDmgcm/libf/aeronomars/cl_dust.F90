@@ -1,4 +1,4 @@
-SUBROUTINE cl_dust(vmr, zdens, reff, dustsurf, temp, press, dt)
+SUBROUTINE cl_dust(vmr, zdens, reff, temp, press, dt)
 
 IMPLICIT NONE
 
@@ -39,7 +39,7 @@ REAL v_hcl(nlayermx), v_oh(nlayermx), &
     v_ho2(nlayermx), v_h2o(nlayermx), &
     v_cl(nlayermx), v_cl2(nlayermx) 
 
-REAL uptake(6) 
+REAL uptake(nlayermx,6) 
 REAL alpha(6), gamma_rxn(6)
 
 INTEGER, PARAMETER :: g_oh = 1
@@ -71,87 +71,51 @@ REAL pvs_a, pvs_b
 REAL RH ! Relative Humidity 
 
 
-IF ( firstcall ) THEN 
-    ! ============================================
-    ! Step 1 : Dust Mixing Ratio -> Number Density
-    ! ============================================
-    DO iq = 1, nqmx
-        IF ( trim(noms(iq)) == "dust_mass" ) THEN 
-            
-            DO l = 1, nlayermx  
-                ! Particle Geometric Volume 
-                particle_volume(l) = (4./3.)*pi*(reff(l)*100.)**3
-                ! Mass Concentration
-                mass_conc =  vmr(l,iq)*press(l) & ! vmr for dust is -actually- mmr 
-                          /(8.314*temp(l))
-                ! Volume Concentration
-                vol_conc = mass_conc/dustdens 
-                ! Particle Number Density 
-                dust_numdens(l) = vol_conc/particle_volume(l)
-
-            ENDDO  ! l 
-
-            EXIT 
+! ============================================
+! Step 1 : Dust Mixing Ratio -> Number Density
+! ============================================
+DO iq = 1, nqmx
+    IF ( trim(noms(iq)) == "dust_mass" ) THEN 
         
-        ENDIF ! "dust_mass"
+        DO l = 1, nlayermx  
+            ! Particle Geometric Volume 
+            particle_volume(l) = (4./3.)*pi*(reff(l)*100.)**3
+            ! Mass Concentration
+            mass_conc =  vmr(l,iq)*press(l) & ! vmr for dust is -actually- mmr 
+                      /(8.314*temp(l))
+            ! Volume Concentration
+            vol_conc = mass_conc/dustdens 
+            ! Particle Number Density 
+            dust_numdens(l) = vol_conc/particle_volume(l)
 
-    ENDDO ! iq 
+        ENDDO  ! l 
+
+        EXIT 
+    
+    ENDIF ! "dust_mass"
+
+ENDDO ! iq 
 
 
-    ! ===============================================
-    ! Step 2: Total Chlorine Available in Dust (cm-3)
-    ! ===============================================
+! ===============================================
+! Step 2: Total Chlorine Available in Dust (cm-3)
+! ===============================================
+IF ( firstcall ) THEN 
     DO l = 1, nlayermx
         ! Mass of dust in layer (g) = particle volume * density of grain * number of particles 
         dustmass = dust_numdens(l)*dustdens*1.e-2*particle_volume(l)
         ! Mass of Cl in dust in layer 
         cl_dustmass = dustmass*cl_wt/100.
         ! Number of Cl atoms in dust in layer = mass of cl in dust * Avogadro's constant / molar mass of Cl
-        dust_cl(l) = cl_dustmass*NA/mmol(igcm_cl)
         ! Save first value as the maximum 
-        dust_cl0(l) = dust_cl(l)
+            dust_cl(l) = cl_dustmass*NA/mmol(igcm_cl)
+            dust_cl0(l) = dust_cl(l)
+
     ENDDO
-
-    firstcall = .False.
-
-ENDIF ! firstcall
-
-! =====================
-! Reactions of Interest 
-! =====================
-! 1. OH + dust -> Cl + products 
-!       alpha = [0.01,0.1]
-!       gamma = [0.01,0.2]
-alpha(g_oh) = 0.1
-gamma_rxn(g_oh) = 0.5 
-
-! 2. HO2 + dust -> Cl + products
-!       alpha = [0.02,0.4]
-!       gamma = [0.025,0.1] 
-alpha(g_ho2) = 0.4 
-gamma_rxn(g_ho2) = 0.1 
-
-! 3. H2O + dust -> Cl + products 
-!       alpha = 0.85
-alpha(g_h2o) = 0.!1.e-1 
-
-! 4. HCl + dust -> dust
-!       alpha = [0.05,0.3]
-alpha(g_hcl) = 0.95
-
-! 5. Cl + dust -> dust 
-!       gamma = 2e-4
-gamma_rxn(g_cl) = 2.e-4
+ENDIF 
 
 
-! 6. Cl2 + dust -> dust 
-!       gamma = [1.e-3,1.e-1]
-gamma_rxn(g_cl2) = 0.2
 
-! where uptake^-1 = (1/alpha) + (1/gamma)
-!
-! Coefficients used from Chemical Kinetics and Photochemical Data
-!   for Use in Atmospheric Studies - Issue 19
 
 DO l = 1, nlayermx
 
@@ -159,20 +123,8 @@ DO l = 1, nlayermx
     cc(l,:) = vmr(l,:)*zdens(l)
     vmr0(l,:) = vmr(l,:)
 
-    ! Uptake Coefficients 
-    uptake(g_oh) = (1./alpha(g_oh)) + (1./gamma_rxn(g_oh))
-        uptake(g_oh) = 1./uptake(g_oh)
-
-    uptake(g_ho2) = (1./alpha(g_ho2)) + (1./gamma_rxn(g_ho2))
-        uptake(g_ho2) = 1./uptake(g_ho2)
-
-    uptake(g_h2o) = alpha(g_h2o)
-
-    uptake(g_hcl) = alpha(g_hcl) 
-
-    uptake(g_cl) = gamma_rxn(g_cl) 
-
-    uptake(g_cl2) = gamma_rxn(g_cl2) 
+    ! HCl Uptake Coefficient on Dust
+    uptake(l,g_hcl) = 5.E-1
 
     ! ------------------------
     ! OH and Relative Humidity 
@@ -186,35 +138,45 @@ DO l = 1, nlayermx
 
     RH = 100.*(pv/pvs)
 
-    uptake(g_oh) = 0.2/(1. + RH**0.36 )
+    uptake(l,g_oh) = 0.2/(1. + RH**0.36 )
 
     ! Calculate available dust surface area (cm^2 cm^-3)
     s(l) =  dust_numdens(l)*4.*pi*(reff(l)*100.)**2
 
     ! Thermal Velocity of Adsorbed Species OH and HCl (cm s-1)
-    v_hcl(l) = SQRT( kb*temp(l)*NA/mmol(igcm_hcl) )*100. 
-    v_oh(l) = SQRT( kb*temp(l)*NA/mmol(igcm_oh) )*100.
-    v_ho2(l) = SQRT( kb*temp(l)*NA/mmol(igcm_ho2) )*100.
-    v_h2o(l) = SQRT( kb*temp(l)*NA/mmol(igcm_h2o_vap) )*100.
-    v_cl(l) = SQRT( kb*temp(l)*NA/mmol(igcm_cl) )*100.
-    v_cl2(l) = SQRT( kb*temp(l)*NA/mmol(igcm_cl2) )*100.
+    v_hcl(l) = SQRT( kb*temp(l)*NA/mmol(igcm_hcl) )
+    v_oh(l) = SQRT( kb*temp(l)*NA/mmol(igcm_oh) )
+    v_ho2(l) = SQRT( kb*temp(l)*NA/mmol(igcm_ho2) )
+    v_h2o(l) = SQRT( kb*temp(l)*NA/mmol(igcm_h2o_vap) )
+    v_cl(l) = SQRT( kb*temp(l)*NA/mmol(igcm_cl) )
+    v_cl2(l) = SQRT( kb*temp(l)*NA/mmol(igcm_cl2) )
 
-    ! Tendency 
-    d_cc(l,g_oh) = -0.25*uptake(g_oh)*s(l)*v_oh(l)*cc(l,igcm_oh)*dt 
+    ! Tendency Calculations 
+    ! =====================
+    ! 
+    ! OH 
+    ! --
+    d_cc(l,g_oh) = -0.25*uptake(l,g_oh)*s(l)*v_oh(l)!*cc(l,igcm_oh)*dt 
 
-    d_cc(l,g_ho2) = -0.25*uptake(g_ho2)*s(l)*v_ho2(l)*cc(l,igcm_ho2)*dt 
+    cc(l,igcm_oh) = cc(l,igcm_oh)/( 1. + d_cc(l,g_oh)*dt )
 
-    d_cc(l,g_h2o) = -0.25*uptake(g_h2o)*s(l)*v_h2o(l)*cc(l,igcm_h2o_vap)*dt 
+    ! HCl 
+    ! ---
+    d_cc(l,g_hcl) = -0.25*uptake(l,g_hcl)*s(l)*v_hcl(l)!*cc(l,igcm_hcl)*dt 
 
-    d_cc(l,g_cl2) = -0.25*uptake(g_cl2)*s(l)*v_cl2(l)*cc(l,igcm_cl2)*dt 
+    cc(l,igcm_hcl) = cc(l,igcm_hcl)/( 1. + d_cc(l,g_hcl)*dt )
 
-    d_cc(l,g_hcl) = -0.25*uptake(g_hcl)*s(l)*v_hcl(l)*cc(l,igcm_hcl)*dt 
+    ! Cl 
+    ! --
+    d_cc(l,g_cl) = -d_cc(l,g_oh) 
 
-    d_cc(l,g_cl) = -d_cc(l,g_oh) - d_cc(l,g_ho2) - d_cc(l,g_h2o)
+    cc(l,igcm_cl) = cc(l,igcm_cl) + d_cc(l,g_cl)*dt 
+
 
     dust_cl(l) = dust_cl(l) &
-               - ( d_cc(l,g_cl2) + d_cc(l,g_hcl) + d_cc(l,g_cl) ) &
-               + ( d_cc(l,g_oh) + d_cc(l,g_h2o) + d_cc(l,g_ho2) )
+               -d_cc(l,g_hcl) + d_cc(l,g_cl) 
+
+
 
     ! Suppression of chlorine build up in dust
     !   - assume that initial value is the saturation point 
@@ -232,35 +194,28 @@ DO l = 1, nlayermx
 
     ! OH 
     ! --
-    vmr(l,igcm_oh) = ( cc(l,igcm_oh) + d_cc(l,g_oh) )/zdens(l)
-
-    ! HO2 
-    ! --
-    vmr(l,igcm_ho2) = ( cc(l,igcm_ho2) + d_cc(l,g_ho2) )/zdens(l)
-
-    ! H2O 
-    ! ---
-    vmr(l,igcm_h2o_vap) = ( cc(l,igcm_h2o_vap) + d_cc(l,g_h2o) )/zdens(l)
-
+    vmr(l,igcm_oh) =  cc(l,igcm_oh)/zdens(l)
+   
     ! HCl 
     ! --
-    vmr(l,igcm_hcl) = ( cc(l,igcm_hcl) + d_cc(l,g_hcl) )/zdens(l)
+    vmr(l,igcm_hcl) = cc(l,igcm_hcl)/zdens(l)
 
-    ! Cl2
-    ! ---
-    vmr(l,igcm_cl2) = ( cc(l,igcm_cl2) + d_cc(l,g_cl2) )/zdens(l)
-
-    ! OH 
+    ! Cl 
     ! --
-    vmr(l,igcm_cl) = ( cc(l,igcm_cl) + d_cc(l,g_cl) )/zdens(l)
+    vmr(l,igcm_cl) = cc(l,igcm_cl)/zdens(l)
+
 
 
 
 ENDDO 
 
-stop
+
 
 ! Optional Saved Output 
+
+call WRITEDIAGFI(1,"cl_in_dust","cl_in_dust", "s", &
+                  1,dust_cl)
+
 call WRITEDIAGFI(1,"dcl_dust","dcl_dust", "s", &
                   1,d_cc(:,g_cl))
 
@@ -270,11 +225,8 @@ call WRITEDIAGFI(1,"dhcl_dust","dhcl_dust", "s", &
 call WRITEDIAGFI(1,"doh_dust","doh_dust", "s", &
                   1,d_cc(:,g_oh))
 
-call WRITEDIAGFI(1,"dho2_dust","dho2_dust", "s", &
-                  1,d_cc(:,g_ho2))
-
-call WRITEDIAGFI(1,"dcl2_dust","dcl2_dust", "s", &
-                  1,d_cc(:,g_cl2))
+call WRITEDIAGFI(1,"oh_uptake","oh_uptake", "s", &
+                  1,uptake(:,g_oh))
 
 END SUBROUTINE cl_dust
 

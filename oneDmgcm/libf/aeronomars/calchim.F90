@@ -1170,7 +1170,7 @@
                                 zpress,ztemp,zdens,dist_sol,       &
                                 surfdust1d,surfice1d,jo3,taucol)
 
-            call cl_dust(zycol, zdens, reff,surfdust1d, ztemp, zpress*100., ptimestep)
+            call cl_dust(zycol, zdens, reff, ztemp, zpress*100., ptimestep)
 
 !        ozone photolysis, for output
 

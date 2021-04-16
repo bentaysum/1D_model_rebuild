@@ -1,7 +1,7 @@
       SUBROUTINE mcd_trac(lt,alt,zls,
      & 			          co2, co, 
      &                        o2, h2,
-     &                        h2o)
+     &                        h2ovap)
 
       ! To acquire longitude...
       USE ioipsl_getincom 
@@ -27,7 +27,7 @@
 
 !     VALUES FOR THE 1D SUBMODULE
       real co2(nlayermx), co(nlayermx), o2(nlayermx)
-      real h2(nlayermx), h2o(nlayermx)
+      real h2(nlayermx), h2ovap(nlayermx)
 ! 	  LOCAL VARIABLES
 !     === longitude ===
       real, save :: mcd_longitude 
@@ -365,9 +365,9 @@ C        ===
           IF ( mcd_h2o ) THEN
 
           call interp_line(mcdv5_lt, zh2o(:,y), N_LT,
-     &                     local_time, h2o(y), 1)
+     &                     local_time, h2ovap(y), 1)
 
-          h2o(y)  = h2o(y)*mmol(15)/mmean(1,y) 
+          h2ovap(y)  = h2ovap(y)*mmol(15)/mmean(1,y) 
 
           ENDIF
 
