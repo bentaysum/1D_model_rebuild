@@ -11,7 +11,7 @@ c*****************************************************************
 c
       subroutine photochemistry(lswitch, zycol, sza, ptimestep, 
      $                  press,temp, dens, dist_sol, surfdust1d,
-     $                  surfice1d, jo3, tau, rdust)
+     $                  surfice1d, jo3, tau, rdust, rice)
           
       USE TLMvars 
       implicit none
@@ -42,7 +42,8 @@ c
       real surfdust1d(nlayermx)  ! dust surface area (cm2/cm3)
       real surfice1d(nlayermx)   ! ice surface area (cm2/cm3)
       real tau                   ! optical depth at 7 hpa
-      real rdust(nlayermx)       ! dust geometric radius
+      real rdust(nlayermx)       ! dust geometric radius (m)
+      real rice(nlayermx)        ! ice geometric radius (m)
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     output:
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -287,13 +288,13 @@ c     loop over time within the physical timestep                c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     
 
-
       do istep = 1,phychemrat
 
 c =================================================================
 
          call chimie(lswitch,nesp, rm, j, dens, ctimestep, ptimestep,
-     $               press, temp, sza, dist_sol, surfdust1d, rdust,
+     $               press, temp, sza, dist_sol, surfdust1d, 
+     $               rdust, rice, zycol(:,igcm_h2o_ice),
      $               a001, a002, a003,
      $               b001, b002, b003, b004, b005, b006,
      $               b007, b008, b009,
@@ -539,7 +540,8 @@ c
 c*****************************************************************
 c
       subroutine chimie(lswitch, nesp, rm, j, dens, dt, ptimestep,
-     $                  press, t, sza, dist_sol, surfdust, rdust,
+     $                  press, t, sza, dist_sol, surfdust,
+     $                  rdust, rice, h2o_ice,
      $                  a001, a002, a003,
      $                  b001, b002, b003, b004, b005, b006,
      $                  b007, b008, b009,
@@ -630,7 +632,8 @@ c
       real dist_sol           ! sun distance (au) 
       real surfdust(nlayermx) ! Dust surface area cm2 / cm3 of air
       real rdust(nlayermx)    ! Mean geometric radius of dust
-
+      real rice(nlayermx)     ! Mean geometric radius of water ice
+      real h2o_ice(nlayermx)  ! Water Ice Volume Mixing Ratio
 c     reaction rates
 c
       real a001(nlayermx), a002(nlayermx), a003(nlayermx)
@@ -778,6 +781,8 @@ c     ================
 
       real dust001(nlayermx) ! OH + dust -> Cl + product 
       real dust002(nlayermx) ! HCl + dust -> dust
+
+      real ice001(nlayermx)  ! HCl + ice -> Products
 
 c     Dust Parameters
 c     ===============
@@ -990,11 +995,16 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccc
         dust002(:) = 0.
       ENDIF 
 
-
-
-
-
-
+cccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     HCl Deposition on Water Ice
+cccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      IF ( igcm_hcl .ne. 0 ) THEN 
+        call hcl_deposition( h2o_ice, rice,
+     $                      dens, t, press*100.,
+     $                      ice001 )
+      ELSE
+        ice001(:) = 0.
+      ENDIF 
 
 
 
@@ -2838,6 +2848,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                + cl040(l)*cc(l,i_o) 
      $                + cl041(l)*cc(l,i_h) 
      $                + dust002(l)
+     $                + ice001(l)
 
 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

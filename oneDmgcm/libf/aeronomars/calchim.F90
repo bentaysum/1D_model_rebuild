@@ -1,7 +1,7 @@
       subroutine calchim(ptimestep,pplay,pplev,pt,pdt,dist_sol,mu0,         &
                          zzlev,zzlay,zday,pq,pdq,dqchim,dqschim,dqcloud,    &
                          dqscloud,tauref,co2ice,                            &
-                         pu,pdu,pv,pdv,surfdust,surfice,rdust)
+                         pu,pdu,pv,pdv,surfdust,surfice,rdust,rice)
 
       implicit none
 
@@ -85,6 +85,7 @@
       real :: surfice(ngridmx,nlayermx)  !  ice surface area (m2/m3)
 
       real :: rdust(nlayermx) ! Dust Radius BMT
+      real :: rice(nlayermx)  ! Ice Radius BMT
 !     output:
 
       real :: dqchim(ngridmx,nlayermx,nqmx) ! tendencies on pq due to chemistry
@@ -177,7 +178,8 @@
 	  integer,save :: i_hoch2co3h   = 0
        ! Dust 
        integer,save :: i_dust = 0 
-       
+       ! Water Ice
+       integer,save :: i_h2oice = 0
        
 !  Chlorine Compounds
      integer,save :: i_cl = 0
@@ -689,6 +691,15 @@
             nbq = nbq + 1
             niq(nbq) = i_h2o
          end if
+         i_h2oice = igcm_h2o_ice
+         if (i_h2oice == 0) then
+            write(*,*) "calchim: Error; no water ice tracer !!!"
+            stop
+         else
+            nbq = nbq + 1
+            niq(nbq) = i_h2oice
+         end if
+
          
 !      Electrons introduced into chemistry [ BMT 30/07/2020 ]
          i_elec = igcm_elec
@@ -1167,7 +1178,7 @@
             call photochemistry(lswitch,zycol,szacol,ptimestep,    &
                                 zpress,ztemp,zdens,dist_sol,       &
                                 surfdust1d,surfice1d,jo3,taucol,   &
-                                rdust)
+                                rdust,rice)
 
 
 !        ozone photolysis, for output
@@ -1196,13 +1207,6 @@
                             zu, zv, zt, zycol, ptimestep, co2ice)
          end if
 
-
-
-
-!        Chlorine deposition [BMT 20/11/2020]
-         ! if ( igcm_hcl .ne. 0 ) then
-         !    call chlorine_deposition(ig,pplay,zzlay,zzlev,zu,zv,zt,zycol,ptimestep)
-         ! endif 
 
 
 !=======================================================================

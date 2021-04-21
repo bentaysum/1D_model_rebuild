@@ -142,6 +142,8 @@ $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(cl_dust.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(euvheat.o)
 
+$(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(hcl_deposition.o)
+
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(inichim_newstart.o)
 
 $(LIBO)/libaeronomars.a :  $(LIBO)/libaeronomars.a(moldiff_red.o)
@@ -484,6 +486,20 @@ $(LIBF)/aeronomars/conc.h
 	$(AR) d $(LIBO)/libaeronomars.a euvheat.o ; \
 	$(COMPILE) $(LIBF)/aeronomars/euvheat.F90 ; \
 	$(AR) r $(LIBO)/libaeronomars.a euvheat.o ; $(RM) euvheat.o ; \
+	cd $(GCM)
+
+$(LIBO)/libaeronomars.a(hcl_deposition.o) : $(LIBF)/aeronomars/hcl_deposition.F90 \
+$(LIBF)/grid/dimensions.h \
+$(LIBF)/phymars/dimphys.h \
+$(LIBF)/aeronomars/chimiedata.h \
+$(LIBF)/phymars/tracer.h \
+$(LIBF)/phymars/comcstfi.h \
+$(LIBF)/phymars/callkeys.h \
+$(LIBF)/aeronomars/conc.h
+	cd $(LOCAL_DIR); \
+	$(AR) d $(LIBO)/libaeronomars.a hcl_deposition.o ; \
+	$(COMPILE) $(LIBF)/aeronomars/hcl_deposition.F90 ; \
+	$(AR) r $(LIBO)/libaeronomars.a hcl_deposition.o ; $(RM) hcl_deposition.o ; \
 	cd $(GCM)
 
 $(LIBO)/libaeronomars.a(inichim_newstart.o) : $(LIBF)/aeronomars/inichim_newstart.F90 \

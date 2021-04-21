@@ -1199,8 +1199,7 @@ c Add lifted dust to tendancies after sedimentation in the LES
 
 c
 c   7c. Chemical species
-c     ------------------
-
+c     -----------------
 #ifndef MESOSCALE
 c        --------------
 c        photochemistry :
@@ -1216,7 +1215,7 @@ c        --------------
             call calchim(ptimestep,pplay,pplev,pt,pdt,dist_sol,mu0,
      $                   zzlev,zzlay,zday,pq,pdq,zdqchim,zdqschim,
      $                   zdqcloud,zdqscloud,tauref,co2ice,
-     $                   pu,pdu,pv,pdv,surfdust,surfice,rdust)
+     $                   pu,pdu,pv,pdv,surfdust,surfice,rdust,rice)
 
            ! increment values of tracers:
            DO iq=1,nq ! loop on all tracers; tendencies for non-chemistry
