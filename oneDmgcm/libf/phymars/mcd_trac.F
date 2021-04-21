@@ -43,7 +43,7 @@
       integer NCID        
 
       character(len=300) FILE_NAME
-      integer co2id, coid, h2id, o2id, h2oid
+      integer co2id, coid, h2id, o2id, h2oid, h2oice_id
       integer altid, latid, ltid, zlsid, longid
 
 !     === Mars Climate Database arrays ===
@@ -51,7 +51,8 @@
      $     mcdv5_co(N_LT, N_ALT, N_ZLS, N_LAT, N_LONG),
      $     mcdv5_h2(N_LT, N_ALT, N_ZLS, N_LAT, N_LONG), 
      $     mcdv5_o2(N_LT, N_ALT, N_ZLS, N_LAT, N_LONG),
-     $     mcdv5_h2o(N_LT, N_ALT, N_ZLS, N_LAT, N_LONG)
+     $     mcdv5_h2o(N_LT, N_ALT, N_ZLS, N_LAT, N_LONG),
+     $     mcdv5_h2oice(N_LT, N_ALT, N_ZLS, N_LAT, N_LONG)
 
       real mcdv5_lt(N_LT), mcdv5_alt(N_ALT), 
      $     mcdv5_zls(N_ZLS), mcdv5_lat(N_LAT),
@@ -61,23 +62,29 @@
      $     int_long_co(N_LT, N_ALT, N_ZLS, N_LAT),
      $     int_long_h2(N_LT, N_ALT, N_ZLS, N_LAT), 
      $     int_long_o2(N_LT, N_ALT, N_ZLS, N_LAT),
-     $     int_long_h2o(N_LT, N_ALT, N_ZLS, N_LAT)
+     $     int_long_h2o(N_LT, N_ALT, N_ZLS, N_LAT),
+     $     int_long_h2oice(N_LT, N_ALT, N_ZLS, N_LAT)
+
 !     === Arrays interpolated via latitude ===
       real int_lat_co2(N_LT, N_ALT, N_ZLS),
      $     int_lat_co(N_LT, N_ALT, N_ZLS),
      $     int_lat_h2(N_LT, N_ALT, N_ZLS),
      $     int_lat_o2(N_LT, N_ALT, N_ZLS),
-     $     int_lat_h2o(N_LT, N_ALT, N_ZLS)
+     $     int_lat_h2o(N_LT, N_ALT, N_ZLS),
+     $     int_lat_h2oice(N_LT, N_ALT, N_ZLS)
 !     === Arrays interpolated via altitude ===
       real, save :: fin_co2(N_LT,nlayermx,N_ZLS), 
      $              fin_co(N_LT,nlayermx,N_ZLS),
      $              fin_h2(N_LT,nlayermx,N_ZLS),
      $              fin_o2(N_LT,nlayermx,N_ZLS),
-     $              fin_h2o(N_LT,nlayermx,N_ZLS)
+     $              fin_h2o(N_LT,nlayermx,N_ZLS),
+     $              fin_h2oice(N_LT,nlayermx,N_ZLS)
+
+
 !     === Arrays interpolated via zls ===
       real zco2(N_LT,nlayermx), zco(N_LT,nlayermx)
       real zo2(N_LT,nlayermx), zh2(N_LT,nlayermx),
-     $     zh2o(N_LT,nlayermx)
+     $     zh2o(N_LT,nlayermx), zh2oice(N_LT,nlayermx)
 !     OTHER
       logical, save :: first_call = .True.
 
@@ -129,8 +136,16 @@
            retval = nf_inq_varid(ncid, 'h2ovap_vmr_longmean', h2oid)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
            
+           retval = nf_inq_varid(ncid, 'h2oice_vmr_longmean', h2oice_id)
+           if (retval .ne. nf_noerr) call get_error_hand(retval)
+
+
+
           ! Place into the relevant sized arrays for interpolation 
           ! further down
+           retval = nf_get_var_real(ncid, h2oice_id, int_long_h2oice)
+           if (retval .ne. nf_noerr) call get_error_hand(retval)
+
            retval = nf_get_var_real(ncid, h2oid, int_long_h2o)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
            
@@ -167,6 +182,10 @@
            retval = nf_inq_varid(ncid, 'h2ovap_vmr', h2oid)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
            
+           retval = nf_inq_varid(ncid, 'h2oice_vmr', h2oice_id)
+           if (retval .ne. nf_noerr) call get_error_hand(retval)
+
+
            retval = nf_inq_varid(ncid, 'Longitude', longid)
            if (retval .ne. nf_noerr) call get_error_hand(retval)       
 
@@ -186,6 +205,9 @@
            retval = nf_get_var_real(ncid, h2oid, mcdv5_h2o)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
            
+           retval = nf_get_var_real(ncid, h2oice_id, mcdv5_h2oice)
+           if (retval .ne. nf_noerr) call get_error_hand(retval)
+
            retval = nf_get_var_real(ncid, longid, mcdv5_long)
            if (retval .ne. nf_noerr) call get_error_hand(retval)
            
@@ -249,8 +271,9 @@ C !=======================================================================
      $                                    N_LONG, mcd_longitude, 
      $                                    int_long_h2o(x,y,z,w), 1)
      
-                         
-     
+                    CALL interp_line(mcdv5_long,mcdv5_h2oice(x,y,z,w,:),
+     $                                    N_LONG, mcd_longitude, 
+     $                                    int_long_h2oice(x,y,z,w), 1)     
                          enddo 
                     enddo
                enddo
@@ -282,6 +305,10 @@ C !=======================================================================
                   call interp_line(mcdv5_lat,int_long_h2o(x,y,z,:),N_LAT
      &                            ,lati(1)*180./pi,int_lat_h2o(x,y,z),1)
 
+              call interp_line(mcdv5_lat,int_long_h2oice(x,y,z,:),N_LAT
+     &                         ,lati(1)*180./pi,int_lat_h2oice(x,y,z),1)
+
+
               end do ! of N_ZLS
           end do ! of N_ALT
       end do ! of N_LT
@@ -305,6 +332,8 @@ c               do y = 1,nlayermx
      &                             ,alt,fin_h2(x,:,z),nlayermx)
                call interp_line(mcdv5_ALT*1000.,int_lat_h2o(x,:,z),N_ALT
      &                             ,alt,fin_h2o(x,:,z),nlayermx)
+            call interp_line(mcdv5_ALT*1000.,int_lat_h2oice(x,:,z),N_ALT
+     &                             ,alt,fin_h2oice(x,:,z),nlayermx)
 
 
 C               end do ! of N_ALT
@@ -333,6 +362,9 @@ C               end do ! of N_ALT
      &                             ,zls ,zh2(x,y),1)
                   call interp_line(mcdv5_zls,fin_h2o(x,y,:),N_ZLS
      &                             ,zls ,zh2o(x,y),1)     
+                  call interp_line(mcdv5_zls,fin_h2oice(x,y,:),N_ZLS
+     &                             ,zls ,zh2oice(x,y),1)     
+
      
          end do ! of nlayermx
       end do ! of N_LT
@@ -356,7 +388,7 @@ C         ===
           call interp_line(mcdv5_lt, zco2(:,y), N_LT, 
      &                     local_time, co2(y), 1)
      
-          co2(y) = co2(y)*mmol(1)/43.34!mmean(1,y)
+          co2(y) = co2(y)*mmol(igcm_co2)/43.34!mmean(1,y)
           
           ENDIF
 
@@ -367,7 +399,13 @@ C        ===
           call interp_line(mcdv5_lt, zh2o(:,y), N_LT,
      &                     local_time, h2ovap(y), 1)
 
-          h2ovap(y)  = h2ovap(y)*mmol(15)/mmean(1,y) 
+          h2ovap(y)  = h2ovap(y)*mmol(igcm_h2o_vap)/mmean(1,y) 
+
+          call interp_line(mcdv5_lt, zh2oice(:,y), N_LT,
+     &                     local_time, h2oice(y), 1)
+
+          h2oice(y)  = h2oice(y)*mmol(igcm_h2o_ice)/mmean(1,y) 
+
 
           ENDIF
 
