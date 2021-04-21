@@ -37,9 +37,9 @@ longitude=137.4
 mcd_dir=/geos/d21/downloaded_model_output/MCD_GCM_sets/
 
 # MCD Subset of choice
-#mcd_file=MCD_subset_climatology_SOLAVG.nc
-mcd_file=MCD_subset_DUSTSTORM.nc
-#mcd_file=MCD_subset_MY25.nc
+mcd_file=MCD_subset_climatology_SOLAVG.nc
+mcd_file=MCD_subset_climatology_SOLAVG.nc
+mcd_file=MCD_subset_climatology_SOLAVG.nc
 
 # Individual Gase
 mcd_co2= .True.
@@ -64,7 +64,7 @@ t_forecast=992
 ###########################
 ### Handled by bash script
 ### perturbation_cycle.sh 
-#pertloop=.false.
+pertloop=.false.
 #PERTGAS=clo3
 #SCALAR=1.E1
 #L_1=18
@@ -78,10 +78,10 @@ t_forecast=992
 #  =6 "cold" (low dust) scenario ; =7 "warm" (high dust) scenario
 #  =24 Mars Year 24  ; =25 Mars Year 25 (year with a global dust storm) ; ...
 #  =30 Mars Year 30 
-iaervar = 5
+iaervar = 1
 
 # Dust opacity at 610 Pa (when constant, i.0e. for the iaervar=1 case)
-tauvis=0.81
+tauvis=0.456332
 
 # Dust vertical distribution: 
 # (=0: old distrib. (Pollack90), =1: top set by "topdustref",

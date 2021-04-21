@@ -46,7 +46,7 @@ REAL vol_conc
 REAL s
 REAL nuhcl
 
-REAL, PARAMETER :: HCL_UPTAKE = 0.02 
+REAL, PARAMETER :: HCL_UPTAKE =1.e-1
 
 REAL, PARAMETER :: ice_particle_density = 916.7 ! kg/m^3
 REAL, PARAMETER :: NA = 6.022e23 ! Avogadro's constant 
