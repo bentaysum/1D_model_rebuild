@@ -27,7 +27,7 @@
 
 !     VALUES FOR THE 1D SUBMODULE
       real co2(nlayermx), co(nlayermx), o2(nlayermx)
-      real h2(nlayermx), h2ovap(nlayermx)
+      real h2(nlayermx), h2ovap(nlayermx), h2oice(nlayermx)
 ! 	  LOCAL VARIABLES
 !     === longitude ===
       real, save :: mcd_longitude 
