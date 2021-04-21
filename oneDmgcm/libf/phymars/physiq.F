@@ -577,7 +577,7 @@ c  table for tracers CO2, CO, H2, H2O vapour, and O2.
      &                          pq(1,:,igcm_co2), pq(1,:,igcm_co), 
      &                          pq(1,:,igcm_o2), pq(1,:,igcm_h2),
      &                          pq(1,:,igcm_h2o_vap),
-     &                          pq(1,:,igcm_h2o_ice))
+     &                          pq(1,:,igcm_h2o_ice), rice(1,:) )
           WRITE(*,*) "MCD CO2, CO, H2, H2O, O2"
       ENDIF
 
@@ -1362,7 +1362,6 @@ c       Thermal inertia feedback
       ENDIF
                
 
-
 c-----------------------------------------------------------------------
 c  10. Write output files
 c  ----------------------
@@ -1471,6 +1470,8 @@ c ******* TEST ******************************************************
       end if
 c *******************************************************************
       
+
+
 c     ---------------------
 c     Outputs to the screen 
 c     ---------------------
