@@ -1,7 +1,7 @@
       SUBROUTINE mcd_trac(lt,alt,zls,
      & 			          co2, co, 
      &                        o2, h2,
-     &                        h2ovap)
+     &                        h2ovap, h2oice)
 
       ! To acquire longitude...
       USE ioipsl_getincom 
@@ -396,6 +396,11 @@ c         ===
      &                     local_time, co(y), 1)
            co(y)  = co(y)*mmol(2)/mmean(1,y) 
           ENDIF 
+
+
+
+          write(*,*) h2oice(y)
+
 
       end do
       

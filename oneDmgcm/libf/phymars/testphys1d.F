@@ -665,17 +665,6 @@ c    ---------------------------
       endif
 
 
-c     MCD Tracer VMR's
-C       IF ( mcd_profiles ) THEN 
-C           call mcd_trac(time*24.,zlay*1.e3,zls*180./pi, 
-C      &                          q(:,1), q(:,2), 
-C      &                          q(:,5), q(:,8),
-C      &                          q(:,15))
-C           WRITE(*,*) "MCD CO2, CO, H2, H2O, O2"
-C       ENDIF
-
-
-
       
 c Check if the surface is a water ice reservoir 
 c --------------------------------------------------

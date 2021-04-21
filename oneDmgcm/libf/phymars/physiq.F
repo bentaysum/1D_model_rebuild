@@ -574,9 +574,10 @@ c  Begin the tracer interpolation routine for the MCD v5.3 look-up
 c  table for tracers CO2, CO, H2, H2O vapour, and O2.
       IF ( mcd_profiles ) THEN 
           call mcd_trac(ptime,zzlay(1,:)*1.e3,zls*180./pi, 
-     &                          pq(1,:,1), pq(1,:,2), 
-     &                          pq(1,:,5), pq(1,:,8),
-     &                          pq(1,:,15))
+     &                          pq(1,:,igcm_co2), pq(1,:,igcm_co), 
+     &                          pq(1,:,igcm_o2), pq(1,:,igcm_h2),
+     &                          pq(1,:,igcm_h2o_vap),
+     &                          pq(1,:,igcm_h2o_ice))
           WRITE(*,*) "MCD CO2, CO, H2, H2O, O2"
       ENDIF
 
