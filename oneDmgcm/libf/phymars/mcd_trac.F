@@ -436,10 +436,6 @@ c         ===
           ENDIF 
 
 
-
-          write(*,*) h2oice(y)
-
-
       end do
       
   
