@@ -14,11 +14,11 @@
      &   ,tifeedback,microphys,caps,photochem,calltherm,outptherm       &
      &   ,callrichsl,callslope,tituscap,long_mean,mcd_profiles          &
      &   ,mcd_co2,mcd_co,mcd_h2,mcd_h2o,mcd_o2,lbfgsb_output,call_tlm   &
-     &   ,NOMAD_ACS
+     &   ,NOMAD_ACS,output_on
      
       COMMON/callkeys_i/iradia,iaervar,iddist,ilwd,ilwb,ilwn,ncouche    &
      &   ,dustbin,nltemodel,nircorr,solvarmod,solvaryear                &
-     &   ,t_backtrace,t_forecast,tlm_day 
+     &   ,t_backtrace,t_forecast,tlm_day,output_sol,output_ndt
      
       COMMON/callkeys_r/topdustref,solarcondate,semi,alphan,euveff,     &
      &   tke_heat_flux,tlm_lt
@@ -50,6 +50,8 @@
       logical lbfgsb_output 
       
       logical NOMAD_ACS 
+      logical output_on
+
 
       real topdustref
       real semi
@@ -74,6 +76,9 @@
 
       integer t_backtrace ! Optimization routine [OPTIONAL] backtrace timestep
       integer t_forecast ! Optimization routine [OPTIONAL] forecast timestep
+
+      integer output_sol
+      integer output_ndt
 
       integer tlm_day
 

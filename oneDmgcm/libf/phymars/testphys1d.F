@@ -417,6 +417,7 @@ c
       call getin("day_step",day_step)
       write(*,*) " day_step = ",day_step
 
+
       ndt=10 ! default value for ndt
       PRINT *,'Number of sols to run ?'
       call getin("ndt",ndt)
@@ -530,6 +531,26 @@ c  done above!) and loads parameters set in callphys.def
 !Mars possible matter with dtphys in input and include!!!
       CALL inifis(1,llm,day0,daysec,dtphys,
      .            lati,long,area,rad,g,r,cpp)
+
+
+c     Timestep for Output 
+c     -------------------
+      output_on=.False. ! Default 
+      output_ndt = day_step*output_sol
+      write(*,*) "output_ndt = ", output_ndt
+
+
+C c     Will output occur?
+c     ---------------------
+      IF ( ndt <= output_ndt ) THEN 
+        WRITE(*,*) "NDT <= OUTPUT_NDT"
+        WRITE(*,*) ndt, " <= ", output_ndt
+        WRITE(*,*) "NO MODEL OUTPUT."
+        STOP
+      ENDIF 
+
+      WRITE(*,*) ndt, output_ndt
+
 
 
 c   Initialization to take into account prescribed winds
@@ -829,6 +850,10 @@ c     -------------------------------
 
 C       call tgo_profiles(q(:,15),zlay/1000.)
 
+
+c     Output Check
+!     ------------
+      IF ( idt >= output_ndt ) output_on = .True.
       
 c       call physics
 c       --------------------

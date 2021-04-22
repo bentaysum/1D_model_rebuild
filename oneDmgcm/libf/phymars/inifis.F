@@ -216,6 +216,11 @@
         call getin("tlm_lt",tlm_lt)
         write(*,*) "tlm_lt : ", tlm_lt 
             
+!      Number of sols to run prior to model output[save memory and cost]
+        output_sol=0 ! Default
+        call getin("output_sol",output_sol)
+        write(*,*) "output_sol=", output_sol
+
 
 !        Plume parameters and keys 
 C          write(*,*) "Introducing an instantaneous plume?"

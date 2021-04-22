@@ -114,6 +114,12 @@
       if ( .not. lbfgsb_output ) RETURN
 #endif 
 
+
+
+!     Output Check
+      IF ( .not. output_on ) RETURN
+
+
       
 ! At very first call, check if there is a "diagfi.def" to use and read it
 ! -----------------------------------------------------------------------

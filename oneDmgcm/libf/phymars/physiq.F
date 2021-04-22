@@ -1075,13 +1075,19 @@ c Temperature variation due to latent heat release
            endif
            
 ! increment water vapour and ice atmospheric tracers tendencies
+
+      ! BMT - OFF WITH MCD INTERPOLATION
+       IF ( mcd_profiles ) THEN 
+          pdq(1:ngrid,1:nlayermx,igcm_h2o_vap) = 0.
+          pdq(1:ngrid,1:nlayer,igcm_h2o_ice) = 0.
+       ELSE 
            pdq(1:ngrid,1:nlayer,igcm_h2o_vap) = 
      &       pdq(1:ngrid,1:nlayer,igcm_h2o_vap) + 
      &       zdqcloud(1:ngrid,1:nlayer,igcm_h2o_vap)
            pdq(1:ngrid,1:nlayer,igcm_h2o_ice) = 
      &       pdq(1:ngrid,1:nlayer,igcm_h2o_ice) + 
      &       zdqcloud(1:ngrid,1:nlayer,igcm_h2o_ice)
-
+       ENDIF 
 ! increment dust and ccn masses and numbers
            if (microphys) then
              pdq(1:ngrid,1:nlayer,igcm_dust_mass) = 
