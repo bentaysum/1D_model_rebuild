@@ -53,7 +53,7 @@ SUBROUTINE tlm_sibem(iter, niter, lyr_m, dens, sza, &
                     ,cl052, cl053, cl054 &
                     ,cl055, cl056, cl057 &
                     ,cl058, cl059, &
-					dccn_dpq, dcc0_dpq, &
+					           dcc0_dpq, &
                     ro2, no, no2, &
 					dHOX_dPQ, dHOX0_dPQ)
 
@@ -80,7 +80,6 @@ integer nesp ! number of species in the chemistry routines
 real cc(nesp), cc0(nesp) ! number density of species after and before the
 						 ! odd-hydrogen calculations (only H, OH and HO2 are effected)
 real cc_hox_next ! cc(hox)^{t+1}
-REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
 real ro2 ! Number density of peroxy radical compounds
 real no, no2 ! NO, NO2 number density
 REAL, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)

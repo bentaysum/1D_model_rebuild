@@ -1,4 +1,4 @@
-SUBROUTINE TLM_chem(dcc0_dpq, dccn_dpq, dHOX_dPQ, dOX_dPQ, &
+SUBROUTINE TLM_chem(dcc0_dpq, dHOX_dPQ, dOX_dPQ, &
                     dHOX0_dPQ, dOX0_dPQ, &
                    ptimestep, istep, phychemrat, &
                    dens, sza, initialisation)
@@ -18,7 +18,6 @@ IMPLICIT NONE
 ! Input
 ! =====
 real dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx) ! Initial Linearised Number Denisty Array 
-real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx) ! Sub-timestep n Linearised Number Density Array 
 real dHOX_dPQ(nlayermx,nqmx*nlayermx) ! Linearised HOx Number Density
 real dOX_dPQ(nlayermx,nqmx*nlayermx) ! Linearised Ox Number Density
 real dHOX0_dPQ(nlayermx,nqmx*nlayermx) ! Initial Linearised HOx Number Density

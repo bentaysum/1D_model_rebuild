@@ -2,7 +2,7 @@ SUBROUTINE tlm_clox(lyr_m, rclo_cl, iter, dt, dens, &
 				pcl, lcl, pclo, lclo, &
 				cc, cc_prev, &
 				nesp, &
-                    dccn_dpq, dcc0_dpq, &
+                     dcc0_dpq, &
                     j, &
                     a001, a002, a003, &
                     b001, b002, b003, b004, b005, b006, &
@@ -76,7 +76,6 @@ REAL dens ! Atmospheric Number Density
 REAL pcl, lcl, pclo, lclo ! Cl and ClO Production and loss
 REAL cc(nesp), cc_prev(nesp)
 INTEGER nesp
-REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
 REAL, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 
 ! Local Variables 

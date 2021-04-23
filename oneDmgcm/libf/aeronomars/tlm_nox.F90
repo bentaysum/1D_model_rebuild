@@ -1,8 +1,7 @@
 SUBROUTINE tlm_nox(iter, lyr_m, dens, nesp, &
                     nox, no, no2, rno2_no, &
                     cc, d001, d002, d003, & 
-                    j_no2, &
-                    dccn_dpq)
+                    j_no2)
 
 USE TLMvars
 
@@ -30,8 +29,6 @@ real rno2_no ! Partition Function
 real cc(nesp) ! tracer number density
 real d001, d002, d003 ! Chemical rate coefficients
 real j_no2 ! Photolysis rate of NO2
-
-real dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
 
 
 ! ====================================================================================

@@ -177,6 +177,8 @@ write(*,"(E15.7,2A10)") MAXVAL(TLM), trim(noms(idx_j(1))), trim(noms(idx_i(1)))
 write(*,"(E15.7,2A10)") MINVAL(TLM), trim(noms(idx_j(2))), trim(noms(idx_i(2)))
 write(*,*) "===================================="
 
+
+stop
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

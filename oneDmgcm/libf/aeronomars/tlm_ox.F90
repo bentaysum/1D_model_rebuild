@@ -54,7 +54,7 @@ SUBROUTINE tlm_ox(iter, lyr_m, dens,&
                     ,cl055, cl056, cl057 &
                     ,cl058, cl059, & 
 					no, no2, &
-					dccn_dpq, dcc0_dpq,&
+					dcc0_dpq,&
 					dOX_dPQ, dOX0_dPQ)
 
 USE TLMvars
@@ -81,7 +81,6 @@ integer nesp ! number of species in the chemistry routines
 real cc(nesp), cc0(nesp) ! number density of species after and before the
 						 ! odd-hydrogen calculations (only H, OH and HO2 are effected)
 real no, no2 ! NO and NO2 number densities
-REAL dccn_dpq(nqmx*nlayermx,nqmx*nlayermx)
 REAL, INTENT(IN) :: dcc0_dpq(nqmx*nlayermx,nqmx*nlayermx)
 REAL dOX_dPQ(nlayermx,nqmx*nlayermx), dOX0_dPQ(nlayermx,nqmx*nlayermx)
 

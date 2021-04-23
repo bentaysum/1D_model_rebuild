@@ -50,8 +50,8 @@ mcd_o2= .True.
 
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call_tlm=.false.
-tlm_day=10
+call_tlm=.true.
+tlm_day=1
 tlm_lt=0.
 
 ## L-BFGS-B Routines 
@@ -136,11 +136,11 @@ callslope = .false.
 ## Tracer (dust water, ice and/or chemical species) options (used if tracer=T):
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # DUST: Transported dust ? (if >0, use 'dustbin' dust bins)
-dustbin    = 2
+dustbin    = 0
 # DUST: Radiatively active dust ? (matters if dustbin>0)
 active  = .false.
 # DUST: use mass and number mixing ratios to predict dust size ?
-doubleq   = .true.
+doubleq   = .false.
 # DUST: lifted by GCM surface winds ?
 lifting = .False.
 # DUST: lifted by dust devils ?

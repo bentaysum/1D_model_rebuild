@@ -25,9 +25,10 @@
           ALLOCATE(Avmr(nlayermx,nqmx))
 
           ALLOCATE(tlm_ident(nlayermx*nqmx,nlayermx*nqmx))
+!         PHOTOCHEMISTRY ARRAYS 
+          ALLOCATE(dccn_dpq(nlayermx*nqmx,nlayermx*nqmx))
 
           ALLOCATE(dNO_dPQ(nlayermx,nqmx*nlayermx))
-          
           ALLOCATE(dNO2_dPQ(nlayermx,nqmx*nlayermx))
       
           IF (igcm_cl .ne. 0 ) THEN 

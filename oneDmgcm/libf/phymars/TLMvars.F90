@@ -25,18 +25,16 @@ INTEGER t_co2, t_co, t_o, t_o1d, t_o2, t_o3, t_h, t_h2, t_oh, &
 	  t_cl, t_clo, t_cl2, t_oclo, t_cl2o2, t_hcl, t_hocl, t_cloo, &
 	  t_ch3ocl, t_clco, t_clo3, t_hclo4, t_clo4 
 
-! Array of coefficients used to calculated 
-! linearised steady-state O2
-REAL, DIMENSION(:), allocatable, SAVE :: o2_coefficient_array(:)  
-! Linearised pseudo-rate coefficient for CH4 destruction
-REAL, DIMENSION(:,:), allocatable, SAVE :: dKpseudo_dPQ(:,:)
+
+! Linearised Tracer Number density [photochemistry]
+REAL, DIMENSION(:,:), allocatable :: dccn_dpq(:,:)
 
 ! Linearised NOx = [NO] + [NO2] compounds in photochemistry
-REAL, DIMENSION(:,:), allocatable, SAVE :: dNO_dPQ(:,:)
-REAL, DIMENSION(:,:), allocatable, SAVE :: dNO2_dPQ(:,:)
+REAL, DIMENSION(:,:), allocatable :: dNO_dPQ(:,:)
+REAL, DIMENSION(:,:), allocatable :: dNO2_dPQ(:,:)
 
 ! Linearised ClOx = [Cl] + [ClO]
-REAL, DIMENSION(:,:), allocatable, SAVE :: dClOx_dPQ(:,:), dClOx0_dPQ(:,:)
+REAL, DIMENSION(:,:), allocatable :: dClOx_dPQ(:,:), dClOx0_dPQ(:,:)
 
 
 CONTAINS
