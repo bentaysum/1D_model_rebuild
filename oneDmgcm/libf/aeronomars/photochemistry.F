@@ -985,13 +985,13 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Chlorine Release from Dust Interactions
 ccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      IF ( (igcm_cl .ne. 0) .and. (doubleq) ) THEN 
-        call cl_dust(cc, nesp, dens, rdust, t, press*100.,
-     $               dust001, dust002)
-      ELSE 
+C       IF ( (igcm_cl .ne. 0) .and. (doubleq) ) THEN 
+C         call cl_dust(cc, nesp, dens, rdust, t, press*100.,
+C      $               dust001, dust002)
+C       ELSE 
         dust001(:) = 0.
         dust002(:) = 0.
-      ENDIF 
+C       ENDIF 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     HCl Deposition on Water Ice

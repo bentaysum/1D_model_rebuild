@@ -37,20 +37,19 @@ longitude=0.
 mcd_dir=/geos/d21/downloaded_model_output/MCD_GCM_sets/
 
 # MCD Subset of choice
-mcd_file=MCD_subset_climatology_SOLAVG.nc
-mcd_file=MCD_subset_climatology_SOLAVG.nc
-mcd_file=MCD_subset_climatology_SOLAVG.nc
+mcd_file=MCD_subset_DUSTSTORM.nc
+
 
 # Individual Gase
 mcd_co2= .True.
 mcd_co= .True.
 mcd_h2= .True.
-mcd_h2o= .True.
+mcd_h2o= .False.
 mcd_o2= .True.
 
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call_tlm=.true.
+call_tlm=.false.
 tlm_day=1
 tlm_lt=0.
 
@@ -136,11 +135,11 @@ callslope = .false.
 ## Tracer (dust water, ice and/or chemical species) options (used if tracer=T):
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # DUST: Transported dust ? (if >0, use 'dustbin' dust bins)
-dustbin    = 0
+dustbin    = 2
 # DUST: Radiatively active dust ? (matters if dustbin>0)
 active  = .false.
 # DUST: use mass and number mixing ratios to predict dust size ?
-doubleq   = .false.
+doubleq   = .true.
 # DUST: lifted by GCM surface winds ?
 lifting = .False.
 # DUST: lifted by dust devils ?

@@ -1174,6 +1174,7 @@
 !=======================================================================
 !        chemistry in lower atmosphere
          if (photochem) then
+		 
 
             call photochemistry(lswitch,zycol,szacol,ptimestep,    &
                                 zpress,ztemp,zdens,dist_sol,       &

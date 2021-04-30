@@ -589,12 +589,25 @@ c     q2 and surface pressure)
      
 c    Dust profiles in kg/kg supplied by MCD dataset 
       IF ( doubleq ) THEN 
-           call mcd_dust(ptime*24.,1.e3*zzlay(1,:),zls*180./pi,
+           call mcd_dust(ptime*24.,1.e-3*zzlay(1,:),zls*180./pi,
      &                       pq(1,:,:), rdust(1,:), 
-     &                       pplay(1,:), zt(1,:) )
+     &                       pplay(1,:), pt(1,:) )
       ENDIF 
 
-
+c    ----------------------------------
+c    1.2.7 : Trace Gas Orbiter Profiles 
+c    ---------------------------------- 
+       DO ig = 1, ngridmx
+        call tgo_profiles( ig, zzlay(ig,:)*1.e-3, pplay(ig,:), pt(ig,:),
+     &                     pq(ig,:,igcm_dust_mass),
+     &                     pq(ig,:,igcm_h2o_ice),
+     &                     pq(ig,:,igcm_h2o_vap),
+     &                     rdust(ig,:), 
+     &                     rice(ig,:) 
+     &                   )
+       ENDDO 
+     
+      
 c----------------------------------------------------------------------
 c    2. Compute radiative tendencies :
 c------------------------------------
@@ -910,8 +923,7 @@ c        Calling vdif (Martian version WITH CO2 condensation)
 #endif
       ENDIF ! of IF (calldifv)
       
-
-      
+       
 
 c-----------------------------------------------------------------------
 c   5. Thermals :
@@ -1003,7 +1015,7 @@ c   -----------------------------
       ENDIF ! of IF(calladj)
 
 
-      
+
 c-----------------------------------------------------------------------
 c   6. Carbon dioxide condensation-sublimation:
 c   -------------------------------------------
@@ -1047,6 +1059,8 @@ c   -------------------------------------------
 
       ENDIF  ! of IF (callcond)
 
+
+      
 c-----------------------------------------------------------------------
 c   7. Specific parameterizations for tracers 
 c:   -----------------------------------------
@@ -1141,6 +1155,9 @@ c Temperature variation due to latent heat release
                       
 
          END IF  ! of IF (water)
+         
+
+         
 
 c   7b. Aerosol particles
 c     -------------------
@@ -1197,6 +1214,8 @@ c        -------------
              ENDDO
            ENDDO
          END IF   ! of IF (sedimentation)
+         
+         
         
 c Add lifted dust to tendancies after sedimentation in the LES
 #ifdef MESOSCALE
@@ -1277,6 +1296,7 @@ c       ---------------------------------
         ENDDO    ! (iq)
 
       endif !  of if (tracer) 
+      
 
 
 
@@ -1366,7 +1386,8 @@ c       Thermal inertia feedback
         ENDIF
       ENDIF
                
-
+        
+               
 c-----------------------------------------------------------------------
 c  10. Write output files
 c  ----------------------
@@ -1394,8 +1415,6 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
       DO iq=1, nq
         DO l=1,nlayer
           DO ig=1,ngrid
-
-            IF ( trim(noms(iq)) == 'co2' ) pdq(ig,l,iq) = 0. 
             
             zq(ig,l,iq)=pq(ig,l,iq) +pdq(ig,l,iq)*ptimestep
 
@@ -1404,7 +1423,6 @@ c (FOR OUTPUT ONLY : the actual model integration is performed in the dynamics)
           ENDDO
         ENDDO
       ENDDO
-      
       
       if ( zq(1,1,1) .le. 0.9 ) then
   405     do iq = 1, nqmx
