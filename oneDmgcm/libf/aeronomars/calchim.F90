@@ -231,6 +231,8 @@
 !=======================================================================
 !     initialization of the chemistry (first call only)
 !=======================================================================
+      
+      
 
       if (firstcall) then
 
@@ -1174,8 +1176,7 @@
 !=======================================================================
 !        chemistry in lower atmosphere
          if (photochem) then
-		 
-
+        
             call photochemistry(lswitch,zycol,szacol,ptimestep,    &
                                 zpress,ztemp,zdens,dist_sol,       &
                                 surfdust1d,surfice1d,jo3,taucol,   &

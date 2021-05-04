@@ -23,7 +23,8 @@
       COMMON/callkeys_r/topdustref,solarcondate,semi,alphan,euveff,     &
      &   tke_heat_flux,tlm_lt
 
-      COMMON/callkeys_c/mcd_dir,mcd_file 
+      COMMON/callkeys_c/mcd_dir,mcd_file,NOMAD_ACS_DIR,NOMAD_DUST_FILE, &
+     &   NOMAD_H2O_FILE
      
       LOGICAL callrad,calldifv,calladj,callcond,callsoil,               &
      &   season,diurnal,lwrite,calllott                                 &
@@ -63,6 +64,10 @@
 
       character(len=150) mcd_dir
       character(len=150) mcd_file
+	  
+	  character(len=150) NOMAD_ACS_DIR
+	  character(len=150) NOMAD_H2O_FILE
+	  character(len=150) NOMAD_DUST_FILE 
 
       integer iddist
       integer iaervar

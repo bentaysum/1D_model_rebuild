@@ -606,8 +606,6 @@ c    ----------------------------------
      &                     rice(ig,:) 
      &                   )
        ENDDO 
-     
-      
 c----------------------------------------------------------------------
 c    2. Compute radiative tendencies :
 c------------------------------------
@@ -675,12 +673,12 @@ c            and aerosols (dust and water ice)
 
 c          Radiative transfer
 c          ------------------
-
            CALL callradite(icount,ngrid,nlayer,nq,zday,zls,pq,albedo,
      $     emis,mu0,pplev,pplay,pt,tsurf,fract,dist_sol,igout,
      $     zdtlw,zdtsw,fluxsurf_lw,fluxsurf_sw,fluxtop_lw,fluxtop_sw,
      $     tauref,tau,aerosol,tauscaling,taucloudtes,rdust,rice,
      $     nuice,co2ice)
+
 
 c          Outputs for basic check (middle of domain)
 c          ------------------------------------------
@@ -1075,11 +1073,16 @@ c        Water ice condensation in the atmosphere
 c        ----------------------------------------
          IF (water) THEN
 
-           call watercloud(ngrid,nlayer,ptimestep,
-     &                pplev,pplay,pdpsrf,zzlay, pt,pdt,
-     &                pq,pdq,zdqcloud,zdtcloud,
-     &                nq,tau,tauscaling,rdust,rice,nuice,
-     &                rsedcloud,rhocloud)
+        ! -------------------------------------------
+        ! BMT - Commented out when using TGO observed
+        !       h2o water + ice profiles 
+        ! -------------------------------------------
+C            call watercloud(ngrid,nlayer,ptimestep,
+C      &                pplev,pplay,pdpsrf,zzlay, pt,pdt,
+C      &                pq,pdq,zdqcloud,zdtcloud,
+C      &                nq,tau,tauscaling,rdust,rice,nuice,
+C      &                rsedcloud,rhocloud)
+
 
 c Temperature variation due to latent heat release
            if (activice) then
@@ -1102,6 +1105,9 @@ c Temperature variation due to latent heat release
      &       pdq(1:ngrid,1:nlayer,igcm_h2o_ice) + 
      &       zdqcloud(1:ngrid,1:nlayer,igcm_h2o_ice)
        ENDIF 
+
+
+
 ! increment dust and ccn masses and numbers
            if (microphys) then
              pdq(1:ngrid,1:nlayer,igcm_dust_mass) = 
@@ -1201,6 +1207,8 @@ c        -------------
      &                pq, pdq, zdqsed, zdqssed,nq, 
      &                tau,tauscaling)
 
+
+
            DO iq=1, nq
              DO l=1,nlayer
                DO ig=1,ngrid
@@ -1214,8 +1222,7 @@ c        -------------
              ENDDO
            ENDDO
          END IF   ! of IF (sedimentation)
-         
-         
+   
         
 c Add lifted dust to tendancies after sedimentation in the LES
 #ifdef MESOSCALE
@@ -1230,12 +1237,17 @@ c        --------------
 c        photochemistry :
 c        --------------
          IF (photochem .or. thermochem) then
-
+          
 !           dust and ice surface area
             call surfacearea(ngrid, nlayer, ptimestep, pplay, zzlay, 
      $                       pt, pq, pdq, nq, 
      $                       rdust, rice, tau, tauscaling, 
      $                       surfdust, surfice)
+    
+            ! Forced Dust+Ice Profiles
+            pdq(:,:,igcm_h2o_ice) = 0. 
+            pdq(:,:,igcm_dust_mass) = 0.
+
 !           call photochemistry
             call calchim(ptimestep,pplay,pplev,pt,pdt,dist_sol,mu0,
      $                   zzlev,zzlay,zday,pq,pdq,zdqchim,zdqschim,

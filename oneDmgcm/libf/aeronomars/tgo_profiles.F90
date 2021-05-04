@@ -82,8 +82,8 @@ CHARACTER(len=*), PARAMETER :: TGO_dir = "NOMAD_ACS/" ! Main Directory of TGO Da
 CHARACTER(len=*), PARAMETER :: TGO_dust_ice = "DUST_ICE/Gridded_Data/" ! TGO Dust 
 CHARACTER(len=*), PARAMETER :: TGO_h2o  = "H2O/Gridded/" 
 
-CHARACTER(len=*), PARAMETER :: DUST_ICE_FILE = "gridded_aerosol_2212_I.txt"
-CHARACTER(len=*), PARAMETER :: H2O_FILE = "75Lat_160-195Ls_H2ONOMAD_MY34.txt"
+CHARACTER(len=*), PARAMETER :: DUST_ICE_FILE = "gridded_aerosol_3482_I.txt"
+CHARACTER(len=*), PARAMETER :: H2O_FILE = "60Lat_240-260Ls_H2ONOMAD_MY34.txt"
 
 ! Particle Number Density -> Mass Mixing Ratio
 ! --------------------------------------------
@@ -98,10 +98,6 @@ REAL,PARAMETER :: icedens = 0.9168  ! Ice density (g m-3)
 
 
 ! ==========================================
-
-
-
-
 
 ! ------------------------------
 ! Stage 1 : Reading TGO Profiles
@@ -168,6 +164,7 @@ call interp_line( alt_grid, data_grid(:,i_icend), Nalt, &
 ! -------------------------------------------------------------------
 DO l = 1, nlayermx
 	
+
 	! Air Density at layer l (g cm-3)
 	airdens = 1.e-3*press(l)/(rnew(ig,l)*temp(l))
 	
@@ -203,12 +200,10 @@ DO l = 1, nlayermx
 	! Mass Mixing Ratio 
 	h2oice_mmr(l) = ice_masscon/airdens	
 
-	write(*,*) z(l), dust_mmr(l), dust_nd(l), " - ", h2oice_mmr(l), &
-																ice_1D(l)
 	
+
 ENDDO
 
-STOP
 ! ===========
 ! Close Units 
 ! ===========

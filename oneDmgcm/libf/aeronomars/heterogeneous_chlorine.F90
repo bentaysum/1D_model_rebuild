@@ -1,5 +1,8 @@
-SUBROUTINE cl_dust(cc, nesp, dens, rdust, temp, press, &
-                   dust001, dust002)
+SUBROUTINE heterogeneous_chlorine(cc, nesp, dens, & 
+                                 temp, press, &  
+                                 ice_mmr, &              
+                                 rdust, rice, &
+                                 dust001, dust002, ice001)
 
 IMPLICIT NONE
 
@@ -17,13 +20,15 @@ IMPLICIT NONE
 REAL cc(nlayermx,nesp) ! Species number densities 
 INTEGER nesp           ! Number of tracers 
 REAL dens(nlayermx)    ! Atmospheric Number Density [cm-3]
-REAL rdust(nlayermx)   ! Mean Geometric radius of dust particles [m]
+REAL ice_mmr(nlayermx) ! Water Ice Mass Mixing Ratio (kg/kg)
+REAL rdust(nlayermx), rice(nlayermx) ! Mean Geometric radius of dust/ice particles [m]
 REAL temp(nlayermx)    ! temperature [K]
 REAL press(nlayermx)   ! Pressure [Pa]
 ! Output 
 ! ------
 REAL dust001(nlayermx) ! Rate of OH + dust -> Cl + Products
 REAL dust002(nlayermx) ! Rate of HCl adsorption onto dust 
+REAL ice001(nlayermx)  ! Rate of HCl adsorption onto ice 
 
 ! Local 
 ! =====
@@ -36,12 +41,16 @@ REAL pv                ! Water Vapour Partial Pressure
 REAL pvs_a, pvs_b, pvs ! Water Vapour Saturation Pressure 
 REAL RH                ! Rel. Humidity 
 REAL uptake_oh(nlayermx) ! OH uptake coefficient 
-REAL uptake_hcl(nlayermx) ! HCl uptake coefficient
+REAL uptake_hcl(nlayermx,2) ! HCl uptake coefficient on dust (1) and ice(2)
 REAL v_oh, v_hcl       ! Mean thermal velocities
+REAL v_h, v_ho2
+REAL ice_nd            ! Ice Particle Number Density
+REAL airdens           ! Air Density (g/cm3)
 
 ! Dust Parameters
 ! ---------------
-REAL, PARAMETER :: dust_density = 2.5e3
+REAL, PARAMETER :: dust_density = 1.5 ! g/cm^3
+REAL, PARAMETER :: ice_density = 0.9167 ! g/cm^3
 REAL, PARAMETER :: NA = 6.022e23 ! Avogadro's constant 
 
 ! Tracer Indexes in Chemistry
@@ -124,89 +133,149 @@ integer, parameter :: i_hclo4 = 71
 integer, parameter :: i_clo4 = 72
 integer, parameter :: i_clox = 73
 
-
+! Scalar Maximum Uptake on ice  
+! -----------------------------
+REAL, PARAMETER :: gamma_oh = 9.e-1
 
 
 DO l = 1, nlayermx 
+
+    airdens = 1.e-3*press(l)/(rnew(1,l)*temp(l)) 
 
     ! =========================
     ! 1. : Dust Number Density 
     ! =========================
 
-    ! 1.1 : Particle Volume 
-    ! ---------------------
-    particle_volume = (4./3.)*pi*(rdust(l)**3) ! m^3
+    ! 1.1.0 : Prevents division by 0
+    ! ----------------------------
+    IF ( rdust(l) < 1.e-12 ) THEN 
+        cc(l,i_dust) = 0. 
+    ELSE
 
-    ! 1.2 : Mass Concentration 
+    ! 1.1.1 : Particle Volume 
+    ! ---------------------
+    particle_volume = 1.e6*(4./3.)*pi*(rdust(l)**3) ! cm^3
+
+    ! 1.1.2 : Mass Concentration 
     ! ------------------------
     !   - cc(:,i_dust) is in MMR units, remainder are number densities 
-    mass_conc = cc(l,i_dust)*press(l)/(8.314*temp(l)) 
+    mass_conc = cc(l,i_dust)*airdens
 
-    ! 1.3 : Volume Concentration
+    ! 1.1.3 : Volume Concentration
     ! --------------------------
     vol_conc = mass_conc/dust_density
 
-    ! 1.4 : Dust Number Density 
+    ! 1.1.4 : Dust Number Density 
     ! -------------------------
-    cc(l,i_dust) = 1.e-6*vol_conc/particle_volume
+    cc(l,i_dust) = vol_conc/particle_volume
+
+    ! 1.1.5 : Small values suppressed to 0
+    ! ----------------------------------
+    IF ( cc(l,i_dust) < 1.e-30*dens(l) ) cc(l,i_dust) = 0. 
+
+    ENDIF 
 
     ! ======================
-    ! 2. : Dust Surface Area 
+    ! 1.2.0 : Dust Surface Area 
     ! ======================
     s = 4.*pi*(100.*rdust(l))**2
     s = s*cc(l,i_dust)
 
     ! =========================
-    ! 3 : OH Uptake Coefficient
+    ! 1.3.0 : OH Uptake Coefficient
     ! =========================
     !   - coefficient from https://doi.org/10.1021/jp311235h
     !
-    ! 3.1 : Partial Pressure of Water Vapour
+    ! 1.3.1 : Partial Pressure of Water Vapour
     ! --------------------------------------
     pv = cc(l,i_h2o)*temp(l)*kb*1.e6 
 
-    ! 3.2 : Saturation Pressure
+    ! 1.3.2 : Saturation Pressure
     ! -------------------------
     pvs_a =  6816.*( (1./273.15) - (1./temp(l)) ) 
     pvs_b =  5.1309*LOG(273.15/temp(l))
 
     pvs = 6.112*EXP(pvs_a + pvs_b)
 
-    ! 3.3 : OH Uptake 
+    ! 1.3.3 : OH Uptake 
     ! ---------------
-    uptake_oh(l) = 0.2/( 1. + RH**0.36 )
+    uptake_oh(l) = gamma_oh/( 1. + RH**0.36 )
 
     ! ============================================
-    ! 4. : HCl Uptake Coeffient [constant for now]
+    ! 1.4.0 : HCl Uptake Coeffient [constant for now]
     ! ============================================
-    uptake_hcl(l) = 1.e-3
+    uptake_hcl(l,1) = 0.
 
     ! =======================
-    ! 5. : Thermal Velocities 
+    ! 1.5.0 : Thermal Velocities 
     ! =======================
     v_oh = (8./pi)*kb*temp(l)*NA/mmol(igcm_oh)
     v_oh = SQRT(v_oh)
+
+    v_h = (8./pi)*kb*temp(l)*NA/mmol(igcm_h)
+    v_h = SQRT(v_h)
+
+    v_ho2 = (8./pi)*kb*temp(l)*NA/mmol(igcm_ho2)
+    v_ho2 = SQRT(v_ho2)
 
     v_hcl = (8./pi)*kb*temp(l)*NA/mmol(igcm_hcl)
     v_hcl = SQRT(v_hcl) 
 
     ! =========================
-    ! 6. Loss/Production Fluxes 
+    ! 1.6.0 Loss/Production Fluxes 
     ! =========================
 
-    ! 6.1: OH Reactions with dust 
+    ! 1.6.1: OH Reactions with dust 
     ! ---------------------------
-    dust001(l) = 0.25*uptake_oh(l)*s*v_oh
+    dust001(l) = 0.25*uptake_oh(l)*s*( v_oh*cc(l,i_oh) &
+                                  + v_h*cc(l,i_h) &
+                                  + v_ho2*cc(l,i_ho2) )
 
-    ! 6.2: HCl Uptake 
+    ! 1.6.2: HCl Uptake 
     ! ----------------
-    dust002(l) = 0.25*uptake_hcl(l)*s*v_hcl
+    dust002(l) = 0.25*uptake_hcl(l,1)*s*v_hcl
+
+
+
+    ! =========================
+    ! 2.0 : Water Ice Particles 
+    ! =========================
+    IF ( rice(l) < 1.e-12 ) THEN 
+        ice_nd = 0. 
+    ELSE
+
+    ! Volume of Ice Particle cm^3
+    ! ---------------------------
+    particle_volume = (4./3.)*pi*(rice(l)**3)*1.e6 
+
+    ! 2.0.1 : Mass Concentration
+    ! --------------------------
+    mass_conc = airdens*ice_mmr(l)*mmol(igcm_h2o_ice)/mmean(1,l)
+
+    ! 2.0.2 : Volume Concentration
+    ! ----------------------------
+    vol_conc = mass_conc/ice_density
+
+    ! 2.0.3 : Number Density 
+    ! ----------------------
+    ice_nd = vol_conc/particle_volume
+
+    ENDIF 
+
+    ! 2.1 : Available Ice Surface Area (cm^2)
+    ! ---------------------------------------
+    s = 4.*pi*( rice(l)*100. )**2 
+
+    ! 2.2 : Uptake Coeffient 
+    ! ----------------------
+    uptake_hcl(l,2) = 0.1
+
+    ! 2.3 : Rate Coeffient
+    ! --------------------
+    ice001(l) = 0.25*uptake_hcl(l,2)*s*v_hcl
+
 
 ENDDO ! l 
-
-
-! Optional Outputs 
-! ================
 
 
 
@@ -214,4 +283,4 @@ RETURN
 
 
 
-END SUBROUTINE cl_dust
+END SUBROUTINE heterogeneous_chlorine

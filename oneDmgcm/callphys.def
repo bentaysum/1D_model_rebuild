@@ -22,6 +22,26 @@ callstats =.false.
 #Save EOF profiles in file "profiles" for Climate Database?
 calleofdump = .false.
 
+## NOMAD/ACS Data
+## ~~~~~~~~~~~~~~
+
+## Use NOMAD/ACS Measurements of:
+##		- dust density + radius profiles
+## 		- water ice density + radius profiles
+## 		- H2O VMR profiles  
+NOMAD_ACS = .True.
+
+## Parent Directory of NOMAD/ACS Measurements 
+NOMAD_ACS_DIR = /home/s1215319/mgcm/oneDmgcm/NOMAD_ACS
+
+## File for NOMAD Dust+Ice Observations 
+NOMAD_DUST_FILE = test1
+
+## File for NOMAD Water Observations
+NOMAD_H2O_FILE = test2
+
+
+
 
 ## MCD v5.3 interpolation routines 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,7 +50,7 @@ calleofdump = .false.
 mcd_profiles = .True. 
 
 # Longitudinal mean values of all MCD v5.3 variables?
-long_mean= .false.
+long_mean= .true.
 longitude=0.
 
 # MCD Data location
@@ -50,7 +70,7 @@ mcd_o2= .True.
 ## Tangent Linear Model Routines
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 call_tlm=.false.
-tlm_day=1
+tlm_day=1000
 tlm_lt=0.
 
 ## L-BFGS-B Routines 
@@ -79,8 +99,8 @@ pertloop=.false.
 #  =30 Mars Year 30 
 iaervar = 1
 
-# Dust opacity at 610 Pa (when constant, i.0e. for the iaervar=1 case)
-tauvis=0.14
+# Dust opacty at 610 Pa (when constant, i.0e. for the iaervar=1 case)
+tauvis=2.
 
 # Dust vertical distribution: 
 # (=0: old distrib. (Pollack90), =1: top set by "topdustref",

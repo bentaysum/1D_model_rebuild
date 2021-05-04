@@ -97,6 +97,8 @@ c   ------
       INTEGER iq,ig,l
       LOGICAL,SAVE :: firstcall=.true.
 
+
+
 c    ** un petit test de coherence
 c       --------------------------
 
@@ -208,7 +210,9 @@ c------------------------------------------------
      &             pplay,pzlay,pt,subpdt,
      &             pq,subpdq,subpdqcloud,subpdtcloud,
      &             nq,tau,rice)
+
         ENDIF
+
 
 
 c-------------------------------------------------------------------
@@ -389,6 +393,8 @@ c------Only rsedcloud is used for the water cycle
         ENDDO
       ENDIF
         
+
+
         
       IF(microphys) THEN
        
@@ -409,9 +415,14 @@ c------Only rsedcloud is used for the water cycle
           
          ENDDO
        ENDDO
+
+
+      
         
       ELSE ! no microphys
         
+
+
         DO l=1,nlay
           DO ig=1,ngrid
           
@@ -424,6 +435,8 @@ c------Only rsedcloud is used for the water cycle
           ENDDO
          ENDDO
        
+
+
        ENDIF ! of IF(microphys)
       
       
@@ -438,8 +451,8 @@ c     Then that should not affect the ice particle radius
           rice(ig,1)=rice(ig,2)
         end if
       end do
-       
-       
+
+
        DO l=1,nlay
          DO ig=1,ngrid
            rsedcloud(ig,l)=max(rice(ig,l)*

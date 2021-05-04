@@ -983,26 +983,23 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     Chlorine Release from Dust Interactions
+c     Heterogeneous Interactions involving Chlorine
+c     Compounds
 ccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C       IF ( (igcm_cl .ne. 0) .and. (doubleq) ) THEN 
-C         call cl_dust(cc, nesp, dens, rdust, t, press*100.,
-C      $               dust001, dust002)
-C       ELSE 
+      IF ( (igcm_cl .ne. 0) .and. (doubleq) ) THEN 
+        
+
+      call heterogeneous_chlorine(cc, nesp, dens,
+     $                            t, press*100.,
+     $                            h2o_ice,
+     $                            rdust, rice, 
+     $                            dust001, dust002, ice001)
+      ELSE 
         dust001(:) = 0.
         dust002(:) = 0.
-C       ENDIF 
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     HCl Deposition on Water Ice
-cccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      IF ( igcm_hcl .ne. 0 ) THEN 
-        call hcl_deposition( h2o_ice, rice,
-     $                      dens, t, press*100.,
-     $                      ice001 )
-      ELSE
         ice001(:) = 0.
       ENDIF 
+
 
 
 
@@ -2185,7 +2182,7 @@ c
      $                 + cl048(l)*cc(l,i_clo3)*cc(l,i_oh)
      $                 + cl049(l)*cc(l,i_clo3)*cc(l,i_oh)
      $                 + cl058(l)*cc(l,i_oclo)*cc(l,i_oh)
-     $                 + dust001(l)*cc(l,i_oh) 
+     $                 + dust001(l) 
 
       loss(l,i_hox) = loss(l,i_hox)/cc(l,i_hox)
 c
@@ -2757,7 +2754,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                     + j(l,j_cl2o2)*cc(l,i_cl2o2)
      $                     + j(l,j_hcl)*cc(l,i_hcl)
      $                     + j(l,j_hocl)*cc(l,i_hocl)
-     $                     + dust001(l)*cc(l,i_oh)
+     $                     + dust001(l)
 
 C       loss(l,i_clox) = 2.*cl003(l)*cc(l,i_clo) 
 C      $               + cl005(l)*cc(l,i_clo)

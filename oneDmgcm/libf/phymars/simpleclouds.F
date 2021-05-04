@@ -155,7 +155,9 @@ c     ~~~~~~~~~~~~~~~
         end do
       end do
 
-c     ice crystal radius
+
+      ! BMT - Using TGO Measured Profiles
+
       do l=1, nlay
         do ig=1,ngridmx
           call updaterice_typ(zq(ig,l,igcm_h2o_ice),
