@@ -135,7 +135,7 @@ integer, parameter :: i_clox = 73
 
 ! Scalar Maximum Uptake on ice  
 ! -----------------------------
-REAL, PARAMETER :: gamma_oh = 9.e-1
+REAL, PARAMETER :: gamma_oh = 4.e-1
 
 
 DO l = 1, nlayermx 
@@ -181,6 +181,7 @@ DO l = 1, nlayermx
     s = 4.*pi*(100.*rdust(l))**2
     s = s*cc(l,i_dust)
 
+
     ! =========================
     ! 1.3.0 : OH Uptake Coefficient
     ! =========================
@@ -204,7 +205,7 @@ DO l = 1, nlayermx
     ! ============================================
     ! 1.4.0 : HCl Uptake Coeffient [constant for now]
     ! ============================================
-    uptake_hcl(l,1) = 0.
+    uptake_hcl(l,1) = 1.e-4
 
     ! =======================
     ! 1.5.0 : Thermal Velocities 
@@ -228,8 +229,7 @@ DO l = 1, nlayermx
     ! 1.6.1: OH Reactions with dust 
     ! ---------------------------
     dust001(l) = 0.25*uptake_oh(l)*s*( v_oh*cc(l,i_oh) &
-                                  + v_h*cc(l,i_h) &
-                                  + v_ho2*cc(l,i_ho2) )
+                                  + v_ho2*cc(l,i_ho2))
 
     ! 1.6.2: HCl Uptake 
     ! ----------------
@@ -268,7 +268,7 @@ DO l = 1, nlayermx
 
     ! 2.2 : Uptake Coeffient 
     ! ----------------------
-    uptake_hcl(l,2) = 0.1
+    uptake_hcl(l,2) = 0.
 
     ! 2.3 : Rate Coeffient
     ! --------------------

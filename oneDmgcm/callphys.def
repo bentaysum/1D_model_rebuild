@@ -29,16 +29,16 @@ calleofdump = .false.
 ##		- dust density + radius profiles
 ## 		- water ice density + radius profiles
 ## 		- H2O VMR profiles  
-NOMAD_ACS = .True.
+NOMAD_ACS=.True.
 
 ## Parent Directory of NOMAD/ACS Measurements 
-NOMAD_ACS_DIR = /home/s1215319/mgcm/oneDmgcm/NOMAD_ACS
+NOMAD_ACS_DIR= /home/s1215319/mgcm/oneDmgcm/NOMAD_ACS
 
 ## File for NOMAD Dust+Ice Observations 
-NOMAD_DUST_FILE = test1
+NOMAD_DUST_FILE=gridded_aerosol_2862_E
 
 ## File for NOMAD Water Observations
-NOMAD_H2O_FILE = test2
+NOMAD_H2O_FILE=35Lat_210-240Ls_H2ONOMAD_MY34
 
 
 
@@ -100,7 +100,7 @@ pertloop=.false.
 iaervar = 1
 
 # Dust opacty at 610 Pa (when constant, i.0e. for the iaervar=1 case)
-tauvis=2.
+tauvis=0.523
 
 # Dust vertical distribution: 
 # (=0: old distrib. (Pollack90), =1: top set by "topdustref",

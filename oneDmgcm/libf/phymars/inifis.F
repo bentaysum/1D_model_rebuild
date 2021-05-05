@@ -196,11 +196,31 @@
          write(*,*) " long_mean = ",long_mean
 
 !       NOMAD/ACS Profiles Used?
-        write(*,*) "Use NOMAD/ACS Tracer Profiles?"
+        write(*,*) "Use NOMAD/ACS Dust, Ice and Water Profiles?"
         NOMAD_ACS = .false. ! default
         call getin("NOMAD_ACS", NOMAD_ACS)
         write(*,*)"NOMAD_ACS = ", NOMAD_ACS
-
+	
+		if ( NOMAD_ACS ) then 
+			! Location of Trace Gas Orbiter Data?
+			NOMAD_ACS_DIR = '/home/s1215319/mgcm/oneDmgcm/NOMAD_ACS'
+			call getin("NOMAD_ACS_DIR",NOMAD_ACS_DIR)
+			write(*,*) "NOMAD_ACS Directory : ", TRIM(NOMAD_ACS_DIR)
+		
+			! Dust and Ice Profiles 
+			NOMAD_DUST_FILE = 'None' ! Default
+			call getin("NOMAD_DUST_FILE",NOMAD_DUST_FILE)
+			write(*,*) "NOMAD Dust and Ice file : ", TRIM(NOMAD_DUST_FILE) 
+			
+			! Water Vapour VMR
+			NOMAD_H2O_FILE = 'None' ! Default 
+			call getin("NOMAD_H2O_FILE",NOMAD_H2O_FILE)
+			write(*,*) "NOMAD Water Vapour file : ", TRIM(NOMAD_H2O_FILE)
+		
+			
+		endif 
+		
+		
 
          
 !        Tangent Linear Model Parameters 

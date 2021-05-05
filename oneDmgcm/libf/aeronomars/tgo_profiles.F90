@@ -14,7 +14,7 @@ IMPLICIT NONE
 #include "tracer.h"
 #include "conc.h"
 #include "comcstfi.h"
-
+#include "callkeys.h"
 
 
 ! ===========================================
@@ -42,17 +42,32 @@ REAL rice(nlayermx)  ! Geometric Radius of ice (m)
 ! ==========
 ! Local Vars
 ! ==========
+
+! File ID's
 INTEGER, PARAMETER :: dust_ice_ID = 110
 INTEGER, PARAMETER :: h2o_ID = 120 
 
+! Number of Altitude Steps in NOMAD Data Files 
 INTEGER, PARAMETER :: Nalt = 81
 
-REAL alt_grid(Nalt) ! Altitude grid of NOMAD Data (km)
-REAL data_grid(Nalt,5) ! TGO Dust Profile 
+! Altitude grid of NOMAD Data (0 -> 80 km , 1 km resolution)
+REAL alt_grid(Nalt) !  
 
-REAL ice_1D(nlayermx) ! 1-D interpolated Ice Number Density (cm-3)
-REAL dust_nd(nlayermx) ! Dust Number Density (cm-3)
+! Array Holding all NOMAD Data extracted from files
+REAL data_grid(Nalt,5) 
+! Indices for data_grid
+INTEGER,PARAMETER  :: i_dustnd=1
+INTEGER,PARAMETER  :: i_rdust=2
+INTEGER,PARAMETER  :: i_icend=3
+INTEGER,PARAMETER  :: i_rice=4
+INTEGER,PARAMETER  :: i_h2ovap=5
 
+! Ice Number density (cm-3)
+! 	- 1D model requires a conversion to MMR (kg/kg) 
+REAL ice_1D(nlayermx) 
+! Dust Number density (cm-3)
+!	- 1D model requires a conversion to MMR (kg/kg) 
+REAL dust_nd(nlayermx) 
 
 ! Loop iterator
 INTEGER i, l
@@ -66,24 +81,24 @@ CHARACTER(len=100) DUMMY
 !	  extrapolation routine, and "constant"
 !	  that assigns constant values outside of the 
 !     TGO's measured altitude range.
-REAL h2o_grid(Nalt,4)
+REAL h2ovmr_NOMAD(Nalt)
+! Used to disregard unwanted columns upon 
+! Read Command 
+REAL dumh2o_1, dumh2o_2, dumh2o_3 
 
-! Indices for data_grid
-INTEGER,PARAMETER  :: i_dustnd=1
-INTEGER,PARAMETER  :: i_rdust=2
-INTEGER,PARAMETER  :: i_icend=3
-INTEGER,PARAMETER  :: i_rice=4
-INTEGER,PARAMETER  :: i_h2ovap=5
+CHARACTER(len=200) NOMADH2O, NOMADICEDUST
 
 ! TGO Datafiles
 ! 	- pre-interpolated onto a 0->80 km altitude grid 
 ! --------------------------------------------------
-CHARACTER(len=*), PARAMETER :: TGO_dir = "NOMAD_ACS/" ! Main Directory of TGO Data
-CHARACTER(len=*), PARAMETER :: TGO_dust_ice = "DUST_ICE/Gridded_Data/" ! TGO Dust 
-CHARACTER(len=*), PARAMETER :: TGO_h2o  = "H2O/Gridded/" 
 
-CHARACTER(len=*), PARAMETER :: DUST_ICE_FILE = "gridded_aerosol_3482_I.txt"
-CHARACTER(len=*), PARAMETER :: H2O_FILE = "60Lat_240-260Ls_H2ONOMAD_MY34.txt"
+
+! CHARACTER(len=*), PARAMETER :: TGO_dir = "NOMAD_ACS/" ! Main Directory of TGO Data
+! CHARACTER(len=*), PARAMETER :: TGO_dust_ice = "DUST_ICE/Gridded_Data/" ! TGO Dust 
+! CHARACTER(len=*), PARAMETER :: TGO_h2o  = "H2O/Gridded/" 
+
+! CHARACTER(len=*), PARAMETER :: DUST_ICE_FILE = "gridded_aerosol_3482_I.txt"
+! CHARACTER(len=*), PARAMETER :: H2O_FILE = "60Lat_240-260Ls_H2ONOMAD_MY34.txt"
 
 ! Particle Number Density -> Mass Mixing Ratio
 ! --------------------------------------------
@@ -102,9 +117,13 @@ REAL,PARAMETER :: icedens = 0.9168  ! Ice density (g m-3)
 ! ------------------------------
 ! Stage 1 : Reading TGO Profiles
 ! ------------------------------
+OPEN( UNIT = dust_ice_ID , FILE = TRIM(NOMAD_ACS_DIR) // "/DUST_ICE/Gridded_Data/" // &
+								  TRIM(NOMAD_DUST_FILE) // ".txt", ACTION = "READ" )
 
-OPEN( UNIT=dust_ice_ID, FILE=TGO_dir//TGO_dust_ice//DUST_ICE_FILE, ACTION = "READ" )
-OPEN( UNIT=h2o_ID, FILE=TGO_dir//TGO_h2o//H2O_FILE, ACTION = "READ" )
+OPEN( UNIT = h2o_ID, FILE = TRIM(NOMAD_ACS_DIR) // "/H2O/Gridded/" // &
+								  TRIM(NOMAD_H2O_FILE) // ".txt", ACTION = "READ" )
+								  
+
 
 READ(  dust_ice_ID, * ) DUMMY ! Skip Header 
 READ( h2o_ID, * ) DUMMY ! Skip Header 
@@ -114,9 +133,12 @@ DO i = 1, Nalt
 	READ( dust_ice_ID, *  ) alt_grid(i), data_grid(i,i_rdust), data_grid(i,i_rice), &
 								data_grid(i,i_dustnd), data_grid(i,i_icend) 
 								
-	READ ( h2o_ID, * ) alt_grid(i), h2o_grid(i,1), h2o_grid(i,2), h2o_grid(i,3), h2o_grid(i,4)	
+	READ ( h2o_ID, * ) alt_grid(i), h2ovmr_NOMAD(i), dumh2o_1, dumh2o_2, dumh2o_3 
+	
 	
 ENDDO
+
+
 
 ! -----------------------------------------------
 ! Stage 2 : Interpolating onto the 1-D Model Grid
@@ -131,7 +153,7 @@ call interp_line( alt_grid, data_grid(:,i_dustnd), Nalt, &
 ! --------------------------------
 ! Water Vapour Volume Mixing ratio
 ! --------------------------------
-call interp_line( alt_grid, h2o_grid(:,1), Nalt, &
+call interp_line( alt_grid, h2ovmr_NOMAD, Nalt, &
 				  z, h2ovap_mmr, nlayermx )
 ! VMR -> MMR 
 	h2ovap_mmr = h2ovap_mmr*mmol(igcm_h2o_vap)/mmean(ig,:)
@@ -159,9 +181,10 @@ call interp_line( alt_grid, data_grid(:,i_icend), Nalt, &
 				  z, ice_1D, nlayermx )
 
 				  
-! -------------------------------------------------------------------
-! Stage 3 : Dust and Ice Particle Number Density -> Mass Mixing Ratio 
-! -------------------------------------------------------------------
+! ! -------------------------------------------------------------------
+! ! Stage 3 : Dust and Ice Particle Number Density -> Mass Mixing Ratio 
+! ! -------------------------------------------------------------------
+ 
 DO l = 1, nlayermx
 	
 
@@ -199,8 +222,6 @@ DO l = 1, nlayermx
 	
 	! Mass Mixing Ratio 
 	h2oice_mmr(l) = ice_masscon/airdens	
-
-	
 
 ENDDO
 
