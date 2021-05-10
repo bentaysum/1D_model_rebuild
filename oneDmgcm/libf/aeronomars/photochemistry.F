@@ -777,10 +777,15 @@ c     ================
       real pcl(nlayermx), pclo(nlayermx)
       real lcl(nlayermx), lclo(nlayermx)
 
-      real dust001(nlayermx) ! OH + dust -> Cl + product 
-      real dust002(nlayermx) ! HCl + dust -> dust
+      real dust001(nlayermx) ! OH + dust -> ClOx + product 
+      real dust002(nlayermx) ! HO2 + dust -> ClOx + product 
+      real dust003(nlayermx) ! H2O + dust -> ClOx + product
+      real dust004(nlayermx) ! Cl + dust -> Products 
 
       real ice001(nlayermx)  ! HCl + ice -> Products
+      real ice002(nlayermx)  ! Cl2 + ice -> products
+      real ice003(nlayermx)  ! OClO + ice -> Products
+      real ice004(nlayermx)  ! ClO + ice -> Products 
 
 c     Dust Parameters
 c     ===============
@@ -993,15 +998,19 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                            t, press*100.,
      $                            h2o_ice,
      $                            rdust, rice, 
-     $                            dust001, dust002, ice001)
+     $                            dust001, dust002, dust003, dust004,
+     $                            ice001, ice002, ice003, ice004)
       ELSE 
         dust001(:) = 0.
         dust002(:) = 0.
+        dust003(:) = 0.
+        dust004(:) = 0.
+
         ice001(:) = 0.
+        ice002(:) = 0.
+        ice003(:) = 0.
+        ice004(:) = 0.
       ENDIF 
-
-
-
 
 c      
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1668,6 +1677,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $    + cl053(l)*cc(l,i_clo4)
      $    + cl056(l)*cc(l,i_hocl)
      $    + cl059(l)*cc(l,i_oclo)
+     $    + dust004(l)
 
       ! Production of ClO via Cl
       pclo(l) = cl001(l)*cc(l,i_o3)
@@ -1684,6 +1694,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $     + cl004(l)*cc(l,i_clo)
      $     + cl005(l)*cc(l,i_clo)
      $     + cl012(l)*cc(l,i_oh)
+     $     + ice004(l)
 
       rclo_cl(l) = (pclo(l) + lcl(l))/(pcl(l) + lclo(l))
 
@@ -1691,10 +1702,9 @@ c     -----------------------------------------------
 C     Atmospheric state prior to timestep advancement
 c     neeeded for TLM
 c     ----------------------------------------------- 
-C       IF ( tlm_on ) THEN 
-C             cc_prev = cc(l,:)
-C       ENDIF ! tlm_on 
-
+      IF ( tlm_on ) THEN 
+            cc_prev = cc(l,:)
+      ENDIF ! tlm_on 
         ! Cl
         cc(l,i_cl) = cc(l,i_clox)/(1. + rclo_cl(l))
 
@@ -2003,6 +2013,7 @@ c
          loss(l,i_h2o) = j(l,j_h2o)
      $                 + b002(l)*cc(l,i_o1d)
      $                 + t001(l)
+     $                 + dust003(l)
 c
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -2182,7 +2193,8 @@ c
      $                 + cl048(l)*cc(l,i_clo3)*cc(l,i_oh)
      $                 + cl049(l)*cc(l,i_clo3)*cc(l,i_oh)
      $                 + cl058(l)*cc(l,i_oclo)*cc(l,i_oh)
-     $                 + dust001(l) 
+     $                 + dust001(l)*cc(l,i_oh)
+     $                 + dust002(l)*cc(l,i_ho2)
 
       loss(l,i_hox) = loss(l,i_hox)/cc(l,i_hox)
 c
@@ -2754,7 +2766,9 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                     + j(l,j_cl2o2)*cc(l,i_cl2o2)
      $                     + j(l,j_hcl)*cc(l,i_hcl)
      $                     + j(l,j_hocl)*cc(l,i_hocl)
-     $                     + dust001(l)
+     $                     + dust001(l)*cc(l,i_oh)
+     $                     + dust002(l)*cc(l,i_ho2)
+     $                     + dust003(l)*cc(l,i_h2o)
 
 C       loss(l,i_clox) = 2.*cl003(l)*cc(l,i_clo) 
 C      $               + cl005(l)*cc(l,i_clo)
@@ -2812,6 +2826,8 @@ C      $               + cl055(l)*cc(l,i_hocl)
      $               + cl046(l)*cc(l,i_clo3)*cc(l,i_clO)
      $               + cl047(l)*cc(l,i_clo3)*cc(l,i_clo)
      $               + cl055(l)*cc(l,i_hocl)*cc(l,i_cl)
+     $               + dust004(l)*cc(l,i_cl)
+     $               + ice004(l)*cc(l,i_clo)
 
       loss(l,i_clox) = loss(l,i_clox)/MAX( cc(l,i_clox), 1.e-30*dens(L))
 
@@ -2841,9 +2857,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                + cl039(l)*cc(l,i_o1d)*0.88
      $                + cl040(l)*cc(l,i_o) 
      $                + cl041(l)*cc(l,i_h) 
-     $                + dust002(l)
      $                + ice001(l)
-
 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Cl2 
@@ -2859,6 +2873,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $              + cl037(l)*cc(l,i_h)
      $              + cl038(l)*cc(l,i_ch3)
      $              + j(l,j_cl2)
+     $              + ice002(l)
 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     ClOO 
@@ -2914,6 +2929,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $               + cl058(l)*cc(l,i_oh)
      $               + cl059(l)*cc(l,i_cl)
      $               + j(l,j_oclo)
+     $               + ice003(l)
 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     CH3OCl

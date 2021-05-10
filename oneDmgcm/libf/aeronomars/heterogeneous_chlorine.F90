@@ -2,7 +2,8 @@ SUBROUTINE heterogeneous_chlorine(cc, nesp, dens, &
                                  temp, press, &  
                                  ice_mmr, &              
                                  rdust, rice, &
-                                 dust001, dust002, ice001)
+                                 dust001, dust002, dust003, dust004,&
+                                 ice001, ice002, ice003, ice004)
 
 IMPLICIT NONE
 
@@ -24,34 +25,54 @@ REAL ice_mmr(nlayermx) ! Water Ice Mass Mixing Ratio (kg/kg)
 REAL rdust(nlayermx), rice(nlayermx) ! Mean Geometric radius of dust/ice particles [m]
 REAL temp(nlayermx)    ! temperature [K]
 REAL press(nlayermx)   ! Pressure [Pa]
-! Output 
-! ------
-REAL dust001(nlayermx) ! Rate of OH + dust -> Cl + Products
-REAL dust002(nlayermx) ! Rate of HCl adsorption onto dust 
-REAL ice001(nlayermx)  ! Rate of HCl adsorption onto ice 
+
+! Output [2nd order rate coefficients]
+! ------------------------------------
+real dust001(nlayermx) ! OH + dust -> ClOx + product 
+real, parameter :: d1_up_gamma =8.E-1
+real d1_up
+real dust002(nlayermx) ! HO2 + dust -> ClOx + product 
+real, parameter :: d2_up = 0.02
+real dust003(nlayermx) ! H2O + dust -> ClOx + product
+real, parameter :: d3_up = 0.
+real dust004(nlayermx) ! Cl + dust -> Products 
+real, parameter :: d4_up = 1.e-2
+
+real ice001(nlayermx)  ! HCl + ice -> Products
+real, parameter :: i1_up = 0.8
+real ice002(nlayermx)  ! Cl2 + ice -> products
+real, parameter :: i2_up = 0. !1.e-4
+real ice003(nlayermx)  ! OClO + ice -> Products
+real, parameter :: i3_up = 0.! 0.8
+real ice004(nlayermx)  ! ClO + ice -> Products 
+real, parameter :: i4_up = 0. !1.e-4
 
 ! Local 
 ! =====
 INTEGER l              ! Layer iterator 
 REAL particle_volume   ! Volume of single dust grain 
-REAL mass_conc         ! Dust mass concentration 
-REAL vol_conc          ! Dust volume concentration
-REAL S                 ! Dust Surface Area per Unit volume
+REAL mass_conc         ! Dust/ice mass concentration 
+REAL vol_conc          ! Dust/ice volume concentration
+REAL dustsurf, icesurf ! Dust/ice Surface Area per Unit volume
 REAL pv                ! Water Vapour Partial Pressure
 REAL pvs_a, pvs_b, pvs ! Water Vapour Saturation Pressure 
 REAL RH                ! Rel. Humidity 
-REAL uptake_oh(nlayermx) ! OH uptake coefficient 
-REAL uptake_hcl(nlayermx,2) ! HCl uptake coefficient on dust (1) and ice(2)
-REAL v_oh, v_hcl       ! Mean thermal velocities
-REAL v_h, v_ho2
 REAL ice_nd            ! Ice Particle Number Density
 REAL airdens           ! Air Density (g/cm3)
+REAL v_therm           ! Thermal velocity of molecule 
+
+! Uptake Coefficients
+! ===================
+
+! 
 
 ! Dust Parameters
 ! ---------------
 REAL, PARAMETER :: dust_density = 1.5 ! g/cm^3
 REAL, PARAMETER :: ice_density = 0.9167 ! g/cm^3
 REAL, PARAMETER :: NA = 6.022e23 ! Avogadro's constant 
+
+
 
 ! Tracer Indexes in Chemistry
 ! ===========================
@@ -133,150 +154,227 @@ integer, parameter :: i_hclo4 = 71
 integer, parameter :: i_clo4 = 72
 integer, parameter :: i_clox = 73
 
-! Scalar Maximum Uptake on ice  
-! -----------------------------
-REAL, PARAMETER :: gamma_oh =8.E-1
 
-
-DO l = 1, nlayermx 
-
+DO l = 1, nlayermx ! Altitude step loop 
+! ===================================================== !
+! Stage 1 : Calculation of Surface Area per unit volume !
+!           of dust and ice 
+! ===================================================== !
+    
+    ! 1.0 : Air Density (g/cm3)
+    ! -------------------------
     airdens = 1.e-3*press(l)/(rnew(1,l)*temp(l)) 
 
-    ! =========================
-    ! 1. : Dust Number Density 
-    ! =========================
+    ! +++++++++++++++++++++++++++++++++++++
+    ! 1.1.0 : Dust Surface Area (cm^2/cm^3)
+    ! +++++++++++++++++++++++++++++++++++++
 
-    ! 1.1.0 : Prevents division by 0
-    ! ----------------------------
+    ! 1.1.1 : Suppress division by 0
+    ! ------------------------------
     IF ( rdust(l) < 1.e-12 ) THEN 
         cc(l,i_dust) = 0. 
     ELSE
 
-    ! 1.1.1 : Particle Volume 
+    ! 1.1.2 : Particle Volume 
     ! ---------------------
     particle_volume = 1.e6*(4./3.)*pi*(rdust(l)**3) ! cm^3
 
-    ! 1.1.2 : Mass Concentration 
+    ! 1.1.3 : Mass Concentration 
     ! ------------------------
-    !   - cc(:,i_dust) is in MMR units, remainder are number densities 
+    !   - cc(:,i_dust) is in MMR units on input,
+    !     remainder are trace gas number densities 
     mass_conc = cc(l,i_dust)*airdens
 
-    ! 1.1.3 : Volume Concentration
+    ! 1.1.4 : Volume Concentration
     ! --------------------------
     vol_conc = mass_conc/dust_density
 
-    ! 1.1.4 : Dust Number Density 
+    ! 1.1.5 : Dust Number Density 
     ! -------------------------
     cc(l,i_dust) = vol_conc/particle_volume
 
-    ! 1.1.5 : Small values suppressed to 0
+    ! 1.1.6 : Small values suppressed to 0
     ! ----------------------------------
     IF ( cc(l,i_dust) < 1.e-30*dens(l) ) cc(l,i_dust) = 0. 
 
-    ENDIF 
+    ENDIF ! if rdust < 1.e-12
 
-    ! ======================
-    ! 1.2.0 : Dust Surface Area 
-    ! ======================
-    s = 4.*pi*(100.*rdust(l))**2
-    s = s*cc(l,i_dust)
+    ! 1.1.7 : Dust Surface Area per cm^3 
+    ! ----------------------------------
+    dustsurf = cc(l,i_dust)*4.*pi*(100.*rdust(l))**2
 
 
-    ! =========================
-    ! 1.3.0 : OH Uptake Coefficient
-    ! =========================
-    !   - coefficient from https://doi.org/10.1021/jp311235h
-    !
-    ! 1.3.1 : Partial Pressure of Water Vapour
-    ! --------------------------------------
-    pv = cc(l,i_h2o)*temp(l)*kb*1.e6 
+    ! +++++++++++++++++++++++++++++++++++++
+    ! 1.2.0 : Ice Surface Area (cm^2/cm^3)
+    ! +++++++++++++++++++++++++++++++++++++
 
-    ! 1.3.2 : Saturation Pressure
-    ! -------------------------
-    pvs_a =  6816.*( (1./273.15) - (1./temp(l)) ) 
-    pvs_b =  5.1309*LOG(273.15/temp(l))
-
-    pvs = 6.112*EXP(pvs_a + pvs_b)
-
-    ! 1.3.3 : OH Uptake 
-    ! ---------------
-    uptake_oh(l) = gamma_oh/( 1. + RH**0.36 )
-
-    ! ============================================
-    ! 1.4.0 : HCl Uptake Coeffient [constant for now]
-    ! ============================================
-    uptake_hcl(l,1) = 0.
-
-    ! =======================
-    ! 1.5.0 : Thermal Velocities 
-    ! =======================
-    v_oh = (8./pi)*kb*temp(l)*NA/mmol(igcm_oh)
-    v_oh = SQRT(v_oh)
-
-    v_h = (8./pi)*kb*temp(l)*NA/mmol(igcm_h)
-    v_h = SQRT(v_h)
-
-    v_ho2 = (8./pi)*kb*temp(l)*NA/mmol(igcm_ho2)
-    v_ho2 = SQRT(v_ho2)
-
-    v_hcl = (8./pi)*kb*temp(l)*NA/mmol(igcm_hcl)
-    v_hcl = SQRT(v_hcl) 
-
-    ! =========================
-    ! 1.6.0 Loss/Production Fluxes 
-    ! =========================
-
-    ! 1.6.1: OH Reactions with dust 
-    ! ---------------------------
-    dust001(l) = 0.25*uptake_oh(l)*s*( v_oh*cc(l,i_oh) &
-                                  + v_ho2*cc(l,i_ho2) &
-                                    + v_h*cc(l,i_h) )
-
-    ! 1.6.2: HCl Uptake 
-    ! ----------------
-    dust002(l) = 0.25*uptake_hcl(l,1)*s*v_hcl
-
-
-
-    ! =========================
-    ! 2.0 : Water Ice Particles 
-    ! =========================
+    ! 1.2.1 : Suppress division by 0
+    ! ------------------------------
     IF ( rice(l) < 1.e-12 ) THEN 
         ice_nd = 0. 
     ELSE
 
-    ! Volume of Ice Particle cm^3
-    ! ---------------------------
+    ! 1.2.2 : Particle Volume
+    ! -----------------------
     particle_volume = (4./3.)*pi*(rice(l)**3)*1.e6 
 
-    ! 2.0.1 : Mass Concentration
+    ! 1.2.3 : Mass Concentration
     ! --------------------------
     mass_conc = airdens*ice_mmr(l)*mmol(igcm_h2o_ice)/mmean(1,l)
 
-    ! 2.0.2 : Volume Concentration
+    ! 1.2.4 : Volume Concentration
     ! ----------------------------
     vol_conc = mass_conc/ice_density
 
-    ! 2.0.3 : Number Density 
+    ! 1.2.5 : Number Density 
     ! ----------------------
     ice_nd = vol_conc/particle_volume
 
-    ENDIF 
+    ! 1.2.6 : Small values suppressed to 0
+    ! ----------------------------------
+    IF ( ice_nd < 1.e-30*dens(l) ) ice_nd = 0. 
 
-    ! 2.1 : Available Ice Surface Area (cm^2)
+    ENDIF ! if rdust < 1.e-12
+
+
+    ! 1.2.6 : Available Ice Surface Area (cm^2)
     ! ---------------------------------------
-    s = 4.*pi*( rice(l)*100. )**2 
-
-    ! 2.2 : Uptake Coeffient 
-    ! ----------------------
-    uptake_hcl(l,2) = 0.9
-
-    ! 2.3 : Rate Coeffient
-    ! --------------------
-    ice001(l) = 0.25*uptake_hcl(l,2)*s*v_hcl
+    icesurf = ice_nd*4.*pi*( rice(l)*100. )**2 
 
 
-ENDDO ! l 
+    ! ===============================================
+    ! 2.0 : Rate Coefficients 
+    ! ===============================================
+
+    ! ------------------------------
+    ! 2.1 : OH + Dust -> ClOx + Dust 
+    ! ------------------------------
+
+    ! 2.1.0 : OH Uptake Coefficient dependancy on Partial Pressure
+    ! ------------------------------------------------------------ 
+
+    ! 2.1.1 : Partial Pressure of Water Vapour
+    !       - Buck Eq.
+    ! --------------------------------------
+    pv = 18.678 - ((temp(l) - 273.15)/234.5) 
+    pv = pv*( (temp(l)-273.15)/( 257.14 - 273.15 + temp(l) ) )
+    pv = 0.61121*EXP( pv )*1.e-3 ! Pa
+
+    ! 2.1.2 : Saturation Pressure
+    ! ---------------------------
+    pvs_a = 2.07023-0.00320991*temp(l)-2484.896/temp(l)+3.56654*alog10(temp(l))
+    pvs = (10.**pvs_a)*100. ! Pa
+    
+    ! 2.1.3 : Relative Humidity
+    ! -------------------------
+    RH = 100.*pv/pvs
+
+    ! 2.1.4 : Uptake Coefficient
+    ! --------------------------
+    d1_up = d1_up_gamma/(1. + RH**0.36)
+
+    ! 2.1.5 : Mean Thermal Velocity of OH
+    ! -----------------------------------
+    v_therm = 1.e7*(8./pi)*kb*temp(l)*NA/mmol(igcm_oh)
+    v_therm = SQRT(v_therm)
+
+    ! 2.1.6 : Rate
+    ! ------------
+    dust001(l) = 0.25*d1_up*dustsurf*v_therm
+
+    ! -------------------------------
+    ! 2.2 : HO2 + Dust -> ClOx + Dust 
+    ! -------------------------------
+
+    ! 2.2.1 : Mean Thermal Vel. of HO2
+    ! --------------------------------
+    v_therm = 1.e7*(8./pi)*kb*temp(l)*NA/mmol(igcm_ho2)
+    v_therm = SQRT(v_therm)
+
+    ! 2.2.2 : Rate
+    ! ------------
+    dust002(l) = 0.25*d2_up*dustsurf*v_therm
+
+    ! -------------------------------
+    ! 2.3 : H2O + Dust -> ClOx + Dust 
+    ! -------------------------------
+
+    ! 2.3.1 : Mean Thermal Vel. of HO2
+    ! --------------------------------
+    v_therm = 1.e7*(8./pi)*kb*temp(l)*NA/mmol(igcm_h2o_vap)
+    v_therm = SQRT(v_therm)
+
+    ! 2.3.2 : Rate
+    ! ------------
+    dust003(l) = 0.25*d3_up*dustsurf*v_therm
+
+    ! -------------------------------
+    ! 2.4 : Cl + Dust -> Products  
+    ! -------------------------------
+
+    ! 2.4.1 : Mean Thermal Vel. of Cl
+    ! --------------------------------
+    v_therm = 1.e7*(8./pi)*kb*temp(l)*NA/mmol(igcm_cl)
+    v_therm = SQRT(v_therm)
+
+    ! 2.4.2 : Rate
+    ! ------------
+    dust004(l) = 0.25*d4_up*dustsurf*v_therm
+
+    ! ----------------------------
+    ! 2.5 : HCl + Ice -> Products
+    ! ----------------------------
+
+    ! 2.5.1 : Thermal Vel.
+    ! -------------------
+    v_therm = 1.e7*(8./pi)*kb*temp(l)*NA/mmol(igcm_hcl)
+    v_therm = SQRT(v_therm)
+
+    ! 2.5.2 : Rate
+    ! ------------
+    ice001(l) = 0.25*i1_up*icesurf*v_therm
+
+    ! ----------------------------
+    ! 2.6 : Cl2 + Ice -> Products
+    ! ----------------------------
+
+    ! 2.6.1 : Thermal Vel.
+    ! -------------------
+    v_therm = 1.e7*(8./pi)*kb*temp(l)*NA/mmol(igcm_cl2)
+    v_therm = SQRT(v_therm)
+
+    ! 2.6.2 : Rate
+    ! ------------
+    ice002(l) = 0.25*i2_up*icesurf*v_therm
+
+    ! ----------------------------
+    ! 2.7 : OClO + Ice -> Products
+    ! ----------------------------
+
+    ! 2.7.1 : Thermal Vel.
+    ! -------------------
+    v_therm = 1.e7*(8./pi)*kb*temp(l)*NA/mmol(igcm_oclo)
+    v_therm = SQRT(v_therm)
+
+    ! 2.7.2 : Rate
+    ! ------------
+    ice003(l) = 0.25*i3_up*icesurf*v_therm
+
+    ! ----------------------------
+    ! 2.6 : ClO + Ice -> Products
+    ! ----------------------------
+
+    ! 2.6.1 : Thermal Vel.
+    ! -------------------
+    v_therm = 1.e7*(8./pi)*kb*temp(l)*NA/mmol(igcm_clo)
+    v_therm = SQRT(v_therm)
+
+    ! 2.6.2 : Rate
+    ! ------------
+    ice004(l) = 0.25*i4_up*icesurf*v_therm
+
+
+ENDDO 
 
 
 
