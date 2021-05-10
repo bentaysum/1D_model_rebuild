@@ -781,7 +781,8 @@ c     ================
       real dust002(nlayermx) ! HO2 + dust -> ClOx + product 
       real dust003(nlayermx) ! H2O + dust -> ClOx + product
       real dust004(nlayermx) ! Cl + dust -> Products 
-
+      real dust005(nlayermx) ! HCl + Dust -> Product
+	  
       real ice001(nlayermx)  ! HCl + ice -> Products
       real ice002(nlayermx)  ! Cl2 + ice -> products
       real ice003(nlayermx)  ! OClO + ice -> Products
@@ -999,6 +1000,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                            h2o_ice,
      $                            rdust, rice, 
      $                            dust001, dust002, dust003, dust004,
+     $                            dust005,
      $                            ice001, ice002, ice003, ice004)
       ELSE 
         dust001(:) = 0.
@@ -2858,6 +2860,7 @@ Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      $                + cl040(l)*cc(l,i_o) 
      $                + cl041(l)*cc(l,i_h) 
      $                + ice001(l)
+     $                + dust005(l)
 
 Cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Cl2 

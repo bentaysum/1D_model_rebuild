@@ -3,6 +3,7 @@ SUBROUTINE heterogeneous_chlorine(cc, nesp, dens, &
                                  ice_mmr, &              
                                  rdust, rice, &
                                  dust001, dust002, dust003, dust004,&
+								 dust005, &
                                  ice001, ice002, ice003, ice004)
 
 IMPLICIT NONE
@@ -29,19 +30,21 @@ REAL press(nlayermx)   ! Pressure [Pa]
 ! Output [2nd order rate coefficients]
 ! ------------------------------------
 real dust001(nlayermx) ! OH + dust -> ClOx + product 
-real, parameter :: d1_up_gamma =8.E-1
+real, parameter :: d1_up_gamma =2.E-1
 real d1_up
 real dust002(nlayermx) ! HO2 + dust -> ClOx + product 
 real, parameter :: d2_up = 0.02
 real dust003(nlayermx) ! H2O + dust -> ClOx + product
 real, parameter :: d3_up = 0.
 real dust004(nlayermx) ! Cl + dust -> Products 
-real, parameter :: d4_up = 1.e-2
+real, parameter :: d4_up = 1.e-1
+real, dust005(nlayermx) ! HCl + dust -> Products
+real, parameter :: d5_up = 13.e-1 
 
 real ice001(nlayermx)  ! HCl + ice -> Products
-real, parameter :: i1_up = 0.8
+real, parameter :: i1_up = 0.6 
 real ice002(nlayermx)  ! Cl2 + ice -> products
-real, parameter :: i2_up = 0. !1.e-4
+real, parameter :: i2_up = 0.!1.e-4
 real ice003(nlayermx)  ! OClO + ice -> Products
 real, parameter :: i3_up = 0.! 0.8
 real ice004(nlayermx)  ! ClO + ice -> Products 
@@ -330,6 +333,11 @@ DO l = 1, nlayermx ! Altitude step loop
     v_therm = 1.e7*(8./pi)*kb*temp(l)*NA/mmol(igcm_hcl)
     v_therm = SQRT(v_therm)
 
+	! ------------------------------
+	! 2.4.1 : HCl + Dust -> Products 
+	! ------------------------------
+	dust005(l) = 0.25*d5_up*dustsurf*v_therm 
+		
     ! 2.5.2 : Rate
     ! ------------
     ice001(l) = 0.25*i1_up*icesurf*v_therm
