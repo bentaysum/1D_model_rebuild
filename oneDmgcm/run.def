@@ -5,7 +5,7 @@
 
 #### Time integration parameters
 # Initial date (in martian sols ; =0 at Ls=0)
-day0=495
+day0=373
 
 # Initial local time (in hours, between 0 and 24)
 time=0.
@@ -24,7 +24,7 @@ output_sol=90
 psurf= 610
 # Reference dust opacity at 610 Pa, in the visible (true tau~tauref*psurf/610)
 tauvis=0.2
-latitude=58.0
+latitude=71.0
 # Albedo of bare ground
 albedo=0.2
 # Soil thermal inertia (SI)

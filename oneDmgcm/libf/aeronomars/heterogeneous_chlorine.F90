@@ -29,20 +29,24 @@ REAL press(nlayermx)   ! Pressure [Pa]
 
 ! Output [2nd order rate coefficients]
 ! ------------------------------------
+! HOx Uptake Source : M. Tang et al.: Heterogeneous reactions of mineral dust aerosol
 real dust001(nlayermx) ! OH + dust -> ClOx + product 
-real, parameter :: d1_up_gamma =2.E-1
+real, parameter :: d1_up_gamma =0.1399
 real d1_up
 real dust002(nlayermx) ! HO2 + dust -> ClOx + product 
-real, parameter :: d2_up = 0.02
+real, parameter :: d2_up_gamma = 0.84
+real d2_up 
 real dust003(nlayermx) ! H2O + dust -> ClOx + product
 real, parameter :: d3_up = 0.
 real dust004(nlayermx) ! Cl + dust -> Products 
-real, parameter :: d4_up = 1.e-1
-real, dust005(nlayermx) ! HCl + dust -> Products
-real, parameter :: d5_up = 13.e-1 
+real, parameter :: d4_up = 0.
+! HCl Uptake on CaCO3 : https://doi.org/10.1021/jp056312b
+real dust005(nlayermx) ! HCl + dust -> Products
+real, parameter :: d5_up = 0.07
 
+! HCl Ice Uptake Source : https://doi.org/10.1002/bbpc.19981020704
 real ice001(nlayermx)  ! HCl + ice -> Products
-real, parameter :: i1_up = 0.6 
+real, parameter :: i1_up = 0.1
 real ice002(nlayermx)  ! Cl2 + ice -> products
 real, parameter :: i2_up = 0.!1.e-4
 real ice003(nlayermx)  ! OClO + ice -> Products
@@ -71,7 +75,7 @@ REAL v_therm           ! Thermal velocity of molecule
 
 ! Dust Parameters
 ! ---------------
-REAL, PARAMETER :: dust_density = 1.5 ! g/cm^3
+REAL, PARAMETER :: dust_density = 1.6 ! g/cm^3
 REAL, PARAMETER :: ice_density = 0.9167 ! g/cm^3
 REAL, PARAMETER :: NA = 6.022e23 ! Avogadro's constant 
 
@@ -296,6 +300,7 @@ DO l = 1, nlayermx ! Altitude step loop
 
     ! 2.2.2 : Rate
     ! ------------
+	d2_up = d2_up_gamma/( 18.7 + RH**1.1 ) 
     dust002(l) = 0.25*d2_up*dustsurf*v_therm
 
     ! -------------------------------

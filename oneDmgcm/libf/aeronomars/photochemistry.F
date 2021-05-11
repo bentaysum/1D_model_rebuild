@@ -788,22 +788,10 @@ c     ================
       real ice003(nlayermx)  ! OClO + ice -> Products
       real ice004(nlayermx)  ! ClO + ice -> Products 
 
-c     Dust Parameters
-c     ===============
-      real dustradius
-      parameter ( dustradius = 1.5e-6 ) ! meters
-      real dustdens 
-      parameter ( dustdens = 2.5e3) ! kg/m3
-      real dust_clwt
-      parameter ( dust_clwt = 0.5 ) ! Chlorine weight % in soil
-
+  
 c     Chlorine Production Parameters
 c     ==============================
       REAL Chlorine_QSSA
-
-
-      real clox_prod
-      parameter( clox_prod = 1.E9)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     tracer numbering in the chemistry
