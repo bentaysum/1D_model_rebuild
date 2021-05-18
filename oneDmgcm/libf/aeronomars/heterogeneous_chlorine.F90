@@ -31,10 +31,10 @@ REAL press(nlayermx)   ! Pressure [Pa]
 ! ------------------------------------
 ! HOx Uptake Source : M. Tang et al.: Heterogeneous reactions of mineral dust aerosol
 real dust001(nlayermx) ! OH + dust -> ClOx + product 
-real, parameter :: d1_up_gamma =0.1399
+real, parameter :: d1_up_gamma =0.2
 real d1_up
 real dust002(nlayermx) ! HO2 + dust -> ClOx + product 
-real, parameter :: d2_up_gamma = 0.84
+real, parameter :: d2_up_gamma = 1.2
 real d2_up 
 real dust003(nlayermx) ! H2O + dust -> ClOx + product
 real, parameter :: d3_up = 0.
@@ -42,11 +42,23 @@ real dust004(nlayermx) ! Cl + dust -> Products
 real, parameter :: d4_up = 0.
 ! HCl Uptake on CaCO3 : https://doi.org/10.1021/jp056312b
 real dust005(nlayermx) ! HCl + dust -> Products
-real, parameter :: d5_up = 0.07
+real, parameter :: d5_up = 0.03
 
 ! HCl Ice Uptake Source : https://doi.org/10.1002/bbpc.19981020704
-real ice001(nlayermx)  ! HCl + ice -> Products
-real, parameter :: i1_up = 0.1
+! ----------------------------------------------------------------
+! real ice001(nlayermx)  ! HCl + ice -> Products
+! real, parameter :: i1_up = 0.1
+
+! Temperature dependent ice :  https://doi.org/10.1029/2000GL012706
+real ice001(nlayermx)
+real, parameter :: i1_alpha = 0.9
+real i1_up
+! Constants for the Mediated Precursor Model
+real, parameter :: Ades = 1.e13 
+real, parameter :: delta_E = 30.5e3
+real, parameter :: Ar = 1.2E4
+real denominator 
+
 real ice002(nlayermx)  ! Cl2 + ice -> products
 real, parameter :: i2_up = 0.!1.e-4
 real ice003(nlayermx)  ! OClO + ice -> Products
@@ -279,7 +291,6 @@ DO l = 1, nlayermx ! Altitude step loop
     ! 2.1.4 : Uptake Coefficient
     ! --------------------------
     d1_up = d1_up_gamma/(1. + RH**0.36)
-
     ! 2.1.5 : Mean Thermal Velocity of OH
     ! -----------------------------------
     v_therm = 1.e7*(8./pi)*kb*temp(l)*NA/mmol(igcm_oh)
@@ -302,7 +313,6 @@ DO l = 1, nlayermx ! Altitude step loop
     ! ------------
 	d2_up = d2_up_gamma/( 18.7 + RH**1.1 ) 
     dust002(l) = 0.25*d2_up*dustsurf*v_therm
-
     ! -------------------------------
     ! 2.3 : H2O + Dust -> ClOx + Dust 
     ! -------------------------------
@@ -345,8 +355,11 @@ DO l = 1, nlayermx ! Altitude step loop
 		
     ! 2.5.2 : Rate
     ! ------------
+	denominator = 1. + (Ades/Ar)*EXP( -delta_E/(8.314*temp(l)) )
+	i1_up = i1_alpha/denominator
+	
+	
     ice001(l) = 0.25*i1_up*icesurf*v_therm
-
     ! ----------------------------
     ! 2.6 : Cl2 + Ice -> Products
     ! ----------------------------

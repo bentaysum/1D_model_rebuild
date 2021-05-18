@@ -108,7 +108,7 @@ REAL dust_masscon, ice_masscon ! Mass Concentrations
  
 REAL airdens ! Density of Air parcel 
  
-REAL,PARAMETER :: dustdens = 1.5 ! Dust Density (g cm-3) 
+REAL,PARAMETER :: dustdens = 1.6 ! Dust Density (g cm-3) 
 REAL,PARAMETER :: icedens = 0.9168  ! Ice density (g m-3)
 
 
@@ -117,7 +117,7 @@ REAL,PARAMETER :: icedens = 0.9168  ! Ice density (g m-3)
 ! ------------------------------
 ! Stage 1 : Reading TGO Profiles
 ! ------------------------------
-OPEN( UNIT = dust_ice_ID , FILE = TRIM(NOMAD_ACS_DIR) // "/DUST_ICE/ZONAL_MEAN_AEROSOLS/" // &
+OPEN( UNIT = dust_ice_ID , FILE = TRIM(NOMAD_ACS_DIR) // "/DUST_ICE/Gridded_Data/" // &
 								  TRIM(NOMAD_DUST_FILE) // ".txt", ACTION = "READ" )
 
 OPEN( UNIT = h2o_ID, FILE = TRIM(NOMAD_ACS_DIR) // "/H2O/Gridded/" // &
