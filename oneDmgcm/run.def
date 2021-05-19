@@ -15,7 +15,7 @@ day_step=48
 ndt=100
 
 # Number of sols to run prior to output
-output_sol=97
+output_sol=90
 
 
 #### Physical parameters
